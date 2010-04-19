@@ -1,6 +1,5 @@
 #ifndef RootTupleMakerV2Tree
 #define RootTupleMakerV2Tree
-// DONT'USE _ IN THE NAMES ABOVE
 
 /** \class RootTupleMakerV2_Tree
  * 
@@ -11,8 +10,8 @@
  *  tree of the selected variables, which it obtains from the EDM
  *  tree.  
  *
- *  $Date: 2010/03/16 14:44:38 $
- *  $Revision: 1.4 $
+ *  $Date: 2010/04/15 18:34:08 $
+ *  $Revision: 1.1 $
  *  \author Burt Betchart - University of Rochester <burton.andrew.betchart@cern.ch>
  */
 
@@ -29,7 +28,7 @@
 #include <TH1I.h>
 
 class RootTupleMakerV2_Tree : public edm::EDAnalyzer {
-private:    
+private:
   virtual void beginJob();
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob(){}

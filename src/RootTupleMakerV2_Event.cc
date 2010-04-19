@@ -8,9 +8,8 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
   produces <unsigned int> ( "bunch" );
   produces <unsigned int> ( "ls"    );
   produces <unsigned int> ( "orbit" );
-  produces <double>       ( "time" );   
-  produces <bool>         ( "isData" );   
-  //  produces <std::vector<std::string> > ( "Test" );
+  produces <double>       ( "time" );
+  produces <bool>         ( "isData" );
 }
 
 void RootTupleMakerV2_Event::

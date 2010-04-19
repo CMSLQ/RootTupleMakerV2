@@ -20,6 +20,7 @@
    <use name=DataFormats/METReco>
    <use name=DataFormats/MuonDetId>
    <use name=DataFormats/MuonReco>
+   <use name=DataFormats/PatCandidates>
    <use name=DataFormats/RecoCandidate>
    <use name=DataFormats/RPCRecHit>
    <use name=DataFormats/SiPixelDigi>
@@ -49,32 +50,4 @@
    <use name=TrackingTools/Records>
 <flags EDM_PLUGIN=1>
 <export>
-   <lib name=LeptoquarksRootTupleMakerV2>
-   <use name=DataFormats/CaloTowers>
-   <use name=DataFormats/Common>
-   <use name=DataFormats/CSCDigi>
-   <use name=DataFormats/CSCRecHit>
-   <use name=CondFormats/L1TObjects>
-   <use name=CondFormats/DataRecord>
-   <use name=DataFormats/DetId>
-   <use name=DataFormats/EcalDetId>
-   <use name=DataFormats/EcalRecHit>	
-   <use name=DataFormats/EgammaCandidates>
-   <use name=DataFormats/EgammaReco>
-   <use name=DataFormats/GeometryVector>
-   <use name=DataFormats/HcalDetId>
-   <use name=DataFormats/HcalRecHit>
-   <use name=DataFormats/HepMCCandidate>
-   <use name=DataFormats/JetReco>
-   <use name=DataFormats/Math>
-   <use name=DataFormats/METReco>
-   <use name=DataFormats/MuonDetId>	
-   <use name=DataFormats/MuonReco>
-   <use name=DataFormats/RecoCandidate>
-   <use name=DataFormats/RPCRecHit>
-   <use name=DataFormats/SiPixelDigi>
-   <use name=DataFormats/TrackReco>
-   <use name=DataFormats/VertexReco>
-   <use name=Geometry/CSCGeometry>
-   <use name=root>
 </export>

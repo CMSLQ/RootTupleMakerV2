@@ -26,9 +26,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(inputTag, mets);
 
   if(mets.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_METInfo") << "total # METs: " << mets->size();
+    edm::LogInfo("RootTupleMakerV2_METInfo") << "Total # METs: " << mets->size();
 
-    for( std::vector<pat::MET>::const_iterator it = mets->begin(); it != mets->end();++it ) {
+    for( std::vector<pat::MET>::const_iterator it = mets->begin(); it != mets->end(); ++it ) {
 
       // fill in all the vectors
       met->push_back( it->pt() );

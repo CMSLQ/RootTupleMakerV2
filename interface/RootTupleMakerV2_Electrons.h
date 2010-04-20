@@ -1,5 +1,5 @@
 #ifndef RootTupleMakerV2Electrons
-#define RootTupleMakerV2electrons
+#define RootTupleMakerV2Electrons
 
 #include "FWCore/Framework/interface/EDProducer.h"
 

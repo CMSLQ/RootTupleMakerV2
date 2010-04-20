@@ -39,7 +39,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "SCEta" + suffix );
   produces <std::vector<double> > ( prefix + "SCPhi" + suffix );
   produces <std::vector<double> > ( prefix + "SCPt" + suffix );
-  produces <std::vector<double> > ( prefix + "SCRawEnergy" + suffix );;
+  produces <std::vector<double> > ( prefix + "SCRawEnergy" + suffix );
 }
 
 void RootTupleMakerV2_Electrons::
@@ -76,9 +76,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(inputTag, electrons);
 
   if(electrons.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "total # Electrons: " << electrons->size();
+    edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Electrons: " << electrons->size();
 
-    for( std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end();++it ) {
+    for( std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it ) {
       // exit from loop when you reach the required number of electrons
       if(eta->size() > maxSize)
         break;
@@ -137,7 +137,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       ecalIso->push_back( it->ecalIso() );
       hcalIso->push_back( it->hcalIso() );
       relIso->push_back( reliso );
-      passIso->push_back( ((reliso<electronIso) ? 1 : 0) );
+      passIso->push_back( (reliso<electronIso) ? 1 : 0 );
       // SC associated with electron
       scEta->push_back( it->superCluster()->eta() );
       scPhi->push_back( it->superCluster()->phi() );

@@ -64,9 +64,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel("offlineBeamSpot", beamSpot );
 
   if(muons.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "total # Muons: " << muons->size();
+    edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Muons: " << muons->size();
 
-    for( std::vector<pat::Muon>::const_iterator it = muons->begin(); it != muons->end();++it ) {
+    for( std::vector<pat::Muon>::const_iterator it = muons->begin(); it != muons->end(); ++it ) {
       // exit from loop when you reach the required number of muons
       if(eta->size() > maxSize)
         break;
@@ -96,8 +96,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hcalIso->push_back( it->hcalIso() );
       hoIso->push_back( it->isolationR03().hoEt );
       relIso->push_back( reliso );
-      passIso->push_back( ((reliso<muonIso) ? 1 : 0) );
-      passID->push_back( ((it->muonID(muonID)) ? 1 : 0) );
+      passIso->push_back( (reliso<muonIso) ? 1 : 0 );
+      passID->push_back( (it->muonID(muonID)) ? 1 : 0 );
     }
   } else {
     edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << inputTag;

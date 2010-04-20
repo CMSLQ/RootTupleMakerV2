@@ -67,9 +67,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(inputTag, jets);
 
   if(jets.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_CaloJetsInfo") << "total # CaloJets: " << jets->size();
+    edm::LogInfo("RootTupleMakerV2_CaloJetsInfo") << "Total # CaloJets: " << jets->size();
 
-    for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end();++it ) {
+    for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it ) {
       // exit from loop when you reach the required number of jets
       if(eta->size() > maxSize)
         break;

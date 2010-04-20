@@ -36,7 +36,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       sumet->push_back( it->sumEt() );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_METError") << "Error! can't get the product " << inputTag;
+    edm::LogError("RootTupleMakerV2_METError") << "Error! Can't get the product " << inputTag;
   }
 
   // put vectors in the event

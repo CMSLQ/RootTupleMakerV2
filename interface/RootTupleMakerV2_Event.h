@@ -1,12 +1,7 @@
 #ifndef RootTupleMakerV2Event
 #define RootTupleMakerV2Event
 
-#include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Framework/interface/EDProducer.h"
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "TString.h"
-#include <fstream>
-#include <iostream>
 
 class RootTupleMakerV2_Event : public edm::EDProducer {
  public: 

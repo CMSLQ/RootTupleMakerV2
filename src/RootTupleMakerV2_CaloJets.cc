@@ -10,11 +10,11 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    maxSize (iConfig.getParameter<unsigned int>          ("MaxSize")),
-    electronPt_ (iConfig.getParameter<double>      ("ElectronPt")),
-    electronIso_ (iConfig.getParameter<double>      ("ElectronIso")),
-    muonPt_ (iConfig.getParameter<double>      ("MuonPt")),
-    muonIso_ (iConfig.getParameter<double>      ("MuonIso"))
+    maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
+    electronPt (iConfig.getParameter<double>    ("ElectronPt")),
+    electronIso (iConfig.getParameter<double>   ("ElectronIso")),
+    muonPt (iConfig.getParameter<double>        ("MuonPt")),
+    muonIso (iConfig.getParameter<double>       ("MuonIso"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -47,7 +47,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pt_raw  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy_raw ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     overlaps_vect ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >     overlaps ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  emf  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  resEmf  ( new std::vector<double>()  );
@@ -70,11 +70,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogInfo("RootTupleMakerV2_CaloJetsInfo") << "total # CaloJets: " << jets->size();
 
     for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end();++it ) {
-      //exit from loop when you reach the required number of its
+      // exit from loop when you reach the required number of jets
       if(eta->size() > maxSize)
         break;
       
-      int overlaps = 0;
+      int ovrlps = 0;
       /* overlaps with good electrons (with different electron IDs) and muons are handled bitwise
          bit 0: eidRobustLoose
          bit 1: eidRobustTight
@@ -88,34 +88,34 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       for (size_t i = 0; i < electrons.size(); ++i) {
         // try to cast into pat::Electron
         const pat::Electron *electron = dynamic_cast<const pat::Electron *>(&*electrons[i]);
-        if (electron) {
-           if (electron->electronID("eidRobustLoose")>0. 
-               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso_
-               && electron->pt()>electronPt_) overlaps = overlaps | 1<<0;
-           if (electron->electronID("eidRobustTight")>0. 
-               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso_
-               && electron->pt()>electronPt_) overlaps = overlaps | 1<<1;
-           if (electron->electronID("eidLoose")>0. 
-               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso_
-               && electron->pt()>electronPt_) overlaps = overlaps | 1<<2;
-           if (electron->electronID("eidTight")>0. 
-               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso_
-               && electron->pt()>electronPt_) overlaps = overlaps | 1<<3;
-           if (electron->electronID("eidRobustHighEnergy")>0. 
-               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso_
-               && electron->pt()>electronPt_) overlaps = overlaps | 1<<4;
-           if (electron->userInt("HEEPId")==0
-               && electron->pt()>electronPt_) overlaps = overlaps | 1<<5;
+        if(electron) {
+          if( electron->electronID("eidRobustLoose")>0. 
+              && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
+              && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<0;
+          if( electron->electronID("eidRobustTight")>0. 
+              && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
+              && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<1;
+          if( electron->electronID("eidLoose")>0. 
+              && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
+              && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<2;
+          if( electron->electronID("eidTight")>0. 
+              && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
+              && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<3;
+          if( electron->electronID("eidRobustHighEnergy")>0. 
+              && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
+              && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<4;
+          if( electron->userInt("HEEPId")==0
+               && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<5;
         }
       }
       const reco::CandidatePtrVector & muons = it->overlaps("muons");
       for (size_t i = 0; i < muons.size(); ++i) {
         // try to cast into pat::Muon
         const pat::Muon *muon = dynamic_cast<const pat::Muon *>(&*muons[i]);
-        if (muon) {
-           if (muon->muonID("GlobalMuonPromptTight") 
-               && ((muon->trackIso()+muon->ecalIso()+muon->hcalIso())/muon->pt())<muonIso_
-               && muon->pt()>muonPt_) overlaps = overlaps | 1<<6;
+        if(muon) {
+          if( muon->muonID("GlobalMuonPromptTight") 
+              && ((muon->trackIso()+muon->ecalIso()+muon->hcalIso())/muon->pt())<muonIso
+              && muon->pt()>muonPt ) ovrlps = ovrlps | 1<<6;
         }
       }
       // fill in all the vectors
@@ -125,7 +125,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pt_raw->push_back( it->correctedJet("raw").pt() );
       energy->push_back( it->energy() );
       energy_raw->push_back( it->correctedJet("raw").energy() );
-      overlaps_vect->push_back( overlaps );
+      overlaps->push_back( ovrlps );
       partonFlavour->push_back( it->partonFlavour() );
       emf->push_back( it->emEnergyFraction() );
       resEmf->push_back( it->jetID().restrictedEMF );
@@ -141,7 +141,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       bProbabilityBTag->push_back( it->bDiscriminator("itBProbabilityBJetTags") );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! can't get the product " << inputTag;
+    edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;
   }
 
   // put vectors in the event
@@ -151,7 +151,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pt_raw, prefix + "PtRaw" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( energy_raw, prefix + "EnergyRaw" + suffix );
-  iEvent.put( overlaps_vect, prefix + "Overlaps" + suffix );
+  iEvent.put( overlaps, prefix + "Overlaps" + suffix );
   iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );
   iEvent.put( emf, prefix + "EMF" + suffix );
   iEvent.put( resEmf, prefix + "resEMF" + suffix );

@@ -103,6 +103,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << inputTag;
   }
 
+  //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );

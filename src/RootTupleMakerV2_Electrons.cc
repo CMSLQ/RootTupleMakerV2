@@ -83,7 +83,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if(eta->size() > maxSize)
         break;
 
-      //if electron is not ECAL driven, continue
+      // if electron is not ECAL driven, continue
       if(!it->ecalDrivenSeed())
         continue;
 
@@ -148,6 +148,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << inputTag;
   }
 
+  //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );

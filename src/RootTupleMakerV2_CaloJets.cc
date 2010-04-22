@@ -89,19 +89,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // try to cast into pat::Electron
         const pat::Electron *electron = dynamic_cast<const pat::Electron *>(&*electrons[i]);
         if(electron) {
-          if( electron->electronID("eidRobustLoose")>0. 
+          if( electron->electronID("eidRobustLoose")>0.
               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
               && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<0;
-          if( electron->electronID("eidRobustTight")>0. 
+          if( electron->electronID("eidRobustTight")>0.
               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
               && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<1;
-          if( electron->electronID("eidLoose")>0. 
+          if( electron->electronID("eidLoose")>0.
               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
               && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<2;
-          if( electron->electronID("eidTight")>0. 
+          if( electron->electronID("eidTight")>0.
               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
               && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<3;
-          if( electron->electronID("eidRobustHighEnergy")>0. 
+          if( electron->electronID("eidRobustHighEnergy")>0.
               && ((electron->trackIso()+electron->ecalIso()+electron->hcalIso())/electron->pt())<electronIso
               && electron->pt()>electronPt ) ovrlps = ovrlps | 1<<4;
           if( electron->userInt("HEEPId")==0
@@ -144,6 +144,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;
   }
 
+  //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );

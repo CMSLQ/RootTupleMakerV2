@@ -9,8 +9,8 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
-    inputTagL1(iConfig.getParameter<edm::InputTag>("InputTagL1")),
-    inputTagHLT(iConfig.getParameter<edm::InputTag>("InputTagHLT")),
+    l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
+    hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
     hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest"))
 {
   produces <std::vector<int> > ( "L1PhysBits" );
@@ -29,10 +29,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
-  iEvent.getByLabel(inputTagL1, l1GtReadoutRecord);
+  iEvent.getByLabel(l1InputTag, l1GtReadoutRecord);
 
   if(l1GtReadoutRecord.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << inputTagL1;
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1InputTag;
 
     for (unsigned int i = 0; i < NmaxL1AlgoBit; ++i) {
       l1physbits->push_back( l1GtReadoutRecord->decisionWord()[i] ? 1 : 0 );
@@ -41,14 +41,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       l1techbits->push_back( l1GtReadoutRecord->technicalTriggerWord()[i] ? 1 : 0 );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << inputTagL1;
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << l1InputTag;
   }
 
   edm::Handle<edm::TriggerResults> triggerResults;
-  iEvent.getByLabel(inputTagHLT, triggerResults);
+  iEvent.getByLabel(hltInputTag, triggerResults);
 
   if(triggerResults.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << inputTagHLT;
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << hltInputTag;
 
     for( unsigned int i = 0; i < triggerResults->size(); i++ ){
       hltbits->push_back( triggerResults->at(i).accept() ? 1 : 0 );
@@ -68,9 +68,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hltresults->push_back( fired );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << inputTagHLT;
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << hltInputTag;
   }
 
+  //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( l1physbits, "L1PhysBits" );
   iEvent.put( l1techbits, "L1TechBits" );

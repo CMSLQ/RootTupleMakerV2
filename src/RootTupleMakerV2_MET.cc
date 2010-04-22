@@ -39,6 +39,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_METError") << "Error! Can't get the product " << inputTag;
   }
 
+  //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( met, prefix + "MET" + suffix );
   iEvent.put( metphi, prefix + "METPhi" + suffix );

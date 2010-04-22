@@ -9,6 +9,7 @@ DEFINE_SEAL_MODULE();
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Electrons.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_MET.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Muons.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_SuperClusters.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Trigger.h"
 
 DEFINE_ANOTHER_FWK_MODULE(RootTupleMakerV2_Tree);
@@ -17,4 +18,5 @@ DEFINE_ANOTHER_FWK_MODULE(RootTupleMakerV2_CaloJets);
 DEFINE_ANOTHER_FWK_MODULE(RootTupleMakerV2_Electrons);
 DEFINE_ANOTHER_FWK_MODULE(RootTupleMakerV2_MET);
 DEFINE_ANOTHER_FWK_MODULE(RootTupleMakerV2_Muons);
+DEFINE_ANOTHER_FWK_MODULE(RootTupleMakerV2_SuperClusters);
 DEFINE_ANOTHER_FWK_MODULE(RootTupleMakerV2_Trigger);

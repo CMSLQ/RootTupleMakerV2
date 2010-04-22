@@ -27,10 +27,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<unsigned int >  orbit ( new unsigned int(iEvent.orbitNumber()     ) );
   std::auto_ptr<double >        time  ( new double(sec+usec/conv));
 
-  std::auto_ptr<bool >        isdata  ( new bool(iEvent.isRealData()));
+  std::auto_ptr<bool >          isdata  ( new bool(iEvent.isRealData()));
 
   //-----------------------------------------------------------------
-
   iEvent.put( run,   "run"   );
   iEvent.put( event, "event" );
   iEvent.put( ls   , "ls"    );

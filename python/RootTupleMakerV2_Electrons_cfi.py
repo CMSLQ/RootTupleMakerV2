@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Electrons",
+rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     InputTag = cms.InputTag('cleanPatElectrons'),
     Prefix = cms.string('Electron'),
     Suffix = cms.string(''),

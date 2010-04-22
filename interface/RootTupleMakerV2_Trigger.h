@@ -9,7 +9,7 @@ class RootTupleMakerV2_Trigger : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTagL1, inputTagHLT;
+  const edm::InputTag   l1InputTag, hltInputTag;
   const std::vector<std::string> hltPathsOfInterest;
 };
 

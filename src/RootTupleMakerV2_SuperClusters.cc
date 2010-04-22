@@ -345,6 +345,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       scE1E9->push_back( emax/e9 );
       scS4S1->push_back( (eright+eleft+etop+ebottom)/emax );
+
+      reco::SuperClusterRef eleSCRef = it->superCluster();  // get SCRef to use to make ele candidate
+      TVector3 sc_vec;
+      sc_vec.SetXYZ(eleSCRef->x(),eleSCRef->y(),eleSCRef->z());
+      double eleSCRefpt = eleSCRef->energy()*(sc_vec.Perp()/sc_vec.Mag());
+      reco::RecoEcalCandidate ecalCand;  // make ele candidate to use Iso algorithm
+      ecalCand.setSuperCluster(eleSCRef);
+      const reco::Candidate::PolarLorentzVector photon_vec(eleSCRefpt, eleSCRef->eta(), eleSCRef->phi(), 0.0);
+      ecalCand.setP4( photon_vec );
+      if (fabs(eleSCRef->eta())<1.48) scEcalIso->push_back( ecalBarrelIsol.getEtSum(&ecalCand) );
+      else scEcalIso->push_back( ecalEndcapIsol.getEtSum(&ecalCand) );
+      if (fabs(eleSCRef->eta())<1.48) scHEEPEcalIso->push_back( HeepEcalBarrelIsol.getEtSum(&ecalCand) );
+      else scHEEPEcalIso->push_back( HeepEcalEndcapIsol.getEtSum(&ecalCand) );
+      scHEEPTrkIso->push_back( TrackTool.getPtTracks(&ecalCand) );
     }
   } else {
     edm::LogError("RootTupleMakerV2_SuperClustersError") << "Error! Can't get the product " << eleInputTag;

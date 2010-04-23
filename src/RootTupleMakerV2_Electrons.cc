@@ -118,7 +118,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
-      trackPt->push_back( it->track()->pt() );
+      trackPt->push_back( it->gsfTrack()->pt() );
       energy->push_back( it->energy() );
       caloEnergy->push_back( it->caloEnergy() );
       charge->push_back( it->charge() );

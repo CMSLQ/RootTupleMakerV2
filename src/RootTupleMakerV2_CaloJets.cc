@@ -138,7 +138,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       trackCountingHighEffBTag->push_back( it->bDiscriminator("trackCountingHighEffBJetTags") );
       simpleSecondaryVertexBTag->push_back( it->bDiscriminator("simpleSecondaryVertexBJetTag") );
       softMuonByPtBTag->push_back( it->bDiscriminator("softMuonByPtBJetTags") );
-      bProbabilityBTag->push_back( it->bDiscriminator("itBProbabilityBJetTags") );
+      bProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
     }
   } else {
     edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;

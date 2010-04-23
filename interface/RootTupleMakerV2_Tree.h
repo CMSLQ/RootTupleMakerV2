@@ -2,16 +2,16 @@
 #define RootTupleMakerV2Tree
 
 /** \class RootTupleMakerV2_Tree
- * 
+ *
  *  Makes a tree out of C++ standard types and vectors of C++ standard types
  *
  *  This class, which is an EDAnalyzer, takes the same "keep" and
  *  "drop" outputCommands parameter as the PoolOutputSource, making a
  *  tree of the selected variables, which it obtains from the EDM
- *  tree.  
+ *  tree.
  *
- *  $Date: 2010/04/15 18:34:08 $
- *  $Revision: 1.1 $
+ *  $Date: 2010/04/19 20:08:08 $
+ *  $Revision: 1.2 $
  *  \author Burt Betchart - University of Rochester <burton.andrew.betchart@cern.ch>
  */
 
@@ -38,7 +38,7 @@ private:
     virtual ~BranchConnector() {};
     virtual void connect(const edm::Event&) = 0;
   };
-  
+
   template <class T>
   class TypedBranchConnector : public BranchConnector {
   private:
@@ -59,14 +59,14 @@ private:
 
 public:
   explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) : pset(iConfig) {}
-  
-  enum LEAFTYPE {BOOL=1,  BOOL_V,          
-		 SHORT,   SHORT_V,           U_SHORT, U_SHORT_V,       
-		 INT,     INT_V,             U_INT,   U_INT_V,
-		 FLOAT,   FLOAT_V,           DOUBLE,  DOUBLE_V,
-		 LONG,    LONG_V,	     U_LONG,  U_LONG_V, 
-		 STRING,  STRING_V
-		 };
+
+  enum LEAFTYPE {BOOL=1,  BOOL_V,
+                 SHORT,   SHORT_V,           U_SHORT, U_SHORT_V,
+                 INT,     INT_V,             U_INT,   U_INT_V,
+                 FLOAT,   FLOAT_V,           DOUBLE,  DOUBLE_V,
+                 LONG,    LONG_V,            U_LONG,  U_LONG_V,
+                 STRING,  STRING_V
+                 };
 };
 
 #endif

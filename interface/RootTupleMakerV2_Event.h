@@ -4,10 +4,10 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 
 class RootTupleMakerV2_Event : public edm::EDProducer {
- public: 
+ public:
   explicit RootTupleMakerV2_Event(const edm::ParameterSet&);
 
- private: 
+ private:
   void produce( edm::Event &, const edm::EventSetup & );
 };
 

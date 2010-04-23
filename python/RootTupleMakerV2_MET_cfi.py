@@ -6,14 +6,14 @@ rootTupleCaloMET = cms.EDProducer("RootTupleMakerV2_MET",
     Suffix = cms.string('')
 )
 
-rootTupleTcMET = cms.EDProducer("RootTupleMakerV2_MET",
+rootTupleTCMET = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('patMETsTC'),
-    Prefix = cms.string('Tc'),
+    Prefix = cms.string('TC'),
     Suffix = cms.string('')
 )
 
-rootTuplePfMET = cms.EDProducer("RootTupleMakerV2_MET",
+rootTuplePFMET = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('patMETsPF'),
-    Prefix = cms.string('Pf'),
+    Prefix = cms.string('PF'),
     Suffix = cms.string('')
 )

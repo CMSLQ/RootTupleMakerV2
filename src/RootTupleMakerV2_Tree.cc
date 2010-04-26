@@ -1,6 +1,6 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Tree.h"
 
-#include "FWCore/Framework/interface/ConstProductRegistry.h" 
+#include "FWCore/Framework/interface/ConstProductRegistry.h"
 #include "FWCore/Framework/interface/GroupSelector.h"
 #include "FWCore/Framework/interface/GroupSelectorRules.h"
 #include "DataFormats/Provenance/interface/Selections.h"
@@ -28,21 +28,21 @@ connect(const edm::Event& iEvent) {
 
 template <class T> 
 RootTupleMakerV2_Tree::TypedBranchConnector<T>::
-TypedBranchConnector(edm::BranchDescription const* desc, 
-		     std::string t, 
-		     TTree * tree)
-  :  ml( desc->moduleLabel() ),  
+TypedBranchConnector(edm::BranchDescription const* desc,
+                     std::string t,
+                     TTree * tree)
+  :  ml( desc->moduleLabel() ),
      pin( desc->productInstanceName() )
 {
-  object_ptr_ = &object_;  
-  std::string s=pin+t;  
+  object_ptr_ = &object_;
+  std::string s=pin+t;
   if(t!="")  { tree->Branch(pin.c_str(),  object_ptr_, s.c_str() );}  //raw type
   else       { tree->Branch(pin.c_str(), &object_ptr_            );}  //vector<type>
 }
 
 void RootTupleMakerV2_Tree::
 beginJob() {
-  tree = fs->make<TTree>("tree", ""); 
+  tree = fs->make<TTree>("tree", "");
 
   std::map<std::string, LEAFTYPE> leafmap;
   leafmap["bool"]      = BOOL;       leafmap["bools"]     = BOOL_V;
@@ -70,13 +70,13 @@ beginJob() {
 
       //Check for duplicate branch names
       if (branchnames.find( selection->productInstanceName()) != branchnames.end() ) {
-	throw edm::Exception(edm::errors::Configuration)
-	  << "More than one branch named: "
-	  << selection->productInstanceName() << std::endl
-	  << "Exception thrown from RootTupleMakerV2_Tree::beginJob" << std::endl;
+        throw edm::Exception(edm::errors::Configuration)
+          << "More than one branch named: "
+          << selection->productInstanceName() << std::endl
+          << "Exception thrown from RootTupleMakerV2_Tree::beginJob" << std::endl;
       }
       else {
-	branchnames.insert( selection->productInstanceName() );
+        branchnames.insert( selection->productInstanceName() );
       }
 
       //Create RootTupleMakerV2_Tree branch
@@ -99,27 +99,27 @@ beginJob() {
       case LONG_V   :  connectors.push_back( new TypedBranchConnector<std::vector          <long> >(selection,   "", tree) ); break;
       case U_LONG   :  connectors.push_back( new TypedBranchConnector             <unsigned long>  (selection, "/l", tree) ); break;
       case U_LONG_V :  connectors.push_back( new TypedBranchConnector<std::vector <unsigned long> >(selection,   "", tree) ); break;
-	//
+        //
       case STRING   :  connectors.push_back( new TypedBranchConnector             <std::string > (selection, "/ST", tree) ); break;
       case STRING_V :  connectors.push_back( new TypedBranchConnector<std::vector <std::string > > (selection,   "", tree) ); break;
 
-      default: 
-	{
-	  std::string leafstring = "";
-	  typedef std::pair<std::string, LEAFTYPE> pair_t;
-	  BOOST_FOREACH( const pair_t& leaf, leafmap) 
-	    leafstring+= "\t" + leaf.first + "\n";
+      default:
+        {
+          std::string leafstring = "";
+          typedef std::pair<std::string, LEAFTYPE> pair_t;
+          BOOST_FOREACH( const pair_t& leaf, leafmap)
+            leafstring+= "\t" + leaf.first + "\n";
 
-	  throw edm::Exception(edm::errors::Configuration)
-	    << "class RootTupleMakerV2_Tree does not handle leaves of type " << selection->className() << " like\n"
-	    <<   selection->friendlyClassName()   << "_" 
-	    <<   selection->moduleLabel()         << "_" 
-	    <<   selection->productInstanceName() << "_"  
-	    <<   selection->processName()         << std::endl
-	    << "Valid leaf types are (friendlyClassName):\n"
-	    <<   leafstring
-	    << "Exception thrown from RootTupleMakerV2_Tree::beginJob\n";
-	}
+          throw edm::Exception(edm::errors::Configuration)
+            << "class RootTupleMakerV2_Tree does not handle leaves of type " << selection->className() << " like\n"
+            <<   selection->friendlyClassName()   << "_"
+            <<   selection->moduleLabel()         << "_"
+            <<   selection->productInstanceName() << "_"
+            <<   selection->processName()         << std::endl
+            << "Valid leaf types are (friendlyClassName):\n"
+            <<   leafstring
+            << "Exception thrown from RootTupleMakerV2_Tree::beginJob\n";
+        }
       }
     }
   }

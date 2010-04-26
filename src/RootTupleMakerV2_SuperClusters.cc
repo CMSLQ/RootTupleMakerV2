@@ -1,12 +1,12 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_SuperClusters.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
+#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
-#include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"
@@ -184,8 +184,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     reco::SuperClusterRef tempSCRef(superClustersEBHandle,std::distance(superClustersEBHandle->begin(),it));  // get SCRef to use to make ele candidate
     reco::RecoEcalCandidate ecalCand;  // make ele candidate to use Iso algorithm
     ecalCand.setSuperCluster(tempSCRef);
-    const reco::Candidate::PolarLorentzVector photon_vec(scpt, it->eta(), it->phi(), 0.0);
-    ecalCand.setP4( photon_vec );
     ecalIso->push_back( ecalBarrelIsol.getEtSum(&ecalCand) );
     heepTrkIso->push_back( TrackTool.getPtTracks(&ecalCand) );
     heepEcalIso->push_back( HeepEcalBarrelIsol.getEtSum(&ecalCand) );

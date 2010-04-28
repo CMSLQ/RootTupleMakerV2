@@ -7,6 +7,7 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
@@ -17,7 +18,8 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
     vtxMaxd0(iConfig.getParameter<double>("VertexMaxd0")),
     trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
     noOfHPTracks(iConfig.getParameter<unsigned int>("NoOfHPTracks")),
-    hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold"))
+    hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
+    hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag"))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -25,6 +27,9 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("isBSCBeamHalo");
   produces <bool> ("isPrimaryVertex");
   produces <bool> ("isBeamScraping");
+  produces <bool> ("passLooseNoiseFilter");
+  produces <bool> ("passTightNoiseFilter");
+  produces <bool> ("passHighLevelNoiseFilter");
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -36,6 +41,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> isbscbeamhalo( new bool() );
   std::auto_ptr<bool> isprimaryvertex( new bool() );
   std::auto_ptr<bool> isbeamscraping( new bool() );
+  std::auto_ptr<bool> passloosenoisefilter( new bool() );
+  std::auto_ptr<bool> passtightnoisefilter( new bool() );
+  std::auto_ptr<bool> passhiglevelnoisefilter( new bool() );
 
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
@@ -43,6 +51,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *isbscbeamhalo.get() = false;
   *isprimaryvertex.get() = false;
   *isbeamscraping.get() = false;
+  *passloosenoisefilter.get() = false;
+  *passtightnoisefilter.get() = false;
+  *passhiglevelnoisefilter.get() = false;
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
@@ -111,6 +122,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << trkInputTag;
   }
 
+  // Hcal Noise Part
+  edm::Handle<HcalNoiseSummary> hcalNoise;
+  iEvent.getByLabel(hcalNoiseInputTag,hcalNoise);
+
+  if(hcalNoise.isValid()) {
+    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained " << hcalNoiseInputTag;;
+
+    *passloosenoisefilter.get() = hcalNoise->passHighLevelNoiseFilter();
+    *passtightnoisefilter.get() = hcalNoise->passTightNoiseFilter();
+    *passhiglevelnoisefilter.get() = hcalNoise->passLooseNoiseFilter();
+  } else {
+    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << hcalNoiseInputTag;
+  }
+
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
   iEvent.put(isbptx0,"isBPTX0");
@@ -118,4 +143,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(isbscbeamhalo,"isBSCBeamHalo");
   iEvent.put(isprimaryvertex,"isPrimaryVertex");
   iEvent.put(isbeamscraping,"isBeamScraping");
+  iEvent.put(passloosenoisefilter,"passLooseNoiseFilter");
+  iEvent.put(passtightnoisefilter,"passTightNoiseFilter");
+  iEvent.put(passhiglevelnoisefilter,"passHighLevelNoiseFilter");
 }

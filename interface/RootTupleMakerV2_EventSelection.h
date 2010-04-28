@@ -15,6 +15,7 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
   const edm::InputTag   trkInputTag;
   const unsigned int    noOfHPTracks;
   const double          hpTrackThreshold;
+  const edm::InputTag   hcalNoiseInputTag;
 };
 
 #endif

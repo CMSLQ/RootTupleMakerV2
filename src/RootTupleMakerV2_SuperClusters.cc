@@ -41,9 +41,7 @@ RootTupleMakerV2_SuperClusters::RootTupleMakerV2_SuperClusters(const edm::Parame
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
   produces <std::vector<double> > ( prefix + "RawEnergy" + suffix );
-  produces <std::vector<double> > ( prefix + "EtaWidth" + suffix );
-  produces <std::vector<double> > ( prefix + "PhiWidth" + suffix );
-  produces <std::vector<int> > ( prefix + "ClustersSize" + suffix );
+  produces <std::vector<int> >    ( prefix + "ClustersSize" + suffix );
   produces <std::vector<double> > ( prefix + "HoE" + suffix );
   produces <std::vector<double> > ( prefix + "SigmaIEtaIEta" + suffix );
   produces <std::vector<double> > ( prefix + "EcalIso" + suffix );
@@ -74,8 +72,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  rawEnergy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  etaWidth  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phiWidth  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     clustersSize  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  hoe   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sigmaIEtaIEta  ( new std::vector<double>()  );
@@ -164,11 +160,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     phi->push_back( it->phi() );
     TVector3 sc_vec;
     sc_vec.SetXYZ(it->x(),it->y(),it->z());
-    double scpt = it->energy()*(sc_vec.Perp()/sc_vec.Mag());
-    pt->push_back( scpt );
+    pt->push_back( it->energy()*(sc_vec.Perp()/sc_vec.Mag()) );
     rawEnergy->push_back( it->rawEnergy() );
-    etaWidth->push_back( it->etaWidth() );
-    phiWidth->push_back( it->phiWidth() );
     clustersSize->push_back( it->clustersSize() );
 
     const reco::SuperCluster* pnt_sc = &(*it);
@@ -240,8 +233,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     sc_vec.SetXYZ(it->x(),it->y(),it->z());
     pt->push_back( it->energy()*(sc_vec.Perp()/sc_vec.Mag()) );
     rawEnergy->push_back( it->rawEnergy() );
-    etaWidth->push_back( it->etaWidth() );
-    phiWidth->push_back( it->phiWidth() );
     clustersSize->push_back( it->clustersSize() );
 
     const reco::SuperCluster* pnt_sc = &(*it);
@@ -368,8 +359,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
   iEvent.put( rawEnergy, prefix + "RawEnergy" + suffix );
-  iEvent.put( etaWidth, prefix + "EtaWidth" + suffix );
-  iEvent.put( phiWidth, prefix + "PhiWidth" + suffix );
   iEvent.put( clustersSize, prefix + "ClustersSize" + suffix );
   iEvent.put( hoe, prefix + "HoE" + suffix );
   iEvent.put( sigmaIEtaIEta, prefix + "SigmaIEtaIEta" + suffix );

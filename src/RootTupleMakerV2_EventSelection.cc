@@ -129,9 +129,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   if(hcalNoise.isValid()) {
     edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained " << hcalNoiseInputTag;;
 
-    *passloosenoisefilter.get() = hcalNoise->passHighLevelNoiseFilter();
+    *passloosenoisefilter.get() = hcalNoise->passLooseNoiseFilter();
     *passtightnoisefilter.get() = hcalNoise->passTightNoiseFilter();
-    *passhiglevelnoisefilter.get() = hcalNoise->passLooseNoiseFilter();
+    *passhiglevelnoisefilter.get() = hcalNoise->passHighLevelNoiseFilter();
   } else {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << hcalNoiseInputTag;
   }

@@ -158,15 +158,20 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     )
 )
 
-# Path definition
-process.reflagging_step = cms.Path(process.hfrecoReflagged)
-process.rereco_step = cms.Path(process.caloTowersRec*(process.recoJets*process.recoJetIds+process.recoTrackJets)*process.recoJetAssociations*process.btagging*process.metreco) # re-reco jets and MET
-process.p = cms.Path(
+# Filter sequence
+process.filterSequence = cms.Sequence(
     process.hltPhysicsDeclared*
     process.hltLevel1GTSeed*
     process.primaryVertexFilter*
     process.scrapingVeto*
-    process.LJFilter*
+    process.LJFilter
+)
+
+# Path definition
+process.reflagging_step = cms.Path(process.filterSequence*process.hfrecoReflagged)
+process.rereco_step = cms.Path(process.filterSequence*process.caloTowersRec*(process.recoJets*process.recoJetIds+process.recoTrackJets)*process.recoJetAssociations*process.btagging*process.metreco) # re-reco jets and MET
+process.p = cms.Path(
+    process.filterSequence*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+

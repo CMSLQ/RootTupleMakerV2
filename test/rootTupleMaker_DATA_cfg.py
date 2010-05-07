@@ -107,7 +107,7 @@ process.scrapingVeto = cms.EDFilter("FilterOutScraping",
     applyfilter = cms.untracked.bool(True),
     debugOn = cms.untracked.bool(False),
     numtrack = cms.untracked.uint32(10),
-    thresh = cms.untracked.double(0.2)
+    thresh = cms.untracked.double(0.25)
 )
 
 # Skim definition

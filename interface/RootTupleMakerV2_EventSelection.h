@@ -13,7 +13,7 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
   const unsigned int    vtxMinNDOF;
   const double          vtxMaxAbsZ, vtxMaxd0;
   const edm::InputTag   trkInputTag;
-  const unsigned int    noOfHPTracks;
+  const unsigned int    numTracks;
   const double          hpTrackThreshold;
   const edm::InputTag   hcalNoiseInputTag;
 };

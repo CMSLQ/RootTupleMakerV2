@@ -7,7 +7,7 @@ rootTupleEventSelection = cms.EDProducer("RootTupleMakerV2_EventSelection",
     VertexMaxAbsZ = cms.double(15.),
     VertexMaxd0 = cms.double(2.),
     TracksInputTag = cms.InputTag('generalTracks'),
-    NoOfHPTracks = cms.uint32(10),
+    NumTracks = cms.uint32(10),
     HPTrackThreshold = cms.double(0.25),
     HcalNoiseInputTag = cms.InputTag('hcalnoise')
 )

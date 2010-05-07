@@ -17,7 +17,7 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
     vtxMaxAbsZ(iConfig.getParameter<double>("VertexMaxAbsZ")),
     vtxMaxd0(iConfig.getParameter<double>("VertexMaxd0")),
     trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
-    noOfHPTracks(iConfig.getParameter<unsigned int>("NoOfHPTracks")),
+    numTracks(iConfig.getParameter<unsigned int>("NumTracks")),
     hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
     hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag"))
 {
@@ -109,11 +109,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     int numhighpurity = 0;
     double fraction = 1.;
-    reco::TrackBase::TrackQuality _trackQuality = reco::TrackBase::qualityByName("highPurity");
+    reco::TrackBase::TrackQuality trackQuality = reco::TrackBase::qualityByName("highPurity");
 
-    if( tracks->size() > noOfHPTracks ){ 
+    if( tracks->size() > numTracks ){
       for( reco::TrackCollection::const_iterator it=tracks->begin(); it!=tracks->end(); ++it ) {
-        if( it->quality(_trackQuality) ) numhighpurity++;
+        if( it->quality(trackQuality) ) numhighpurity++;
       }
       fraction = (double)numhighpurity/(double)tracks->size();
       if( fraction < hpTrackThreshold ) *isbeamscraping.get() = true;

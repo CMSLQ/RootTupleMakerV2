@@ -18,6 +18,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
+  //produces <std::vector<double> > ( prefix + "EtHeep" + suffix );
   produces <std::vector<double> > ( prefix + "TrackPt" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<double> > ( prefix + "CaloEnergy" + suffix );
@@ -29,6 +30,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "DeltaPhiTrkSC" + suffix );
   produces <std::vector<double> > ( prefix + "DeltaEtaTrkSC" + suffix );
   produces <std::vector<int> >    ( prefix + "Classif" + suffix );
+  produces <std::vector<double> > ( prefix + "E1x5OverE5x5" + suffix );
+  produces <std::vector<double> > ( prefix + "E2x5OverE5x5" + suffix );
   produces <std::vector<int> >    ( prefix + "HeepID" + suffix );
   produces <std::vector<int> >    ( prefix + "PassID" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIso" + suffix );
@@ -36,6 +39,10 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HcalIso" + suffix );
   produces <std::vector<double> > ( prefix + "RelIso" + suffix );
   produces <std::vector<int> >    ( prefix + "PassIso" + suffix );
+  produces <std::vector<double> > ( prefix + "EcalIsoHeep" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoD1Heep" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoD2Heep" + suffix );
+  produces <std::vector<double> > ( prefix + "TrkIsoHeep" + suffix );
   produces <std::vector<double> > ( prefix + "SCEta" + suffix );
   produces <std::vector<double> > ( prefix + "SCPhi" + suffix );
   produces <std::vector<double> > ( prefix + "SCPt" + suffix );
@@ -48,6 +55,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
+  //std::auto_ptr<std::vector<double> >  etHeep  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trackPt  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  caloEnergy  ( new std::vector<double>()  );
@@ -59,6 +67,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  deltaPhiTrkSC  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  deltaEtaTrkSC  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     classif  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  e1x5overe5x5  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  e2x5overe5x5  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     heepID  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     passID  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  trkIso   ( new std::vector<double>()  );
@@ -66,6 +76,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  hcalIso  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  relIso   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     passIso  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  ecalIsoHeep  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoD1Heep  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoD2Heep  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkIsoHeep  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scEta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPhi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPt  ( new std::vector<double>()  );
@@ -118,6 +132,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
+      //etHeep->push_back( it->caloEnergy()*sin( it->p4().theta() ) );
       trackPt->push_back( it->gsfTrack()->pt() );
       energy->push_back( it->energy() );
       caloEnergy->push_back( it->caloEnergy() );
@@ -130,6 +145,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       deltaPhiTrkSC->push_back( it->deltaPhiSuperClusterTrackAtVtx() );
       deltaEtaTrkSC->push_back( it->deltaEtaSuperClusterTrackAtVtx() );
       classif->push_back( it->classification() );
+      if( it->e5x5()>0 )
+	{
+	  e1x5overe5x5->push_back( double ( it->e1x5() / it->e5x5() ) );
+	  e2x5overe5x5->push_back( double ( it->e2x5Max() / it->e5x5() ) );
+	} 
       heepID->push_back( it->userInt("HEEPId") );
       passID->push_back( passId );
       // Iso variables
@@ -138,6 +158,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hcalIso->push_back( it->hcalIso() );
       relIso->push_back( reliso );
       passIso->push_back( (reliso<electronIso) ? 1 : 0 );
+      // Iso variables (Heep)
+      ecalIsoHeep->push_back( it->dr03EcalRecHitSumEt() );
+      hcalIsoD1Heep->push_back( it->dr03HcalDepth1TowerSumEt() );
+      hcalIsoD2Heep->push_back( it->dr03HcalDepth2TowerSumEt() );
+      trkIsoHeep->push_back( it->dr03TkSumPt() );
       // SC associated with electron
       scEta->push_back( it->superCluster()->eta() );
       scPhi->push_back( it->superCluster()->phi() );
@@ -153,6 +178,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
+  //iEvent.put( etHeep, prefix + "EtHeep" + suffix );
   iEvent.put( trackPt, prefix + "TrackPt" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( caloEnergy, prefix + "CaloEnergy" + suffix );
@@ -164,6 +190,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix );
   iEvent.put( deltaEtaTrkSC, prefix + "DeltaEtaTrkSC" + suffix );
   iEvent.put( classif, prefix + "Classif" + suffix );
+  iEvent.put( e1x5overe5x5, prefix + "E1x5OverE5x5" + suffix );
+  iEvent.put( e2x5overe5x5, prefix + "E2x5OverE5x5" + suffix );
   iEvent.put( heepID, prefix + "HeepID" + suffix );
   iEvent.put( passID, prefix + "PassID" + suffix );
   iEvent.put( trkIso, prefix + "TrkIso" + suffix );
@@ -171,6 +199,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( hcalIso, prefix + "HcalIso" + suffix );
   iEvent.put( relIso, prefix + "RelIso" + suffix );
   iEvent.put( passIso, prefix + "PassIso" + suffix );
+  iEvent.put( ecalIsoHeep, prefix + "EcalIsoHeep" + suffix );
+  iEvent.put( hcalIsoD1Heep, prefix + "HcalIsoD1Heep" + suffix );
+  iEvent.put( hcalIsoD2Heep, prefix + "HcalIsoD2Heep" + suffix );
+  iEvent.put( trkIsoHeep, prefix + "TrkIsoHeep" + suffix );
   iEvent.put( scEta, prefix + "SCEta" + suffix );
   iEvent.put( scPhi, prefix + "SCPhi" + suffix );
   iEvent.put( scPt, prefix + "SCPt" + suffix );

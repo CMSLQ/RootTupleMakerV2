@@ -3,7 +3,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 
 unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;

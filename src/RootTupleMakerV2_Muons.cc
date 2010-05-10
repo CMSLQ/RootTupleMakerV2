@@ -17,6 +17,7 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
+  produces <std::vector<double> > ( prefix + "P" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<int> >    ( prefix + "Charge" + suffix );
   produces <std::vector<int> >    ( prefix + "TrkHits" + suffix );
@@ -40,6 +41,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  p  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     charge  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     trkHits ( new std::vector<int>()  );
@@ -83,6 +85,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
+      p->push_back( it->p() );
       energy->push_back( it->energy() );
       charge->push_back( it->charge() );
       trkHits->push_back( it->track()->numberOfValidHits() );
@@ -108,6 +111,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
+  iEvent.put( p, prefix + "P" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( charge, prefix + "Charge" + suffix );
   iEvent.put( trkHits, prefix + "TrkHits" + suffix );

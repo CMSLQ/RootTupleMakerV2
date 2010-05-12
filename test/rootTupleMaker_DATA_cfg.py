@@ -7,7 +7,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
 process.MessageLogger.cerr.FwkReport.reportEvery = 10
-process.MessageLogger.cerr.default.limit = 100
+process.MessageLogger.cerr.default.limit = 10
 #################################################################
 
 # Load RootTupleMakerV2 modules
@@ -57,7 +57,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJetID      = False
 )
 
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
+#from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 # Run ak5 gen jets
 #run33xOnReRecoMC( process, "ak5GenJets")
 
@@ -89,11 +89,11 @@ process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
 process.load('HLTrigger.special.hltPhysicsDeclared_cfi')
 process.hltPhysicsDeclared.L1GtReadoutRecordTag = 'gtDigis'
 
-# BPTX & BSC triggers filter
+# BPTX and BSC triggers filter
 process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
 process.load('HLTrigger/HLTfilters/hltLevel1GTSeed_cfi')
 process.hltLevel1GTSeed.L1TechTriggerSeeding = cms.bool(True)
-process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND (40 OR 41) AND NOT (36 OR 37 OR 38 OR 39)')
+process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND NOT (36 OR 37 OR 38 OR 39)')
 
 # Primary vertex filter
 process.primaryVertexFilter = cms.EDFilter("VertexSelector",
@@ -115,8 +115,8 @@ process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
-process.LJFilter.muPT = 10.
-process.LJFilter.elecPT = 30.
+process.LJFilter.muPT = 15.
+process.LJFilter.elecPT = 15.
 
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
@@ -132,17 +132,31 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleSuperClusters_*_*',
-        'keep *_rootTupleTrigger_*_*'
+        'keep *_rootTupleTrigger_*_*',
+        'keep *_rootTupleGenEventInfo_*_*',
+        'keep *_rootTupleGenParticles_*_*',
+        'keep *_rootTupleGenJets_*_*'
+    )
+)
+
+# Produce PDF weights (maximum is 3)
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+    FixPOWHEG = cms.untracked.bool(False), # fix POWHEG (it requires cteq6m* PDFs in the list)
+    PdfInfoTag = cms.untracked.InputTag("generator"),
+    PdfSetNames = cms.untracked.vstring(
+        "cteq65.LHgrid"
+      #, "MRST2006nnlo.LHgrid"
+      #, "MRST2007lomod.LHgrid"
     )
 )
 
 # Path definition
 process.p = cms.Path(
+    process.LJFilter*
     process.hltPhysicsDeclared*
     process.hltLevel1GTSeed*
     process.primaryVertexFilter*
     process.scrapingVeto*
-    process.LJFilter*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
@@ -155,7 +169,10 @@ process.p = cms.Path(
     process.rootTuplePFMET+
     process.rootTupleMuons+
     process.rootTupleSuperClusters+
-    process.rootTupleTrigger
+    process.rootTupleTrigger+
+    (process.pdfWeights*process.rootTupleGenEventInfo)+
+    process.rootTupleGenParticles+
+    process.rootTupleGenJets
     )
     *process.rootTupleTree
 )

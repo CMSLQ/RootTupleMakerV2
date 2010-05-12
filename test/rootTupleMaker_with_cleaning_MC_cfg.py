@@ -6,7 +6,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.MessageLogger.cerr.default.limit = 10
 #################################################################
 
@@ -22,7 +22,7 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START3X_V26::All'
 
 # Events to process
-process.maxEvents.input = 1000
+process.maxEvents.input = 100
 
 # Options and Output Report
 process.options.wantSummary = True
@@ -170,6 +170,7 @@ process.reflagging_step = cms.Path(process.filterSequence*process.hfrecoReflagge
 process.rereco_step = cms.Path(process.filterSequence*process.caloTowersRec*(process.recoJets*process.recoJetIds+process.recoTrackJets)*process.recoJetAssociations*process.btagging*process.metreco) # re-reco jets and MET
 process.p = cms.Path(
     process.filterSequence*
+    process.pdfWeights*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
@@ -183,7 +184,7 @@ process.p = cms.Path(
     process.rootTupleMuons+
     process.rootTupleSuperClusters+
     process.rootTupleTrigger+
-    (process.pdfWeights*process.rootTupleGenEventInfo)+
+    process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
     process.rootTupleGenJets
     )

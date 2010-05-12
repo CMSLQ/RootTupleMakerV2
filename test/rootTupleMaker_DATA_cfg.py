@@ -6,7 +6,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.MessageLogger.cerr.default.limit = 10
 #################################################################
 
@@ -22,7 +22,7 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'GR_R_35X_V7A::All'
 
 # Events to process
-process.maxEvents.input = 1000
+process.maxEvents.input = 100
 
 # Options and Output Report
 process.options.wantSummary = True
@@ -139,17 +139,6 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     )
 )
 
-# Produce PDF weights (maximum is 3)
-process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-    FixPOWHEG = cms.untracked.bool(False), # fix POWHEG (it requires cteq6m* PDFs in the list)
-    PdfInfoTag = cms.untracked.InputTag("generator"),
-    PdfSetNames = cms.untracked.vstring(
-        "cteq65.LHgrid"
-      #, "MRST2006nnlo.LHgrid"
-      #, "MRST2007lomod.LHgrid"
-    )
-)
-
 # Path definition
 process.p = cms.Path(
     process.LJFilter*
@@ -170,7 +159,7 @@ process.p = cms.Path(
     process.rootTupleMuons+
     process.rootTupleSuperClusters+
     process.rootTupleTrigger+
-    (process.pdfWeights*process.rootTupleGenEventInfo)+
+    process.rootTupleGenEventInfo
     process.rootTupleGenParticles+
     process.rootTupleGenJets
     )

@@ -21,6 +21,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<double >               ptHat ( new double() );
   std::auto_ptr<std::vector<double> >  pdfWeights  ( new std::vector<double>()  );
 
+  *processID.get() = 0;
+  *ptHat.get() = 0.;
+
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
     // GenEventInfo Part
@@ -31,7 +34,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
 
       *processID.get() = genEvtInfoProduct->signalProcessID();
-      *ptHat.get() = ( genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0.0 );
+      *ptHat.get() = ( genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0. );
 
     } else {
       edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;

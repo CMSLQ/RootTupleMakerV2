@@ -54,9 +54,17 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJetID      = False
 )
 
+##################################################################
+#### For Summer09 samples redigitized during Spring10 production
+
 #from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
 # Run ak5 gen jets
 #run33xOnReRecoMC( process, "ak5GenJets")
+
+#process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI')
+
+####
+##################################################################
 
 # Switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
@@ -81,21 +89,6 @@ process.selectedPatElectrons.src = cms.InputTag("heepPatElectrons")
 process.cleanPatElectrons.checkOverlaps.muons.deltaR = 0.3
 process.cleanPatJets.checkOverlaps.muons.deltaR = 0.5
 process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
-
-# Primary vertex filter
-process.primaryVertexFilter = cms.EDFilter("VertexSelector",
-    src = cms.InputTag("offlinePrimaryVertices"),
-    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"),
-    filter = cms.bool(True)
-)
-
-# Scraping filter
-process.scrapingVeto = cms.EDFilter("FilterOutScraping",
-    applyfilter = cms.untracked.bool(True),
-    debugOn = cms.untracked.bool(False),
-    numtrack = cms.untracked.uint32(10),
-    thresh = cms.untracked.double(0.25)
-)
 
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
@@ -137,11 +130,13 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
     )
 )
 
+# In order to disable the PDF weights calculation, uncomment the line below and
+# comment out the pdfWeights module in the Path 'p' below
+#process.rootTupleGenEventInfo.StorePDFWeights = False
+
 # Path definition
 process.p = cms.Path(
     process.LJFilter*
-    process.primaryVertexFilter*
-    process.scrapingVeto*
     process.pdfWeights*
     process.patDefaultSequence*
     (

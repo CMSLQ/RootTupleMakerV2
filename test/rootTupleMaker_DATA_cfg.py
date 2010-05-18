@@ -57,10 +57,6 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJetID      = False
 )
 
-#from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
-# Run ak5 gen jets
-#run33xOnReRecoMC( process, "ak5GenJets")
-
 # Switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
 #switchOnTrigger( process )
@@ -84,31 +80,6 @@ process.selectedPatElectrons.src = cms.InputTag("heepPatElectrons")
 process.cleanPatElectrons.checkOverlaps.muons.deltaR = 0.3
 process.cleanPatJets.checkOverlaps.muons.deltaR = 0.5
 process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
-
-# PhysicsDeclared filter
-process.load('HLTrigger.special.hltPhysicsDeclared_cfi')
-process.hltPhysicsDeclared.L1GtReadoutRecordTag = 'gtDigis'
-
-# BPTX and BSC triggers filter
-process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
-process.load('HLTrigger/HLTfilters/hltLevel1GTSeed_cfi')
-process.hltLevel1GTSeed.L1TechTriggerSeeding = cms.bool(True)
-process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('0 AND NOT (36 OR 37 OR 38 OR 39) AND NOT ((42 AND NOT 43) OR (43 AND NOT 42))')
-
-# Primary vertex filter
-process.primaryVertexFilter = cms.EDFilter("VertexSelector",
-    src = cms.InputTag("offlinePrimaryVertices"),
-    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"),
-    filter = cms.bool(True)
-)
-
-# Scraping filter
-process.scrapingVeto = cms.EDFilter("FilterOutScraping",
-    applyfilter = cms.untracked.bool(True),
-    debugOn = cms.untracked.bool(False),
-    numtrack = cms.untracked.uint32(10),
-    thresh = cms.untracked.double(0.25)
-)
 
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
@@ -142,10 +113,6 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 # Path definition
 process.p = cms.Path(
     process.LJFilter*
-    process.hltPhysicsDeclared*
-    process.hltLevel1GTSeed*
-    process.primaryVertexFilter*
-    process.scrapingVeto*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
@@ -159,7 +126,7 @@ process.p = cms.Path(
     process.rootTupleMuons+
     process.rootTupleSuperClusters+
     process.rootTupleTrigger+
-    process.rootTupleGenEventInfo
+    process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
     process.rootTupleGenJets
     )

@@ -12,3 +12,4 @@ from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Trigger_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenEventInfo_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenParticles_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenJets_cfi import *
+from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenMET_cfi import *

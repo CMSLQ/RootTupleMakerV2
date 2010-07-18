@@ -8,6 +8,8 @@ rootTupleCaloJets = cms.EDProducer("RootTupleMakerV2_CaloJets",
     ElectronPt = cms.double(30.),
     ElectronIso = cms.double(0.1),
     MuonPt = cms.double(10.),
-    MuonIso = cms.double(0.05)
+    MuonIso = cms.double(0.05),
+    ApplyResidualJEC = cms.bool(False),
+    ResidualJEC = cms.string('CondFormats/JetMETObjects/data/Spring10DataV1_L2L3Residual_AK5Calo.txt')
 )
 

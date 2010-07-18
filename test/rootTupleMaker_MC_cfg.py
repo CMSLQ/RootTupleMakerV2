@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'START3X_V26::All'
+process.GlobalTag.globaltag = 'START36_V7::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,8 +29,11 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/relval/CMSSW_3_5_7/RelValTTbar/GEN-SIM-RECO/START3X_V26-v1/0012/F8624D39-5349-DF11-A757-001A92971B36.root'
+    '/store/relval/CMSSW_3_6_1/RelValTTbar/GEN-SIM-RECO/START36_V7-v1/0020/EABD13F1-0A5D-DF11-92FA-001A92971B38.root'
 ]
+
+# Turn off MC matching for the process
+#removeMCMatching(process, ['All'])
 
 # Add tcMET and pfMET
 from PhysicsTools.PatAlgos.tools.metTools import *
@@ -39,7 +42,12 @@ addPfMET(process, 'PF')
 
 # Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
-switchJECSet( process, "Summer09_7TeV_ReReco332")
+switchJECSet( process, "Spring10" )
+
+# Residual jet energy corrections (only applied to real data)
+#process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+#process.rootTupleCaloJets.ApplyResidualJEC = True
+#process.rootTuplePFJets.ApplyResidualJEC = True
 
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),

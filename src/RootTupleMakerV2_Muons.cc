@@ -70,7 +70,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     for( std::vector<pat::Muon>::const_iterator it = muons->begin(); it != muons->end(); ++it ) {
       // exit from loop when you reach the required number of muons
-      if(eta->size() > maxSize)
+      if(eta->size() >= maxSize)
         break;
 
       // if muon is not global muon, continue

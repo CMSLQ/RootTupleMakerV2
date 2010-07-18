@@ -4,6 +4,8 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 
 
 RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iConfig) :
@@ -14,7 +16,9 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
     electronPt (iConfig.getParameter<double>    ("ElectronPt")),
     electronIso (iConfig.getParameter<double>   ("ElectronIso")),
     muonPt (iConfig.getParameter<double>        ("MuonPt")),
-    muonIso (iConfig.getParameter<double>       ("MuonIso"))
+    muonIso (iConfig.getParameter<double>       ("MuonIso")),
+    applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
+    resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -69,11 +73,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   if(jets.isValid()) {
     edm::LogInfo("RootTupleMakerV2_CaloJetsInfo") << "Total # CaloJets: " << jets->size();
 
+    JetCorrectorParameters *ResJetCorPar = 0;
+    FactorizedJetCorrector *JEC = 0;
+    if(applyResJEC) {
+      edm::FileInPath fipRes(resJEC);
+      ResJetCorPar = new JetCorrectorParameters(fipRes.fullPath());
+      std::vector<JetCorrectorParameters> vParam;
+      vParam.push_back(*ResJetCorPar);
+      JEC = new FactorizedJetCorrector(vParam);
+    }
+
     for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it ) {
       // exit from loop when you reach the required number of jets
-      if(eta->size() > maxSize)
+      if(eta->size() >= maxSize)
         break;
-      
+
       int ovrlps = 0;
       /* overlaps with good electrons (with different electron IDs) and muons are handled bitwise
          bit 0: eidRobustLoose
@@ -118,12 +132,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
               && muon->pt()>muonPt ) ovrlps = ovrlps | 1<<6;
         }
       }
+
+      double corr = 1.;
+      if( applyResJEC && iEvent.isRealData() ) {
+        JEC->setJetEta( it->eta() );
+        JEC->setJetPt( it->pt() ); // here you put the L2L3 Corrected jet pt
+        corr = JEC->getCorrection();
+      }
+
       // fill in all the vectors
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
-      pt->push_back( it->pt() );
+      pt->push_back( it->pt()*corr );
       pt_raw->push_back( it->correctedJet("raw").pt() );
-      energy->push_back( it->energy() );
+      energy->push_back( it->energy()*corr );
       energy_raw->push_back( it->correctedJet("raw").energy() );
       overlaps->push_back( ovrlps );
       partonFlavour->push_back( it->partonFlavour() );

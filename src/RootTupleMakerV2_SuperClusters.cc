@@ -153,7 +153,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   for( reco::SuperClusterCollection::const_iterator it = superClustersEBHandle->begin(); it != superClustersEBHandle->end(); ++it ) {
     // exit from loop when you reach the required number of barrel superclusters
-    if( eta->size() > ebMaxSize )
+    if( eta->size() >= ebMaxSize )
       break;
 
     eta->push_back( it->eta() );
@@ -224,7 +224,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   for( reco::SuperClusterCollection::const_iterator it = superClustersEEHandle->begin(); it != superClustersEEHandle->end(); ++it ) {
     // exit from loop when you reach the required number of endcap superclusters
-    if( eta->size() > (ebMaxSize + eeMaxSize) )
+    if( eta->size() >= (ebMaxSize + eeMaxSize) )
       break;
 
     eta->push_back( it->eta() );
@@ -302,7 +302,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     for( std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it ) {
       // exit from loop when you reach the required number of electrons
-      if(scE1E9->size() > eleMaxSize)
+      if(scE1E9->size() >= eleMaxSize)
         break;
 
       // if electron is not ECAL driven, continue

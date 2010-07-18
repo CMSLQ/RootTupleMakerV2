@@ -56,7 +56,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       for( reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); ++it ) {
         // exit from loop when you reach the required number of GenParticles
-        if(eta->size() > maxSize)
+        if(eta->size() >= maxSize)
           break;
 
         // fill in all the vectors

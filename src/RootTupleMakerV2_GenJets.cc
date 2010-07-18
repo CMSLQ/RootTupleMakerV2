@@ -40,7 +40,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       for( reco::GenJetCollection::const_iterator it = genJets->begin(); it != genJets->end(); ++it ) {
         // exit from loop when you reach the required number of GenJets
-        if(eta->size() > maxSize)
+        if(eta->size() >= maxSize)
           break;
 
         // fill in all the vectors

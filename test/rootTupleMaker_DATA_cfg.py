@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR_R_35X_V7A::All'
+process.GlobalTag.globaltag = 'GR_R_36X_V12A::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,7 +29,7 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Commissioning10/MinimumBias/RECO/Apr20ReReco-v1/0165/96ED8CE5-EA4C-DF11-AC05-0018F3D096F8.root'
+    '/store/data/Run2010A/EG/RECO/Jun14thReReco_v1/0001/FE96AFA9-C678-DF11-9E4C-003048F0E7FC.root'
 ]
 
 # Turn off MC matching for the process
@@ -42,7 +42,12 @@ addPfMET(process, 'PF')
 
 # Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
-switchJECSet( process, "Summer09_7TeV_ReReco332")
+switchJECSet( process, "Spring10" )
+
+# Residual jet energy corrections (only applied to real data)
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+process.rootTupleCaloJets.ApplyResidualJEC = True
+process.rootTuplePFJets.ApplyResidualJEC = True
 
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),

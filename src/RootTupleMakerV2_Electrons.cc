@@ -94,7 +94,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     for( std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it ) {
       // exit from loop when you reach the required number of electrons
-      if(eta->size() > maxSize)
+      if(eta->size() >= maxSize)
         break;
 
       // if electron is not ECAL driven, continue

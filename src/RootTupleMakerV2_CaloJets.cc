@@ -162,6 +162,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       softMuonByPtBTag->push_back( it->bDiscriminator("softMuonByPtBJetTags") );
       bProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
     }
+
+    delete ResJetCorPar;
+    delete JEC;
   } else {
     edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;
   }

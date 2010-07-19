@@ -96,6 +96,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       neutralMultiplicity->push_back( it->neutralMultiplicity() );
       muonMultiplicity->push_back( it->muonMultiplicity() );
     }
+
+    delete ResJetCorPar;
+    delete JEC;
   } else {
     edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTag;
   }

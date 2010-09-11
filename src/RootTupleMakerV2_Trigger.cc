@@ -3,7 +3,6 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "FWCore/Common/interface/TriggerNames.h"
 
 unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
@@ -17,6 +16,22 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   produces <std::vector<int> > ( "L1TechBits" );
   produces <std::vector<int> > ( "HLTBits" );
   produces <std::vector<int> > ( "HLTResults" );
+  produces <std::vector<int> > ( "HLTPrescales" );
+}
+
+void RootTupleMakerV2_Trigger::
+beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
+
+  bool changed = true;
+  if (hltConfig.init(iRun, iSetup, hltInputTag.process(), changed)) {
+    // if init returns TRUE, initialisation has succeeded!
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "HLT config with process name " << hltInputTag.process() << " successfully extracted";
+  } else {
+    // if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
+    // with the file and/or code and needs to be investigated!
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! HLT config extraction with process name " << hltInputTag.process() << " failed";
+    // In this case, all access methods will return empty values!
+  }
 }
 
 void RootTupleMakerV2_Trigger::
@@ -26,6 +41,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >  l1techbits   ( new std::vector<int>() );
   std::auto_ptr<std::vector<int> >  hltbits      ( new std::vector<int>() );
   std::auto_ptr<std::vector<int> >  hltresults   ( new std::vector<int>() );
+  std::auto_ptr<std::vector<int> >  hltprescales ( new std::vector<int>() );
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
@@ -54,18 +70,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hltbits->push_back( triggerResults->at(i).accept() ? 1 : 0 );
     }
 
-    const edm::TriggerNames & triggerNames = iEvent.triggerNames(*triggerResults);
-
     for( std::vector<std::string>::const_iterator it = hltPathsOfInterest.begin();
          it != hltPathsOfInterest.end(); ++it ) {
       int fired = 0;
-      unsigned int index = triggerNames.triggerIndex(*it);
+      unsigned int index = hltConfig.triggerIndex(*it);
       if( index < triggerResults->size() ) {
         if( triggerResults->accept( index ) ) fired = 1;
       } else {
         edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Requested HLT path \"" << (*it) << "\" does not exist";
       }
       hltresults->push_back( fired );
+
+      int prescale = -1;
+      if(hltConfig.prescaleSet(iEvent, iSetup)<0) {
+        edm::LogError("RootTupleMakerV2_TriggerError") << "Error! The prescale set index number could not be obtained";
+      } else {
+        prescale = hltConfig.prescaleValue(iEvent, iSetup, *it);
+      }
+      hltprescales->push_back( prescale );
     }
   } else {
     edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << hltInputTag;
@@ -77,4 +99,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( l1techbits, "L1TechBits" );
   iEvent.put( hltbits,    "HLTBits" );
   iEvent.put( hltresults, "HLTResults" );
+  iEvent.put( hltprescales, "HLTPrescales" );
 }

@@ -3,6 +3,8 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 
 RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig) :
@@ -12,7 +14,8 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
     muonIso (iConfig.getParameter<double>       ("MuonIso")),
     muonID  (iConfig.getParameter<std::string>  ("MuonID")),
-    beamSpotCorr (iConfig.getParameter<bool>    ("BeamSpotCorr"))
+    beamSpotCorr (iConfig.getParameter<bool>    ("BeamSpotCorr")),
+    vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -33,6 +36,8 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "RelIso" + suffix );
   produces <std::vector<int> >    ( prefix + "PassIso" + suffix );
   produces <std::vector<int> >    ( prefix + "PassID" + suffix );
+  produces <std::vector<double> > ( prefix + "VtxDist3D" + suffix );
+  produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
 }
 
 void RootTupleMakerV2_Muons::
@@ -57,10 +62,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  relIso   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     passIso  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     passID   ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  vtxDist3D  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::Muon> > muons;
   iEvent.getByLabel(inputTag, muons);
+
+  edm::Handle<reco::VertexCollection> primaryVertices;
+  iEvent.getByLabel(vtxInputTag,primaryVertices);
 
   edm::Handle<reco::BeamSpot> beamSpot;
   iEvent.getByLabel("offlineBeamSpot", beamSpot );
@@ -82,6 +92,26 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else if( beamSpotCorr && !beamSpot.isValid() ) edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
       double reliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/it->pt();
 
+      // Vertex association
+      double minVtxDist3D = 9999.;
+      int indexVtx = -1;
+
+      if(primaryVertices.isValid()) {
+        edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
+
+        for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ) {
+
+          double dist3D = sqrt(pow(it->track()->dxy(v_it->position()),2) + pow(it->track()->dz(v_it->position()),2));
+
+          if( dist3D<minVtxDist3D ) {
+            minVtxDist3D = dist3D;
+            indexVtx = int(std::distance(primaryVertices->begin(),v_it));
+          }
+        }
+      } else {
+        edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
+      }
+
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
@@ -101,6 +131,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       relIso->push_back( reliso );
       passIso->push_back( (reliso<muonIso) ? 1 : 0 );
       passID->push_back( (it->muonID(muonID)) ? 1 : 0 );
+      vtxDist3D->push_back( minVtxDist3D );
+      vtxIndex->push_back( indexVtx );
     }
   } else {
     edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << inputTag;
@@ -127,4 +159,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( relIso, prefix + "RelIso" + suffix );
   iEvent.put( passIso, prefix + "PassIso" + suffix );
   iEvent.put( passID, prefix + "PassID" + suffix );
+  iEvent.put( vtxDist3D, prefix + "VtxDist3D" + suffix );
+  iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
 }

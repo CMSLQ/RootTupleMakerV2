@@ -12,6 +12,9 @@ RootTupleMakerV2_MET::RootTupleMakerV2_MET(const edm::ParameterSet& iConfig) :
   produces <std::vector<double> > ( prefix + "MET" + suffix );
   produces <std::vector<double> > ( prefix + "METPhi" + suffix );
   produces <std::vector<double> > ( prefix + "SumET" + suffix );
+  produces <std::vector<double> > ( prefix + "METUncorr" + suffix );
+  produces <std::vector<double> > ( prefix + "METPhiUncorr" + suffix );
+  produces <std::vector<double> > ( prefix + "SumETUncorr" + suffix );
 }
 
 void RootTupleMakerV2_MET::
@@ -20,6 +23,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  met  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  metphi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sumet  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  metuncorr  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  metphiuncorr  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sumetuncorr  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::MET> > mets;
@@ -34,6 +40,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       met->push_back( it->pt() );
       metphi->push_back( it->phi() );
       sumet->push_back( it->sumEt() );
+      metuncorr->push_back( it->uncorrectedPt(pat::MET::uncorrALL) );
+      metphiuncorr->push_back( it->uncorrectedPhi(pat::MET::uncorrALL) );
+      sumetuncorr->push_back( it->sumEt() - it->corSumEt(pat::MET::uncorrALL) );
     }
   } else {
     edm::LogError("RootTupleMakerV2_METError") << "Error! Can't get the product " << inputTag;
@@ -44,4 +53,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( met, prefix + "MET" + suffix );
   iEvent.put( metphi, prefix + "METPhi" + suffix );
   iEvent.put( sumet, prefix + "SumET" + suffix );
+  iEvent.put( metuncorr, prefix + "METUncorr" + suffix );
+  iEvent.put( metphiuncorr, prefix + "METPhiUncorr" + suffix );
+  iEvent.put( sumetuncorr, prefix + "SumETUncorr" + suffix );
 }

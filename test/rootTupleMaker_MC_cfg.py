@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'START36_V7::All'
+process.GlobalTag.globaltag = 'START38_V8::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,7 +29,7 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/relval/CMSSW_3_6_1/RelValTTbar/GEN-SIM-RECO/START36_V7-v1/0020/EABD13F1-0A5D-DF11-92FA-001A92971B38.root'
+    '/store/relval/CMSSW_3_8_1/RelValTTbar/GEN-SIM-RECO/START38_V8-v1/0011/34CFA0A0-E2A1-DF11-9BB8-00304867C1B0.root'
 ]
 
 # Turn off MC matching for the process
@@ -106,6 +106,9 @@ process.LJFilter.jetLabel = 'ak5CaloJets'
 process.LJFilter.muPT = 15.
 process.LJFilter.elecPT = 15.
 
+# Load HBHENoiseFilterResultProducer
+process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
@@ -113,7 +116,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleEvent_*_*',
         'keep *_rootTupleEventSelection_*_*',
         'keep *_rootTupleCaloJets_*_*',
-        'keep *_rootTuplePFJets_*_*',
+        #'keep *_rootTuplePFJets_*_*',
         'keep *_rootTupleElectrons_*_*',
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
@@ -121,6 +124,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleSuperClusters_*_*',
         'keep *_rootTupleTrigger_*_*',
+        'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
@@ -146,13 +150,14 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 # Path definition
 process.p = cms.Path(
     process.LJFilter*
+    process.HBHENoiseFilterResultProducer*
     process.pdfWeights*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
     process.rootTupleEventSelection+
     process.rootTupleCaloJets+
-    process.rootTuplePFJets+
+    #process.rootTuplePFJets+
     process.rootTupleElectrons+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
@@ -160,6 +165,7 @@ process.p = cms.Path(
     process.rootTupleMuons+
     process.rootTupleSuperClusters+
     process.rootTupleTrigger+
+    process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
     process.rootTupleGenJets+

@@ -26,6 +26,7 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
   produces <std::vector<double> > ( prefix + "PtRaw" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<double> > ( prefix + "EnergyRaw" + suffix );
+  produces <std::vector<double> > ( prefix + "ResJEC" + suffix );
   produces <std::vector<int> >    ( prefix + "Overlaps" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
   produces <std::vector<double> > ( prefix + "EMF" + suffix );
@@ -37,9 +38,11 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
   produces <std::vector<double> > ( prefix + "SigmaEta" + suffix );
   produces <std::vector<double> > ( prefix + "SigmaPhi" + suffix );
   produces <std::vector<double> > ( prefix + "TrackCountingHighEffBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "SoftMuonByPtBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "BProbabilityBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackCountingHighPurBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "JetProbabilityBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "JetBProbabilityBTag" + suffix );
 }
 
 void RootTupleMakerV2_CaloJets::
@@ -51,6 +54,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pt_raw  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy_raw ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  resJEC_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     overlaps ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  emf  ( new std::vector<double>()  );
@@ -62,9 +66,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  sigmaEta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sigmaPhi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trackCountingHighEffBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  softMuonByPtBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  bProbabilityBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackCountingHighPurBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighEffBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  jetProbabilityBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::Jet> > jets;
@@ -127,7 +133,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // try to cast into pat::Muon
         const pat::Muon *muon = dynamic_cast<const pat::Muon *>(&*muons[i]);
         if(muon) {
-          if( muon->muonID("GlobalMuonPromptTight") 
+          if( muon->muonID("GlobalMuonPromptTight")
               && ((muon->trackIso()+muon->ecalIso()+muon->hcalIso())/muon->pt())<muonIso
               && muon->pt()>muonPt ) ovrlps = ovrlps | 1<<6;
         }
@@ -147,6 +153,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pt_raw->push_back( it->correctedJet("raw").pt() );
       energy->push_back( it->energy()*corr );
       energy_raw->push_back( it->correctedJet("raw").energy() );
+      resJEC_vec->push_back( corr );
       overlaps->push_back( ovrlps );
       partonFlavour->push_back( it->partonFlavour() );
       emf->push_back( it->emEnergyFraction() );
@@ -158,9 +165,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       sigmaEta->push_back( sqrt(it->etaetaMoment()) );
       sigmaPhi->push_back( sqrt(it->phiphiMoment()) );
       trackCountingHighEffBTag->push_back( it->bDiscriminator("trackCountingHighEffBJetTags") );
-      simpleSecondaryVertexBTag->push_back( it->bDiscriminator("simpleSecondaryVertexBJetTag") );
-      softMuonByPtBTag->push_back( it->bDiscriminator("softMuonByPtBJetTags") );
-      bProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
+      trackCountingHighPurBTag->push_back( it->bDiscriminator("trackCountingHighPurBJetTags") );
+      simpleSecondaryVertexHighEffBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags") );
+      simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags") );
+      jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
+      jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
     }
 
     delete ResJetCorPar;
@@ -177,6 +186,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pt_raw, prefix + "PtRaw" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( energy_raw, prefix + "EnergyRaw" + suffix );
+  iEvent.put( resJEC_vec, prefix + "ResJEC" + suffix );
   iEvent.put( overlaps, prefix + "Overlaps" + suffix );
   iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );
   iEvent.put( emf, prefix + "EMF" + suffix );
@@ -188,7 +198,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( sigmaEta, prefix + "SigmaEta" + suffix );
   iEvent.put( sigmaPhi, prefix + "SigmaPhi" + suffix );
   iEvent.put( trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix );
-  iEvent.put( simpleSecondaryVertexBTag, prefix + "SimpleSecondaryVertexBTag" + suffix );
-  iEvent.put( softMuonByPtBTag, prefix + "SoftMuonByPtBTag" + suffix );
-  iEvent.put( bProbabilityBTag, prefix + "BProbabilityBTag" + suffix );
+  iEvent.put( trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix );
+  iEvent.put( simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  iEvent.put( simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  iEvent.put( jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix );
+  iEvent.put( jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix );
 }

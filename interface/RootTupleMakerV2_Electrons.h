@@ -9,11 +9,12 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTag;
-  const std::string     prefix,suffix;
+  const edm::InputTag   trkInputTag, dcsInputTag, inputTag;
+  const std::string     prefix, suffix;
   const unsigned int    maxSize;
   const double          electronIso, muonPt, muonIso;
   const std::string     muonID;
+  const edm::InputTag   vtxInputTag;
 };
 
 #endif

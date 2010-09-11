@@ -47,6 +47,7 @@ RootTupleMakerV2_SuperClusters::RootTupleMakerV2_SuperClusters(const edm::Parame
   produces <std::vector<double> > ( prefix + "EcalIso" + suffix );
   produces <std::vector<double> > ( prefix + "E1E9" + suffix );
   produces <std::vector<double> > ( prefix + "S4S1" + suffix );
+  produces <std::vector<int> >    ( prefix + "kOutOfTime" + suffix );
   produces <std::vector<double> > ( prefix + "HEEPEcalIso" + suffix );
   produces <std::vector<double> > ( prefix + "HEEPTrkIso" + suffix );
   produces <std::vector<int> >    ( prefix + "TrackMatch" + suffix );
@@ -60,6 +61,7 @@ RootTupleMakerV2_SuperClusters::RootTupleMakerV2_SuperClusters(const edm::Parame
   produces <std::vector<double> > ( prefix + "Track2Pt" + suffix );
   produces <std::vector<double> > ( elePrefix + "SCE1E9" + suffix );
   produces <std::vector<double> > ( elePrefix + "SCS4S1" + suffix );
+  produces <std::vector<int> >    ( elePrefix + "SCkOutOfTime" + suffix );
   produces <std::vector<double> > ( elePrefix + "SCEcalIso" + suffix );
   produces <std::vector<double> > ( elePrefix + "SCHEEPEcalIso" + suffix );
   produces <std::vector<double> > ( elePrefix + "SCHEEPTrkIso" + suffix );
@@ -78,6 +80,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  ecalIso  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e1e9  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  s4s1  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     koutoftime  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  heepEcalIso  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  heepTrkIso  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     trackMatch  ( new std::vector<int>()  );;
@@ -91,6 +94,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  track2Pt   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scE1E9  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scS4S1  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     sckOutOfTime  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  scEcalIso   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scHEEPEcalIso   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scHEEPTrkIso   ( new std::vector<double>()  );
@@ -98,7 +102,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-----------------------------------------------------------------
   edm::Handle<reco::SuperClusterCollection> superClustersEBHandle;
   iEvent.getByLabel(ebInputTag, superClustersEBHandle);
-  
+
   edm::Handle<reco::SuperClusterCollection> superClustersEEHandle;
   iEvent.getByLabel(eeInputTag, superClustersEEHandle);
 
@@ -165,11 +169,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     clustersSize->push_back( it->clustersSize() );
 
     const reco::SuperCluster* pnt_sc = &(*it);
-    if (hbheRecHits) {// is this a RECO file, so the rechit info is available to calculate HoE?
-      HoECalculator calc_HoE;
-      double schoe = calc_HoE(pnt_sc,iEvent,iSetup);
-      hoe->push_back( schoe );
-    }
+    // HCAL RecHits are only available in RECO files
+    HoECalculator calc_HoE;
+    double schoe = calc_HoE(pnt_sc,iEvent,iSetup);
+    hoe->push_back( schoe );
+
     std::vector<float> scLocalCov = EcalTool.scLocalCovariances(*it);
     double scSigmaiEiE= sqrt(scLocalCov[0]); // same method used in GsfElectronAlgo.cc
     sigmaIEtaIEta->push_back( scSigmaiEiE );
@@ -220,6 +224,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     e1e9->push_back( emax/e9 );
     s4s1->push_back( (eright+eleft+etop+ebottom)/emax );
+
+    EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(it->seed()->seed());
+    koutoftime->push_back( (recHit!=ecalEndcapRecHitHandle->end() && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ? 1 : 0 );
   }
 
   for( reco::SuperClusterCollection::const_iterator it = superClustersEEHandle->begin(); it != superClustersEEHandle->end(); ++it ) {
@@ -236,11 +243,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     clustersSize->push_back( it->clustersSize() );
 
     const reco::SuperCluster* pnt_sc = &(*it);
-    if (hbheRecHits) {
-      HoECalculator calc_HoE;
-      double schoe = calc_HoE(pnt_sc,iEvent,iSetup);
-      hoe->push_back( schoe );
-    }
+    // HCAL RecHits are only available in RECO files
+    HoECalculator calc_HoE;
+    double schoe = calc_HoE(pnt_sc,iEvent,iSetup);
+    hoe->push_back( schoe );
+
     std::vector<float> scLocalCov = EcalTool.scLocalCovariances(*it);
     double scSigmaiEiE= sqrt(scLocalCov[0]); // same method used in GsfElectronAlgo.cc
     sigmaIEtaIEta->push_back( scSigmaiEiE );
@@ -251,7 +258,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     ecalIso->push_back( ecalEndcapIsol.getEtSum(&ecalCand) );
     heepEcalIso->push_back( HeepEcalEndcapIsol.getEtSum(&ecalCand) );
     heepTrkIso->push_back( TrackTool.getPtTracks(&ecalCand) );
-    
+
     double closestTrkDr = 99.;
     reco::Track closestTrk;
     double nextTrkDr = 99.;
@@ -291,6 +298,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     e1e9->push_back( emax/e9 );
     s4s1->push_back( (eright+eleft+etop+ebottom)/emax );
+
+    EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(it->seed()->seed());
+    koutoftime->push_back( (recHit!=ecalEndcapRecHitHandle->end() && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ? 1 : 0 );
   }
 
   // Electrons
@@ -316,6 +326,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       double eleft   = 0.;
       double etop    = 0.;
       double ebottom = 0.;
+      int ekoutoftime = -1;
       if( it->superCluster()->seed()->seed().subdetId() == EcalBarrel ) {
         emax    = EcalClusterTools::eMax( *(it->superCluster()), &(*ecalBarrelRecHitHandle) );
         e9      = EcalClusterTools::e3x3( *(it->superCluster()), &(*ecalBarrelRecHitHandle), &(*caloTopology) );
@@ -323,6 +334,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         eleft   = EcalClusterTools::eLeft( *(it->superCluster()), &(*ecalBarrelRecHitHandle), &(*caloTopology) ) ;
         etop    = EcalClusterTools::eTop( *(it->superCluster()), &(*ecalBarrelRecHitHandle), &(*caloTopology) ) ;
         ebottom = EcalClusterTools::eBottom( *(it->superCluster()), &(*ecalBarrelRecHitHandle), &(*caloTopology) );
+
+        EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(it->superCluster()->seed()->seed());
+        ekoutoftime = (recHit!=ecalBarrelRecHitHandle->end()) ? recHit->flagField(EcalRecHit::kOutOfTime) : -1;
       } else {
         emax    = EcalClusterTools::eMax( *(it->superCluster()), &(*ecalEndcapRecHitHandle) );
         e9      = EcalClusterTools::e3x3( *(it->superCluster()), &(*ecalEndcapRecHitHandle), &(*caloTopology) );
@@ -330,10 +344,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         eleft   = EcalClusterTools::eLeft( *(it->superCluster()), &(*ecalEndcapRecHitHandle), &(*caloTopology) ) ;
         etop    = EcalClusterTools::eTop( *(it->superCluster()), &(*ecalEndcapRecHitHandle), &(*caloTopology) ) ;
         ebottom = EcalClusterTools::eBottom( *(it->superCluster()), &(*ecalEndcapRecHitHandle), &(*caloTopology) );
+
+        EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(it->superCluster()->seed()->seed());
+        ekoutoftime = (recHit!=ecalEndcapRecHitHandle->end() && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ? 1 : 0;
       }
 
       scE1E9->push_back( emax/e9 );
       scS4S1->push_back( (eright+eleft+etop+ebottom)/emax );
+      sckOutOfTime->push_back( ekoutoftime );
 
       reco::SuperClusterRef eleSCRef = it->superCluster();  // get SCRef to use to make ele candidate
       TVector3 sc_vec;
@@ -365,6 +383,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( ecalIso, prefix + "EcalIso" + suffix );
   iEvent.put( e1e9, prefix + "E1E9" + suffix );
   iEvent.put( s4s1, prefix + "S4S1" + suffix );
+  iEvent.put( koutoftime, prefix + "kOutOfTime" + suffix );
   iEvent.put( heepEcalIso, prefix + "HEEPEcalIso" + suffix );
   iEvent.put( heepTrkIso, prefix + "HEEPTrkIso" + suffix );
   iEvent.put( trackMatch, prefix + "TrackMatch" + suffix );
@@ -378,6 +397,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( track2Pt, prefix + "Track2Pt" + suffix );
   iEvent.put( scE1E9, elePrefix + "SCE1E9" + suffix );
   iEvent.put( scS4S1, elePrefix + "SCS4S1" + suffix );
+  iEvent.put( sckOutOfTime, elePrefix + "SCkOutOfTime" + suffix );
   iEvent.put( scEcalIso, elePrefix + "SCEcalIso" + suffix );
   iEvent.put( scHEEPEcalIso, elePrefix + "SCHEEPEcalIso" + suffix );
   iEvent.put( scHEEPTrkIso, elePrefix + "SCHEEPTrkIso" + suffix );

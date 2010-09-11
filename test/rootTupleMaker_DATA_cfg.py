@@ -6,7 +6,7 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.MessageLogger.cerr.default.limit = 10
 #################################################################
 
@@ -19,17 +19,17 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR_R_36X_V12A::All'
+process.GlobalTag.globaltag = 'GR_R_38X_V9::All'
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = 2000
 
 # Options and Output Report
 process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2010A/EG/RECO/Jun14thReReco_v1/0001/FE96AFA9-C678-DF11-9E4C-003048F0E7FC.root'
+    '/store/data/Run2010A/EG/RECO/Aug13ReHLTReReco_PreProd_v3/0002/E6854469-FBA9-DF11-8B97-0030487F172B.root'
 ]
 
 # Turn off MC matching for the process
@@ -61,6 +61,14 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     genJetCollection=cms.InputTag("ak5GenJets"),
     doJetID      = False
 )
+
+##################################################################
+#### For data samples re-HLT'ed and re-reco'ed in 38X
+
+process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','HLT38')
+
+####
+##################################################################
 
 # Switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
@@ -94,6 +102,9 @@ process.LJFilter.jetLabel = 'ak5CaloJets'
 process.LJFilter.muPT = 15.
 process.LJFilter.elecPT = 15.
 
+# Load HBHENoiseFilterResultProducer
+process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
@@ -101,7 +112,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleEvent_*_*',
         'keep *_rootTupleEventSelection_*_*',
         'keep *_rootTupleCaloJets_*_*',
-        'keep *_rootTuplePFJets_*_*',
+        #'keep *_rootTuplePFJets_*_*',
         'keep *_rootTupleElectrons_*_*',
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
@@ -109,6 +120,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleSuperClusters_*_*',
         'keep *_rootTupleTrigger_*_*',
+        'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
@@ -119,12 +131,13 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 # Path definition
 process.p = cms.Path(
     process.LJFilter*
+    process.HBHENoiseFilterResultProducer*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
     process.rootTupleEventSelection+
     process.rootTupleCaloJets+
-    process.rootTuplePFJets+
+    #process.rootTuplePFJets+
     process.rootTupleElectrons+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
@@ -132,6 +145,7 @@ process.p = cms.Path(
     process.rootTupleMuons+
     process.rootTupleSuperClusters+
     process.rootTupleTrigger+
+    process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
     process.rootTupleGenJets+

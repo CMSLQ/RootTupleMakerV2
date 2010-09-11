@@ -118,9 +118,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<EcalRecHitCollection> ecalEndcapRecHitHandle;
   iEvent.getByLabel(ecalEEInputTag, ecalEndcapRecHitHandle);
 
-  edm::Handle<HBHERecHitCollection> hbheRecHitsHandle;
-  iEvent.getByLabel("hbhereco",hbheRecHitsHandle);
-  const HBHERecHitCollection* hbheRecHits = hbheRecHitsHandle.failedToGet () ? 0 : &*hbheRecHitsHandle;
   EcalClusterLazyTools EcalTool(iEvent,iSetup,ecalEBInputTag,ecalEEInputTag);
 
   edm::Handle<reco::TrackCollection> trackHandle;
@@ -169,8 +166,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     clustersSize->push_back( it->clustersSize() );
 
     const reco::SuperCluster* pnt_sc = &(*it);
-    // HCAL RecHits are only available in RECO files
-    HoECalculator calc_HoE;
+    HoECalculator calc_HoE; // requires HCAL RecHits that are only available in RECO files
     double schoe = calc_HoE(pnt_sc,iEvent,iSetup);
     hoe->push_back( schoe );
 
@@ -243,8 +239,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     clustersSize->push_back( it->clustersSize() );
 
     const reco::SuperCluster* pnt_sc = &(*it);
-    // HCAL RecHits are only available in RECO files
-    HoECalculator calc_HoE;
+    HoECalculator calc_HoE; // requires HCAL RecHits that are only available in RECO files
     double schoe = calc_HoE(pnt_sc,iEvent,iSetup);
     hoe->push_back( schoe );
 

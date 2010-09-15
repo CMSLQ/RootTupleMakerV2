@@ -12,6 +12,7 @@ class RootTupleMakerV2_PFJets : public edm::EDProducer {
   const edm::InputTag   inputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
+  const std::string     jecUncPath;
   const bool            applyResJEC;
   const std::string     resJEC;
 };

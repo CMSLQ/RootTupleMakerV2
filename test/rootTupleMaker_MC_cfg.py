@@ -45,7 +45,6 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJECSet( process, "Spring10" )
 
 # Residual jet energy corrections (only applied to real data)
-#process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 #process.rootTupleCaloJets.ApplyResidualJEC = True
 #process.rootTuplePFJets.ApplyResidualJEC = True
 
@@ -100,11 +99,26 @@ process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
 
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
+##################################################################
+#### Electron based skim
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
-process.LJFilter.muPT = 15.
-process.LJFilter.elecPT = 15.
+process.LJFilter.muonsMin = -1
+process.LJFilter.electronsMin = 1
+process.LJFilter.elecPT = 20.
+process.LJFilter.counteitherleptontype = False
+##################################################################
+#### SuperCluster based skim
+#process.LJFilter.muLabel = 'muons'
+#process.LJFilter.elecLabel = 'gsfElectrons'
+#process.LJFilter.jetLabel = 'ak5CaloJets'
+#process.LJFilter.muonsMin = -1
+#process.LJFilter.electronsMin = -1
+#process.LJFilter.scMin = 1
+#process.LJFilter.scET = 20.
+#process.LJFilter.scHoE = 0.05
+##################################################################
 
 # Load HBHENoiseFilterResultProducer
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
@@ -116,7 +130,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleEvent_*_*',
         'keep *_rootTupleEventSelection_*_*',
         'keep *_rootTupleCaloJets_*_*',
-        #'keep *_rootTuplePFJets_*_*',
+        'keep *_rootTuplePFJets_*_*',
         'keep *_rootTupleElectrons_*_*',
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
@@ -157,7 +171,7 @@ process.p = cms.Path(
     process.rootTupleEvent+
     process.rootTupleEventSelection+
     process.rootTupleCaloJets+
-    #process.rootTuplePFJets+
+    process.rootTuplePFJets+
     process.rootTupleElectrons+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+

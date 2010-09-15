@@ -6,6 +6,7 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 
 RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iConfig) :
@@ -17,6 +18,7 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
     electronIso (iConfig.getParameter<double>   ("ElectronIso")),
     muonPt (iConfig.getParameter<double>        ("MuonPt")),
     muonIso (iConfig.getParameter<double>       ("MuonIso")),
+    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
     applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
     resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
@@ -26,6 +28,7 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
   produces <std::vector<double> > ( prefix + "PtRaw" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<double> > ( prefix + "EnergyRaw" + suffix );
+  produces <std::vector<double> > ( prefix + "JECUnc" + suffix );
   produces <std::vector<double> > ( prefix + "ResJEC" + suffix );
   produces <std::vector<int> >    ( prefix + "Overlaps" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
@@ -54,6 +57,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pt_raw  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy_raw ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  jecUnc_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  resJEC_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     overlaps ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
@@ -73,21 +77,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
+  edm::FileInPath fipUnc(jecUncPath);;
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fipUnc.fullPath());
+
+  JetCorrectorParameters *ResJetCorPar = 0;
+  FactorizedJetCorrector *JEC = 0;
+  if(applyResJEC) {
+    edm::FileInPath fipRes(resJEC);
+    ResJetCorPar = new JetCorrectorParameters(fipRes.fullPath());
+    std::vector<JetCorrectorParameters> vParam;
+    vParam.push_back(*ResJetCorPar);
+    JEC = new FactorizedJetCorrector(vParam);
+  }
+
   edm::Handle<std::vector<pat::Jet> > jets;
   iEvent.getByLabel(inputTag, jets);
 
   if(jets.isValid()) {
     edm::LogInfo("RootTupleMakerV2_CaloJetsInfo") << "Total # CaloJets: " << jets->size();
-
-    JetCorrectorParameters *ResJetCorPar = 0;
-    FactorizedJetCorrector *JEC = 0;
-    if(applyResJEC) {
-      edm::FileInPath fipRes(resJEC);
-      ResJetCorPar = new JetCorrectorParameters(fipRes.fullPath());
-      std::vector<JetCorrectorParameters> vParam;
-      vParam.push_back(*ResJetCorPar);
-      JEC = new FactorizedJetCorrector(vParam);
-    }
 
     for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it ) {
       // exit from loop when you reach the required number of jets
@@ -146,6 +153,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         corr = JEC->getCorrection();
       }
 
+      jecUnc->setJetEta( it->eta() );
+      jecUnc->setJetPt( it->pt()*corr ); // the uncertainty is a function of the corrected pt
+
       // fill in all the vectors
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
@@ -153,6 +163,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pt_raw->push_back( it->correctedJet("raw").pt() );
       energy->push_back( it->energy()*corr );
       energy_raw->push_back( it->correctedJet("raw").energy() );
+      jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
       resJEC_vec->push_back( corr );
       overlaps->push_back( ovrlps );
       partonFlavour->push_back( it->partonFlavour() );
@@ -171,12 +182,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
       jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
     }
-
-    delete ResJetCorPar;
-    delete JEC;
   } else {
     edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;
   }
+
+  delete jecUnc;
+  delete ResJetCorPar;
+  delete JEC;
 
   //-----------------------------------------------------------------
   // put vectors in the event
@@ -186,6 +198,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pt_raw, prefix + "PtRaw" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( energy_raw, prefix + "EnergyRaw" + suffix );
+  iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
   iEvent.put( resJEC_vec, prefix + "ResJEC" + suffix );
   iEvent.put( overlaps, prefix + "Overlaps" + suffix );
   iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );

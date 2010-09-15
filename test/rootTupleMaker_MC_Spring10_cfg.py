@@ -15,11 +15,11 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RootTupleMakerV2_output_DATA.root')
+    fileName = cms.string('RootTupleMakerV2_output_MC.root')
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR_R_38X_V9::All'
+process.GlobalTag.globaltag = 'START38_V8::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,11 +29,12 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2010A/EG/RECO/Aug13ReHLTReReco_PreProd_v3/0002/E6854469-FBA9-DF11-8B97-0030487F172B.root'
+    '/store/relval/CMSSW_3_5_7/RelValTTbar/GEN-SIM-RECO/START3X_V26-v1/0012/F8624D39-5349-DF11-A757-001A92971B36.root'
+    #'/store/mc/Spring10/TTbarJets-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0006/FE8DE204-C446-DF11-BF76-003048C693FA.root'
 ]
 
 # Turn off MC matching for the process
-removeMCMatching(process, ['All'])
+#removeMCMatching(process, ['All'])
 
 # Add tcMET and pfMET
 from PhysicsTools.PatAlgos.tools.metTools import *
@@ -45,8 +46,8 @@ from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJECSet( process, "Spring10" )
 
 # Residual jet energy corrections (only applied to real data)
-process.rootTupleCaloJets.ApplyResidualJEC = True
-process.rootTuplePFJets.ApplyResidualJEC = True
+#process.rootTupleCaloJets.ApplyResidualJEC = True
+#process.rootTuplePFJets.ApplyResidualJEC = True
 
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),
@@ -62,9 +63,14 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 )
 
 ##################################################################
-#### For data samples re-HLT'ed and re-reco'ed in 38X
+#### For Summer09 samples redigitized during Spring10 production
 
-process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','HLT38')
+# Run ak5 gen jets
+#process.load("RecoJets.Configuration.GenJetParticles_cff")
+#process.load("RecoJets.JetProducers.ak5GenJets_cfi")
+#process.patDefaultSequence.replace( getattr(process,"patCandidates"), process.genParticlesForJets+getattr(process,"ak5GenJets")+getattr(process,"patCandidates"))
+
+#process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI')
 
 ####
 ##################################################################
@@ -97,27 +103,29 @@ process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 ##################################################################
 #### Electron based skim
-#process.LJFilter.muLabel = 'muons'
-#process.LJFilter.elecLabel = 'gsfElectrons'
-#process.LJFilter.jetLabel = 'ak5CaloJets'
-#process.LJFilter.muonsMin = -1
-#process.LJFilter.electronsMin = 1
-#process.LJFilter.elecPT = 20.
-#process.LJFilter.counteitherleptontype = False
-##################################################################
-#### SuperCluster based skim
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
 process.LJFilter.muonsMin = -1
-process.LJFilter.electronsMin = -1
-process.LJFilter.scMin = 1
-process.LJFilter.scET = 20.
-process.LJFilter.scHoE = 0.05
+process.LJFilter.electronsMin = 1
+process.LJFilter.elecPT = 20.
+process.LJFilter.counteitherleptontype = False
+##################################################################
+#### SuperCluster based skim
+#process.LJFilter.muLabel = 'muons'
+#process.LJFilter.elecLabel = 'gsfElectrons'
+#process.LJFilter.jetLabel = 'ak5CaloJets'
+#process.LJFilter.muonsMin = -1
+#process.LJFilter.electronsMin = -1
+#process.LJFilter.scMin = 1
+#process.LJFilter.scET = 20.
+#process.LJFilter.scHoE = 0.05
 ##################################################################
 
 # Load HBHENoiseFilterResultProducer
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+
+process.load('Configuration/StandardSequences/Reconstruction_cff')
 
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
@@ -142,10 +150,30 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     )
 )
 
+# Produce PDF weights (maximum is 3)
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+    FixPOWHEG = cms.untracked.bool(False), # fix POWHEG (it requires cteq6m* PDFs in the list)
+    PdfInfoTag = cms.untracked.InputTag("generator"),
+    PdfSetNames = cms.untracked.vstring(
+        "cteq65.LHgrid"
+      #, "MRST2006nnlo.LHgrid"
+      #, "MRST2007lomod.LHgrid"
+    )
+)
+
+# In order to disable the PDF weights calculation, uncomment the line below and
+# comment out the pdfWeights module in the Path 'p' below
+#process.rootTupleGenEventInfo.StorePDFWeights = False
+
 # Path definition
+process.missing_btags = cms.Path(
+    process.simpleSecondaryVertexHighEffBJetTags+
+    process.simpleSecondaryVertexHighPurBJetTags
+)
 process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
+    process.pdfWeights*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
@@ -173,4 +201,4 @@ del process.out
 del process.outpath
 
 # Schedule definition
-process.schedule = cms.Schedule(process.p)
+process.schedule = cms.Schedule(process.missing_btags,process.p)

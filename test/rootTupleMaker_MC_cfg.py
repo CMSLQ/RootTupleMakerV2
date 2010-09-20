@@ -61,7 +61,9 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJetID      = False
 )
 
-##################################################################
+####################################################################
+###  NO NEED TO USE IT SINCE THIS CONFIG FILE IS FOR 38X MC SAMPLES 
+####################################################################
 #### For Summer09 samples redigitized during Spring10 production
 
 #from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
@@ -71,7 +73,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 #process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI')
 
 ####
-##################################################################
+####################################################################
 
 # Switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger

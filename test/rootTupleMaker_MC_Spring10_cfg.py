@@ -19,6 +19,14 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
+# Note from Dinko (Sept 16 2010 ):
+# Starting from CMSSW_3_8_0, jet energy corrections are being retrieved from the
+# conditions database which means that the older global tag will not have
+# JEC info available. This means that we will have to use a different
+# global tag from the one that was originally used to make the Spring10 MC
+# samples. This could potentially introduce a slight inconsistency.
+# However, since we are not re-reco'ing anything on-the-fly, I don't
+# expect this to have any noticeable effect.
 process.GlobalTag.globaltag = 'START38_V8::All'
 
 # Events to process

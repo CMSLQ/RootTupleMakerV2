@@ -59,7 +59,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "DCotTheta" + suffix );
   produces <std::vector<double> > ( prefix + "SCEta" + suffix );
   produces <std::vector<double> > ( prefix + "SCPhi" + suffix );
-  produces <std::vector<double> > ( prefix + "SCET" + suffix );
+  produces <std::vector<double> > ( prefix + "SCPt" + suffix );
   produces <std::vector<double> > ( prefix + "SCRawEnergy" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDist3D" + suffix );
   produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
@@ -100,7 +100,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  dCotTheta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scEta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPhi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  scET  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scPt  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scRawEnergy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDist3D  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
@@ -260,7 +260,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // SC associated with electron
       scEta->push_back( it->superCluster()->eta() );
       scPhi->push_back( it->superCluster()->phi() );
-      scET->push_back( it->superCluster()->energy()/cosh(it->superCluster()->eta()) );
+      scPt->push_back( it->superCluster()->energy()/cosh(it->superCluster()->eta()) );
       scRawEnergy->push_back( it->superCluster()->rawEnergy() );
       // Vertex association variables
       vtxDist3D->push_back( minVtxDist3D );
@@ -304,7 +304,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( dCotTheta, prefix + "DCotTheta" + suffix );
   iEvent.put( scEta, prefix + "SCEta" + suffix );
   iEvent.put( scPhi, prefix + "SCPhi" + suffix );
-  iEvent.put( scET, prefix + "SCET" + suffix );
+  iEvent.put( scPt, prefix + "SCPt" + suffix );
   iEvent.put( scRawEnergy, prefix + "SCRawEnergy" + suffix );
   iEvent.put( vtxDist3D, prefix + "VtxDist3D" + suffix );
   iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );

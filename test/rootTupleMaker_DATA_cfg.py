@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR_R_38X_V9::All'
+process.GlobalTag.globaltag = 'GR10_P_V10::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,7 +29,7 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2010A/EG/RECO/Aug13ReHLTReReco_PreProd_v3/0002/E6854469-FBA9-DF11-8B97-0030487F172B.root'
+    '/store/data/Run2010B/Electron/RECO/PromptReco-v2/000/147/206/FA81A36C-F8D0-DF11-87F8-001D09F29849.root'
 ]
 
 # Turn off MC matching for the process
@@ -62,9 +62,9 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 )
 
 ##################################################################
-#### For data samples re-HLT'ed and re-reco'ed in 38X
+#### For data samples re-HLT'ed and re-reco'ed in 38X --> NEED TO CHECK THE LABEL (i.e. "HLT38" might change for different re-reco)
 
-process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','HLT38')
+#process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','HLT38')
 
 ####
 ##################################################################

@@ -14,8 +14,14 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
     # http://indico.cern.ch/getFile.py/access?contribId=0&resId=1&materialId=slides&confId=99224
     # plans for 2E32:  https://twiki.cern.ch/twiki/bin/view/CMS/TMDLumi2E32v0
     #                  https://hypernews.cern.ch/HyperNews/CMS/get/exotica/868.html
-
+    #3) 2E32 menu /cdaq/physics/Run2010/v9.0/HLT/V1
+    #see https://twiki.cern.ch/twiki/bin/view/CMS/TMDLumi2E32v6
+    #see also https://hypernews.cern.ch/HyperNews/CMS/get/commissioning/2315.html                              
+                                  
     HLTPathsOfInterest = cms.vstring(
+                                     ##############
+                                     ## 2E31 + 6E31
+                                     ##############
                                      #Electron
                                      'HLT_DoubleEle10_SW_L1R', #0
                                      'HLT_Ele12_SW_TightEleIdIsol_L1R', #1
@@ -108,7 +114,47 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
                                      'HLT_StoppedHSCP_v2', #82
                                      #Cosmics
                                      'HLT_L1Tech_BSC_halo', #83
-                                     'HLT_TrackerCosmics' #84
+                                     'HLT_TrackerCosmics', #84
+                                     ##############
+                                     ## 2E32
+                                     ##############
+                                     #Electron
+                                     'HLT_DoubleEle17_SW_L1R_v1', #85
+                                     'HLT_DoubleEle8_SW_HT70U_L1R_v1', #86
+                                     'HLT_Ele10_SW_EleId_HT70U_L1R_v1', #87
+                                     'HLT_Ele10_SW_HT100U_L1R_v1', #88
+                                     'HLT_Ele10_SW_HT70U_L1R_v1', #89
+                                     'HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v1', #90
+                                     'HLT_Ele17_SW_TighterEleIdIsol_L1R_v2', #91
+                                     'HLT_Ele22_SW_TighterCaloIdIsol_L1R_v1', #92
+                                     'HLT_Ele22_SW_TighterEleId_L1R_v2', #93
+                                     'HLT_Ele32_SW_TighterEleId_L1R_v2', #94
+                                     'HLT_IsoEle12_PFTau15_v1', #95
+                                     #Photon
+                                     'HLT_DoublePhoton17_SingleIsol_L1R_v1', #96
+                                     'HLT_DoublePhoton22_L1R_v1', #97
+                                     'HLT_DoublePhoton5_CEP_L1R_v3', #98
+                                     'HLT_Photon110_NoHE_Cleaned_L1R_v1', #99
+                                     'HLT_Photon17_Isol_SC17HE_L1R_v1', #100
+                                     'HLT_Photon22_SC22HE_L1R_v1', #101
+                                     'HLT_Photon40_CaloId_Cleaned_L1R_v1', #102
+                                     'HLT_Photon40_Isol_Cleaned_L1R_v1', #103
+                                     'HLT_Photon50_Cleaned_L1R_v1', #104
+                                     'HLT_Photon70_Cleaned_L1R_v1', #105
+                                     #Mu
+                                     'HLT_IsoMu13_v3', #106
+                                     'HLT_Mu17_v1', #107
+                                     'HLT_Mu21_v1', #108
+                                     'HLT_Mu8_Ele8_v1', #109
+                                     'HLT_Mu5_HT100U_v3', #110
+                                     'HLT_Mu5_HT70U_v3', #111
+                                     #Jet
+                                     'HLT_Jet50U_v3', #112
+                                     'HLT_Jet140U_v3', #113
+                                     #METFwd
+                                     'HLT_MET100_v3', #114
+                                     'HLT_MET120_v3', #115
+                                     'HLT_MET45_DiJet30U_v3' #116
                                      )
 
     #used in Spring10 - Summer10 analysis                                  

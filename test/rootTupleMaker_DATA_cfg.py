@@ -19,7 +19,8 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR10_P_V10::All'
+process.GlobalTag.globaltag = 'GR10_P_V10::All' #/Electron/Run2010B-PromptReco-v2/RECO
+#process.GlobalTag.globaltag = 'GR_R_38X_V13A::All'  #/EG/Run2010A-Sep17ReReco_v2/RECO
 
 # Events to process
 process.maxEvents.input = 100
@@ -43,6 +44,12 @@ addPfMET(process, 'PF')
 # Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJECSet( process, "Spring10" )
+process.ak5CaloL2Relative.useCondDB = False
+process.ak5CaloL3Absolute.useCondDB = False
+process.ak5CaloResidual.useCondDB = False
+process.ak5PFL2Relative.useCondDB = False
+process.ak5PFL3Absolute.useCondDB = False
+process.ak5PFResidual.useCondDB = False
 
 # Residual jet energy corrections (only applied to real data)
 process.rootTupleCaloJets.ApplyResidualJEC = True
@@ -97,23 +104,23 @@ process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 ##################################################################
 #### Electron based skim
-#process.LJFilter.muLabel = 'muons'
-#process.LJFilter.elecLabel = 'gsfElectrons'
-#process.LJFilter.jetLabel = 'ak5CaloJets'
-#process.LJFilter.muonsMin = -1
-#process.LJFilter.electronsMin = 1
-#process.LJFilter.elecPT = 20.
-#process.LJFilter.counteitherleptontype = False
-##################################################################
-#### SuperCluster based skim
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
 process.LJFilter.muonsMin = -1
-process.LJFilter.electronsMin = -1
-process.LJFilter.scMin = 1
-process.LJFilter.scET = 20.
-process.LJFilter.scHoE = 0.05
+process.LJFilter.electronsMin = 1
+process.LJFilter.elecPT = 20.
+process.LJFilter.counteitherleptontype = False
+##################################################################
+#### SuperCluster based skim
+#process.LJFilter.muLabel = 'muons'
+#process.LJFilter.elecLabel = 'gsfElectrons'
+#process.LJFilter.jetLabel = 'ak5CaloJets'
+#process.LJFilter.muonsMin = -1
+#process.LJFilter.electronsMin = -1
+#process.LJFilter.scMin = 1
+#process.LJFilter.scET = 20.
+#process.LJFilter.scHoE = 0.05
 ##################################################################
 
 # Load HBHENoiseFilterResultProducer

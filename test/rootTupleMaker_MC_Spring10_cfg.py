@@ -19,15 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-# Note from Dinko (Sept 16 2010 ):
-# Starting from CMSSW_3_8_0, jet energy corrections are being retrieved from the
-# conditions database which means that the older global tag will not have
-# JEC info available. This means that we will have to use a different
-# global tag from the one that was originally used to make the Spring10 MC
-# samples. This could potentially introduce a slight inconsistency.
-# However, since we are not re-reco'ing anything on-the-fly, I don't
-# expect this to have any noticeable effect.
-process.GlobalTag.globaltag = 'START38_V8::All'
+process.GlobalTag.globaltag = 'START3X_V26::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -37,8 +29,7 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/relval/CMSSW_3_5_7/RelValTTbar/GEN-SIM-RECO/START3X_V26-v1/0012/F8624D39-5349-DF11-A757-001A92971B36.root'
-    #'/store/mc/Spring10/TTbarJets-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0006/FE8DE204-C446-DF11-BF76-003048C693FA.root'
+    '/store/mc/Spring10/TTbarJets-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0006/FE8DE204-C446-DF11-BF76-003048C693FA.root'
 ]
 
 # Turn off MC matching for the process
@@ -52,10 +43,12 @@ addPfMET(process, 'PF')
 # Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJECSet( process, "Spring10" )
-
-# Residual jet energy corrections (only applied to real data)
-#process.rootTupleCaloJets.ApplyResidualJEC = True
-#process.rootTuplePFJets.ApplyResidualJEC = True
+process.ak5CaloL2Relative.useCondDB = False
+process.ak5CaloL3Absolute.useCondDB = False
+process.ak5CaloResidual.useCondDB = False
+process.ak5PFL2Relative.useCondDB = False
+process.ak5PFL3Absolute.useCondDB = False
+process.ak5PFResidual.useCondDB = False
 
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),
@@ -74,11 +67,11 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 #### For Summer09 samples redigitized during Spring10 production
 
 # Run ak5 gen jets
-#process.load("RecoJets.Configuration.GenJetParticles_cff")
-#process.load("RecoJets.JetProducers.ak5GenJets_cfi")
-#process.patDefaultSequence.replace( getattr(process,"patCandidates"), process.genParticlesForJets+getattr(process,"ak5GenJets")+getattr(process,"patCandidates"))
+process.load("RecoJets.Configuration.GenJetParticles_cff")
+process.load("RecoJets.JetProducers.ak5GenJets_cfi")
+process.patDefaultSequence.replace( getattr(process,"patCandidates"), process.genParticlesForJets+getattr(process,"ak5GenJets")+getattr(process,"patCandidates"))
 
-#process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI')
+process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI')
 
 ####
 ##################################################################

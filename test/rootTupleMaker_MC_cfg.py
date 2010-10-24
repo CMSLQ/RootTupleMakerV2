@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'START38_V8::All'
+process.GlobalTag.globaltag = 'START38_V12::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,7 +29,7 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/relval/CMSSW_3_8_1/RelValTTbar/GEN-SIM-RECO/START38_V8-v1/0011/34CFA0A0-E2A1-DF11-9BB8-00304867C1B0.root'
+    '/store/relval/CMSSW_3_8_5/RelValTTbar/GEN-SIM-RECO/START38_V12-v1/0040/3667674E-EAD1-DF11-8507-002618943933.root'
 ]
 
 # Turn off MC matching for the process
@@ -43,10 +43,12 @@ addPfMET(process, 'PF')
 # Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJECSet( process, "Spring10" )
-
-# Residual jet energy corrections (only applied to real data)
-#process.rootTupleCaloJets.ApplyResidualJEC = True
-#process.rootTuplePFJets.ApplyResidualJEC = True
+process.ak5CaloL2Relative.useCondDB = False
+process.ak5CaloL3Absolute.useCondDB = False
+process.ak5CaloResidual.useCondDB = False
+process.ak5PFL2Relative.useCondDB = False
+process.ak5PFL3Absolute.useCondDB = False
+process.ak5PFResidual.useCondDB = False
 
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),
@@ -60,20 +62,6 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     genJetCollection=cms.InputTag("ak5GenJets"),
     doJetID      = False
 )
-
-####################################################################
-###  NO NEED TO USE IT SINCE THIS CONFIG FILE IS FOR 38X MC SAMPLES 
-####################################################################
-#### For Summer09 samples redigitized during Spring10 production
-
-#from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
-# Run ak5 gen jets
-#run33xOnReRecoMC( process, "ak5GenJets")
-
-#process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI')
-
-####
-####################################################################
 
 # Switch on PAT trigger
 #from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger

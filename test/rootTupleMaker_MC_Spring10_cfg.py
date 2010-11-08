@@ -40,6 +40,10 @@ from PhysicsTools.PatAlgos.tools.metTools import *
 addTcMET(process, 'TC')
 addPfMET(process, 'PF')
 
+# Add pfMET type 1 corrections
+from Leptoquarks.RootTupleMakerV2.tools import *
+addPfMETType1Cor(process, 'PFType1Cor')
+
 # Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
 switchJECSet( process, "Spring10" )
@@ -140,6 +144,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
+        'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleSuperClusters_*_*',
         'keep *_rootTupleTrigger_*_*',
@@ -175,6 +180,7 @@ process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
     process.pdfWeights*
+    process.metJESCorAK5PFJet*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
@@ -185,6 +191,7 @@ process.p = cms.Path(
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
     process.rootTuplePFMET+
+    process.rootTuplePFMETType1Cor+
     process.rootTupleMuons+
     process.rootTupleSuperClusters+
     process.rootTupleTrigger+

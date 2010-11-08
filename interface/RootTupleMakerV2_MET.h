@@ -11,6 +11,7 @@ class RootTupleMakerV2_MET : public edm::EDProducer {
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag   inputTag;
   const std::string     prefix,suffix;
+  const bool            store_uncorrected_MET;
 };
 
 #endif

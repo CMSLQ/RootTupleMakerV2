@@ -36,8 +36,9 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "RelIso" + suffix );
   produces <std::vector<int> >    ( prefix + "PassIso" + suffix );
   produces <std::vector<int> >    ( prefix + "PassID" + suffix );
-  produces <std::vector<double> > ( prefix + "VtxDist3D" + suffix );
   produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
+  produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
+  produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
 }
 
 void RootTupleMakerV2_Muons::
@@ -62,8 +63,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  relIso   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     passIso  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     passID   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  vtxDist3D  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::Muon> > muons;
@@ -94,18 +96,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       // Vertex association
       double minVtxDist3D = 9999.;
-      int indexVtx = -1;
+      int vtxIndex_ = -1;
+      double vtxDistXY_ = -9999.;
+      double vtxDistZ_ = -9999.;
 
       if(primaryVertices.isValid()) {
         edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
         for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ) {
 
-          double dist3D = sqrt(pow(it->track()->dxy(v_it->position()),2) + pow(it->track()->dz(v_it->position()),2));
+          double distXY = it->track()->dxy(v_it->position());
+          double distZ = it->track()->dz(v_it->position());
+          double dist3D = sqrt(pow(distXY,2) + pow(distZ,2));
 
           if( dist3D<minVtxDist3D ) {
             minVtxDist3D = dist3D;
-            indexVtx = int(std::distance(primaryVertices->begin(),v_it));
+            vtxIndex_ = int(std::distance(primaryVertices->begin(),v_it));
+            vtxDistXY_ = distXY;
+            vtxDistZ_ = distZ;
           }
         }
       } else {
@@ -131,8 +139,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       relIso->push_back( reliso );
       passIso->push_back( (reliso<muonIso) ? 1 : 0 );
       passID->push_back( (it->muonID(muonID)) ? 1 : 0 );
-      vtxDist3D->push_back( minVtxDist3D );
-      vtxIndex->push_back( indexVtx );
+      vtxIndex->push_back( vtxIndex_ );
+      vtxDistXY->push_back( vtxDistXY_ );
+      vtxDistZ->push_back( vtxDistZ_ );
     }
   } else {
     edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << inputTag;
@@ -159,6 +168,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( relIso, prefix + "RelIso" + suffix );
   iEvent.put( passIso, prefix + "PassIso" + suffix );
   iEvent.put( passID, prefix + "PassID" + suffix );
-  iEvent.put( vtxDist3D, prefix + "VtxDist3D" + suffix );
   iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
+  iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
+  iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
 }

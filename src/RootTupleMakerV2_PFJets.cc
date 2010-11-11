@@ -40,6 +40,13 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<int> >    ( prefix + "NeutralHadronMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "NeutralMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "PhotonMultiplicity"  + suffix );
+  produces <std::vector<int> >    ( prefix + "NConstituents"  + suffix );
+  produces <std::vector<double> > ( prefix + "TrackCountingHighEffBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackCountingHighPurBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "JetProbabilityBTag" + suffix );
+  produces <std::vector<double> > ( prefix + "JetBProbabilityBTag" + suffix );
 }
 
 void RootTupleMakerV2_PFJets::
@@ -69,6 +76,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     neutralHadronMultiplicity  ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     neutralMultiplicity  ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     photonMultiplicity  ( new std::vector<int>()  ) ;
+  std::auto_ptr<std::vector<int> >     nConstituents  ( new std::vector<int>()  ) ;
+  std::auto_ptr<std::vector<double> >  trackCountingHighEffBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackCountingHighPurBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighEffBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  jetProbabilityBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
   edm::FileInPath fipUnc(jecUncPath);;
@@ -130,6 +144,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       neutralHadronMultiplicity->push_back( it->neutralHadronMultiplicity() );
       neutralMultiplicity->push_back( it->neutralMultiplicity() );
       photonMultiplicity->push_back( it->photonMultiplicity() );
+      nConstituents->push_back( it->numberOfDaughters() );
+      trackCountingHighEffBTag->push_back( it->bDiscriminator("trackCountingHighEffBJetTags") );
+      trackCountingHighPurBTag->push_back( it->bDiscriminator("trackCountingHighPurBJetTags") );
+      simpleSecondaryVertexHighEffBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags") );
+      simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags") );
+      jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
+      jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
     }
   } else {
     edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTag;
@@ -165,4 +186,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( neutralHadronMultiplicity,  prefix + "NeutralHadronMultiplicity"  + suffix );
   iEvent.put( neutralMultiplicity,  prefix + "NeutralMultiplicity"  + suffix );
   iEvent.put( photonMultiplicity,  prefix + "PhotonMultiplicity"  + suffix );
+  iEvent.put( nConstituents,  prefix + "NConstituents"  + suffix );
+  iEvent.put( trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix );
+  iEvent.put( trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix );
+  iEvent.put( simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  iEvent.put( simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  iEvent.put( jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix );
+  iEvent.put( jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix );
 }

@@ -62,8 +62,8 @@ process.rootTuplePFJets.ApplyResidualJEC = True
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
-    doJTA        = False,
-    doBTagging   = False,
+    doJTA        = True,
+    doBTagging   = True,
     jetCorrLabel = ('AK5','PF'),
     doType1MET   = False,
     doL1Cleaning = False,

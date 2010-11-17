@@ -154,7 +154,16 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
                                      #METFwd
                                      'HLT_MET100_v3', #114
                                      'HLT_MET120_v3', #115
-                                     'HLT_MET45_DiJet30U_v3' #116
+                                     'HLT_MET45_DiJet30U_v3', #116
+                                     ##############
+                                     ## Others (from Sam, W' analysis)
+                                     ##############
+                                     'HLT_Ele10_LW_L1R', #117
+                                     'HLT_Ele15_SW_L1R', #118
+                                     'HLT_Ele15_SW_EleId_L1R', #119
+                                     'HLT_Ele20_SW_L1R', #120
+                                     'HLT_Ele15_SW_CaloEleId_L1R' #121                                     
+                                     'HLT_Ele22_SW_TighterEleId_L1R_v3', #122                                     
                                      )
 
     #used in Spring10 - Summer10 analysis                                  

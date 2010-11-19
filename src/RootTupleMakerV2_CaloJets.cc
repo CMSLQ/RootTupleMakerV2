@@ -3,6 +3,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h" 
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
@@ -46,7 +47,14 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
   produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
   produces <std::vector<double> > ( prefix + "JetProbabilityBTag" + suffix );
   produces <std::vector<double> > ( prefix + "JetBProbabilityBTag" + suffix );
+  produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);  
+  produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);  
 }
+
+JetIDSelectionFunctor jetIDLoose( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::LOOSE );
+JetIDSelectionFunctor jetIDTight( JetIDSelectionFunctor::PURE09, JetIDSelectionFunctor::TIGHT );
+
+pat::strbitset ret = jetIDLoose.getBitTemplate();                        
 
 void RootTupleMakerV2_CaloJets::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -75,6 +83,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  jetProbabilityBTag  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >  passLooseID  ( new std::vector<int>()  );   
+  std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );   
 
   //-----------------------------------------------------------------
   edm::FileInPath fipUnc(jecUncPath);;
@@ -100,6 +110,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // exit from loop when you reach the required number of jets
       if(eta->size() >= maxSize)
         break;
+
+      ret.set(false);                                       
+      int passjetLoose =0;                                  
+      if(jetIDLoose( *it, ret )) passjetLoose =1;          
+
+      ret.set(false);                                      
+      int passjetTight = 0;                                
+      if (jetIDTight( *it, ret)) passjetTight =1;          
+
 
       int ovrlps = 0;
       /* overlaps with good electrons (with different electron IDs) and muons are handled bitwise
@@ -181,6 +200,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags") );
       jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
       jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
+      passLooseID->push_back( passjetLoose );   
+      passTightID->push_back( passjetTight );   
     }
   } else {
     edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;
@@ -216,4 +237,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
   iEvent.put( jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix );
   iEvent.put( jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix );
+  iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);   
+  iEvent.put( passTightID, prefix + "PassTightID" + suffix);  
 }

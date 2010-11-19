@@ -5,7 +5,7 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-
+#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
@@ -47,7 +47,15 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
   produces <std::vector<double> > ( prefix + "JetProbabilityBTag" + suffix );
   produces <std::vector<double> > ( prefix + "JetBProbabilityBTag" + suffix );
+  produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);  
+  produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);  
 }
+
+
+PFJetIDSelectionFunctor pfjetIDLoose( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE );
+PFJetIDSelectionFunctor pfjetIDTight( PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::TIGHT );
+
+pat::strbitset retpf = pfjetIDLoose.getBitTemplate();          
 
 void RootTupleMakerV2_PFJets::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -83,6 +91,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  jetProbabilityBTag  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >  passLooseID  ( new std::vector<int>()  );   
+  std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );   
 
   //-----------------------------------------------------------------
   edm::FileInPath fipUnc(jecUncPath);;
@@ -108,6 +118,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // exit from loop when you reach the required number of jets
       if(eta->size() >= maxSize)
         break;
+
+      retpf.set(false);                                       
+      int passjetLoose =0;                                  
+      if(pfjetIDLoose( *it, retpf )) passjetLoose =1;          
+
+      retpf.set(false);                                      
+      int passjetTight = 0;                                
+      if (pfjetIDTight( *it, retpf)) passjetTight =1;          
+
+
 
       double corr = 1.;
       if( applyResJEC && iEvent.isRealData() ) {
@@ -151,6 +171,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags") );
       jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
       jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
+      passLooseID->push_back( passjetLoose );   
+      passTightID->push_back( passjetTight );   
     }
   } else {
     edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTag;
@@ -193,4 +215,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
   iEvent.put( jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix );
   iEvent.put( jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix );
+  iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);   
+  iEvent.put( passTightID, prefix + "PassTightID" + suffix);  
 }

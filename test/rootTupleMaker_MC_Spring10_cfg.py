@@ -158,12 +158,15 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 
 # Produce PDF weights (maximum is 3)
 process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-    FixPOWHEG = cms.untracked.bool(False), # fix POWHEG (it requires cteq6m* PDFs in the list)
+    # Fix POWHEG if buggy (this PDF set will also appear on output,
+    # so only two more PDF sets can be added in PdfSetNames if not "")
+    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
+    #GenTag = cms.untracked.InputTag("genParticles"),
     PdfInfoTag = cms.untracked.InputTag("generator"),
     PdfSetNames = cms.untracked.vstring(
-        "cteq65.LHgrid"
-      #, "MRST2006nnlo.LHgrid"
-      #, "MRST2007lomod.LHgrid"
+            "cteq66.LHgrid"
+          #, "MRST2006nnlo.LHgrid"
+          #, "MRST2007lomod.LHgrid"
     )
 )
 

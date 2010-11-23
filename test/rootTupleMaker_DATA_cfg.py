@@ -19,8 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR10_P_V10::All' #/Electron/Run2010B-PromptReco-v2/RECO
-#process.GlobalTag.globaltag = 'GR_R_38X_V13A::All'  #/EG/Run2010A-Sep17ReReco_v2/RECO
+process.GlobalTag.globaltag = 'FT_R_38X_V14A::All' # /EG/Run2010A-Nov4ReReco_v1/RECO and /Electron/Run2010B-Nov4ReReco_v1/RECO
 
 # Events to process
 process.maxEvents.input = 100
@@ -30,7 +29,7 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2010B/Electron/RECO/PromptReco-v2/000/147/206/FA81A36C-F8D0-DF11-87F8-001D09F29849.root'
+    '/store/data/Run2010B/Electron/RECO/Nov4ReReco_v1/0127/64991BB2-8BEA-DF11-BC18-001BFCDBD1BE.root'
 ]
 
 # Turn off MC matching for the process

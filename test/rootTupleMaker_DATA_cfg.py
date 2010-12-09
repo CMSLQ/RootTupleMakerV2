@@ -116,6 +116,8 @@ process.LJFilter.elecPT = 20.
 process.LJFilter.counteitherleptontype = False
 ##################################################################
 #### SuperCluster based skim
+#process.LJFilter.scLabelEB = 'correctedHybridSuperClusters'
+#process.LJFilter.scLabelEE = 'correctedMulti5x5SuperClustersWithPreshower'
 #process.LJFilter.muLabel = 'muons'
 #process.LJFilter.elecLabel = 'gsfElectrons'
 #process.LJFilter.jetLabel = 'ak5CaloJets'

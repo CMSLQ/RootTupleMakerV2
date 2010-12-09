@@ -126,8 +126,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // scale factor = 3.801/18166.0 which are
       // average values taken over a stable two-week period
       double currentToBFieldScaleFactor = 2.09237036221512717e-04;
-      double current = (*dcsHandle)[0].magnetCurrent();
-      evt_bField = current*currentToBFieldScaleFactor;
+      if( (*dcsHandle).size()>0 ) {
+        double current = (*dcsHandle)[0].magnetCurrent();
+        evt_bField = current*currentToBFieldScaleFactor;
+      }
     } else {
       edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << dcsInputTag;
     }

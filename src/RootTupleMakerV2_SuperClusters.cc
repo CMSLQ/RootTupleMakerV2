@@ -221,8 +221,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     e1e9->push_back( emax/e9 );
     s4s1->push_back( (eright+eleft+etop+ebottom)/emax );
 
-    EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(it->seed()->seed());
-    koutoftime->push_back( (recHit!=ecalEndcapRecHitHandle->end() && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ? 1 : 0 );
+    int flaggedRecHitCounter = 0;
+    const std::vector<std::pair<DetId, float> > & hitsAndFractions = it->seed()->hitsAndFractions();
+    std::vector<std::pair<DetId, float> >::const_iterator hitIter;
+
+    for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
+      EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(hitIter->first);
+      if(recHit!=ecalEndcapRecHitHandle->end()) {
+        if( ((hitIter->second*recHit->energy())/it->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+      }
+    }
+
+    koutoftime->push_back( (flaggedRecHitCounter>0) ? 1 : 0 );
   }
 
   for( reco::SuperClusterCollection::const_iterator it = superClustersEEHandle->begin(); it != superClustersEEHandle->end(); ++it ) {
@@ -294,8 +304,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     e1e9->push_back( emax/e9 );
     s4s1->push_back( (eright+eleft+etop+ebottom)/emax );
 
-    EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(it->seed()->seed());
-    koutoftime->push_back( (recHit!=ecalEndcapRecHitHandle->end() && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ? 1 : 0 );
+    int flaggedRecHitCounter = 0;
+    const std::vector<std::pair<DetId, float> > & hitsAndFractions = it->seed()->hitsAndFractions();
+    std::vector<std::pair<DetId, float> >::const_iterator hitIter;
+
+    for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
+      EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(hitIter->first);
+      if(recHit!=ecalEndcapRecHitHandle->end()) {
+        if( ((hitIter->second*recHit->energy())/it->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+      }
+    }
+
+    koutoftime->push_back( (flaggedRecHitCounter>0) ? 1 : 0 );
   }
 
   // Electrons
@@ -330,8 +350,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         etop    = EcalClusterTools::eTop( *(it->superCluster()), &(*ecalBarrelRecHitHandle), &(*caloTopology) ) ;
         ebottom = EcalClusterTools::eBottom( *(it->superCluster()), &(*ecalBarrelRecHitHandle), &(*caloTopology) );
 
-        EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(it->superCluster()->seed()->seed());
-        ekoutoftime = (recHit!=ecalBarrelRecHitHandle->end()) ? recHit->flagField(EcalRecHit::kOutOfTime) : -1;
+        int flaggedRecHitCounter = 0;
+        const std::vector<std::pair<DetId, float> > & hitsAndFractions = it->superCluster()->seed()->hitsAndFractions();
+        std::vector<std::pair<DetId, float> >::const_iterator hitIter;
+
+        for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
+          EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(hitIter->first);
+          if(recHit!=ecalEndcapRecHitHandle->end()) {
+            if( ((hitIter->second*recHit->energy())/it->superCluster()->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+          }
+        }
+
+        ekoutoftime = (flaggedRecHitCounter>0) ? 1 : 0;
       } else {
         emax    = EcalClusterTools::eMax( *(it->superCluster()), &(*ecalEndcapRecHitHandle) );
         e9      = EcalClusterTools::e3x3( *(it->superCluster()), &(*ecalEndcapRecHitHandle), &(*caloTopology) );
@@ -340,8 +370,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         etop    = EcalClusterTools::eTop( *(it->superCluster()), &(*ecalEndcapRecHitHandle), &(*caloTopology) ) ;
         ebottom = EcalClusterTools::eBottom( *(it->superCluster()), &(*ecalEndcapRecHitHandle), &(*caloTopology) );
 
-        EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(it->superCluster()->seed()->seed());
-        ekoutoftime = (recHit!=ecalEndcapRecHitHandle->end() && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ? 1 : 0;
+        int flaggedRecHitCounter = 0;
+        const std::vector<std::pair<DetId, float> > & hitsAndFractions = it->superCluster()->seed()->hitsAndFractions();
+        std::vector<std::pair<DetId, float> >::const_iterator hitIter;
+
+        for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
+          EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(hitIter->first);
+          if(recHit!=ecalEndcapRecHitHandle->end()) {
+            if( ((hitIter->second*recHit->energy())/it->superCluster()->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+          }
+        }
+
+        ekoutoftime = (flaggedRecHitCounter>0) ? 1 : 0;
       }
 
       scE1E9->push_back( emax/e9 );

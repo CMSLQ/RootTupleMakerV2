@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'FT_R_38X_V14A::All' # /EG/Run2010A-Nov4ReReco_v1/RECO and /Electron/Run2010B-Nov4ReReco_v1/RECO
+process.GlobalTag.globaltag = 'GR_R_39X_V6::All' # /EG/Run2010A-Dec22ReReco_v1/RECO and /Electron/Run2010B-Dec22ReReco_v1/RECO
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,41 +29,28 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2010B/Electron/RECO/Nov4ReReco_v1/0127/64991BB2-8BEA-DF11-BC18-001BFCDBD1BE.root'
+    '/store/data/Run2010B/Electron/RECO/Dec22ReReco_v1/0009/6E793492-840E-E011-9559-002354EF3BDF.root'
 ]
 
 # Turn off MC matching for the process
-removeMCMatching(process, ['All'])
+removeMCMatching(process, ['All'], '', False)
 
 # Add tcMET and pfMET
 from PhysicsTools.PatAlgos.tools.metTools import *
 addTcMET(process, 'TC')
 addPfMET(process, 'PF')
 
-# Add pfMET type 1 corrections
+# Add type-I corrected pfMET
 from Leptoquarks.RootTupleMakerV2.tools import *
 addPfMETType1Cor(process, 'PFType1Cor')
 
-# Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
-switchJECSet( process, "Spring10" )
-process.ak5CaloL2Relative.useCondDB = False
-process.ak5CaloL3Absolute.useCondDB = False
-process.ak5CaloResidual.useCondDB = False
-process.ak5PFL2Relative.useCondDB = False
-process.ak5PFL3Absolute.useCondDB = False
-process.ak5PFResidual.useCondDB = False
-
-# Residual jet energy corrections (only applied to real data)
-process.rootTupleCaloJets.ApplyResidualJEC = True
-process.rootTuplePFJets.ApplyResidualJEC = True
-
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5','PF'),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'])),
     doType1MET   = False,
     doL1Cleaning = False,
     doL1Counters = False,
@@ -71,20 +58,9 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJetID      = False
 )
 
-##################################################################
-#### For data samples re-HLT'ed and re-reco'ed in 38X --> NEED TO CHECK THE LABEL (i.e. "HLT38" might change for different re-reco)
-
-#process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','HLT38')
-
-####
-##################################################################
-
-# Switch on PAT trigger
-#from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
-#switchOnTrigger( process )
-
-# Restrict input to AOD
-#restrictInputToAOD(process, ['All'])
+# Residual jet energy corrections (only applied to real data)
+process.rootTupleCaloJets.ApplyResidualJEC = True
+process.rootTuplePFJets.ApplyResidualJEC = True
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *

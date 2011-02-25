@@ -2,6 +2,8 @@
 #define RootTupleMakerV2PFJets
 
 #include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 class RootTupleMakerV2_PFJets : public edm::EDProducer {
  public:

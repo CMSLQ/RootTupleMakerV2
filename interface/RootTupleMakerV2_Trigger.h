@@ -2,6 +2,8 @@
 #define RootTupleMakerV2Trigger
 
 #include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 class RootTupleMakerV2_Trigger : public edm::EDProducer {

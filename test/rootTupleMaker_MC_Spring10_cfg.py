@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'START3X_V26::All'
+process.GlobalTag.globaltag = 'START39_V9::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -32,34 +32,22 @@ process.source.fileNames = [
     '/store/mc/Spring10/TTbarJets-madgraph/GEN-SIM-RECO/START3X_V26_S09-v1/0006/FE8DE204-C446-DF11-BF76-003048C693FA.root'
 ]
 
-# Turn off MC matching for the process
-#removeMCMatching(process, ['All'])
-
 # Add tcMET and pfMET
 from PhysicsTools.PatAlgos.tools.metTools import *
 addTcMET(process, 'TC')
 addPfMET(process, 'PF')
 
-# Add pfMET type 1 corrections
+# Add type-I corrected pfMET
 from Leptoquarks.RootTupleMakerV2.tools import *
 addPfMETType1Cor(process, 'PFType1Cor')
 
-# Get the 7 TeV GeV jet corrections
 from PhysicsTools.PatAlgos.tools.jetTools import *
-switchJECSet( process, "Spring10" )
-process.ak5CaloL2Relative.useCondDB = False
-process.ak5CaloL3Absolute.useCondDB = False
-process.ak5CaloResidual.useCondDB = False
-process.ak5PFL2Relative.useCondDB = False
-process.ak5PFL3Absolute.useCondDB = False
-process.ak5PFResidual.useCondDB = False
-
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5','PF'),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'])),
     doType1MET   = False,
     doL1Cleaning = False,
     doL1Counters = False,
@@ -79,13 +67,6 @@ process.rootTupleTrigger.HLTInputTag = cms.InputTag('TriggerResults','','REDIGI'
 
 ####
 ##################################################################
-
-# Switch on PAT trigger
-#from PhysicsTools.PatAlgos.tools.trigTools import switchOnTrigger
-#switchOnTrigger( process )
-
-# Restrict input to AOD
-#restrictInputToAOD(process, ['All'])
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *

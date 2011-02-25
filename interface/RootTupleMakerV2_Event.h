@@ -2,6 +2,7 @@
 #define RootTupleMakerV2Event
 
 #include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 class RootTupleMakerV2_Event : public edm::EDProducer {
  public:

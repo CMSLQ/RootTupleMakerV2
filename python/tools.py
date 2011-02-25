@@ -2,7 +2,7 @@ from FWCore.GuiBrowsers.ConfigToolBase import *
 
 class AddPfMETType1Cor(ConfigToolBase):
 
-    """ Add Type1 corrected pflow MET collection to patEventContent
+    """ Add Type-I corrected pfMET collection to patEventContent
     """
     _label='addPfMETType1Cor'
     _defaultParameters=dicttypes.SortedKeysDict()

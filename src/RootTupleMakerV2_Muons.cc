@@ -1,11 +1,11 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Muons.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-
 
 RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
@@ -67,6 +67,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
 
+  std::auto_ptr<std::vector<double> >  ctEta        ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctPhi        ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctPt         ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctP          ( new std::vector<double> () );
+  std::auto_ptr<std::vector<int   > >  ctCharge     ( new std::vector<int   > () );
+  std::auto_ptr<std::vector<int   > >  ctTrkHits    ( new std::vector<int   > () );
+  std::auto_ptr<std::vector<double> >  ctTrkD0      ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctTrkD0Error ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctTrkDz      ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctTrkDzError ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctGlobalChi2 ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctRelIso     ( new std::vector<double> () );
+  std::auto_ptr<std::vector<int   > >  passCTIso    ( new std::vector<int   > () );
+  
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::Muon> > muons;
   iEvent.getByLabel(inputTag, muons);
@@ -89,10 +103,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if(!it->isGlobalMuon())
         continue;
 
-      double trkd0 = it->track()->d0();
-      if( beamSpotCorr && beamSpot.isValid() ) trkd0 = -(it->track()->dxy( beamSpot->position()));
+      // get muon cocktail track
+      const reco::TrackRef& cocktail_track = pmcTrack(*it);
+
+      double trkd0   = it->track()->d0();
+      double cttrkd0 = cocktail_track -> d0();
+
+      if( beamSpotCorr && beamSpot.isValid() ) {
+	trkd0   = -(it->track()   ->dxy( beamSpot->position()));
+	cttrkd0 = -(cocktail_track->dxy( beamSpot->position()));
+      }
+      
       else if( beamSpotCorr && !beamSpot.isValid() ) edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
-      double reliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/it->pt();
+
+      double reliso   = (it->trackIso() + it->ecalIso() + it->hcalIso())/it->pt();
+      double ctreliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/cocktail_track->pt();
 
       // Vertex association
       double minVtxDist3D = 9999.;
@@ -124,7 +149,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
       p->push_back( it->p() );
-      energy->push_back( it->energy() );
       charge->push_back( it->charge() );
       trkHits->push_back( it->track()->numberOfValidHits() );
       trkD0->push_back( trkd0 );
@@ -132,12 +156,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       trkDz->push_back( it->track()->dz() );
       trkDzError->push_back( it->track()->dzError() );
       globalChi2->push_back( it->track()->normalizedChi2() );
+      relIso->push_back( reliso );
+      passIso->push_back( (reliso<muonIso) ? 1 : 0 );
+
+      ctEta       ->push_back( cocktail_track->eta() );
+      ctPhi       ->push_back( cocktail_track->phi() );
+      ctPt        ->push_back( cocktail_track->pt() );
+      ctP         ->push_back( cocktail_track->p() );
+      ctCharge    ->push_back( cocktail_track->charge() );
+      ctTrkHits   ->push_back( cocktail_track->numberOfValidHits() );
+      ctTrkD0     ->push_back( cttrkd0 );
+      ctTrkD0Error->push_back( cocktail_track->d0Error() );
+      ctTrkDz     ->push_back( cocktail_track->dz() );
+      ctTrkDzError->push_back( cocktail_track -> dzError() );
+      ctGlobalChi2->push_back( cocktail_track ->normalizedChi2() );
+      ctRelIso    ->push_back( ctreliso ) ;
+      passCTIso   ->push_back( (ctreliso<muonIso) ? 1 : 0 );
+      
+      energy->push_back( it->energy() );
       trkIso->push_back( it->trackIso() );
       ecalIso->push_back( it->ecalIso() );
       hcalIso->push_back( it->hcalIso() );
       hoIso->push_back( it->isolationR03().hoEt );
-      relIso->push_back( reliso );
-      passIso->push_back( (reliso<muonIso) ? 1 : 0 );
+
       passID->push_back( (it->muonID(muonID)) ? 1 : 0 );
       vtxIndex->push_back( vtxIndex_ );
       vtxDistXY->push_back( vtxDistXY_ );
@@ -171,4 +212,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
   iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
+
+  iEvent.put( ctEta       , prefix + "CocktailEta"        + suffix ) ;
+  iEvent.put( ctPhi       , prefix + "CocktailPhi"        + suffix ) ;
+  iEvent.put( ctPt        , prefix + "CocktailPt"         + suffix ) ;
+  iEvent.put( ctP         , prefix + "CocktailP"          + suffix ) ;
+  iEvent.put( ctCharge    , prefix + "CocktailCharge"     + suffix ) ;
+  iEvent.put( ctTrkHits   , prefix + "CocktailTrkHits"    + suffix ) ;
+  iEvent.put( ctTrkD0     , prefix + "CocktailTrkD0"      + suffix ) ;
+  iEvent.put( ctTrkD0Error, prefix + "CocktailTrkD0Error" + suffix ) ;
+  iEvent.put( ctTrkDz     , prefix + "CocktailTrkDz"      + suffix ) ;
+  iEvent.put( ctTrkDzError, prefix + "CocktailTrkDzError" + suffix ) ;
+  iEvent.put( ctGlobalChi2, prefix + "CocktailGlobalChi2" + suffix ) ;
+  iEvent.put( ctRelIso    , prefix + "CocktailRelIso"     + suffix ) ;
+  iEvent.put( passCTIso   , prefix + "CocktailPassIso"    + suffix ) ;
+  
 }

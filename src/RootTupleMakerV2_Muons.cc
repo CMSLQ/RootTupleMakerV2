@@ -39,6 +39,23 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
+
+  produces <std::vector<double> > ( prefix + "CocktailEta"        + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailPhi"        + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailPt"         + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailP"          + suffix ) ;
+  produces <std::vector<int   > > ( prefix + "CocktailCharge"     + suffix ) ;
+  produces <std::vector<int   > > ( prefix + "CocktailTrkHits"    + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailTrkD0"      + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailTrkD0Error" + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailTrkDz"      + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailTrkDzError" + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailGlobalChi2" + suffix ) ;
+  produces <std::vector<double> > ( prefix + "CocktailRelIso"     + suffix ) ;
+  produces <std::vector<int   > > ( prefix + "CocktailPassIso"    + suffix ) ;
+
+
+
 }
 
 void RootTupleMakerV2_Muons::

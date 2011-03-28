@@ -15,6 +15,7 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
     muonIso (iConfig.getParameter<double>       ("MuonIso")),
     muonID  (iConfig.getParameter<std::string>  ("MuonID")),
     beamSpotCorr (iConfig.getParameter<bool>    ("BeamSpotCorr")),
+    useCocktailRefits ( iConfig.getParameter<bool>("UseCocktailRefits")),
     vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
@@ -40,21 +41,21 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
 
-  produces <std::vector<double> > ( prefix + "CocktailEta"        + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailPhi"        + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailPt"         + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailP"          + suffix ) ;
-  produces <std::vector<int   > > ( prefix + "CocktailCharge"     + suffix ) ;
-  produces <std::vector<int   > > ( prefix + "CocktailTrkHits"    + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailTrkD0"      + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailTrkD0Error" + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailTrkDz"      + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailTrkDzError" + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailGlobalChi2" + suffix ) ;
-  produces <std::vector<double> > ( prefix + "CocktailRelIso"     + suffix ) ;
-  produces <std::vector<int   > > ( prefix + "CocktailPassIso"    + suffix ) ;
-
-
+  if ( useCocktailRefits ) {
+    produces <std::vector<double> > ( prefix + "CocktailEta"        + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailPhi"        + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailPt"         + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailP"          + suffix ) ;
+    produces <std::vector<int   > > ( prefix + "CocktailCharge"     + suffix ) ;
+    produces <std::vector<int   > > ( prefix + "CocktailTrkHits"    + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailTrkD0"      + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailTrkD0Error" + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailTrkDz"      + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailTrkDzError" + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailGlobalChi2" + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailRelIso"     + suffix ) ;
+    produces <std::vector<int   > > ( prefix + "CocktailPassIso"    + suffix ) ;
+  }
 
 }
 
@@ -120,21 +121,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if(!it->isGlobalMuon())
         continue;
 
-      // get muon cocktail track
-      const reco::TrackRef& cocktail_track = pmcTrack(*it);
-
       double trkd0   = it->track()->d0();
-      double cttrkd0 = cocktail_track -> d0();
 
       if( beamSpotCorr && beamSpot.isValid() ) {
 	trkd0   = -(it->track()   ->dxy( beamSpot->position()));
-	cttrkd0 = -(cocktail_track->dxy( beamSpot->position()));
       }
       
       else if( beamSpotCorr && !beamSpot.isValid() ) edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
 
       double reliso   = (it->trackIso() + it->ecalIso() + it->hcalIso())/it->pt();
-      double ctreliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/cocktail_track->pt();
 
       // Vertex association
       double minVtxDist3D = 9999.;
@@ -176,19 +171,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       relIso->push_back( reliso );
       passIso->push_back( (reliso<muonIso) ? 1 : 0 );
 
-      ctEta       ->push_back( cocktail_track->eta() );
-      ctPhi       ->push_back( cocktail_track->phi() );
-      ctPt        ->push_back( cocktail_track->pt() );
-      ctP         ->push_back( cocktail_track->p() );
-      ctCharge    ->push_back( cocktail_track->charge() );
-      ctTrkHits   ->push_back( cocktail_track->numberOfValidHits() );
-      ctTrkD0     ->push_back( cttrkd0 );
-      ctTrkD0Error->push_back( cocktail_track->d0Error() );
-      ctTrkDz     ->push_back( cocktail_track->dz() );
-      ctTrkDzError->push_back( cocktail_track -> dzError() );
-      ctGlobalChi2->push_back( cocktail_track ->normalizedChi2() );
-      ctRelIso    ->push_back( ctreliso ) ;
-      passCTIso   ->push_back( (ctreliso<muonIso) ? 1 : 0 );
+      if ( useCocktailRefits ) {
+
+	const reco::TrackRef& cocktail_track = pmcTrack(*it);
+	
+	double ctreliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/cocktail_track->pt();
+	double cttrkd0  = cocktail_track -> d0() ;
+	if( beamSpotCorr && beamSpot.isValid() ) 
+	  cttrkd0 = -(cocktail_track->dxy( beamSpot->position()));
+	
+	ctEta       ->push_back( cocktail_track->eta() );
+	ctPhi       ->push_back( cocktail_track->phi() );
+	ctPt        ->push_back( cocktail_track->pt() );
+	ctP         ->push_back( cocktail_track->p() );
+	ctCharge    ->push_back( cocktail_track->charge() );
+	ctTrkHits   ->push_back( cocktail_track->numberOfValidHits() );
+	ctTrkD0     ->push_back( cttrkd0 ) ;
+	ctTrkD0Error->push_back( cocktail_track->d0Error() );
+	ctTrkDz     ->push_back( cocktail_track->dz() );
+	ctTrkDzError->push_back( cocktail_track -> dzError() );
+	ctGlobalChi2->push_back( cocktail_track ->normalizedChi2() );
+	ctRelIso    ->push_back( ctreliso ) ;
+	passCTIso   ->push_back( (ctreliso<muonIso) ? 1 : 0 );
+      }
       
       energy->push_back( it->energy() );
       trkIso->push_back( it->trackIso() );
@@ -230,18 +235,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
 
-  iEvent.put( ctEta       , prefix + "CocktailEta"        + suffix ) ;
-  iEvent.put( ctPhi       , prefix + "CocktailPhi"        + suffix ) ;
-  iEvent.put( ctPt        , prefix + "CocktailPt"         + suffix ) ;
-  iEvent.put( ctP         , prefix + "CocktailP"          + suffix ) ;
-  iEvent.put( ctCharge    , prefix + "CocktailCharge"     + suffix ) ;
-  iEvent.put( ctTrkHits   , prefix + "CocktailTrkHits"    + suffix ) ;
-  iEvent.put( ctTrkD0     , prefix + "CocktailTrkD0"      + suffix ) ;
-  iEvent.put( ctTrkD0Error, prefix + "CocktailTrkD0Error" + suffix ) ;
-  iEvent.put( ctTrkDz     , prefix + "CocktailTrkDz"      + suffix ) ;
-  iEvent.put( ctTrkDzError, prefix + "CocktailTrkDzError" + suffix ) ;
-  iEvent.put( ctGlobalChi2, prefix + "CocktailGlobalChi2" + suffix ) ;
-  iEvent.put( ctRelIso    , prefix + "CocktailRelIso"     + suffix ) ;
-  iEvent.put( passCTIso   , prefix + "CocktailPassIso"    + suffix ) ;
-  
+  if ( useCocktailRefits ) {
+    iEvent.put( ctEta       , prefix + "CocktailEta"        + suffix ) ;
+    iEvent.put( ctPhi       , prefix + "CocktailPhi"        + suffix ) ;
+    iEvent.put( ctPt        , prefix + "CocktailPt"         + suffix ) ;
+    iEvent.put( ctP         , prefix + "CocktailP"          + suffix ) ;
+    iEvent.put( ctCharge    , prefix + "CocktailCharge"     + suffix ) ;
+    iEvent.put( ctTrkHits   , prefix + "CocktailTrkHits"    + suffix ) ;
+    iEvent.put( ctTrkD0     , prefix + "CocktailTrkD0"      + suffix ) ;
+    iEvent.put( ctTrkD0Error, prefix + "CocktailTrkD0Error" + suffix ) ;
+    iEvent.put( ctTrkDz     , prefix + "CocktailTrkDz"      + suffix ) ;
+    iEvent.put( ctTrkDzError, prefix + "CocktailTrkDzError" + suffix ) ;
+    iEvent.put( ctGlobalChi2, prefix + "CocktailGlobalChi2" + suffix ) ;
+    iEvent.put( ctRelIso    , prefix + "CocktailRelIso"     + suffix ) ;
+    iEvent.put( passCTIso   , prefix + "CocktailPassIso"    + suffix ) ;
+  }
 }

@@ -17,6 +17,7 @@ class RootTupleMakerV2_Muons : public edm::EDProducer {
   const double          muonIso;
   const std::string     muonID;
   const bool            beamSpotCorr;
+  const bool            useCocktailRefits;
   const edm::InputTag   vtxInputTag;
 };
 

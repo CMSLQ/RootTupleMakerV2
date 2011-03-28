@@ -8,5 +8,6 @@ rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Muons",
     MuonIso = cms.double(0.05),
     MuonID = cms.string('GlobalMuonPromptTight'),
     BeamSpotCorr = cms.bool(False),
+    UseCocktailRefits = cms.bool(False),
     VertexInputTag = cms.InputTag('offlinePrimaryVertices')
 )

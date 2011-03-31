@@ -21,6 +21,10 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
+  produces <std::vector<double> > ( prefix + "EtaError" + suffix );
+  produces <std::vector<double> > ( prefix + "PhiError" + suffix );
+  produces <std::vector<double> > ( prefix + "PtError" + suffix );
+  produces <std::vector<double> > ( prefix + "QOverPError" + suffix );
   produces <std::vector<double> > ( prefix + "P" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<int> >    ( prefix + "Charge" + suffix );
@@ -45,6 +49,10 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
     produces <std::vector<double> > ( prefix + "CocktailEta"        + suffix ) ;
     produces <std::vector<double> > ( prefix + "CocktailPhi"        + suffix ) ;
     produces <std::vector<double> > ( prefix + "CocktailPt"         + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailEtaError"   + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailPhiError"   + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailPtError"    + suffix ) ;
+    produces <std::vector<double> > ( prefix + "CocktailQOverPError"+ suffix ) ;
     produces <std::vector<double> > ( prefix + "CocktailP"          + suffix ) ;
     produces <std::vector<int   > > ( prefix + "CocktailCharge"     + suffix ) ;
     produces <std::vector<int   > > ( prefix + "CocktailTrkHits"    + suffix ) ;
@@ -65,6 +73,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  etaError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  phiError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ptError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  qoverpError  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  p  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     charge  ( new std::vector<int>()  );
@@ -88,6 +100,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  ctEta        ( new std::vector<double> () );
   std::auto_ptr<std::vector<double> >  ctPhi        ( new std::vector<double> () );
   std::auto_ptr<std::vector<double> >  ctPt         ( new std::vector<double> () );
+  std::auto_ptr<std::vector<double> >  ctEtaError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ctPhiError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ctPtError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ctQoverpError  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ctP          ( new std::vector<double> () );
   std::auto_ptr<std::vector<int   > >  ctCharge     ( new std::vector<int   > () );
   std::auto_ptr<std::vector<int   > >  ctTrkHits    ( new std::vector<int   > () );
@@ -161,6 +177,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
       p->push_back( it->p() );
+
+      etaError    -> push_back ( it->globalTrack()->etaError() );
+      phiError    -> push_back ( it->globalTrack()->phiError() );
+      ptError     -> push_back ( it->globalTrack()->ptError () );
+      qoverpError -> push_back ( it->globalTrack()->qoverpError() ) ;
+
       charge->push_back( it->charge() );
       trkHits->push_back( it->track()->numberOfValidHits() );
       trkD0->push_back( trkd0 );
@@ -180,6 +202,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	if( beamSpotCorr && beamSpot.isValid() ) 
 	  cttrkd0 = -(cocktail_track->dxy( beamSpot->position()));
 	
+	ctEtaError    -> push_back ( cocktail_track->etaError() );
+	ctPhiError    -> push_back ( cocktail_track->phiError() );
+	ctPtError     -> push_back ( cocktail_track->ptError () );
+	ctQoverpError -> push_back ( cocktail_track->qoverpError() ) ;
+
 	ctEta       ->push_back( cocktail_track->eta() );
 	ctPhi       ->push_back( cocktail_track->phi() );
 	ctPt        ->push_back( cocktail_track->pt() );
@@ -215,6 +242,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
+  iEvent.put( etaError, prefix + "EtaError" + suffix );
+  iEvent.put( phiError, prefix + "PhiError" + suffix );
+  iEvent.put( ptError, prefix + "PtError" + suffix );
+  iEvent.put( qoverpError, prefix + "QOverPError" + suffix );
   iEvent.put( p, prefix + "P" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( charge, prefix + "Charge" + suffix );
@@ -223,7 +254,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( trkD0Error, prefix + "TrkD0Error" + suffix );
   iEvent.put( trkDz, prefix + "TrkDz" + suffix );
   iEvent.put( trkDzError, prefix + "TrkDzError" + suffix );
-  iEvent.put( globalChi2, prefix + "GlobalChi2" + suffix );
+  iEvent.put( globalChi2, prefix + "GlobalChi2" + suffix ); 
   iEvent.put( trkIso, prefix + "TrkIso" + suffix );
   iEvent.put( ecalIso, prefix + "EcalIso" + suffix );
   iEvent.put( hcalIso, prefix + "HcalIso" + suffix );
@@ -236,18 +267,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
 
   if ( useCocktailRefits ) {
-    iEvent.put( ctEta       , prefix + "CocktailEta"        + suffix ) ;
-    iEvent.put( ctPhi       , prefix + "CocktailPhi"        + suffix ) ;
-    iEvent.put( ctPt        , prefix + "CocktailPt"         + suffix ) ;
-    iEvent.put( ctP         , prefix + "CocktailP"          + suffix ) ;
-    iEvent.put( ctCharge    , prefix + "CocktailCharge"     + suffix ) ;
-    iEvent.put( ctTrkHits   , prefix + "CocktailTrkHits"    + suffix ) ;
-    iEvent.put( ctTrkD0     , prefix + "CocktailTrkD0"      + suffix ) ;
-    iEvent.put( ctTrkD0Error, prefix + "CocktailTrkD0Error" + suffix ) ;
-    iEvent.put( ctTrkDz     , prefix + "CocktailTrkDz"      + suffix ) ;
-    iEvent.put( ctTrkDzError, prefix + "CocktailTrkDzError" + suffix ) ;
-    iEvent.put( ctGlobalChi2, prefix + "CocktailGlobalChi2" + suffix ) ;
-    iEvent.put( ctRelIso    , prefix + "CocktailRelIso"     + suffix ) ;
-    iEvent.put( passCTIso   , prefix + "CocktailPassIso"    + suffix ) ;
+    iEvent.put( ctEta        , prefix + "CocktailEta"         + suffix ) ;
+    iEvent.put( ctPhi        , prefix + "CocktailPhi"         + suffix ) ;
+    iEvent.put( ctPt         , prefix + "CocktailPt"          + suffix ) ;
+    iEvent.put( ctEtaError   , prefix + "CocktailEtaError"    + suffix ) ;
+    iEvent.put( ctPhiError   , prefix + "CocktailPhiError"    + suffix ) ;
+    iEvent.put( ctPtError    , prefix + "CocktailPtError"     + suffix ) ;
+    iEvent.put( ctQoverpError, prefix + "CocktailQOverPError" + suffix );
+    iEvent.put( ctP          , prefix + "CocktailP"           + suffix ) ;
+    iEvent.put( ctCharge     , prefix + "CocktailCharge"      + suffix ) ;
+    iEvent.put( ctTrkHits    , prefix + "CocktailTrkHits"     + suffix ) ;
+    iEvent.put( ctTrkD0      , prefix + "CocktailTrkD0"       + suffix ) ;
+    iEvent.put( ctTrkD0Error , prefix + "CocktailTrkD0Error"  + suffix ) ;
+    iEvent.put( ctTrkDz      , prefix + "CocktailTrkDz"       + suffix ) ;
+    iEvent.put( ctTrkDzError , prefix + "CocktailTrkDzError"  + suffix ) ;
+    iEvent.put( ctGlobalChi2 , prefix + "CocktailGlobalChi2"  + suffix ) ;
+    iEvent.put( ctRelIso     , prefix + "CocktailRelIso"      + suffix ) ;
+    iEvent.put( passCTIso    , prefix + "CocktailPassIso"     + suffix ) ;
   }
 }

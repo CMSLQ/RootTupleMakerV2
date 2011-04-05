@@ -2,14 +2,15 @@
 #include "DataFormats/MuonReco/interface/MuonCocktails.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 
-reco::TrackRef pmcTrack(const pat::Muon& mu) {
-  return tevOptimized(mu.innerTrack(), mu.globalTrack(), mu.tpfmsMuon(), mu.pickyMuon());
+reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id ) {
+  return tevOptimized(mu.innerTrack(), mu.globalTrack(), mu.tpfmsMuon(), mu.pickyMuon(), refit_id);
 }
 
 reco::TrackRef tevOptimized(const reco::TrackRef& trackerTrack,
 			    const reco::TrackRef& gmrTrack,
 			    const reco::TrackRef& fmsTrack,
-			    const reco::TrackRef& pmrTrack) {
+			    const reco::TrackRef& pmrTrack,
+			    int & refit_id ) {
   const reco::TrackRef refit[4] = { 
     trackerTrack, 
     gmrTrack, 
@@ -33,5 +34,6 @@ reco::TrackRef tevOptimized(const reco::TrackRef& trackerTrack,
   if (prob[0] > 0. && prob[3] > 0. && prob[3] - prob[0] > 30.) chosen = 0; 
   if (prob[2] > 0. && prob[chosen] - prob[2] > 0.) chosen = 2;
  
+  refit_id = chosen;
   return refit[chosen]; 
 } 

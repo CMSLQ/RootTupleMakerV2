@@ -15,6 +15,7 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenParticles.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenJets.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenMET.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Photons.h"
 
 DEFINE_FWK_MODULE(RootTupleMakerV2_Tree);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Event);
@@ -31,3 +32,4 @@ DEFINE_FWK_MODULE(RootTupleMakerV2_GenEventInfo);
 DEFINE_FWK_MODULE(RootTupleMakerV2_GenParticles);
 DEFINE_FWK_MODULE(RootTupleMakerV2_GenJets);
 DEFINE_FWK_MODULE(RootTupleMakerV2_GenMET);
+DEFINE_FWK_MODULE(RootTupleMakerV2_Photons);

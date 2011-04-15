@@ -19,8 +19,8 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'START39_V9::All'
-
+process.GlobalTag.globaltag = 'START311_V2::All' # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
+                               
 # Events to process
 process.maxEvents.input = 100
 
@@ -29,7 +29,7 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/mc/Fall10/TTJets_TuneZ2_7TeV-madgraph-tauola/GEN-SIM-RECO/START38_V12-v2/0006/125D724F-5EE4-DF11-816A-00145E550F3E.root'
+    '/store/relval/CMSSW_4_1_4/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0019/62AC26CD-4161-E011-BDE8-002618943857.root' #RECO
 ]
 
 # Add tcMET and pfMET
@@ -114,13 +114,14 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTupleMuons_*_*',
-        'keep *_rootTupleSuperClusters_*_*',
+        'keep *_rootTupleSuperClusters_*_*', #RECO only
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
-        'keep *_rootTupleGenMETTrue_*_*'
+        'keep *_rootTupleGenMETTrue_*_*',
+        'keep *_rootTuplePhotons_*_*'
     )
 )
 
@@ -160,13 +161,14 @@ process.p = cms.Path(
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
     process.rootTupleMuons+
-    process.rootTupleSuperClusters+
+    process.rootTupleSuperClusters+ #RECO only
     process.rootTupleTrigger+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
     process.rootTupleGenJets+
-    process.rootTupleGenMETTrue
+    process.rootTupleGenMETTrue+
+    process.rootTuplePhotons
     )
     *process.rootTupleTree
 )

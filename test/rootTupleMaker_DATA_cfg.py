@@ -19,7 +19,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR_R_39X_V6::All' # /EG/Run2010A-Dec22ReReco_v1/RECO and /Electron/Run2010B-Dec22ReReco_v1/RECO
+process.GlobalTag.globaltag = 'GR_R_311_V2::All' # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,7 +29,8 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2010B/Electron/RECO/Dec22ReReco_v1/0009/6E793492-840E-E011-9559-002354EF3BDF.root'
+    '/store/data/Run2011A/SingleElectron/RECO/PromptReco-v1/000/160/405/0E58AE5B-D64F-E011-88F1-003048F024DC.root' #RECO
+    #'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v1/000/161/312/90646AF9-F957-E011-B0DB-003048F118C4.root' #AOD
 ]
 
 # Turn off MC matching for the process
@@ -121,13 +122,14 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTupleMuons_*_*',
-        'keep *_rootTupleSuperClusters_*_*',
+        'keep *_rootTupleSuperClusters_*_*', #RECO only
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
-        'keep *_rootTupleGenMETTrue_*_*'
+        'keep *_rootTupleGenMETTrue_*_*',
+        'keep *_rootTuplePhotons_*_*'
     )
 )
 
@@ -148,13 +150,14 @@ process.p = cms.Path(
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
     process.rootTupleMuons+
-    process.rootTupleSuperClusters+
+    process.rootTupleSuperClusters+ #RECO only
     process.rootTupleTrigger+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
     process.rootTupleGenJets+
-    process.rootTupleGenMETTrue
+    process.rootTupleGenMETTrue+
+    process.rootTuplePhotons
     )
     *process.rootTupleTree
 )

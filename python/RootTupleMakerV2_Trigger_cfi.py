@@ -5,6 +5,7 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
     HLTInputTag = cms.InputTag('TriggerResults','','HLT'),
 
     # HLT config browser : http://j2eeps.cern.ch/cms-project-confdb-hltdev/browser/
+    # HLT Tools https://twiki.cern.ch/twiki/bin/view/CMS/HLTriggerTools
 
     HLTPathsOfInterest = cms.vstring(
                                      ##############

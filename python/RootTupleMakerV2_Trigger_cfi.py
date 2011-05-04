@@ -11,7 +11,7 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
                                      ## 2011: run range 160329-163876
                                      ##############
 
-                                     ## Electrons ## 
+                                     ## Single Electrons ## 
                                      # from /cdaq/physics/Run2011/5e32/v4.2/HLT/V1
                                      'HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1', #0
                                      'HLT_Ele45_CaloIdVT_TrkIdT_v1', #1
@@ -26,8 +26,28 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
                                      'HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2', #8
                                      'HLT_Ele45_CaloIdVT_TrkIdT_v3', #9
                                      'HLT_Ele90_NoSpikeFilter_v3', #10
-                                     ## Photons ##
-                                     
+                                     ## Single Photons ##
+                                     # from /cdaq/physics/Run2011/5e32/v4.2/HLT/V1
+                                     'HLT_Photon30_CaloIdVL_IsoL_v1', #
+                                     'HLT_Photon30_CaloIdVL_v1', #
+                                     'HLT_Photon75_CaloIdVL_IsoL_v1', #
+                                     'HLT_Photon75_CaloIdVL_v1', #
+                                     # from /cdaq/physics/Run2011/5e32/v6.1/HLT/V1
+                                     'HLT_Photon20_CaloIdVL_IsoL_v1', #
+                                     'HLT_Photon30_CaloIdVL_IsoL_v2', #
+                                     'HLT_Photon30_CaloIdVL_v2', #
+                                     'HLT_Photon50_CaloIdVL_IsoL_v1', #
+                                     'HLT_Photon75_CaloIdVL_IsoL_v2', #
+                                     'HLT_Photon75_CaloIdVL_v2', #
+                                     # from /cdaq/physics/Run2011/5e32/v8.1/HLT/V5
+                                     'HLT_Photon20_CaloIdVL_IsoL_v2', #
+                                     'HLT_Photon30_CaloIdVL_IsoL_v3', #
+                                     'HLT_Photon30_CaloIdVL_v3', #
+                                     'HLT_Photon50_CaloIdVL_IsoL_v2', #
+                                     'HLT_Photon75_CaloIdVL_IsoL_v3', #
+                                     'HLT_Photon75_CaloIdVL_v3', #
+                                     ## Double Photons ##
+
                                      ## Muons ##                                     
 
                                      )

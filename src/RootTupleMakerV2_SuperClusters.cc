@@ -16,6 +16,8 @@
 #include "Geometry/CaloTopology/interface/CaloTopology.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 #include "RecoEgamma/EgammaIsolationAlgos/interface/PhotonTkIsolation.h"
+#include "RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h"
+#include "RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgoRcd.h"
 #include "RecoEgamma/EgammaIsolationAlgos/interface/EgammaRecHitIsolation.h"
 #include "RecoEgamma/EgammaTools/interface/HoECalculator.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
@@ -112,6 +114,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::ESHandle<CaloTopology> caloTopology;
   iSetup.get<CaloTopologyRecord>().get(caloTopology);
 
+   edm::ESHandle<EcalSeverityLevelAlgo> sevlv;
+   iSetup.get<EcalSeverityLevelAlgoRcd>().get(sevlv);
+   const EcalSeverityLevelAlgo* sevLevel = sevlv.product();
+
   edm::Handle<EcalRecHitCollection> ecalBarrelRecHitHandle;
   iEvent.getByLabel(ecalEBInputTag, ecalBarrelRecHitHandle);
 
@@ -140,12 +146,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   double HeepConeInRadius = 3.; // note that this is in num of crystals
   double HeepEtaWidth = 1.5;  // note that this is in num of crystals
   EcalRecHitMetaCollection ecalBarrelHits(*ecalBarrelRecHitHandle);// these are all needed to make an instance of EgammaRecHitIsolation
-  EgammaRecHitIsolation ecalBarrelIsol(ConeOutRadius,ConeInRadius,EtaWidth,PtMin,EMin,caloGeometry,&ecalBarrelHits,DetId::Ecal);
-  EgammaRecHitIsolation HeepEcalBarrelIsol(HeepConeOutRadius,HeepConeInRadius,HeepEtaWidth,PtMin,EMin,caloGeometry,&ecalBarrelHits,DetId::Ecal);
+  EgammaRecHitIsolation ecalBarrelIsol(ConeOutRadius,ConeInRadius,EtaWidth,PtMin,EMin,caloGeometry,&ecalBarrelHits,sevLevel,DetId::Ecal);
+  EgammaRecHitIsolation HeepEcalBarrelIsol(HeepConeOutRadius,HeepConeInRadius,HeepEtaWidth,PtMin,EMin,caloGeometry,&ecalBarrelHits,sevLevel,DetId::Ecal);
   HeepEcalBarrelIsol.setUseNumCrystals(true);
   EcalRecHitMetaCollection ecalEndcapHits(*ecalEndcapRecHitHandle);
-  EgammaRecHitIsolation ecalEndcapIsol(ConeOutRadius,EndcapConeInRadius,EtaWidth,EndcapPtMin,EndcapEMin,caloGeometry,&ecalEndcapHits,DetId::Ecal);
-  EgammaRecHitIsolation HeepEcalEndcapIsol(HeepConeOutRadius,HeepConeInRadius,HeepEtaWidth,EndcapPtMin,EndcapEMin,caloGeometry,&ecalEndcapHits,DetId::Ecal);
+  EgammaRecHitIsolation ecalEndcapIsol(ConeOutRadius,EndcapConeInRadius,EtaWidth,EndcapPtMin,EndcapEMin,caloGeometry,&ecalEndcapHits,sevLevel,DetId::Ecal);
+  EgammaRecHitIsolation HeepEcalEndcapIsol(HeepConeOutRadius,HeepConeInRadius,HeepEtaWidth,EndcapPtMin,EndcapEMin,caloGeometry,&ecalEndcapHits,sevLevel,DetId::Ecal);
   HeepEcalEndcapIsol.setUseNumCrystals(true);
 
   // SuperClusters for barrel and endcap are in different collections
@@ -228,7 +234,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
       EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(hitIter->first);
       if(recHit!=ecalEndcapRecHitHandle->end()) {
-        if( ((hitIter->second*recHit->energy())/it->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+        if( (hitIter->second*recHit->energy())/it->rawEnergy()>0.05 && recHit->checkFlag(EcalRecHit::kOutOfTime) ) flaggedRecHitCounter++;
       }
     }
 
@@ -311,7 +317,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
       EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(hitIter->first);
       if(recHit!=ecalEndcapRecHitHandle->end()) {
-        if( ((hitIter->second*recHit->energy())/it->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+        if( (hitIter->second*recHit->energy())/it->rawEnergy()>0.05 && recHit->checkFlag(EcalRecHit::kOutOfTime) ) flaggedRecHitCounter++;
       }
     }
 
@@ -357,7 +363,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
           EcalRecHitCollection::const_iterator recHit = ecalBarrelRecHitHandle->find(hitIter->first);
           if(recHit!=ecalEndcapRecHitHandle->end()) {
-            if( ((hitIter->second*recHit->energy())/it->superCluster()->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+            if( (hitIter->second*recHit->energy())/it->superCluster()->rawEnergy()>0.05 && recHit->checkFlag(EcalRecHit::kOutOfTime) ) flaggedRecHitCounter++;
           }
         }
 
@@ -377,7 +383,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for( hitIter=hitsAndFractions.begin(); hitIter!=hitsAndFractions.end(); ++hitIter ) {
           EcalRecHitCollection::const_iterator recHit = ecalEndcapRecHitHandle->find(hitIter->first);
           if(recHit!=ecalEndcapRecHitHandle->end()) {
-            if( ((hitIter->second*recHit->energy())/it->superCluster()->rawEnergy()>0.05 && (recHit->flagBits() & 0x1 << EcalRecHit::kOutOfTime)!=0) ) flaggedRecHitCounter++;
+            if( (hitIter->second*recHit->energy())/it->superCluster()->rawEnergy()>0.05 && recHit->checkFlag(EcalRecHit::kOutOfTime) ) flaggedRecHitCounter++;
           }
         }
 

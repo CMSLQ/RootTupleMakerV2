@@ -85,6 +85,14 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
                                      # 163269 <= run < 163876
                                      'HLT_Mu24_v2', #42
                                      'HLT_Mu30_v2', #43
+
+                                     ## Double Muons ##
+                                     # from /cdaq/physics/Run2011/5e32/v4.2/HLT/V1
+                                     # 160404 <= run < 163269
+                                     'HLT_DoubleMu7_v1', #44
+                                     # from /cdaq/physics/Run2011/5e32/v8.1/HLT/V5
+                                     # 163269 <= run < 163876
+                                     'HLT_DoubleMu7_v2', #45
                                      )
 
 )

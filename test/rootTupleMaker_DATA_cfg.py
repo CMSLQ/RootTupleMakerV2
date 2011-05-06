@@ -109,7 +109,7 @@ process.LJFilter.counteitherleptontype = False
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
 
 # Load EcalSeverityLevelESProducer (needed only if the SuperCluster module is run)
-process.load('RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi')
+#process.load('RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi')
 
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
@@ -153,7 +153,7 @@ process.p = cms.Path(
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
     process.rootTupleMuons+
-    process.rootTupleSuperClusters+ #RECO only
+    #process.rootTupleSuperClusters+ #RECO only
     process.rootTupleTrigger+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+

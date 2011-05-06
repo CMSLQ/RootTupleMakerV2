@@ -18,8 +18,8 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string('RootTupleMakerV2_output_DATA.root')
 )
 
-# Global tag (make sure it always matches with the global tag used to reconstruct input files)
-process.GlobalTag.globaltag = 'GR_R_311_V2::All' # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
+# Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
+process.GlobalTag.globaltag = 'GR_R_311_V2::All'
 
 # Events to process
 process.maxEvents.input = 100
@@ -107,6 +107,9 @@ process.LJFilter.counteitherleptontype = False
 
 # Load HBHENoiseFilterResultProducer
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+
+# Load EcalSeverityLevelESProducer (needed only if the SuperCluster module is run)
+process.load('RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi')
 
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",

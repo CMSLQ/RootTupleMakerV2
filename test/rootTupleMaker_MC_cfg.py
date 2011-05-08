@@ -117,7 +117,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTupleMuons_*_*',
-        'keep *_rootTupleSuperClusters_*_*', #RECO only
+        #'keep *_rootTupleSuperClusters_*_*', #RECO only
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',

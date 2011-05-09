@@ -24,6 +24,12 @@ RootTupleMakerV2_Photons::RootTupleMakerV2_Photons(const edm::ParameterSet& iCon
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
+  produces <std::vector<double> > ( prefix + "EcalIso" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIso" + suffix );
+  produces <std::vector<double> > ( prefix + "HoE" + suffix );
+  produces <std::vector<double> > ( prefix + "TrkIso" + suffix );
+  produces <std::vector<double> > ( prefix + "SigmaIEtaIEta" + suffix );
+  produces <std::vector<bool> >   ( prefix + "TrkVeto" + suffix );
 }
 
 void RootTupleMakerV2_Photons::
@@ -33,6 +39,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ecalIso  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIso  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hoe  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkIso  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sigmaIetaIeta  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<bool> >    trkVeto  ( new std::vector<bool>()  );
 
   //-----------------------------------------------------------------
 
@@ -51,6 +63,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
       energy->push_back( it->energy() );
+      ecalIso->push_back( it->ecalIso() );
+      hcalIso->push_back( it->hcalIso() );
+      hoe->push_back( it->hadronicOverEm() );
+      trkIso->push_back( it->trkSumPtHollowConeDR04() );
+      sigmaIetaIeta->push_back( it->sigmaIetaIeta() );
+      trkVeto->push_back( it->hasPixelSeed() );
 
     }
   } else {
@@ -63,4 +81,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
+  iEvent.put( ecalIso, prefix + "EcalIso" + suffix );
+  iEvent.put( hcalIso, prefix + "HcalIso" + suffix );
+  iEvent.put( hoe, prefix + "HoE" + suffix );
+  iEvent.put( trkIso, prefix + "TrkIso" + suffix );
+  iEvent.put( sigmaIetaIeta, prefix + "SigmaIEtaIEta" + suffix );
+  iEvent.put( trkVeto, prefix + "TrkVeto" + suffix );
 }

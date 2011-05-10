@@ -1,6 +1,5 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "DataFormats/MuonReco/interface/MuonCocktails.h"
-#include "DataFormats/TrackReco/interface/Track.h"
 
 reco::TrackRef pmcTrack(const pat::Muon& mu, int & refit_id ) {
   return tevOptimized(mu.innerTrack(), mu.globalTrack(), mu.tpfmsMuon(), mu.pickyMuon(), refit_id);

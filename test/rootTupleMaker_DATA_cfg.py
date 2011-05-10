@@ -3,6 +3,8 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
+import os
+
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
@@ -20,6 +22,8 @@ process.TFileService = cms.Service("TFileService",
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
 process.GlobalTag.globaltag = 'GR_R_311_V2::All'
+#process.GlobalTag.globaltag = 'GR_P_V14::All'
+
 
 # Events to process
 process.maxEvents.input = 100
@@ -29,8 +33,9 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2011A/SingleElectron/RECO/PromptReco-v1/000/160/405/0E58AE5B-D64F-E011-88F1-003048F024DC.root' #RECO
+    #'/store/data/Run2011A/SingleElectron/RECO/PromptReco-v1/000/160/405/0E58AE5B-D64F-E011-88F1-003048F024DC.root' #RECO
     #'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v1/000/161/312/90646AF9-F957-E011-B0DB-003048F118C4.root' #AOD
+    'file:/tmp/santanas/90646AF9-F957-E011-B0DB-003048F118C4.root' #AOD
 ]
 
 # Turn off MC matching for the process
@@ -45,23 +50,61 @@ addPfMET(process, 'PF')
 from Leptoquarks.RootTupleMakerV2.tools import *
 addPfMETType1Cor(process, 'PFType1Cor')
 
+# Add JEC Fall10
+# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetEnCor2010
+# -->remember to do from $CMSSW_BASE/src: cvs co -d JEC UserCode/KKousour/data/Jec10V3.db
+# Provide external jecfile:
+jecfile = os.getenv('CMSSW_BASE')+'/src/JEC/Jec10V3.db' #using env variables
+#jecfile = '/afs/cern.ch/user/s/santanas/scratch0/Releases/CMSSW_4_1_5_LQ/src/JEC/Jec10V3.db' #or giving full path
+
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+process.jec = cms.ESSource("PoolDBESSource",
+      DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+        ),
+      timetype = cms.string('runnumber'),
+      toGet = cms.VPSet(
+               cms.PSet(
+                       record = cms.string('JetCorrectionsRecord'),
+                       tag    = cms.string('JetCorrectorParametersCollection_Jec10V3_AK5PF'),
+                       label  = cms.untracked.string('AK5PF')
+                       ),
+               cms.PSet(
+                       record = cms.string('JetCorrectionsRecord'),
+                       tag    = cms.string('JetCorrectorParametersCollection_Jec10V3_AK5Calo'),
+                       label  = cms.untracked.string('AK5Calo')
+                       )
+      ),
+      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo, KT6PF, KT6Calo)
+      connect = cms.string('sqlite_file:'+jecfile)
+)
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+
 from PhysicsTools.PatAlgos.tools.jetTools import *
-# Add PF jets
+# Add PF jets          --> See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L2Relative', 'L3Absolute', 'L5Flavor', 'L7Parton'])),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])),
+                 # check L1 corrections
+                 # see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPATDataFormats#JetCorrFactors
     doType1MET   = False,
     doL1Cleaning = False,
     doL1Counters = False,
-    genJetCollection=cms.InputTag("ak5GenJets"),
+    genJetCollection = cms.InputTag("ak5GenJets"),
     doJetID      = False
 )
-
+## Modify JEC for CaloJets (default)
+process.patJetCorrFactors.levels = cms.vstring('L1Offset', 
+                                               'L2Relative', 
+                                               'L3Absolute',
+                                               'L2L3Residual')
+                                                                                              
+#OLD
 # Residual jet energy corrections (only applied to real data)
-process.rootTupleCaloJets.ApplyResidualJEC = True
-process.rootTuplePFJets.ApplyResidualJEC = True
+#process.rootTupleCaloJets.ApplyResidualJEC = True
+#process.rootTuplePFJets.ApplyResidualJEC = True
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *

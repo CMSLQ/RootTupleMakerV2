@@ -11,10 +11,11 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
-    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
-    applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
-    resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
+    maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
+    //OLD
+    //    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
+    //    applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
+    //    resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -23,7 +24,10 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<double> > ( prefix + "EnergyRaw" + suffix );
   produces <std::vector<double> > ( prefix + "JECUnc" + suffix );
-  produces <std::vector<double> > ( prefix + "ResJEC" + suffix );
+  produces <std::vector<double> > ( prefix + "L2L3ResJEC" + suffix );
+  produces <std::vector<double> > ( prefix + "L3AbsJEC" + suffix );
+  produces <std::vector<double> > ( prefix + "L2RelJEC" + suffix );
+  produces <std::vector<double> > ( prefix + "L1OffJEC" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
   produces <std::vector<double> > ( prefix + "ChargedEmEnergyFraction"  + suffix );
   produces <std::vector<double> > ( prefix + "ChargedHadronEnergyFraction"  + suffix );
@@ -67,7 +71,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy_raw ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  jecUnc_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  resJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  l2l3resJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  l3absJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  l2relJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  l1offJEC_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  chargedEmEnergyFraction  ( new std::vector<double>()  ) ;
   std::auto_ptr<std::vector<double> >  chargedHadronEnergyFraction  ( new std::vector<double>()  ) ;
@@ -95,18 +102,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );
 
   //-----------------------------------------------------------------
-  edm::FileInPath fipUnc(jecUncPath);;
-  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fipUnc.fullPath());
 
-  JetCorrectorParameters *ResJetCorPar = 0;
-  FactorizedJetCorrector *JEC = 0;
-  if(applyResJEC) {
-    edm::FileInPath fipRes(resJEC);
-    ResJetCorPar = new JetCorrectorParameters(fipRes.fullPath());
-    std::vector<JetCorrectorParameters> vParam;
-    vParam.push_back(*ResJetCorPar);
-    JEC = new FactorizedJetCorrector(vParam);
-  }
+  // OLD
+  //   edm::FileInPath fipUnc(jecUncPath);;
+  //   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fipUnc.fullPath());
+  //
+  //   JetCorrectorParameters *ResJetCorPar = 0;
+  //   FactorizedJetCorrector *JEC = 0;
+  //   if(applyResJEC) {
+  //     edm::FileInPath fipRes(resJEC);
+  //     ResJetCorPar = new JetCorrectorParameters(fipRes.fullPath());
+  //     std::vector<JetCorrectorParameters> vParam;
+  //     vParam.push_back(*ResJetCorPar);
+  //     JEC = new FactorizedJetCorrector(vParam);
+  //   }
 
   edm::Handle<std::vector<pat::Jet> > jets;
   iEvent.getByLabel(inputTag, jets);
@@ -127,27 +136,39 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       int passjetTight = 0;
       if (pfjetIDTight( *it, retpf)) passjetTight =1;
 
+      // OLD
+      //       double corr = 1.;
+      //       if( applyResJEC && iEvent.isRealData() ) {
+      //         JEC->setJetEta( it->eta() );
+      //         JEC->setJetPt( it->pt() ); // here you put the L2L3 Corrected jet pt
+      //         corr = JEC->getCorrection();
+      //       }
+      //       jecUnc->setJetEta( it->eta() );
+      //       jecUnc->setJetPt( it->pt()*corr ); // the uncertainty is a function of the corrected pt
 
-
-      double corr = 1.;
-      if( applyResJEC && iEvent.isRealData() ) {
-        JEC->setJetEta( it->eta() );
-        JEC->setJetPt( it->pt() ); // here you put the L2L3 Corrected jet pt
-        corr = JEC->getCorrection();
-      }
-
-      jecUnc->setJetEta( it->eta() );
-      jecUnc->setJetPt( it->pt()*corr ); // the uncertainty is a function of the corrected pt
+      // Status of JEC
+      //std::cout << "PF: currentJECLevel(): " << it->currentJECLevel() << std::endl;
+      //std::cout << "PF: currentJECSet(): " << it->currentJECSet() << std::endl;
+      //-------------------
 
       // fill in all the vectors
+
+      // OLD
+      // pt->push_back( it->pt()*corr );
+      // energy->push_back( it->energy()*corr );
+      // jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
+      // resJEC_vec->push_back( corr );
+
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
-      pt->push_back( it->pt()*corr );
+      pt->push_back( it->pt() );
       pt_raw->push_back( it->correctedJet("Uncorrected").pt() );
-      energy->push_back( it->energy()*corr );
+      energy->push_back( it->energy() );
       energy_raw->push_back( it->correctedJet("Uncorrected").energy() );
-      jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
-      resJEC_vec->push_back( corr );
+      l2l3resJEC_vec->push_back( it->pt()/it->correctedJet("L3Absolute").pt() );
+      l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
+      l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1Offset").pt() );
+      l1offJEC_vec->push_back( it->correctedJet("L1Offset").pt()/it->correctedJet("Uncorrected").pt() );
       partonFlavour->push_back( it->partonFlavour() );
       chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
       chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
@@ -178,9 +199,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTag;
   }
 
-  delete jecUnc;
-  delete ResJetCorPar;
-  delete JEC;
+  //OLD 
+  //   delete jecUnc;
+  //   delete ResJetCorPar;
+  //   delete JEC;
 
   //-----------------------------------------------------------------
   // put vectors in the event
@@ -191,7 +213,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( energy_raw, prefix + "EnergyRaw" + suffix );
   iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
-  iEvent.put( resJEC_vec, prefix + "ResJEC" + suffix );
+  iEvent.put( l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix );
+  iEvent.put( l3absJEC_vec, prefix + "L3AbsJEC" + suffix );
+  iEvent.put( l2relJEC_vec, prefix + "L2RelJEC" + suffix );
+  iEvent.put( l1offJEC_vec, prefix + "L1OffJEC" + suffix );
   iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );
   iEvent.put( chargedEmEnergyFraction,  prefix + "ChargedEmEnergyFraction"  + suffix );
   iEvent.put( chargedHadronEnergyFraction,  prefix + "ChargedHadronEnergyFraction"  + suffix );

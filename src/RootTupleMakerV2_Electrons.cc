@@ -1,4 +1,5 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Electrons.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -31,6 +32,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
   produces <std::vector<double> > ( prefix + "TrackPt" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackValidFractionOfHits" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<double> > ( prefix + "CaloEnergy" + suffix );
   produces <std::vector<int> >    ( prefix + "Charge" + suffix );
@@ -77,6 +79,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  caloEnergy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     charge  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     overlaps  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  trackValidFractionOfHits  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hoe   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sigmaEtaEta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sigmaIEtaIEta  ( new std::vector<double>()  );
@@ -242,6 +245,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       charge->push_back( it->charge() );
       overlaps->push_back( ovrlps );
       // ID variables
+      trackValidFractionOfHits->push_back ( validFraction ( it->gsfTrack() ) );
       hoe->push_back( it->hadronicOverEm() );
       sigmaEtaEta->push_back( it->sigmaEtaEta() );
       sigmaIEtaIEta->push_back( it->sigmaIetaIeta() );
@@ -291,6 +295,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( caloEnergy, prefix + "CaloEnergy" + suffix );
   iEvent.put( charge, prefix + "Charge" + suffix );
   iEvent.put( overlaps, prefix + "Overlaps" + suffix );
+  iEvent.put( trackValidFractionOfHits, prefix + "TrackValidFractionOfHits" + suffix );
   iEvent.put( hoe, prefix + "HoE" + suffix );
   iEvent.put( sigmaEtaEta, prefix + "SigmaEtaEta" + suffix );
   iEvent.put( sigmaIEtaIEta, prefix + "SigmaIEtaIEta" + suffix );

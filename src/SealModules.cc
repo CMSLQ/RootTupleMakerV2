@@ -8,6 +8,7 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Electrons.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_MET.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Muons.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_PileUp.h"
 //#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_SuperClusters.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Trigger.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Vertex.h"
@@ -25,6 +26,7 @@ DEFINE_FWK_MODULE(RootTupleMakerV2_PFJets);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Electrons);
 DEFINE_FWK_MODULE(RootTupleMakerV2_MET);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Muons);
+DEFINE_FWK_MODULE(RootTupleMakerV2_PileUp);
 //DEFINE_FWK_MODULE(RootTupleMakerV2_SuperClusters);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Trigger);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Vertex);

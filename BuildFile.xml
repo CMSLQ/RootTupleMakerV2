@@ -12,6 +12,7 @@
 <use name="L1Trigger/GlobalTriggerAnalyzer"/>
 <use name="MagneticField/Engine"/>
 <use name="MagneticField/Records"/>
+<use name="JetMETCorrections/Objects"/>
 <use name="lhapdf"/>
 <flags EDM_PLUGIN="1"/>
 

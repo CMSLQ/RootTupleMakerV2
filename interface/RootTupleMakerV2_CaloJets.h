@@ -15,8 +15,8 @@ class RootTupleMakerV2_CaloJets : public edm::EDProducer {
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const double          electronPt, electronIso, muonPt, muonIso;
+  const std::string     jecUncPath;
   //OLD
-  /*   const std::string     jecUncPath; */
   /*   const bool            applyResJEC; */
   /*   const std::string     resJEC; */
 };

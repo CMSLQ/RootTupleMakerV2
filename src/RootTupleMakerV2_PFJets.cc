@@ -1,19 +1,22 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_PFJets.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
+    maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
+    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty"))
     //OLD
-    //    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
     //    applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
     //    resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
@@ -116,7 +119,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //     vParam.push_back(*ResJetCorPar);
   //     JEC = new FactorizedJetCorrector(vParam);
   //   }
-
+  
+  //JEC Uncertainties 
+  //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html 
+  // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
+  // handle the jet corrector parameters collection
+  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  // get the jet corrector parameters collection from the global tag
+  iSetup.get<JetCorrectionsRecord>().get(jecUncPath,JetCorParColl);
+  // get the uncertainty parameters from the collection
+  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  // instantiate the jec uncertainty object
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
+  
   edm::Handle<std::vector<pat::Jet> > jets;
   iEvent.getByLabel(inputTag, jets);
 
@@ -135,6 +150,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       retpf.set(false);
       int passjetTight = 0;
       if (pfjetIDTight( *it, retpf)) passjetTight =1;
+     
+      jecUnc->setJetEta( it->eta() );
+      jecUnc->setJetPt( it->pt() ); // the uncertainty is a function of the corrected pt      
 
       // OLD
       //       double corr = 1.;
@@ -143,8 +161,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //         JEC->setJetPt( it->pt() ); // here you put the L2L3 Corrected jet pt
       //         corr = JEC->getCorrection();
       //       }
-      //       jecUnc->setJetEta( it->eta() );
-      //       jecUnc->setJetPt( it->pt()*corr ); // the uncertainty is a function of the corrected pt
 
       // Status of JEC
       //std::cout << "PF: currentJECLevel(): " << it->currentJECLevel() << std::endl;
@@ -156,7 +172,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // OLD
       // pt->push_back( it->pt()*corr );
       // energy->push_back( it->energy()*corr );
-      // jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
       // resJEC_vec->push_back( corr );
 
       eta->push_back( it->eta() );
@@ -169,6 +184,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
       l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1Offset").pt() );
       l1offJEC_vec->push_back( it->correctedJet("L1Offset").pt()/it->correctedJet("Uncorrected").pt() );
+      jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
       partonFlavour->push_back( it->partonFlavour() );
       chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
       chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
@@ -200,7 +216,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 
   //OLD 
-  //   delete jecUnc;
+  delete jecUnc;
   //   delete ResJetCorPar;
   //   delete JEC;
 

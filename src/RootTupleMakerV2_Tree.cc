@@ -55,7 +55,7 @@ beginJob() {
   leafmap["lint"]      = LONG;       leafmap["longs"]     = LONG_V;
   leafmap["ulint"]     = U_LONG;     leafmap["ulongs"]    = U_LONG_V;
   //
-  leafmap["string"]     = STRING;     leafmap["strings"]    = STRING_V;
+  leafmap["String"]     = STRING;     leafmap["Strings"]    = STRING_V;
 
   edm::Service<edm::ConstProductRegistry> reg;
   edm::Selections allBranches = reg->allBranchDescriptions();

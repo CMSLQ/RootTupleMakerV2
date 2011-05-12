@@ -24,7 +24,7 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START311_V2::All'
                                
 # Events to process
-process.maxEvents.input = 10
+process.maxEvents.input = 100
 
 # Options and Output Report
 process.options.wantSummary = True
@@ -84,7 +84,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJTA        = True,
     doBTagging   = True,
     jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
-    doType1MET   = False,
+    doType1MET   = False, 
     doL1Cleaning = False,
     doL1Counters = False,
     genJetCollection=cms.InputTag("ak5GenJets"),
@@ -123,11 +123,12 @@ process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
-
-process.LJFilter.elecPT = 20.
+process.LJFilter.muonsMin = 1
 process.LJFilter.muPT = 20.
+process.LJFilter.electronsMin = 1
+process.LJFilter.elecPT = 20.
 process.LJFilter.counteitherleptontype = True
-
+##################################################################
 
 # Load HBHENoiseFilterResultProducer
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
@@ -149,8 +150,6 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTupleMuons_*_*',
-        'keep *_rootTuplePileUp_*_*',
-        #'keep *_rootTupleSuperClusters_*_*', #RECO only
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
@@ -197,8 +196,6 @@ process.p = cms.Path(
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
     process.rootTupleMuons+
-    process.rootTuplePileUp+
-    #process.rootTupleSuperClusters+ #RECO only
     process.rootTupleTrigger+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+

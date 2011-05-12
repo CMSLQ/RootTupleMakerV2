@@ -80,8 +80,8 @@ process.jec = cms.ESSource("PoolDBESSource",
 )
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
-from PhysicsTools.PatAlgos.tools.jetTools import *
 # Add PF jets          --> See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
+from PhysicsTools.PatAlgos.tools.jetTools import *
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
@@ -168,7 +168,6 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTupleMuons_*_*',
-        #'keep *_rootTupleSuperClusters_*_*', #RECO only
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
@@ -196,7 +195,6 @@ process.p = cms.Path(
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
     process.rootTupleMuons+
-    #process.rootTupleSuperClusters+ #RECO only
     process.rootTupleTrigger+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+

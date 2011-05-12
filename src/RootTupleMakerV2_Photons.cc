@@ -30,6 +30,9 @@ RootTupleMakerV2_Photons::RootTupleMakerV2_Photons(const edm::ParameterSet& iCon
   produces <std::vector<double> > ( prefix + "TrkIso" + suffix );
   produces <std::vector<double> > ( prefix + "SigmaIEtaIEta" + suffix );
   produces <std::vector<bool> >   ( prefix + "TrkVeto" + suffix );
+  produces <std::vector<double> > ( prefix + "SCseedEnergy" + suffix );
+  produces <std::vector<double> > ( prefix + "E3x3" + suffix );
+  produces <std::vector<double> > ( prefix + "E5x5" + suffix );
 }
 
 void RootTupleMakerV2_Photons::
@@ -45,6 +48,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  trkIso  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sigmaIetaIeta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<bool> >    trkVeto  ( new std::vector<bool>()  );
+  std::auto_ptr<std::vector<double> >  SCseedEnergy  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  E3x3  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  E5x5  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
 
@@ -69,6 +75,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       trkIso->push_back( it->trkSumPtHollowConeDR04() );
       sigmaIetaIeta->push_back( it->sigmaIetaIeta() );
       trkVeto->push_back( it->hasPixelSeed() );
+      SCseedEnergy->push_back( it->superCluster()->seed()->energy() );
+      E3x3->push_back( it->e3x3() );
+      E5x5->push_back( it->e5x5() );
 
     }
   } else {
@@ -87,4 +96,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( trkIso, prefix + "TrkIso" + suffix );
   iEvent.put( sigmaIetaIeta, prefix + "SigmaIEtaIEta" + suffix );
   iEvent.put( trkVeto, prefix + "TrkVeto" + suffix );
+  iEvent.put( SCseedEnergy, prefix + "SCseedEnergy" + suffix );
+  iEvent.put( E3x3, prefix + "E3x3" + suffix );
+  iEvent.put( E5x5, prefix + "E5x5" + suffix );
 }

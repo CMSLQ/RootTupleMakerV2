@@ -14,6 +14,7 @@ class RootTupleMakerV2_GenEventInfo : public edm::EDProducer {
   const edm::InputTag   genEvtInfoInputTag;
   const bool            storePDFWeights;
   const edm::InputTag   pdfWeightsInputTag;
+  const edm::InputTag   pileupInfoSrc;
 };
 
 #endif

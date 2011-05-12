@@ -113,14 +113,24 @@ process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 ##################################################################
-#### Electron based skim
+#### Shared Muon/Electron Skim
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
-process.LJFilter.muonsMin = -1
+process.LJFilter.muonsMin = 1
+process.LJFilter.muPT = 20.
 process.LJFilter.electronsMin = 1
 process.LJFilter.elecPT = 20.
-process.LJFilter.counteitherleptontype = False
+process.LJFilter.counteitherleptontype = True
+##################################################################
+#### Electron based skim
+#process.LJFilter.muLabel = 'muons'
+#process.LJFilter.elecLabel = 'gsfElectrons'
+#process.LJFilter.jetLabel = 'ak5CaloJets'
+#process.LJFilter.muonsMin = -1
+#process.LJFilter.electronsMin = 1
+#process.LJFilter.elecPT = 20.
+#process.LJFilter.counteitherleptontype = False
 ##################################################################
 #### SuperCluster based skim
 #process.LJFilter.scLabelEB = 'correctedHybridSuperClusters'
@@ -155,7 +165,6 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTupleMuons_*_*',
-        #'keep *_rootTupleSuperClusters_*_*', #RECO only
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
@@ -202,7 +211,6 @@ process.p = cms.Path(
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
     process.rootTupleMuons+
-    #process.rootTupleSuperClusters+ #RECO only
     process.rootTupleTrigger+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+

@@ -8,7 +8,7 @@
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
-
+#include "DataFormats/METReco/interface/BeamHaloSummary.h"
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
     l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
@@ -19,7 +19,8 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
     trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
     numTracks(iConfig.getParameter<unsigned int>("NumTracks")),
     hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
-    hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag"))
+    hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag")),
+    beamHaloInputTag(iConfig.getParameter<edm::InputTag>("BeamHaloInputTag"))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -28,6 +29,8 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("isPrimaryVertex");
   produces <bool> ("isBeamScraping");
   produces <bool> ("passHBHENoiseFilter");
+  produces <bool> ("passBeamHaloFilterLoose");
+  produces <bool> ("passBeamHaloFilterTight");
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -40,7 +43,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> isprimaryvertex( new bool() );
   std::auto_ptr<bool> isbeamscraping( new bool() );
   std::auto_ptr<bool> passhbhenoisefilter( new bool() );
-
+  std::auto_ptr<bool> passbeamhalofilterloose( new bool() );
+  std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
 
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
@@ -49,6 +53,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *isprimaryvertex.get() = false;
   *isbeamscraping.get() = false;
   *passhbhenoisefilter.get() = true;
+  *passbeamhalofilterloose.get() = true;
+  *passbeamhalofiltertight.get() = true;
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
@@ -131,6 +137,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << hcalNoiseInputTag;
   }
 
+  // Beam Halo part
+  edm::Handle<reco::BeamHaloSummary> TheBeamHaloSummary;
+  iEvent.getByLabel(beamHaloInputTag,TheBeamHaloSummary); 
+
+  if(TheBeamHaloSummary.isValid()) {
+    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained " << beamHaloInputTag;
+    const reco::BeamHaloSummary TheSummary = (*TheBeamHaloSummary.product() );
+    *passbeamhalofilterloose.get() = !TheSummary.CSCLooseHaloId();
+    *passbeamhalofiltertight.get() = !TheSummary.CSCTightHaloId();    
+  } else {
+    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << beamHaloInputTag;
+  }
+
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
   iEvent.put(isbptx0,"isBPTX0");
@@ -139,4 +158,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(isprimaryvertex,"isPrimaryVertex");
   iEvent.put(isbeamscraping,"isBeamScraping");
   iEvent.put(passhbhenoisefilter,"passHBHENoiseFilter");
+  iEvent.put(passbeamhalofilterloose,"passBeamHaloFilterLoose");
+  iEvent.put(passbeamhalofiltertight,"passBeamHaloFilterTight");
+
 }

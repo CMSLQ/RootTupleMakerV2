@@ -9,5 +9,6 @@ rootTupleEventSelection = cms.EDProducer("RootTupleMakerV2_EventSelection",
     TracksInputTag = cms.InputTag('generalTracks'),
     NumTracks = cms.uint32(10),
     HPTrackThreshold = cms.double(0.25),
-    HcalNoiseInputTag = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult')
+    HcalNoiseInputTag = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
+    BeamHaloInputTag = cms.InputTag('BeamHaloSummary')
 )

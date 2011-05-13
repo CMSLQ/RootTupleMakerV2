@@ -18,6 +18,7 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
   const unsigned int    numTracks;
   const double          hpTrackThreshold;
   const edm::InputTag   hcalNoiseInputTag;
+  const edm::InputTag   beamHaloInputTag;
 };
 
 #endif

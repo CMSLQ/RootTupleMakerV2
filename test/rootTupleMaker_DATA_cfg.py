@@ -95,12 +95,23 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     genJetCollection = cms.InputTag("ak5GenJets"),
     doJetID      = False
 )
+## Modify type-I corrected PFMET --> should be consistent with PF Jets (defined above)
+#process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3') #default value
+#process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3Residual') #it crashes.. why?
+process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3Residual')
+process.metJESCorAK5PFJet.jetPTthreshold = cms.double(10.0) 
+
 ## Modify JEC for CaloJets (default)
 process.patJetCorrFactors.levels = cms.vstring('L1Offset', 
                                                'L2Relative', 
                                                'L3Absolute',
                                                'L2L3Residual')
-                                                                                              
+## Modify type-I corrected caloMET (default) --> should be consistent with caloJets (defined above)
+#process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3') #default value
+#process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3Residual') #it crashes.. why?
+process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3Residual')
+process.metJESCorAK5CaloJet.jetPTthreshold = cms.double(20.0) #default value
+
 #OLD
 # Residual jet energy corrections (only applied to real data)
 #process.rootTupleCaloJets.ApplyResidualJEC = True
@@ -150,6 +161,13 @@ process.LJFilter.counteitherleptontype = False
 
 # Load HBHENoiseFilterResultProducer
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
+# Check the latest recommendation from https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2011
+process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumE = cms.double(9999)
+process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumEt = cms.double(9999)
+process.HBHENoiseFilterResultProducer.maxRatio = cms.double(999)
+process.HBHENoiseFilterResultProducer.minRatio = cms.double(-999)
+process.HBHENoiseFilterResultProducer.minNumIsolatedNoiseChannels = cms.int32(9999)
+#process.HBHENoiseFilterResultProducer.useTS4TS5 = cms.bool(True) #available only from 420
 
 # Load EcalSeverityLevelESProducer (needed only if the SuperCluster module is run)
 #process.load('RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi')

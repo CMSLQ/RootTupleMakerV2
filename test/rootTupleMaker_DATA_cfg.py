@@ -169,6 +169,20 @@ process.HBHENoiseFilterResultProducer.minRatio = cms.double(-999)
 process.HBHENoiseFilterResultProducer.minNumIsolatedNoiseChannels = cms.int32(9999)
 #process.HBHENoiseFilterResultProducer.useTS4TS5 = cms.bool(True) #available only from 420
 
+#Load CosmicID producer
+process.load('Leptoquarks.CosmicID.cosmicid_cfi')
+process.cosmicCompatibility = cms.EDProducer("CosmicID",
+                                             src=cms.InputTag("cosmicsVeto"),
+                                             result = cms.string("cosmicCompatibility")
+                                             )
+process.timeCompatibility = process.cosmicCompatibility.clone(result = 'timeCompatibility')
+process.backToBackCompatibility = process.cosmicCompatibility.clone(result = 'backToBackCompatibility')
+process.overlapCompatibility = process.cosmicCompatibility.clone(result = 'overlapCompatibility')
+process.patMuons.userData.userFloats.src = ['cosmicCompatibility',
+                                            'timeCompatibility',
+                                            'backToBackCompatibility',
+                                            'overlapCompatibility']
+
 # Load EcalSeverityLevelESProducer (needed only if the SuperCluster module is run)
 #process.load('RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi')
 
@@ -201,6 +215,12 @@ process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
     process.metJESCorAK5PFJet*
+    (
+    process.cosmicCompatibility +
+    process.timeCompatibility +
+    process.backToBackCompatibility +
+    process.overlapCompatibility
+    )*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+

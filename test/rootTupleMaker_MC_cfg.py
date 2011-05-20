@@ -140,17 +140,16 @@ process.LJFilter.counteitherleptontype = True
 #process.LJFilter.elecPT = 20.
 #process.LJFilter.counteitherleptontype = False
 ##################################################################
-#### SuperCluster based skim
-#process.LJFilter.scLabelEB = 'correctedHybridSuperClusters'
-#process.LJFilter.scLabelEE = 'correctedMulti5x5SuperClustersWithPreshower'
-#process.LJFilter.muLabel = 'muons'
-#process.LJFilter.elecLabel = 'gsfElectrons'
-#process.LJFilter.jetLabel = 'ak5CaloJets'
-#process.LJFilter.muonsMin = -1
-#process.LJFilter.electronsMin = -1
-#process.LJFilter.scMin = 1
-#process.LJFilter.scET = 20.
-#process.LJFilter.scHoE = 0.05
+#### Photon based skim
+# process.LJFilter.muLabel = 'muons'
+# process.LJFilter.elecLabel = 'gsfElectrons'
+# process.LJFilter.photLabel = 'photons'
+# process.LJFilter.jetLabel = 'ak5CaloJets'
+# process.LJFilter.muonsMin = -1
+# process.LJFilter.electronsMin = -1
+# process.LJFilter.photMin = 1
+# process.LJFilter.photET = 20.
+# process.LJFilter.photHoE = 0.05
 ##################################################################
 
 # Load HBHENoiseFilterResultProducer

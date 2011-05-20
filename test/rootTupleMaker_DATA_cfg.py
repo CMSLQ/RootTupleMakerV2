@@ -97,8 +97,8 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 )
 ## Modify type-I corrected PFMET --> should be consistent with PF Jets (defined above)
 #process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3') #default value
-#process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3Residual') #it crashes.. why?
-process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3Residual')
+process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3Residual')
+#process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3Residual')
 process.metJESCorAK5PFJet.jetPTthreshold = cms.double(10.0) 
 
 ## Modify JEC for CaloJets (default)
@@ -108,8 +108,8 @@ process.patJetCorrFactors.levels = cms.vstring('L1Offset',
                                                'L2L3Residual')
 ## Modify type-I corrected caloMET (default) --> should be consistent with caloJets (defined above)
 #process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3') #default value
-#process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3Residual') #it crashes.. why?
-process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3Residual')
+process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3Residual') 
+#process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3Residual')
 process.metJESCorAK5CaloJet.jetPTthreshold = cms.double(20.0) #default value
 
 #OLD

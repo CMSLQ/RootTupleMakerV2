@@ -9,7 +9,8 @@ rootTupleCaloJets = cms.EDProducer("RootTupleMakerV2_CaloJets",
     ElectronIso = cms.double(0.1),
     MuonPt = cms.double(10.),
     MuonIso = cms.double(0.05),
-    JECUncertainty = cms.string('AK5Calo')
+    JECUncertainty = cms.string('AK5Calo'),
+    ReadJECuncertainty = cms.bool(True)
     #OLD
     #    JECUncertainty = cms.string('CondFormats/JetMETObjects/data/Spring10_Uncertainty_AK5Calo.txt'),
     #    ApplyResidualJEC = cms.bool(False),

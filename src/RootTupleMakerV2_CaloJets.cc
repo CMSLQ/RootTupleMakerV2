@@ -22,7 +22,8 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
     electronIso (iConfig.getParameter<double>   ("ElectronIso")),
     muonPt (iConfig.getParameter<double>        ("MuonPt")),
     muonIso (iConfig.getParameter<double>       ("MuonIso")),
-    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty"))
+    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
+    readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty"))
     //OLD
     //     applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
     //     resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
@@ -112,17 +113,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //   }
 
   //JEC Uncertainties 
-  //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html 
-  // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
-  // handle the jet corrector parameters collection
-  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-  // get the jet corrector parameters collection from the global tag
-  iSetup.get<JetCorrectionsRecord>().get(jecUncPath,JetCorParColl);
-  // get the uncertainty parameters from the collection
-  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-  // instantiate the jec uncertainty object
-  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
-  
+  JetCorrectionUncertainty *jecUnc = 0;
+  if(readJECuncertainty)
+    {
+      //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html 
+      // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
+      // handle the jet corrector parameters collection
+      edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+      // get the jet corrector parameters collection from the global tag
+      iSetup.get<JetCorrectionsRecord>().get(jecUncPath,JetCorParColl);
+      // get the uncertainty parameters from the collection
+      JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+      // instantiate the jec uncertainty object
+      jecUnc = new JetCorrectionUncertainty(JetCorPar);
+    }  
+
   edm::Handle<std::vector<pat::Jet> > jets;
   iEvent.getByLabel(inputTag, jets);
   
@@ -142,9 +147,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       int passjetTight = 0;
       if (jetIDTight( *it, ret)) passjetTight =1;
 
-      jecUnc->setJetEta( it->eta() );
-      jecUnc->setJetPt( it->pt() ); // the uncertainty is a function of the corrected pt      
-      
+      if(readJECuncertainty)
+	{
+	  jecUnc->setJetEta( it->eta() );
+	  jecUnc->setJetPt( it->pt() ); // the uncertainty is a function of the corrected pt      
+	}
+
       int ovrlps = 0;
       /* overlaps with good electrons (with different electron IDs) and muons are handled bitwise
          bit 0: eidRobustLoose
@@ -223,7 +231,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
       l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1Offset").pt() );
       l1offJEC_vec->push_back( it->correctedJet("L1Offset").pt()/it->correctedJet("Uncorrected").pt() );
-      jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
+      if(readJECuncertainty)
+	jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
+      else
+	jecUnc_vec->push_back( -999 );
       overlaps->push_back( ovrlps );
       partonFlavour->push_back( it->partonFlavour() );
       emf->push_back( it->emEnergyFraction() );

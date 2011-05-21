@@ -31,7 +31,8 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/relval/CMSSW_4_1_4/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0019/62AC26CD-4161-E011-BDE8-002618943857.root' #RECO
+    #'/store/relval/CMSSW_4_1_4/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0019/62AC26CD-4161-E011-BDE8-002618943857.root' #RECO
+    '/store/relval/CMSSW_4_1_5/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0042/36C91851-606D-E011-A0F6-002618943924.root' #RECO
     #'/store/relval/CMSSW_4_1_5/RelValTTbar_Tauola/GEN-SIM-RECO/START311_V2_PU_E7TeV_AVE_2_BX156-v1/0049/EC2A2471-0472-E011-9235-0018F3D09682.root' #RECO (pile-up)
 ]
 

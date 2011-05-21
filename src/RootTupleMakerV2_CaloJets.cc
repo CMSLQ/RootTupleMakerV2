@@ -122,7 +122,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
   // instantiate the jec uncertainty object
   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
-
+  
   edm::Handle<std::vector<pat::Jet> > jets;
   iEvent.getByLabel(inputTag, jets);
   

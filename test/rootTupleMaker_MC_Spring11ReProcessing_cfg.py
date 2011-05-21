@@ -94,6 +94,13 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3') 
 #process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3') #default value
 process.metJESCorAK5PFJet.jetPTthreshold = cms.double(10.0) 
+## Remove muons from raw pfjet collection
+process.ak5PFJetsNoMuon =  cms.EDFilter("PFJetSelector",    
+                                        src = cms.InputTag('ak5PFJets'),
+                                        cut = cms.string("chargedMuEnergyFraction < 0.8"),
+                                        filter = cms.bool(False)
+                                        )
+process.metJESCorAK5PFJet.inputUncorJetsLabel = cms.string('ak5PFJetsNoMuon')
 
 ## Modify JEC for CaloJets (default)
 process.patJetCorrFactors.levels = cms.vstring('L1Offset', 
@@ -136,6 +143,26 @@ process.LJFilter.muPT = 20.
 process.LJFilter.electronsMin = 1
 process.LJFilter.elecPT = 20.
 process.LJFilter.counteitherleptontype = True
+##################################################################
+#### Electron based skim
+#process.LJFilter.muLabel = 'muons'
+#process.LJFilter.elecLabel = 'gsfElectrons'
+#process.LJFilter.jetLabel = 'ak5CaloJets'
+#process.LJFilter.muonsMin = -1
+#process.LJFilter.electronsMin = 1
+#process.LJFilter.elecPT = 20.
+#process.LJFilter.counteitherleptontype = False
+##################################################################
+#### Photon based skim
+# process.LJFilter.muLabel = 'muons'
+# process.LJFilter.elecLabel = 'gsfElectrons'
+# process.LJFilter.photLabel = 'photons'
+# process.LJFilter.jetLabel = 'ak5CaloJets'
+# process.LJFilter.muonsMin = -1
+# process.LJFilter.electronsMin = -1
+# process.LJFilter.photMin = 1
+# process.LJFilter.photET = 20.
+# process.LJFilter.photHoE = 0.05
 ##################################################################
 
 # Load HBHENoiseFilterResultProducer
@@ -212,6 +239,7 @@ process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
     process.pdfWeights*
+    process.ak5PFJetsNoMuon*
     process.metJESCorAK5PFJet*
     (
     process.cosmicCompatibility +
@@ -242,9 +270,23 @@ process.p = cms.Path(
     *process.rootTupleTree
 )
 
+###################
+#process.dump = cms.OutputModule("PoolOutputModule",
+#                                  outputCommands = cms.untracked.vstring(
+#           'keep *',
+#                  ),
+#                                  fileName = cms.untracked.string('dump.root')
+#                                )
+#process.DUMP    = cms.EndPath (process.dump)
+###################
+
 # Delete predefined Endpath (needed for running with CRAB)
 del process.out
 del process.outpath
 
 # Schedule definition
 process.schedule = cms.Schedule(process.p)
+
+##############
+#process.schedule.append( process.DUMP )
+##############

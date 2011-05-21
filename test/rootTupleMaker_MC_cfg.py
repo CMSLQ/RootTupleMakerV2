@@ -21,8 +21,8 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
-#process.GlobalTag.globaltag = 'XXXXXX::All' # ===> for Summer11 MC analyzed in 42X (contains Jec10V3)
-process.GlobalTag.globaltag = 'START41_V0::All' # ===> for 41X MC analyzed in 41X (contains Jec10V3)
+process.GlobalTag.globaltag = 'START42_V12::All' # ===> for Summer11 MC analyzed in 42X (contains Jec11_V1, does not contain "residual" JEC and uncertainties yet...)
+#process.GlobalTag.globaltag = 'START41_V0::All' # ===> for 41X MC analyzed in 41X (contains Jec10V3)
                                
 # Events to process
 process.maxEvents.input = 100
@@ -32,9 +32,10 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    #'/store/relval/CMSSW_4_1_4/RelValTTbar/GEN-SIM-RECO/START311_V2-v1/0019/62AC26CD-4161-E011-BDE8-002618943857.root' #RECO
-    '/store/relval/CMSSW_4_1_5/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0042/36C91851-606D-E011-A0F6-002618943924.root' #RECO
-    #'/store/relval/CMSSW_4_1_5/RelValTTbar_Tauola/GEN-SIM-RECO/START311_V2_PU_E7TeV_AVE_2_BX156-v1/0049/EC2A2471-0472-E011-9235-0018F3D09682.root' #RECO (pile-up)
+    #'/store/relval/CMSSW_4_2_3/RelValZEE/GEN-SIM-RECO/START42_V12-v2/0062/3CE75CB9-317B-E011-86BE-002618943864.root' #RECO (42X)
+    '/store/relval/CMSSW_4_2_3/RelValTTbar_Tauola/GEN-SIM-RECO/START42_V12_PU_E7TeV_FlatDist10_2011EarlyData_inTimeOnly-v1/0072/16CE5EEA-B47C-E011-85A9-00248C0BE005.root' #RECO (42X, pile-up)
+    #'/store/relval/CMSSW_4_1_5/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0042/36C91851-606D-E011-A0F6-002618943924.root' #RECO (41X)
+    #'/store/relval/CMSSW_4_1_5/RelValTTbar_Tauola/GEN-SIM-RECO/START311_V2_PU_E7TeV_AVE_2_BX156-v1/0049/EC2A2471-0472-E011-9235-0018F3D09682.root' #RECO (41x, pile-up)
 ]
 
 # Add tcMET and pfMET
@@ -109,6 +110,10 @@ process.patJetCorrFactors.levels = cms.vstring('L1Offset',
 process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3') 
 #process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3') #default value
 process.metJESCorAK5CaloJet.jetPTthreshold = cms.double(20.0) #default value
+
+## Read JEC uncertainties (might not be available in some global tag)
+process.rootTupleCaloJets.ReadJECuncertainty = False # IMPORTANT: put them back when available in global tag
+process.rootTuplePFJets.ReadJECuncertainty = False # IMPORTANT: put them back when available in global tag
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *

@@ -21,7 +21,8 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
-process.GlobalTag.globaltag = 'START311_V2::All'
+#process.GlobalTag.globaltag = 'XXXXXX::All' # ===> for Summer11 MC analyzed in 42X (contains Jec10V3)
+process.GlobalTag.globaltag = 'START41_V0::All' # ===> for 41X MC analyzed in 41X (contains Jec10V3)
                                
 # Events to process
 process.maxEvents.input = 100
@@ -45,35 +46,35 @@ addPfMET(process, 'PF')
 from Leptoquarks.RootTupleMakerV2.tools import *
 addPfMETType1Cor(process, 'PFType1Cor')
 
-# Add JEC Fall10
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetEnCor2010
-# -->remember to do from $CMSSW_BASE/src: cvs co -d JEC UserCode/KKousour/data/Jec10V3.db
-# Provide external jecfile:
-jecfile = os.getenv('CMSSW_BASE')+'/src/JEC/Jec10V3.db' #using env variables
-#jecfile = '/afs/cern.ch/user/s/santanas/scratch0/Releases/CMSSW_4_1_5_LQ/src/JEC/Jec10V3.db' #or giving full path
-
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.jec = cms.ESSource("PoolDBESSource",
-      DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-        ),
-      timetype = cms.string('runnumber'),
-      toGet = cms.VPSet(
-               cms.PSet(
-                       record = cms.string('JetCorrectionsRecord'),
-                       tag    = cms.string('JetCorrectorParametersCollection_Jec10V3_AK5PF'),
-                       label  = cms.untracked.string('AK5PF')
-                       ),
-               cms.PSet(
-                       record = cms.string('JetCorrectionsRecord'),
-                       tag    = cms.string('JetCorrectorParametersCollection_Jec10V3_AK5Calo'),
-                       label  = cms.untracked.string('AK5Calo')
-                       )
-      ),
-      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo, KT6PF, KT6Calo)
-      connect = cms.string('sqlite_file:'+jecfile)
-)
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+## Add JEC Fall10 ==> Not needed if the corrections are already in the global tag <==
+## See https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetEnCor2010
+## -->remember to do from $CMSSW_BASE/src: cvs co -d JEC UserCode/KKousour/data/Jec10V3.db
+## Provide external jecfile:
+#jecfile = os.getenv('CMSSW_BASE')+'/src/JEC/Jec10V3.db' #using env variables
+##jecfile = '/afs/cern.ch/user/s/santanas/scratch0/Releases/CMSSW_4_1_5_LQ/src/JEC/Jec10V3.db' #or giving full path
+#
+#process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#process.jec = cms.ESSource("PoolDBESSource",
+#      DBParameters = cms.PSet(
+#        messageLevel = cms.untracked.int32(0)
+#        ),
+#      timetype = cms.string('runnumber'),
+#      toGet = cms.VPSet(
+#               cms.PSet(
+#                       record = cms.string('JetCorrectionsRecord'),
+#                       tag    = cms.string('JetCorrectorParametersCollection_Jec10V3_AK5PF'),
+#                       label  = cms.untracked.string('AK5PF')
+#                       ),
+#               cms.PSet(
+#                       record = cms.string('JetCorrectionsRecord'),
+#                       tag    = cms.string('JetCorrectorParametersCollection_Jec10V3_AK5Calo'),
+#                       label  = cms.untracked.string('AK5Calo')
+#                       )
+#      ),
+#      ## here you add as many jet types as you need (AK5Calo, AK5JPT, AK7PF, AK7Calo, KT4PF, KT4Calo, KT6PF, KT6Calo)
+#      connect = cms.string('sqlite_file:'+jecfile)
+#)
+#process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 # Add PF jets

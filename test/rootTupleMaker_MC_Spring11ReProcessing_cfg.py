@@ -239,6 +239,7 @@ process.p = cms.Path(
     process.pdfWeights*
     process.ak5PFJetsNoMuon*
     process.metJESCorAK5PFJet*
+    process.btagging* # Bug fix for use with 41X MC Reprocessing only  
     (
     process.cosmicCompatibility +
     process.timeCompatibility +

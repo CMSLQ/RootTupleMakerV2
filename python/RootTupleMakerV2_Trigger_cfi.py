@@ -73,8 +73,8 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
                                      'HLT_Ele17_CaloIdVT_TrkIdT_CentralJet30_CentralJet25_v1', #18 (prescaled)
                                      # from /cdaq/physics/Run2011/1e33/v2.3/HLT/V1
                                      # 165970 <= run < 165980
-                                     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4' #19
-                                     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_v1' #20 (prescaled)
+                                     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_CentralJet25_PFMHT20_v4', #19
+                                     'HLT_Ele25_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_CentralJet30_v1', #20 (prescaled)
 
                                      #---------------------------------------------
                                      ## Photon ##

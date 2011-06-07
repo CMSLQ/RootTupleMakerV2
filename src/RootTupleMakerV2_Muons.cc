@@ -35,13 +35,18 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<int> >    ( prefix + "Charge" + suffix );
   produces <std::vector<int> >    ( prefix + "TrkHits" + suffix );
+  produces <std::vector<int> >    ( prefix + "GlobalTrkValidHits" + suffix );
+  produces <std::vector<int> >    ( prefix + "PixelHitCount" + suffix );
+  produces <std::vector<int> >    ( prefix + "SegmentMatches" + suffix );
   produces <std::vector<double> > ( prefix + "TrkValidFractionOfHits" + suffix );
   produces <std::vector<double> > ( prefix + "TrkD0" + suffix );
   produces <std::vector<double> > ( prefix + "TrkD0Error" + suffix );
   produces <std::vector<double> > ( prefix + "TrkDz" + suffix );
   produces <std::vector<double> > ( prefix + "TrkDzError" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackChi2" + suffix );
   produces <std::vector<double> > ( prefix + "GlobalChi2" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIso" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackerkIsoSumPT" + suffix );
   produces <std::vector<double> > ( prefix + "EcalIso" + suffix );
   produces <std::vector<double> > ( prefix + "HcalIso" + suffix );
   produces <std::vector<double> > ( prefix + "HOIso" + suffix );
@@ -51,6 +56,8 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
+  produces <std::vector<int> >    ( prefix + "IsGlobal" + suffix );
+  produces <std::vector<int> >    ( prefix + "IsTracker" + suffix );
 
   if ( useCocktailRefits ) {
     produces <std::vector<int>    > ( prefix + "CocktailRefitID"                + suffix ) ;
@@ -100,13 +107,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     charge  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     trkHits ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >     GlobaltrkValidHits ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >     pixelHitCount ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >     segmentMatches ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >     Valid ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  trkValidFractionOfHits ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkD0   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkD0Error ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkDz   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkDzError ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackChi2 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  globalChi2 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIso   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackerIsoSumPT   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ecalIso  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hcalIso  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hoIso    ( new std::vector<double>()  );
@@ -116,6 +129,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     IsGlobal   ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >     IsTracker   ( new std::vector<int>()  );
 
   std::auto_ptr<std::vector<int   > >  ctRefitID    ( new std::vector<int   > () );
   std::auto_ptr<std::vector<double> >  ctEta        ( new std::vector<double> () );
@@ -220,12 +235,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       charge->push_back( it->charge() );
       trkHits->push_back( it->track()->numberOfValidHits() );
+      GlobaltrkValidHits->push_back( it->globalTrack()->hitPattern().numberOfValidMuonHits() );
+      pixelHitCount->push_back(it->globalTrack()->hitPattern().numberOfValidPixelHits());
+      segmentMatches->push_back(it->numberOfMatches());
       trkValidFractionOfHits->push_back ( validFraction ( it->track() ));
       trkD0->push_back( trkd0 );
       trkD0Error->push_back( it->track()->d0Error() );
       trkDz->push_back( it->track()->dz() );
       trkDzError->push_back( it->track()->dzError() );
-      globalChi2->push_back( it->track()->normalizedChi2() );
+      globalChi2->push_back( it->globalTrack()->normalizedChi2() );
+      trackChi2->push_back( it->track()->normalizedChi2() );
       relIso->push_back( reliso );
       passIso->push_back( (reliso<muonIso) ? 1 : 0 );
       
@@ -265,12 +284,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       energy->push_back( it->energy() );
       trkIso->push_back( it->trackIso() );
+      trackerIsoSumPT->push_back( it->isolationR03().sumPt );
       ecalIso->push_back( it->ecalIso() );
       hcalIso->push_back( it->hcalIso() );
       hoIso->push_back( it->isolationR03().hoEt );
 
       passID->push_back( (it->muonID(muonID)) ? 1 : 0 );
-      vtxIndex->push_back( vtxIndex_ );
+      IsGlobal->push_back( (it->isGlobalMuon()) ? 1 : 0 );
+      IsTracker->push_back( (it->isTrackerMuon()) ? 1 : 0 ); 
+     vtxIndex->push_back( vtxIndex_ );
       vtxDistXY->push_back( vtxDistXY_ );
       vtxDistZ->push_back( vtxDistZ_ );
 
@@ -304,19 +326,26 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( charge, prefix + "Charge" + suffix );
   iEvent.put( trkHits, prefix + "TrkHits" + suffix );
+  iEvent.put( GlobaltrkValidHits, prefix + "GlobalTrkValidHits" + suffix );
+  iEvent.put( pixelHitCount, prefix + "PixelHitCount" + suffix );
+  iEvent.put( segmentMatches, prefix + "SegmentMatches" + suffix );
   iEvent.put( trkValidFractionOfHits, prefix + "TrkValidFractionOfHits" + suffix );
   iEvent.put( trkD0, prefix + "TrkD0" + suffix );
   iEvent.put( trkD0Error, prefix + "TrkD0Error" + suffix );
   iEvent.put( trkDz, prefix + "TrkDz" + suffix );
   iEvent.put( trkDzError, prefix + "TrkDzError" + suffix );
+  iEvent.put( trackChi2, prefix + "TrackChi2" + suffix ); 
   iEvent.put( globalChi2, prefix + "GlobalChi2" + suffix ); 
   iEvent.put( trkIso, prefix + "TrkIso" + suffix );
+  iEvent.put( trackerIsoSumPT, prefix + "TrackerkIsoSumPT" + suffix );
   iEvent.put( ecalIso, prefix + "EcalIso" + suffix );
   iEvent.put( hcalIso, prefix + "HcalIso" + suffix );
   iEvent.put( hoIso, prefix + "HOIso" + suffix );
   iEvent.put( relIso, prefix + "RelIso" + suffix );
   iEvent.put( passIso, prefix + "PassIso" + suffix );
   iEvent.put( passID, prefix + "PassID" + suffix );
+  iEvent.put( IsGlobal, prefix + "IsGlobal" + suffix ); 
+  iEvent.put( IsTracker, prefix + "IsTracker" + suffix );  
   iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
   iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );

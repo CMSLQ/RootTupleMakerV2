@@ -25,7 +25,7 @@ process.GlobalTag.globaltag = 'START42_V12::All' # ===> for Summer11 MC analyzed
 #process.GlobalTag.globaltag = 'START41_V0::All' # ===> for 41X MC analyzed in 41X (contains Jec10V3)
                                
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = 5
 
 # Options and Output Report
 process.options.wantSummary = True
@@ -202,6 +202,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleCaloJets_*_*',
         'keep *_rootTuplePFJets_*_*',
         'keep *_rootTupleElectrons_*_*',
+        'keep *_rootTupleTaus_*_*',
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
@@ -255,6 +256,7 @@ process.p = cms.Path(
     process.rootTupleCaloJets+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
+    process.rootTupleTaus+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
     process.rootTuplePFMET+

@@ -174,6 +174,7 @@ process.p = cms.Path(
     process.rootTupleCaloJets+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
+    process.rootTupleTaus+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
     process.rootTuplePFMET+

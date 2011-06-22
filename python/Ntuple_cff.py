@@ -5,6 +5,7 @@ from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_EventSelection_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_CaloJets_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_PFJets_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Electrons_cfi import *
+from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Taus_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_MET_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Muons_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Trigger_cfi import *

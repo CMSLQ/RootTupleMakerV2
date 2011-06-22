@@ -6,6 +6,7 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_CaloJets.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_PFJets.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Electrons.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Taus.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_MET.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Muons.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Trigger.h"
@@ -22,6 +23,7 @@ DEFINE_FWK_MODULE(RootTupleMakerV2_EventSelection);
 DEFINE_FWK_MODULE(RootTupleMakerV2_CaloJets);
 DEFINE_FWK_MODULE(RootTupleMakerV2_PFJets);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Electrons);
+DEFINE_FWK_MODULE(RootTupleMakerV2_Taus);
 DEFINE_FWK_MODULE(RootTupleMakerV2_MET);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Muons);
 DEFINE_FWK_MODULE(RootTupleMakerV2_Trigger);

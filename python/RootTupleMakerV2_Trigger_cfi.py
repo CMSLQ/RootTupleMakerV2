@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
     L1InputTag  = cms.InputTag('gtDigis'),
     HLTInputTag = cms.InputTag('TriggerResults','','HLT'),
+    SourceName  = cms.string("DS:Electron"),                                  
 
     # HLT config browser : http://j2eeps.cern.ch/cms-project-confdb-hltdev/browser/
     # HLT Tools https://twiki.cern.ch/twiki/bin/view/CMS/HLTriggerTools

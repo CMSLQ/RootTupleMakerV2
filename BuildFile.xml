@@ -3,6 +3,7 @@
 <use name="FWCore/ParameterSet"/>
 <use name="CommonTools/UtilAlgos"/>
 <use name="DataFormats/PatCandidates"/>
+<use name="DataFormats/Common"/>
 <use name="RecoEcal/EgammaClusterAlgos"/>
 <use name="RecoEgamma/EgammaTools"/>
 <use name="RecoEgamma/EgammaIsolationAlgos"/>
@@ -12,7 +13,8 @@
 <use name="L1Trigger/GlobalTriggerAnalyzer"/>
 <use name="MagneticField/Engine"/>
 <use name="MagneticField/Records"/>
+<use name="PhysicsTools/PatUtils"/>
 <use name="JetMETCorrections/Objects"/>
 <use name="lhapdf"/>
-<flags EDM_PLUGIN="1"/>
-
+<use name="rootrflx"/>
+<use name="rootmath"/>

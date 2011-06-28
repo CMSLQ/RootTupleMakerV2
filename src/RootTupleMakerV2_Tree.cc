@@ -44,6 +44,10 @@ void RootTupleMakerV2_Tree::
 beginJob() {
   tree = fs->make<TTree>("tree", "");
 
+  typedef std::map<std::string,       bool> mapStringBool;
+  typedef std::map<std::string,        int> mapStringInt;
+  typedef std::map<std::string,std::string> mapStringString;
+
   std::map<std::string, LEAFTYPE> leafmap;
   leafmap["bool"]      = BOOL;       leafmap["bools"]     = BOOL_V;
   leafmap["short int"] = SHORT;      leafmap["shorts"]    = SHORT_V;
@@ -54,6 +58,10 @@ beginJob() {
   leafmap["double"]    = DOUBLE;     leafmap["doubles"]   = DOUBLE_V;
   leafmap["lint"]      = LONG;       leafmap["longs"]     = LONG_V;
   leafmap["ulint"]     = U_LONG;     leafmap["ulongs"]    = U_LONG_V;
+  leafmap["StringStringstdmap"] = STRING_STRING_M;
+  leafmap["Stringboolstdmap"  ] = STRING_BOOL_M;
+  leafmap["Stringintstdmap"   ] = STRING_INT_M;
+  
   //
   leafmap["String"]     = STRING;     leafmap["Strings"]    = STRING_V;
 
@@ -81,27 +89,32 @@ beginJob() {
 
       //Create RootTupleMakerV2_Tree branch
       switch(leafmap.find( selection->friendlyClassName() )->second) {
-      case BOOL     :  connectors.push_back( new TypedBranchConnector                      <bool>  (selection, "/O", tree) ); break;
-      case BOOL_V   :  connectors.push_back( new TypedBranchConnector<std::vector          <bool> >(selection,   "", tree) ); break;
-      case INT      :  connectors.push_back( new TypedBranchConnector                       <int>  (selection, "/I", tree) ); break;
-      case INT_V    :  connectors.push_back( new TypedBranchConnector<std::vector           <int> >(selection,   "", tree) ); break;
-      case U_INT    :  connectors.push_back( new TypedBranchConnector              <unsigned int>  (selection, "/i", tree) ); break;
-      case U_INT_V  :  connectors.push_back( new TypedBranchConnector<std::vector  <unsigned int> >(selection,   "", tree) ); break;
-      case SHORT    :  connectors.push_back( new TypedBranchConnector                     <short>  (selection, "/S", tree) ); break;
-      case SHORT_V  :  connectors.push_back( new TypedBranchConnector<std::vector         <short> >(selection,   "", tree) ); break;
-      case U_SHORT  :  connectors.push_back( new TypedBranchConnector            <unsigned short>  (selection, "/s", tree) ); break;
-      case U_SHORT_V:  connectors.push_back( new TypedBranchConnector<std::vector<unsigned short> >(selection,   "", tree) ); break;
-      case FLOAT    :  connectors.push_back( new TypedBranchConnector                     <float>  (selection, "/F", tree) ); break;
-      case FLOAT_V  :  connectors.push_back( new TypedBranchConnector<std::vector         <float> >(selection,   "", tree) ); break;
-      case DOUBLE   :  connectors.push_back( new TypedBranchConnector                    <double>  (selection, "/D", tree) ); break;
-      case DOUBLE_V :  connectors.push_back( new TypedBranchConnector<std::vector        <double> >(selection,   "", tree) ); break;
-      case LONG     :  connectors.push_back( new TypedBranchConnector                      <long>  (selection, "/L", tree) ); break;
-      case LONG_V   :  connectors.push_back( new TypedBranchConnector<std::vector          <long> >(selection,   "", tree) ); break;
-      case U_LONG   :  connectors.push_back( new TypedBranchConnector             <unsigned long>  (selection, "/l", tree) ); break;
-      case U_LONG_V :  connectors.push_back( new TypedBranchConnector<std::vector <unsigned long> >(selection,   "", tree) ); break;
-        //
-      case STRING   :  connectors.push_back( new TypedBranchConnector             <std::string > (selection, "/ST", tree) ); break;
-      case STRING_V :  connectors.push_back( new TypedBranchConnector<std::vector <std::string > > (selection,   "", tree) ); break;
+      case BOOL            :  connectors.push_back( new TypedBranchConnector                      <bool>         (selection, "/O", tree) ); break;
+      case BOOL_V          :  connectors.push_back( new TypedBranchConnector<std::vector          <bool> >       (selection,   "", tree) ); break;
+      case INT             :  connectors.push_back( new TypedBranchConnector                       <int>         (selection, "/I", tree) ); break;
+      case INT_V           :  connectors.push_back( new TypedBranchConnector<std::vector           <int> >       (selection,   "", tree) ); break;
+      case U_INT           :  connectors.push_back( new TypedBranchConnector              <unsigned int>         (selection, "/i", tree) ); break;
+      case U_INT_V         :  connectors.push_back( new TypedBranchConnector<std::vector  <unsigned int> >       (selection,   "", tree) ); break;
+      case SHORT           :  connectors.push_back( new TypedBranchConnector                     <short>         (selection, "/S", tree) ); break;
+      case SHORT_V         :  connectors.push_back( new TypedBranchConnector<std::vector         <short> >       (selection,   "", tree) ); break;
+      case U_SHORT         :  connectors.push_back( new TypedBranchConnector            <unsigned short>         (selection, "/s", tree) ); break;
+      case U_SHORT_V       :  connectors.push_back( new TypedBranchConnector<std::vector<unsigned short> >       (selection,   "", tree) ); break;
+      case FLOAT           :  connectors.push_back( new TypedBranchConnector                     <float>         (selection, "/F", tree) ); break;
+      case FLOAT_V         :  connectors.push_back( new TypedBranchConnector<std::vector         <float> >       (selection,   "", tree) ); break;
+      case DOUBLE          :  connectors.push_back( new TypedBranchConnector                    <double>         (selection, "/D", tree) ); break;
+      case DOUBLE_V        :  connectors.push_back( new TypedBranchConnector<std::vector        <double> >       (selection,   "", tree) ); break;
+      case LONG            :  connectors.push_back( new TypedBranchConnector                      <long>         (selection, "/L", tree) ); break;
+      case LONG_V          :  connectors.push_back( new TypedBranchConnector<std::vector          <long> >       (selection,   "", tree) ); break;
+      case U_LONG          :  connectors.push_back( new TypedBranchConnector             <unsigned long>         (selection, "/l", tree) ); break;
+      case U_LONG_V        :  connectors.push_back( new TypedBranchConnector<std::vector <unsigned long> >       (selection,   "", tree) ); break;
+        //	           										         
+      case STRING          :  connectors.push_back( new TypedBranchConnector             <std::string  >         (selection,"/ST", tree) ); break;
+      case STRING_V        :  connectors.push_back( new TypedBranchConnector<std::vector <std::string  > >       (selection,   "", tree) ); break;
+	
+      case STRING_INT_M    :  connectors.push_back( new TypedBranchConnector<mapStringInt>        (selection,   "", tree) ); break;
+      case STRING_BOOL_M   :  connectors.push_back( new TypedBranchConnector<mapStringBool>       (selection,   "", tree) ); break;
+      case STRING_STRING_M :  connectors.push_back( new TypedBranchConnector<mapStringString>     (selection,   "", tree) ); break;
+      
 
       default:
         {

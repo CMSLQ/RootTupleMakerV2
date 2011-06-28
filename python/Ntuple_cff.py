@@ -9,6 +9,7 @@ from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Taus_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_MET_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Muons_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Trigger_cfi import *
+from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_TriggerObjects_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Vertex_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenEventInfo_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenParticles_cfi import *

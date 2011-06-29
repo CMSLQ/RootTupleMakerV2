@@ -12,12 +12,12 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
+  sourceType(NOT_APPLICABLE),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
   l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
   hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest"))
 {
-  std::cout << "sourceName = " << sourceName << std::endl;
   // Source is either a stream or a dataset (mutually exclusive)
   if (sourceName.length() > 0) {
     if (sourceName.length() >= 2 && sourceName[0]=='S' && sourceName[1]==':') {
@@ -33,9 +33,6 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
 	   << "' -- must start with either 'S:' for streams or 'DS:' for datasets."
 	   << std::endl;
   }
-
-  std::cout << "sourceType = " << sourceType << std::endl;
-  std::cout << "sourceName = " << sourceName << std::endl;
   
   produces <std::string> ("HLTKey");
 
@@ -133,8 +130,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::map<std::string,int  > > m_hlt_insideDataset_namesToPrescales  (new std::map<std::string,int >());
   std::auto_ptr<std::map<std::string,int  > > m_hlt_outsideDataset_namesToPrescales (new std::map<std::string,int >());
   */
-
-  //std::auto_ptr<std::vector<std::string > > v
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;

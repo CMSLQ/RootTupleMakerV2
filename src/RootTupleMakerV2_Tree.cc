@@ -108,7 +108,7 @@ beginJob() {
       case U_LONG          :  connectors.push_back( new TypedBranchConnector             <unsigned long>         (selection, "/l", tree) ); break;
       case U_LONG_V        :  connectors.push_back( new TypedBranchConnector<std::vector <unsigned long> >       (selection,   "", tree) ); break;
         //	           										         
-      case STRING          :  connectors.push_back( new TypedBranchConnector             <std::string  >         (selection,"/ST", tree) ); break;
+      case STRING          :  connectors.push_back( new TypedBranchConnector             <std::string  >         (selection,   "", tree) ); break;
       case STRING_V        :  connectors.push_back( new TypedBranchConnector<std::vector <std::string  > >       (selection,   "", tree) ); break;
 	
       case STRING_INT_M    :  connectors.push_back( new TypedBranchConnector<mapStringInt>        (selection,   "", tree) ); break;

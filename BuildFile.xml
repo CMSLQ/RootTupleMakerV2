@@ -18,3 +18,4 @@
 <use name="lhapdf"/>
 <use name="rootrflx"/>
 <use name="rootmath"/>
+<flags EDM_PLUGIN="1"/>

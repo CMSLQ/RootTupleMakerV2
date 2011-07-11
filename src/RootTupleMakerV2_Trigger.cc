@@ -12,11 +12,11 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
-  sourceType(NOT_APPLICABLE),
-  sourceName(iConfig.getParameter<std::string>  ("SourceName")),
   l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
   hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
-  hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest"))
+  hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
+  sourceName(iConfig.getParameter<std::string>  ("SourceName")),
+  sourceType(NOT_APPLICABLE)
 {
   // Source is either a stream or a dataset (mutually exclusive)
   if (sourceName.length() > 0) {

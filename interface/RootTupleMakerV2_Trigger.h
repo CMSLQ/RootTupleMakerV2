@@ -16,7 +16,8 @@ class RootTupleMakerV2_Trigger : public edm::EDProducer {
   void beginRun( edm::Run &, const edm::EventSetup & );
   void getDataSource() ;
   void printNames(const std::vector<std::string>& names);
-  const edm::InputTag   l1InputTag, hltInputTag;
+  const edm::InputTag   l1InputTag;
+  const edm::InputTag   hltInputTag;
   const std::vector<std::string> hltPathsOfInterest;
   HLTConfigProvider hltConfig;
 

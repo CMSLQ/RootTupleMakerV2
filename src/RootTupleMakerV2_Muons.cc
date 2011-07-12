@@ -328,11 +328,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			backToBackCompatibility->push_back( it->userFloat("backToBackCompatibility") );
 			overlapCompatibility->push_back( it->userFloat("overlapCompatibility") );
 			
-		std::cout<<it->dB() <<std::endl;
-		std::cout<<it->track()->hitPattern().numberOfValidTrackerHits()<<std::endl;
-		std::cout<<it->track()->hitPattern().numberOfValidPixelHits()<<std::endl;
-		std::cout<<it->numberOfMatchedStations()<<std::endl;
-		std::cout<<" --------------- "<<std::endl;
+		//std::cout<<it->dB() <<std::endl;
+		//std::cout<<it->track()->hitPattern().numberOfValidTrackerHits()<<std::endl;
+		//std::cout<<it->track()->hitPattern().numberOfValidPixelHits()<<std::endl;
+		//std::cout<<it->numberOfMatchedStations()<<std::endl;
+		//std::cout<<" --------------- "<<std::endl;
 			
 		}
 	}

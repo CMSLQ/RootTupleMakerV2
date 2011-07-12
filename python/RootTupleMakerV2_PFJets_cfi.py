@@ -6,7 +6,9 @@ rootTuplePFJets = cms.EDProducer("RootTupleMakerV2_PFJets",
     Suffix = cms.string(''),
     MaxSize = cms.uint32(10),
     JECUncertainty = cms.string('AK5PF'),
-    ReadJECuncertainty = cms.bool(True)
+    ReadJECuncertainty = cms.bool(True),
+    VertexInputTag = cms.InputTag('offlinePrimaryVertices')
+ 
     #OLD                                
     #JECUncertainty = cms.string('CondFormats/JetMETObjects/data/Spring10_Uncertainty_AK5PF.txt'),
     #ApplyResidualJEC = cms.bool(False),

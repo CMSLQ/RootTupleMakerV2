@@ -21,7 +21,8 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
-process.GlobalTag.globaltag = 'GR_R_42_V12::All' # ===> for 42X prompt reco or re-reco (contains Jec11_V1, does not contain "residual" JEC and uncertainties yet...)
+process.GlobalTag.globaltag = 'GR_R_42_V19::All' # ===> First complete JEC set for 42x 2011 data (https://indico.cern.ch/getFile.py/access?contribId=8&resId=0&materialId=slides&confId=143981)
+#process.GlobalTag.globaltag = 'GR_R_42_V12::All' # ===> for 42X prompt reco or re-reco (contains Jec11_V1, does not contain "residual" JEC and uncertainties yet...)
 #process.GlobalTag.globaltag = 'GR_R_41_V0::All' # ===> for 41X prompt reco (contains Jec10V3)
 
 # Events to process
@@ -85,8 +86,8 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
-    #jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), # IMPORTANT: put them back when available in global tag
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), # IMPORTANT: put them back when available in global tag
+    #jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
                  # check L1 corrections
                  # see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPATDataFormats#JetCorrFactors
     doType1MET   = False,
@@ -97,8 +98,8 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 )
 ## Modify type-I corrected PFMET --> should be consistent with PF Jets (defined above)
 #process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3') #default value
-#process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3Residual') # IMPORTANT: put them back when available in global tag
-process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3')
+process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3Residual') # IMPORTANT: put them back when available in global tag
+#process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3')
 process.metJESCorAK5PFJet.jetPTthreshold = cms.double(10.0) 
 ## Remove muons from raw pfjet collection
 process.ak5PFJetsNoMuon =  cms.EDFilter("PFJetSelector",    
@@ -109,18 +110,18 @@ process.ak5PFJetsNoMuon =  cms.EDFilter("PFJetSelector",
 process.metJESCorAK5PFJet.inputUncorJetsLabel = cms.string('ak5PFJetsNoMuon')
 
 ## Modify JEC for CaloJets (default)
-#process.patJetCorrFactors.levels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual') # IMPORTANT: put them back when available in global tag
-process.patJetCorrFactors.levels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute') 
+process.patJetCorrFactors.levels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual') # IMPORTANT: put them back when available in global tag
+#process.patJetCorrFactors.levels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute') 
                                                
 ## Modify type-I corrected caloMET (default) --> should be consistent with caloJets (defined above)
 #process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3') #default value
-#process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3Residual') # IMPORTANT: put them back when available in global tag
-process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3')
+process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3Residual') # IMPORTANT: put them back when available in global tag
+#process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3')
 process.metJESCorAK5CaloJet.jetPTthreshold = cms.double(20.0) #default value
 
 ## Read JEC uncertainties (might not be available in some global tag)
-process.rootTupleCaloJets.ReadJECuncertainty = False # IMPORTANT: put them back when available in global tag
-process.rootTuplePFJets.ReadJECuncertainty = False # IMPORTANT: put them back when available in global tag
+process.rootTupleCaloJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
+process.rootTuplePFJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
 
 #OLD
 # Residual jet energy corrections (only applied to real data)

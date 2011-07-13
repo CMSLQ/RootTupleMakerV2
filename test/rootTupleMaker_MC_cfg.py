@@ -21,11 +21,12 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
-process.GlobalTag.globaltag = 'START42_V12::All' # ===> for Summer11 MC analyzed in 42X (contains Jec11_V1, does not contain "residual" JEC and uncertainties yet...)
+process.GlobalTag.globaltag = 'START42_V13::All' # ===> First complete JEC set for 42x 2011 data (https://indico.cern.ch/getFile.py/access?contribId=8&resId=0&materialId=slides&confId=143981)
+#process.GlobalTag.globaltag = 'START42_V12::All' # ===> for Summer11 MC analyzed in 42X (contains Jec11_V1, does not contain "residual" JEC and uncertainties yet...)
 #process.GlobalTag.globaltag = 'START41_V0::All' # ===> for 41X MC analyzed in 41X (contains Jec10V3)
                                
 # Events to process
-process.maxEvents.input = 5
+process.maxEvents.input = 100
 
 # Options and Output Report
 process.options.wantSummary = True
@@ -112,8 +113,8 @@ process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3')
 process.metJESCorAK5CaloJet.jetPTthreshold = cms.double(20.0) #default value
 
 ## Read JEC uncertainties (might not be available in some global tag)
-process.rootTupleCaloJets.ReadJECuncertainty = False # IMPORTANT: put them back when available in global tag
-process.rootTuplePFJets.ReadJECuncertainty = False # IMPORTANT: put them back when available in global tag
+process.rootTupleCaloJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
+process.rootTuplePFJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *

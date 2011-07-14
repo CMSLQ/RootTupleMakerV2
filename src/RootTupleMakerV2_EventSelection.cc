@@ -20,7 +20,11 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
     numTracks(iConfig.getParameter<unsigned int>("NumTracks")),
     hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
     hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag")),
-    beamHaloInputTag(iConfig.getParameter<edm::InputTag>("BeamHaloInputTag"))
+    beamHaloInputTag(iConfig.getParameter<edm::InputTag>("BeamHaloInputTag")),
+    trackingFilterJetInputTag   (iConfig.getParameter<edm::InputTag>("TrackingFailureJets")),	      
+    trackingFilterDzTrVtxMax    (iConfig.getParameter<double>       ("TrackingFailureDzTrVtzMax")),   
+    trackingFilterDxyTrVtxMax   (iConfig.getParameter<double>       ("TrackingFailureDxyTrVtxMax")) ,
+    trackingFilterMinSumPtOverHT(iConfig.getParameter<double>       ("TrackingFailureMinSumPtOverHT"))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -31,6 +35,7 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passHBHENoiseFilter");
   produces <bool> ("passBeamHaloFilterLoose");
   produces <bool> ("passBeamHaloFilterTight");
+  produces <bool> ("isTrackingFailure");
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -45,6 +50,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> passhbhenoisefilter( new bool() );
   std::auto_ptr<bool> passbeamhalofilterloose( new bool() );
   std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
+  std::auto_ptr<bool> istrackingfailure ( new bool() ) ;
 
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
@@ -150,6 +156,27 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << beamHaloInputTag;
   }
 
+  //Tracking failure filter:
+  edm::Handle<edm::View<reco::Jet> > jets;
+  iEvent.getByLabel(trackingFilterJetInputTag, jets);
+  
+  double ht = 0;
+  for (edm::View<reco::Jet>::const_iterator j = jets->begin(); j != jets->end(); ++j) {
+    ht += j->pt();
+  }
+
+  double sumpt = 0;
+  if (primaryVertices->size() > 0) {
+    const reco::Vertex * vtx = &((*primaryVertices)[0]);
+    for (std::vector<reco::Track>::const_iterator tr = tracks->begin(); tr != tracks->end(); ++tr) {
+      if (fabs(tr->dz(vtx->position()))  > trackingFilterDzTrVtxMax    ) continue;
+      if (fabs(tr->dxy(vtx->position())) > trackingFilterDxyTrVtxMax   ) continue;
+      sumpt += tr->pt();
+    }
+  }
+  
+  *istrackingfailure.get() = ((sumpt/ht) < trackingFilterMinSumPtOverHT );
+
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
   iEvent.put(isbptx0,"isBPTX0");
@@ -160,5 +187,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(passhbhenoisefilter,"passHBHENoiseFilter");
   iEvent.put(passbeamhalofilterloose,"passBeamHaloFilterLoose");
   iEvent.put(passbeamhalofiltertight,"passBeamHaloFilterTight");
+  iEvent.put(istrackingfailure, "isTrackingFailure");
 
 }

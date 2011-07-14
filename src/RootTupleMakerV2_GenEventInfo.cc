@@ -18,7 +18,8 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   produces <unsigned int> ( "ProcessID" );
   produces <double>       ( "PtHat" );
   produces <std::vector<double> > ( "PDFWeights" );
-  produces <int> ( "PileUpInteractions" );
+  produces <std::vector<int> > ( "PileUpInteractions");
+  produces <std::vector<int> > ( "PileUpOriginBX" ) ;
 }
 
 void RootTupleMakerV2_GenEventInfo::
@@ -27,11 +28,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<unsigned int >         processID   ( new unsigned int() );
   std::auto_ptr<double >               ptHat ( new double() );
   std::auto_ptr<std::vector<double> >  pdfWeights  ( new std::vector<double>()  );
-  std::auto_ptr<int >                  Number_interactions  ( new int() );
+  std::auto_ptr<std::vector<int >  >   Number_interactions  ( new std::vector<int>() );
+  std::auto_ptr<std::vector<int >  >   OriginBX( new std::vector<int>() );
 
   *processID.get() = 0;
   *ptHat.get() = 0.;
-  *Number_interactions.get() = -1;
 
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
@@ -68,8 +69,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     
     if(puInfo.isValid()) {
       for( std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it ) {
-	*Number_interactions.get() = it->getPU_NumInteractions();
-	//std::cout<<it->getPU_NumInteractions()<<std::endl;
+	Number_interactions -> push_back ( it->getPU_NumInteractions() );
+	OriginBX -> push_back ( it -> getBunchCrossing());
       }
     }
     else {
@@ -82,4 +83,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( ptHat, "PtHat" );
   iEvent.put( pdfWeights, "PDFWeights" );
   iEvent.put( Number_interactions,   "PileUpInteractions"   );
+  iEvent.put( OriginBX,   "PileUpOriginBX" );
 }

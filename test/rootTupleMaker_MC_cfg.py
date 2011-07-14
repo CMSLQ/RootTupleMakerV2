@@ -170,12 +170,19 @@ process.LJFilter.counteitherleptontype = True
 # Load HBHENoiseFilterResultProducer
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
 # Check the latest recommendation from https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2011
+process.HBHENoiseFilterResultProducer.minRatio = cms.double(-999)
+process.HBHENoiseFilterResultProducer.maxRatio = cms.double(999)
+process.HBHENoiseFilterResultProducer.minHPDHits = cms.int32(17)
+process.HBHENoiseFilterResultProducer.minRBXHits = cms.int32(999)
+process.HBHENoiseFilterResultProducer.minHPDNoOtherHits = cms.int32(10)
+process.HBHENoiseFilterResultProducer.minZeros = cms.int32(10)
+process.HBHENoiseFilterResultProducer.minHighEHitTime = cms.double(-9999.0)
+process.HBHENoiseFilterResultProducer.maxHighEHitTime = cms.double(9999.0)
+process.HBHENoiseFilterResultProducer.maxRBXEMF = cms.double(-999.0)
+process.HBHENoiseFilterResultProducer.minNumIsolatedNoiseChannels = cms.int32(9999)
 process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumE = cms.double(9999)
 process.HBHENoiseFilterResultProducer.minIsolatedNoiseSumEt = cms.double(9999)
-process.HBHENoiseFilterResultProducer.maxRatio = cms.double(999)
-process.HBHENoiseFilterResultProducer.minRatio = cms.double(-999)
-process.HBHENoiseFilterResultProducer.minNumIsolatedNoiseChannels = cms.int32(9999)
-#process.HBHENoiseFilterResultProducer.useTS4TS5 = cms.bool(True) #available only from 420
+process.HBHENoiseFilterResultProducer.useTS4TS5 = cms.bool(True)
 
 #Load CosmicID producer
 process.load('Leptoquarks.CosmicID.cosmicid_cfi')

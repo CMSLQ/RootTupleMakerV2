@@ -34,9 +34,10 @@ process.options.wantSummary = True
 # Input files
 process.source.fileNames = [
     #'/store/relval/CMSSW_4_2_3/RelValZEE/GEN-SIM-RECO/START42_V12-v2/0062/3CE75CB9-317B-E011-86BE-002618943864.root' #RECO (42X)
-    '/store/relval/CMSSW_4_2_3/RelValTTbar_Tauola/GEN-SIM-RECO/START42_V12_PU_E7TeV_FlatDist10_2011EarlyData_inTimeOnly-v1/0072/16CE5EEA-B47C-E011-85A9-00248C0BE005.root' #RECO (42X, pile-up)
+    #'/store/relval/CMSSW_4_2_3/RelValTTbar_Tauola/GEN-SIM-RECO/START42_V12_PU_E7TeV_FlatDist10_2011EarlyData_inTimeOnly-v1/0072/16CE5EEA-B47C-E011-85A9-00248C0BE005.root' #RECO (42X, pile-up)
     #'/store/relval/CMSSW_4_1_5/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0042/36C91851-606D-E011-A0F6-002618943924.root' #RECO (41X)
     #'/store/relval/CMSSW_4_1_5/RelValTTbar_Tauola/GEN-SIM-RECO/START311_V2_PU_E7TeV_AVE_2_BX156-v1/0049/EC2A2471-0472-E011-9235-0018F3D09682.root' #RECO (41x, pile-up)
+    '/store/mc/Summer11/WW_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S4_START42_V11-v1/0000/008E825F-9C9D-E011-BE4C-0018F3D096EC.root'
 ]
 
 # Add tcMET and pfMET
@@ -133,23 +134,35 @@ process.cleanPatElectrons.checkOverlaps.muons.deltaR = 0.3
 process.cleanPatJets.checkOverlaps.muons.deltaR = 0.5
 process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
 
+# Add tau id sources:
+process.patTaus.tauIDSources.leadingTrackPtCut              = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingTrackPtCut")
+process.patTaus.tauIDSources.trackIsolation                 = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolation")
+process.patTaus.tauIDSources.trackIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion")
+process.patTaus.tauIDSources.ecalIsolation                  = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolation")
+process.patTaus.tauIDSources.ecalIsolationUsingLeadingPion  = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion")
+process.patTaus.tauIDSources.byIsolation                    = cms.InputTag("shrinkingConePFTauDiscriminationByIsolation")
+
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 ##################################################################
-#### Shared Muon/Electron Skim
+#### Shared Muon/Electron/Tau Skim
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
+process.LJFilter.tauLabel = 'shrinkingConePFTauProducer'
 process.LJFilter.muonsMin = 1
 process.LJFilter.muPT = 20.
 process.LJFilter.electronsMin = 1
 process.LJFilter.elecPT = 20.
+process.LJFilter.tausMin = 1
+process.LJFilter.tauPT = 15
 process.LJFilter.counteitherleptontype = True
 ##################################################################
 #### Electron based skim
 #process.LJFilter.muLabel = 'muons'
 #process.LJFilter.elecLabel = 'gsfElectrons'
 #process.LJFilter.jetLabel = 'ak5CaloJets'
+#process.LJFilter.tauLabel = 'shrinkingConePFTauProducer'
 #process.LJFilter.muonsMin = -1
 #process.LJFilter.electronsMin = 1
 #process.LJFilter.elecPT = 20.
@@ -160,6 +173,7 @@ process.LJFilter.counteitherleptontype = True
 # process.LJFilter.elecLabel = 'gsfElectrons'
 # process.LJFilter.photLabel = 'photons'
 # process.LJFilter.jetLabel = 'ak5CaloJets'
+# process.LJFilter.tauLabel = 'shrinkingConePFTauProducer'
 # process.LJFilter.muonsMin = -1
 # process.LJFilter.electronsMin = -1
 # process.LJFilter.photMin = 1
@@ -242,13 +256,13 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 
 # In order to disable the PDF weights calculation, uncomment the line below and
 # comment out the pdfWeights module in the Path 'p' below
-#process.rootTupleGenEventInfo.StorePDFWeights = False
+process.rootTupleGenEventInfo.StorePDFWeights = False
 
 # Path definition
 process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
-    process.pdfWeights*
+    # process.pdfWeights*
     process.ak5PFJetsNoMuon*
     process.metJESCorAK5PFJet*
     (

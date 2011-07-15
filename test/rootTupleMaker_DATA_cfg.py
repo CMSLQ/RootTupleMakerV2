@@ -145,6 +145,14 @@ process.cleanPatElectrons.checkOverlaps.muons.deltaR = 0.3
 process.cleanPatJets.checkOverlaps.muons.deltaR = 0.5
 process.cleanPatJets.checkOverlaps.electrons.deltaR = 0.5
 
+# Add tau id sources:
+process.patTaus.tauIDSources.leadingTrackPtCut              = cms.InputTag("shrinkingConePFTauDiscriminationByLeadingTrackPtCut")
+process.patTaus.tauIDSources.trackIsolation                 = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolation")
+process.patTaus.tauIDSources.trackIsolationUsingLeadingPion = cms.InputTag("shrinkingConePFTauDiscriminationByTrackIsolationUsingLeadingPion")
+process.patTaus.tauIDSources.ecalIsolation                  = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolation")
+process.patTaus.tauIDSources.ecalIsolationUsingLeadingPion  = cms.InputTag("shrinkingConePFTauDiscriminationByECALIsolationUsingLeadingPion")
+process.patTaus.tauIDSources.byIsolation                    = cms.InputTag("shrinkingConePFTauDiscriminationByIsolation")
+
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 ##################################################################
@@ -152,6 +160,7 @@ process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
 process.LJFilter.jetLabel = 'ak5CaloJets'
+process.LJFilter.tauLabel = 'shrinkingConePFTauProducer'
 process.LJFilter.muonsMin = -1
 process.LJFilter.electronsMin = 1
 process.LJFilter.elecPT = 20.
@@ -162,6 +171,7 @@ process.LJFilter.counteitherleptontype = False
 # process.LJFilter.elecLabel = 'gsfElectrons'
 # process.LJFilter.photLabel = 'photons'
 # process.LJFilter.jetLabel = 'ak5CaloJets'
+# process.LJFilter.tauLabel = 'shrinkingConePFTauProducer'
 # process.LJFilter.muonsMin = -1
 # process.LJFilter.electronsMin = -1
 # process.LJFilter.photMin = 1

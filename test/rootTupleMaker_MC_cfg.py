@@ -256,13 +256,13 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 
 # In order to disable the PDF weights calculation, uncomment the line below and
 # comment out the pdfWeights module in the Path 'p' below
-process.rootTupleGenEventInfo.StorePDFWeights = False
+# process.rootTupleGenEventInfo.StorePDFWeights = False
 
 # Path definition
 process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
-    # process.pdfWeights*
+    process.pdfWeights*
     process.ak5PFJetsNoMuon*
     process.metJESCorAK5PFJet*
     (

@@ -53,12 +53,16 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "RelIso" + suffix );
   produces <std::vector<int> >    ( prefix + "PassIso" + suffix );
   produces <std::vector<double> > ( prefix + "EcalIsoHeep" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoHeep" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoHeepFullCone" + suffix );
   produces <std::vector<double> > ( prefix + "HcalIsoD1Heep" + suffix );
   produces <std::vector<double> > ( prefix + "HcalIsoD2Heep" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoHeep" + suffix );
   produces <std::vector<int> >    ( prefix + "MissingHits" + suffix );
   produces <std::vector<double> > ( prefix + "Dist" + suffix );
   produces <std::vector<double> > ( prefix + "DCotTheta" + suffix );
+  produces <std::vector<double> > ( prefix + "Fbrem" + suffix );
+  produces <std::vector<double> > ( prefix + "ESuperClusterOverP" + suffix );
   produces <std::vector<double> > ( prefix + "SCEta" + suffix );
   produces <std::vector<double> > ( prefix + "SCPhi" + suffix );
   produces <std::vector<double> > ( prefix + "SCPt" + suffix );
@@ -96,12 +100,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  relIso   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     passIso  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  ecalIsoHeep  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoHeep  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoHeepFullCone  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hcalIsoD1Heep  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hcalIsoD2Heep  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIsoHeep  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     missingHits  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  dist_vec  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  dCotTheta  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  fbrem  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  eSuperClusterOverP  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scEta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPhi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPt  ( new std::vector<double>()  );
@@ -256,21 +264,31 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       e2x5overe5x5->push_back( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
       heepID->push_back( it->userInt("HEEPId") );
       passID->push_back( passId );
-      // Iso variables
+      // Iso variables (PAT default...)
       trkIso->push_back( it->trackIso() );
       ecalIso->push_back( it->ecalIso() );
       hcalIso->push_back( it->hcalIso() );
       relIso->push_back( reliso );
       passIso->push_back( (reliso<electronIso) ? 1 : 0 );
-      // Iso variables (Heep)
+      // Iso variables (Heep, VBTF, etc..) --> don't be confused by the Heep in the name!!
       ecalIsoHeep->push_back( it->dr03EcalRecHitSumEt() );
+      hcalIsoHeep->push_back( it->dr03HcalTowerSumEt() );
+      hcalIsoHeepFullCone->push_back( it->dr03HcalTowerSumEt() 
+				      + ( it->hadronicOverEm() 
+					  * it->superCluster()->energy() 
+					  / cosh(it->superCluster()->eta())
+					  )
+				      );
       hcalIsoD1Heep->push_back( it->dr03HcalDepth1TowerSumEt() );
       hcalIsoD2Heep->push_back( it->dr03HcalDepth2TowerSumEt() );
       trkIsoHeep->push_back( it->dr03TkSumPt() );
       // Conversion variables
-      missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
+      missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits() );
       dist_vec->push_back( dist );
       dCotTheta->push_back( dcot );
+      //Other variables
+      fbrem->push_back( it->fbrem() );
+      eSuperClusterOverP->push_back( it->eSuperClusterOverP() );
       // SC associated with electron
       scEta->push_back( it->superCluster()->eta() );
       scPhi->push_back( it->superCluster()->phi() );
@@ -312,12 +330,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( relIso, prefix + "RelIso" + suffix );
   iEvent.put( passIso, prefix + "PassIso" + suffix );
   iEvent.put( ecalIsoHeep, prefix + "EcalIsoHeep" + suffix );
+  iEvent.put( hcalIsoHeep, prefix + "HcalIsoHeep" + suffix );
+  iEvent.put( hcalIsoHeepFullCone, prefix + "HcalIsoHeepFullCone" + suffix );
   iEvent.put( hcalIsoD1Heep, prefix + "HcalIsoD1Heep" + suffix );
   iEvent.put( hcalIsoD2Heep, prefix + "HcalIsoD2Heep" + suffix );
   iEvent.put( trkIsoHeep, prefix + "TrkIsoHeep" + suffix );
   iEvent.put( missingHits, prefix + "MissingHits" + suffix );
   iEvent.put( dist_vec, prefix + "Dist" + suffix );
   iEvent.put( dCotTheta, prefix + "DCotTheta" + suffix );
+  iEvent.put( fbrem, prefix + "Fbrem" + suffix );
+  iEvent.put( eSuperClusterOverP, prefix + "ESuperClusterOverP" + suffix );
   iEvent.put( scEta, prefix + "SCEta" + suffix );
   iEvent.put( scPhi, prefix + "SCPhi" + suffix );
   iEvent.put( scPt, prefix + "SCPt" + suffix );

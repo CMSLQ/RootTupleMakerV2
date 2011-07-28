@@ -33,11 +33,11 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    #'/store/relval/CMSSW_4_2_3/RelValZEE/GEN-SIM-RECO/START42_V12-v2/0062/3CE75CB9-317B-E011-86BE-002618943864.root' #RECO (42X)
+    '/store/relval/CMSSW_4_2_3/RelValZEE/GEN-SIM-RECO/START42_V12-v2/0062/3CE75CB9-317B-E011-86BE-002618943864.root' #RECO (42X)
     #'/store/relval/CMSSW_4_2_3/RelValTTbar_Tauola/GEN-SIM-RECO/START42_V12_PU_E7TeV_FlatDist10_2011EarlyData_inTimeOnly-v1/0072/16CE5EEA-B47C-E011-85A9-00248C0BE005.root' #RECO (42X, pile-up)
     #'/store/relval/CMSSW_4_1_5/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0042/36C91851-606D-E011-A0F6-002618943924.root' #RECO (41X)
     #'/store/relval/CMSSW_4_1_5/RelValTTbar_Tauola/GEN-SIM-RECO/START311_V2_PU_E7TeV_AVE_2_BX156-v1/0049/EC2A2471-0472-E011-9235-0018F3D09682.root' #RECO (41x, pile-up)
-    '/store/mc/Summer11/WW_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S4_START42_V11-v1/0000/008E825F-9C9D-E011-BE4C-0018F3D096EC.root'
+    #'/store/mc/Summer11/WW_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S4_START42_V11-v1/0000/008E825F-9C9D-E011-BE4C-0018F3D096EC.root'
 ]
 
 # Add tcMET and pfMET
@@ -116,6 +116,11 @@ process.metJESCorAK5CaloJet.jetPTthreshold = cms.double(20.0) #default value
 ## Read JEC uncertainties (might not be available in some global tag)
 process.rootTupleCaloJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
 process.rootTuplePFJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
+
+## Calculating rho to correct the isolation
+process.load('RecoJets.JetProducers.kt4PFJets_cfi')
+process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJets.Rho_EtaMax = cms.double(2.5)
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *
@@ -271,6 +276,7 @@ process.p = cms.Path(
     process.backToBackCompatibility +
     process.overlapCompatibility
     )*
+    process.kt6PFJets*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+

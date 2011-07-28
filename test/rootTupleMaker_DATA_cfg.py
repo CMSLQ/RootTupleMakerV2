@@ -33,7 +33,8 @@ process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    '/store/data/Run2011A/SingleElectron/AOD/PromptReco-v4/000/165/121/D0162694-1382-E011-876E-003048F1BF68.root' #AOD (42X)
+    'file:/tmp/santanas/SingleElectron-AOD-May10ReReco-v1_42X.root'
+    #'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v4/000/165/121/D0162694-1382-E011-876E-003048F1BF68.root' #AOD (42X)
     #'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v1/000/161/312/90646AF9-F957-E011-B0DB-003048F118C4.root' #AOD (41X)
     #'/store/data/Run2011A/SingleElectron/RECO/PromptReco-v1/000/160/405/0E58AE5B-D64F-E011-88F1-003048F024DC.root' #RECO
 ]
@@ -127,6 +128,11 @@ process.rootTuplePFJets.ReadJECuncertainty = True # IMPORTANT: put them back whe
 # Residual jet energy corrections (only applied to real data)
 #process.rootTupleCaloJets.ApplyResidualJEC = True
 #process.rootTuplePFJets.ApplyResidualJEC = True
+
+## Calculating rho to correct the isolation
+process.load('RecoJets.JetProducers.kt4PFJets_cfi')
+process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJets.Rho_EtaMax = cms.double(2.5)
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *
@@ -243,13 +249,14 @@ process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
     process.ak5PFJetsNoMuon*
-    process.metJESCorAK5PFJet*
+    process.metJESCorAK5PFJet*   
     (
     process.cosmicCompatibility +
     process.timeCompatibility +
     process.backToBackCompatibility +
     process.overlapCompatibility
     )*
+    process.kt6PFJets*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+

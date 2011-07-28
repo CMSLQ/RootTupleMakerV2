@@ -10,6 +10,7 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
   produces <unsigned int> ( "orbit" );
   produces <double>       ( "time" );
   produces <bool>         ( "isData" );
+  produces <double>       ( "rho" );
 }
 
 void RootTupleMakerV2_Event::
@@ -29,6 +30,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<bool >          isdata  ( new bool(iEvent.isRealData()));
 
+  edm::Handle<double> rhoH;
+  iEvent.getByLabel(edm::InputTag("kt6PFJets","rho"),rhoH);
+  std::auto_ptr<double >        rho  ( new double( *rhoH.product() ) );
+
   //-----------------------------------------------------------------
   iEvent.put( run,   "run"   );
   iEvent.put( event, "event" );
@@ -37,4 +42,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( orbit, "orbit" );
   iEvent.put( time,  "time"  );
   iEvent.put( isdata,"isData");
+  iEvent.put( rho,   "rho"   );
 }

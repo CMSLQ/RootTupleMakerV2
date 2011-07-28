@@ -283,7 +283,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hcalIsoD2Heep->push_back( it->dr03HcalDepth2TowerSumEt() );
       trkIsoHeep->push_back( it->dr03TkSumPt() );
       // Conversion variables
-      missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits() );
+      missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
       dist_vec->push_back( dist );
       dCotTheta->push_back( dcot );
       //Other variables

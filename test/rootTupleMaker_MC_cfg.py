@@ -35,6 +35,7 @@ process.options.wantSummary = True
 process.source.fileNames = [
     '/store/relval/CMSSW_4_2_3/RelValZEE/GEN-SIM-RECO/START42_V12-v2/0062/3CE75CB9-317B-E011-86BE-002618943864.root' #RECO (42X)
     #'/store/relval/CMSSW_4_2_3/RelValTTbar_Tauola/GEN-SIM-RECO/START42_V12_PU_E7TeV_FlatDist10_2011EarlyData_inTimeOnly-v1/0072/16CE5EEA-B47C-E011-85A9-00248C0BE005.root' #RECO (42X, pile-up)
+    #'/store/relval/CMSSW_4_2_3/RelValSingleGammaPt35/GEN-SIM-RECO/MC_42_V12-v2/0066/688D5126-DA7B-E011-8883-001A928116AE.root' #RECO (42X) disable pdfweight to run on this sample
     #'/store/relval/CMSSW_4_1_5/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0042/36C91851-606D-E011-A0F6-002618943924.root' #RECO (41X)
     #'/store/relval/CMSSW_4_1_5/RelValTTbar_Tauola/GEN-SIM-RECO/START311_V2_PU_E7TeV_AVE_2_BX156-v1/0049/EC2A2471-0472-E011-9235-0018F3D09682.root' #RECO (41x, pile-up)
     #'/store/mc/Summer11/WW_TuneZ2_7TeV_pythia6_tauola/AODSIM/PU_S4_START42_V11-v1/0000/008E825F-9C9D-E011-BE4C-0018F3D096EC.root'
@@ -261,7 +262,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 
 # In order to disable the PDF weights calculation, uncomment the line below and
 # comment out the pdfWeights module in the Path 'p' below
-# process.rootTupleGenEventInfo.StorePDFWeights = False
+#process.rootTupleGenEventInfo.StorePDFWeights = False
 
 # Path definition
 process.p = cms.Path(

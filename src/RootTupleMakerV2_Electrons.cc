@@ -13,6 +13,7 @@
 #include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
@@ -26,7 +27,9 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
     muonPt (iConfig.getParameter<double>        ("MuonPt")),
     muonIso (iConfig.getParameter<double>       ("MuonIso")),
     muonID  (iConfig.getParameter<std::string>  ("MuonID")),
-    vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
+    vtxInputTag(iConfig.getParameter<edm::InputTag>        ("VertexInputTag")),
+    beamSpotInputTag(iConfig.getParameter<edm::InputTag>   ("BeamSpotInputTag")),
+    conversionsInputTag(iConfig.getParameter<edm::InputTag>("ConversionsInputTag"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -70,6 +73,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
+  produces <std::vector<int> >    ( prefix + "IsFromPhotonConvFit" + suffix );
 }
 
 void RootTupleMakerV2_Electrons::
@@ -117,6 +121,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     isFromPhotonConvFit  ( new std::vector<int>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::TrackCollection> tracks;
@@ -159,6 +164,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   edm::Handle<reco::VertexCollection> primaryVertices;
   iEvent.getByLabel(vtxInputTag,primaryVertices);
+
+  edm::Handle<reco::BeamSpot> bsHandle; 
+  iEvent.getByLabel(beamSpotInputTag, bsHandle); 
+  edm::Handle<reco::ConversionCollection> hConversions;
+  iEvent.getByLabel(conversionsInputTag, hConversions); 
 
   edm::Handle<std::vector<pat::Electron> > electrons;
   iEvent.getByLabel(inputTag, electrons);
@@ -204,7 +214,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if (it->electronID("eidRobustHighEnergy")>0) passId = passId | 1<<4;
       if (it->userInt("HEEPId")==0) passId = passId | 1<<5;
 
-      // Conversion
+      // Conversion (variables)
       ConversionFinder convFinder;
       double dist = -9999.;
       double dcot = -9999.;
@@ -218,6 +228,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << trkInputTag;
       }
 
+      // Conversion (fit) 
+      bool matchesConv = false;
+      if( hConversions.isValid() && bsHandle.isValid() ) 
+	{
+	  matchesConv = ConversionTools::hasMatchedConversion(*it,hConversions,bsHandle->position());
+	  //See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
+          //and https://hypernews.cern.ch/HyperNews/CMS/get/egamma/999.html
+	}
+      else 
+	{
+	  if( !bsHandle.isValid() )
+	    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << beamSpotInputTag;
+	  if( !hConversions.isValid() )
+	    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << conversionsInputTag;
+	}
+      
       // Vertex association
       double minVtxDist3D = 9999.;
       int vtxIndex_ = -1;
@@ -286,6 +312,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
       dist_vec->push_back( dist );
       dCotTheta->push_back( dcot );
+      if( matchesConv )
+	isFromPhotonConvFit->push_back( 1 );
+      else
+	isFromPhotonConvFit->push_back( 0 );
       //Other variables
       fbrem->push_back( it->fbrem() );
       eSuperClusterOverP->push_back( it->eSuperClusterOverP() );
@@ -347,4 +377,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
   iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
+  iEvent.put( isFromPhotonConvFit, prefix + "IsFromPhotonConvFit" + suffix );
 }

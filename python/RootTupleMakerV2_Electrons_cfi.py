@@ -11,5 +11,7 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     MuonPt = cms.double(10.),
     MuonIso = cms.double(0.05),
     MuonID = cms.string('GlobalMuonPromptTight'),
-    VertexInputTag = cms.InputTag('offlinePrimaryVertices')
+    VertexInputTag = cms.InputTag('offlinePrimaryVertices'),
+    BeamSpotInputTag = cms.InputTag('offlineBeamSpot'),
+    ConversionsInputTag = cms.InputTag('allConversions')
 )

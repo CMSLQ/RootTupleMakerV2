@@ -167,6 +167,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   edm::Handle<reco::BeamSpot> bsHandle; 
   iEvent.getByLabel(beamSpotInputTag, bsHandle); 
+
   edm::Handle<reco::ConversionCollection> hConversions;
   iEvent.getByLabel(conversionsInputTag, hConversions); 
 
@@ -234,7 +235,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	{
 	  matchesConv = ConversionTools::hasMatchedConversion(*it,hConversions,bsHandle->position());
 	  //See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
-          //and https://hypernews.cern.ch/HyperNews/CMS/get/egamma/999.html
+          //and https://hypernews.cern.ch/HyperNews/CMS/get/egamma/999.html ( N.1 )
 	}
       else 
 	{

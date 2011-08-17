@@ -73,7 +73,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
-  produces <std::vector<int> >    ( prefix + "IsFromPhotonConvFit" + suffix );
+  produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot" + suffix );
 }
 
 void RootTupleMakerV2_Electrons::
@@ -121,7 +121,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     isFromPhotonConvFit  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot  ( new std::vector<bool>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::TrackCollection> tracks;
@@ -313,10 +313,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
       dist_vec->push_back( dist );
       dCotTheta->push_back( dcot );
-      if( matchesConv )
-	isFromPhotonConvFit->push_back( 1 );
-      else
-	isFromPhotonConvFit->push_back( 0 );
+      hasMatchedConvPhot->push_back( matchesConv );
       //Other variables
       fbrem->push_back( it->fbrem() );
       eSuperClusterOverP->push_back( it->eSuperClusterOverP() );
@@ -378,5 +375,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
   iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
-  iEvent.put( isFromPhotonConvFit, prefix + "IsFromPhotonConvFit" + suffix );
+  iEvent.put( hasMatchedConvPhot, prefix + "HasMatchedConvPhot" + suffix );
 }

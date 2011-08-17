@@ -14,6 +14,7 @@ class RootTupleMakerV2_Photons : public edm::EDProducer {
   const edm::InputTag   inputTag;
   const std::string     prefix, suffix;
   const unsigned int    maxSize;
+  const edm::InputTag   beamSpotInputTag, conversionsInputTag, electronsInputTag, ecalRecHitsEBInputTag, ecalRecHitsEEInputTag;
 };
 
 #endif

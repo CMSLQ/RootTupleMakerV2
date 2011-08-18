@@ -135,6 +135,10 @@ process.heepPatElectrons = cms.EDProducer("HEEPAttStatusToPAT",
 process.patDefaultSequence.replace( process.patElectrons, process.patElectrons*process.heepPatElectrons )
 process.selectedPatElectrons.src = cms.InputTag("heepPatElectrons")
 
+# LikelihoodEle
+process.load('RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi')
+process.egammaIDLikelihood = process.eidLikelihoodExt.clone()
+
 # Electron and jet cleaning deltaR parameters
 process.cleanPatElectrons.checkOverlaps.muons.deltaR = 0.3
 process.cleanPatJets.checkOverlaps.muons.deltaR = 0.5
@@ -271,6 +275,7 @@ process.p = cms.Path(
     process.pdfWeights*
     process.ak5PFJetsNoMuon*
     process.metJESCorAK5PFJet*
+    process.egammaIDLikelihood*
     (
     process.cosmicCompatibility +
     process.timeCompatibility +

@@ -74,6 +74,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot" + suffix );
+  produces <std::vector<double> > ( prefix + "Likelihood" + suffix );
+  produces <std::vector<int> >    ( prefix + "NumberOfBrems" + suffix );
 }
 
 void RootTupleMakerV2_Electrons::
@@ -122,6 +124,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot  ( new std::vector<bool>()  );
+  std::auto_ptr<std::vector<double> >  likelihood  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     numberOfBrems  ( new std::vector<int>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::TrackCollection> tracks;
@@ -174,10 +178,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<std::vector<pat::Electron> > electrons;
   iEvent.getByLabel(inputTag, electrons);
 
+  std::vector<edm::Handle<edm::ValueMap<float> > > eIDValueMap(1); 
+  iEvent.getByLabel( "egammaIDLikelihood" , eIDValueMap[0] );
+  const edm::ValueMap<float> & eIDmapLikelihood = * eIDValueMap[0] ;
+
   if(electrons.isValid()) {
     edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Electrons: " << electrons->size();
 
     for( std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it ) {
+
       // exit from loop when you reach the required number of electrons
       if(eta->size() >= maxSize)
         break;
@@ -270,7 +279,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       } else {
         edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
       }
+      
+      // Likelihood Based Ele ID ( https://twiki.cern.ch/twiki/bin/view/CMS/LikelihoodBasedEleID2011 )
+      double likelihood_ = -999.;
+      if(eIDValueMap[0].isValid())
+ 	{
+	  likelihood_ = eIDmapLikelihood[it->originalObjectRef()];	 
+ 	}
 
+      //-------------------------------------------
+      
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
@@ -291,6 +309,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       e2x5overe5x5->push_back( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
       heepID->push_back( it->userInt("HEEPId") );
       passID->push_back( passId );
+      likelihood->push_back( likelihood_ );
+      numberOfBrems->push_back( it->numberOfBrems() );
       // Iso variables (PAT default...)
       trkIso->push_back( it->trackIso() );
       ecalIso->push_back( it->ecalIso() );
@@ -376,4 +396,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
   iEvent.put( hasMatchedConvPhot, prefix + "HasMatchedConvPhot" + suffix );
+  iEvent.put( likelihood, prefix + "Likelihood" + suffix );
+  iEvent.put( numberOfBrems, prefix + "NumberOfBrems" + suffix );
 }

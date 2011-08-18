@@ -161,7 +161,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       bool matchesElectron = false; 
       if( hConversions.isValid() && bsHandle.isValid() && electrons.isValid()) 
 	{
-	  matchesElectron = ConversionTools::hasMatchedPromptElectron(it->superCluster(),electrons,hConversions,bsHandle->position());
+	  //get the original photon ( https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATFAQs#How_can_I_retrieve_the_reference )
+	  edm::Ptr<reco::Candidate> originalRef = it->originalObjectRef();
+	  const reco::Photon *originalPhoton = dynamic_cast<const reco::Photon *>(originalRef.get());
+
+	  matchesElectron = ConversionTools::hasMatchedPromptElectron(originalPhoton->superCluster(),electrons,hConversions,bsHandle->position());
 	  //See https://indico.cern.ch/getFile.py/access?contribId=6&resId=0&materialId=slides&confId=129730
           //and https://hypernews.cern.ch/HyperNews/CMS/get/egamma/999.html ( N.3 )
 	}

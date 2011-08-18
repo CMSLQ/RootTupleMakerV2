@@ -21,6 +21,7 @@
 #include "Geometry/CaloEventSetup/interface/CaloTopologyRecord.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
 
+
 RootTupleMakerV2_Photons::RootTupleMakerV2_Photons(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
@@ -74,7 +75,171 @@ RootTupleMakerV2_Photons::RootTupleMakerV2_Photons(const edm::ParameterSet& iCon
   produces <std::vector<double> > ( prefix + "DPhiTracksAtVtxConvPhot" + suffix );
   produces <std::vector<double> > ( prefix + "TimeSeed" + suffix );
   produces <std::vector<double> > ( prefix + "E4SwissCross" + suffix );
+  produces <std::vector<double> > ( prefix + "SMajMaj" + suffix );
+  produces <std::vector<double> > ( prefix + "SMinMin" + suffix );
+  produces <std::vector<double> > ( prefix + "Alpha" + suffix );
+  produces <std::vector<double> > ( prefix + "SEtaEta" + suffix );
+  produces <std::vector<double> > ( prefix + "SEtaPhi" + suffix );
+  produces <std::vector<double> > ( prefix + "SPhiPhi" + suffix );
+  produces <std::vector<double> > ( prefix + "E2OverE9" + suffix );
 }
+
+
+//------ user defined functions ------
+
+inline float RootTupleMakerV2_Photons::recHitE( const  DetId id,  const EcalRecHitCollection &recHits )
+{
+  if ( id == DetId(0) ) {
+    return 0;
+  } else {
+    EcalRecHitCollection::const_iterator it = recHits.find( id );
+    if ( it != recHits.end() ) return (*it).energy();
+  }
+  return 0;
+}
+
+inline float RootTupleMakerV2_Photons::recHitE( const DetId id, const EcalRecHitCollection & recHits,int di, int dj )
+{
+  // in the barrel:   di = dEta   dj = dPhi
+  // in the endcap:   di = dX     dj = dY
+
+  DetId nid;
+  if( id.subdetId() == EcalBarrel) nid = EBDetId::offsetBy( id, di, dj );
+  else if( id.subdetId() == EcalEndcap) nid = EEDetId::offsetBy( id, di, dj );
+
+  return ( nid == DetId(0) ? 0 : recHitE( nid, recHits ) );
+}
+
+inline float RootTupleMakerV2_Photons::recHitApproxEt(  const DetId id,  const EcalRecHitCollection &recHits )
+{
+  // for the time being works only for the barrel
+  if ( id.subdetId() == EcalBarrel ) {
+    return recHitE( id, recHits ) / cosh( EBDetId::approxEta( id ) );
+  }
+  return 0;
+}
+
+float RootTupleMakerV2_Photons::GetE2OverE9( const DetId id, const EcalRecHitCollection & recHits)
+{ ///////////start calculating e2/e9
+  ////http://cmslxr.fnal.gov/lxr/source/RecoLocalCalo/EcalRecAlgos/src/EcalSeverityLevelAlgo.cc#240
+  // compute e2overe9
+  //   | | | |
+  //   +-+-+-+
+  //   | |1|2|
+  //   +-+-+-+
+  //   | | | |
+  //   1 - input hit,  2 - highest energy hit in a 3x3 around 1
+  //   rechit 1 must have E_t > recHitEtThreshold
+  //   rechit 2 must have E_t > recHitEtThreshold2
+  //   function returns value of E2/E9 centered around 1 (E2=energy of hits 1+2) if energy of 1>2
+  //   if energy of 2>1 and KillSecondHit is set to true, function returns value of E2/E9 centered around 2
+  //   *provided* that 1 is the highest energy hit in a 3x3 centered around 2, otherwise, function returns 0
+  
+float recHitEtThreshold = 10.0;
+float recHitEtThreshold2 = 1.0;
+bool avoidIeta85=false;
+bool KillSecondHit=true;
+
+if ( id.subdetId() == EcalBarrel ) {
+  EBDetId ebId( id );
+  // avoid recHits at |eta|=85 where one side of the neighbours is missing
+  if ( abs(ebId.ieta())==85 && avoidIeta85) return 0;
+  // select recHits with Et above recHitEtThreshold
+  float e1 = recHitE( id, recHits );
+  float ete1=recHitApproxEt( id, recHits );
+  // check that rechit E_t is above threshold
+  if (ete1 < std::min(recHitEtThreshold,recHitEtThreshold2) ) return 0;
+  if (ete1 < recHitEtThreshold && !KillSecondHit ) return 0;
+
+  float e2=-1;
+  float ete2=0;
+  float s9 = 0;
+  // coordinates of 2nd hit relative to central hit
+  int e2eta=0;
+  int e2phi=0;
+
+  // LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 1
+  for ( int deta = -1; deta <= +1; ++deta ) {
+    for ( int dphi = -1; dphi <= +1; ++dphi ) {
+      // compute 3x3 energy
+      float etmp=recHitE( id, recHits, deta, dphi );
+      s9 += etmp;
+      EBDetId idtmp=EBDetId::offsetBy(id,deta,dphi);
+      float eapproxet=recHitApproxEt( idtmp, recHits );
+      // remember 2nd highest energy deposit (above threshold) in 3x3 array
+      if (etmp>e2 && eapproxet>recHitEtThreshold2 && !(deta==0 && dphi==0)) {
+	e2=etmp;
+	ete2=eapproxet;
+	e2eta=deta;
+	e2phi=dphi;
+      }
+    }
+  }
+
+  if ( e1 == 0 )  return 0;
+  // return 0 if 2nd hit is below threshold
+  if ( e2 == -1 ) return 0;
+  // compute e2/e9 centered around 1st hit
+  float e2nd=e1+e2;
+  float e2e9=0;
+
+  if (s9!=0) e2e9=e2nd/s9;
+  // if central hit has higher energy than 2nd hit
+  //  return e2/e9 if 1st hit is above E_t threshold
+  if (e1 > e2 && ete1>recHitEtThreshold) return e2e9;
+  // if second hit has higher energy than 1st hit
+  if ( e2 > e1 ) {
+    // return 0 if user does not want to flag 2nd hit, or
+    // hits are below E_t thresholds - note here we
+    // now assume the 2nd hit to be the leading hit.
+
+    if (!KillSecondHit || ete2<recHitEtThreshold || ete1<recHitEtThreshold2) {
+      return 0;
+    }
+    else {
+      // LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 2
+      float s92nd=0;
+      float e2nd_prime=0;
+      int e2prime_eta=0;
+      int e2prime_phi=0;
+
+      EBDetId secondid=EBDetId::offsetBy(id,e2eta,e2phi);
+
+      for ( int deta = -1; deta <= +1; ++deta ) {
+	for ( int dphi = -1; dphi <= +1; ++dphi ) {
+
+	  // compute 3x3 energy
+	  float etmp=recHitE( secondid, recHits, deta, dphi );
+	  s92nd += etmp;
+
+	  if (etmp>e2nd_prime && !(deta==0 && dphi==0)) {
+	    e2nd_prime=etmp;
+	    e2prime_eta=deta;
+	    e2prime_phi=dphi;
+	  }
+	}
+      }
+      // if highest energy hit around E2 is not the same as the input hit, return 0;
+      if (!(e2prime_eta==-e2eta && e2prime_phi==-e2phi))
+	{
+	  return 0;
+	}
+      // compute E2/E9 around second hit
+      float e2e9_2=0;
+      if (s92nd!=0) e2e9_2=e2nd/s92nd;
+      //   return the value of E2/E9 calculated around 2nd hit
+      return e2e9_2;
+    }
+  }
+ } else if ( id.subdetId() == EcalEndcap ) {
+  // only used for EB at the moment
+  return 0;
+ }
+return 0;
+}
+
+
+//------
 
 void RootTupleMakerV2_Photons::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -121,6 +286,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  dPhiTracksAtVtxConvPhot  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  timeSeed  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e4SwissCross  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sMajMaj  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sMinMin  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  alpha  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sEtaEta  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sEtaPhi  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sPhiPhi  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  e2OverE9  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
 
@@ -236,12 +408,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //variables from ecal rechits collection
       double timeSeed_     = 0.;     
       double e4SwissCross_ = -1;     
-//       double sMajMaj_      = -99.;
-//       double sMinMin_      = -99.;
-//       double alpha_        = -99.;
-//       double sEtaEta_      = it->sigmaEtaEta();
-//       double sEtaPhi_      = -99.;
-//       double sPhiPhi_      = -99.;
+      double sMajMaj_      = -99.;
+      double sMinMin_      = -99.;
+      double alpha_        = -99.;
+      double sEtaEta_      = it->sigmaEtaEta();
+      double sEtaPhi_      = -99.;
+      double sPhiPhi_      = -99.;
+      double e2OverE9_     = -99.;
+
       const reco::CaloClusterPtr theSeed = it->superCluster()->seed(); 
       const EBRecHitCollection* rechits = ( it->isEB()) ? rhitseb : rhitsee;
       if( ecalhitseb.isValid() && ecalhitsee.isValid() )
@@ -261,34 +435,26 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	      EcalClusterTools::eRight( *theSeed, &(*rechits), topology ) +
 	      EcalClusterTools::eTop( *theSeed, &(*rechits), topology ) +
 	      EcalClusterTools::eBottom( *theSeed, &(*rechits), topology ) );	  
-// 	  //cluster shape: 	  //FIXME
-// 	  if(maxRH.second) {
-// 	    Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*theSeed, *rechits);
-// 	    std::vector<float> etaphimoments = EcalClusterTools::localCovariances(*theSeed, &(*rechits), &(*topology));
-// 	    sMajMaj_ = moments.sMaj;
-// 	    sMinMin_ = moments.sMin;
-// 	    alpha_   = moments.alpha;
-// 	    sEtaEta_ = etaphimoments[0];
-// 	    sEtaPhi_ = etaphimoments[1];
-// 	    sPhiPhi_ = etaphimoments[2];
-// 	  }else{
-// 	    sMajMaj_ = -100.;
-// 	    sMinMin_ = -100.;
-// 	    alpha_   = -100.;
-// 	    sEtaEta_ = it->sigmaEtaEta();//-100.;
-// 	    sEtaPhi_ = -100.;
-// 	    sPhiPhi_ = -100.;
-// 	  }
-// 	  E2OverE9Phot_=-99.;
-// 	  if ( it->isEB() )
-// 	    E2OverE9Phot[nPhot] = GetE2OverE9(seedCrystalId,*rechits);
+	  // cluster shape:
+	  if(maxRH.second) {
+	    Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*theSeed, *rechits);
+	    std::vector<float> etaphimoments = EcalClusterTools::localCovariances(*theSeed, &(*rechits), &(*topology));
+	    sMajMaj_ = moments.sMaj;
+	    sMinMin_ = moments.sMin;
+	    alpha_   = moments.alpha;
+	    sEtaEta_ = etaphimoments[0];
+	    sEtaPhi_ = etaphimoments[1];
+	    sPhiPhi_ = etaphimoments[2];
+	  }
+	  if ( it->isEB() )
+	    e2OverE9_ = GetE2OverE9(seedCrystalId,*rechits);
 	}
       else
 	{
 	  if( !ecalhitseb.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << beamSpotInputTag; //FIXME
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalRecHitsEBInputTag; //FIXME
 	  if( !ecalhitsee.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << beamSpotInputTag; //FIXME
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalRecHitsEEInputTag; //FIXME
 	}
 
       //-----------------------------------------------------------------      
@@ -337,6 +503,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //variables from ecal rechits
       timeSeed->push_back( timeSeed_ );
       e4SwissCross->push_back( e4SwissCross_ );
+      sMajMaj->push_back( sMajMaj_ );
+      sMinMin->push_back( sMinMin_ );
+      alpha->push_back( alpha_ );
+      sEtaEta->push_back( sEtaEta_ );
+      sEtaPhi->push_back( sEtaPhi_ );
+      sPhiPhi->push_back( sPhiPhi_ );
+      e2OverE9->push_back( e2OverE9_ );
     }
   } else {
     edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << inputTag;
@@ -385,6 +558,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( eOverPConvPhot, prefix + "EOverPConvPhot" + suffix );
   iEvent.put( distOfMinApproachConvPhot, prefix + "DistOfMinApproachConvPhot" + suffix );
   iEvent.put( dPhiTracksAtVtxConvPhot, prefix + "DPhiTracksAtVtxConvPhot" + suffix );
+  //variables from ecal rechits
   iEvent.put( timeSeed, prefix + "TimeSeed" + suffix );
   iEvent.put( e4SwissCross, prefix + "E4SwissCross" + suffix );
+  iEvent.put( sMajMaj, prefix + "SMajMaj" + suffix );
+  iEvent.put( sMinMin, prefix + "SMinMin" + suffix );
+  iEvent.put( alpha, prefix + "Alpha" + suffix );
+  iEvent.put( sEtaEta, prefix + "SEtaEta" + suffix );
+  iEvent.put( sEtaPhi, prefix + "SEtaPhi" + suffix );
+  iEvent.put( sPhiPhi, prefix + "SPhiPhi" + suffix );
+  iEvent.put( e2OverE9, prefix + "E2OverE9" + suffix );
 }
+

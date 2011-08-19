@@ -131,8 +131,8 @@ process.rootTuplePFJets.ReadJECuncertainty = True # IMPORTANT: put them back whe
 
 ## Calculating rho to correct the isolation
 process.load('RecoJets.JetProducers.kt4PFJets_cfi')
-process.kt6PFJets = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJets.Rho_EtaMax = cms.double(2.5)
+process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 
 # HEEPify PAT electrons
 from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *
@@ -261,7 +261,7 @@ process.p = cms.Path(
     process.backToBackCompatibility +
     process.overlapCompatibility
     )*
-    process.kt6PFJets*
+    process.kt6PFJetsForIsolation*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+

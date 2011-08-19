@@ -10,6 +10,9 @@ class RootTupleMakerV2_Event : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
+
+  const edm::InputTag fastJetForIsolationInputTag ;
+
 };
 
 #endif

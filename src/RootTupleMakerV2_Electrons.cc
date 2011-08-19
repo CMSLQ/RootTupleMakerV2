@@ -29,7 +29,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
     muonID  (iConfig.getParameter<std::string>  ("MuonID")),
     vtxInputTag(iConfig.getParameter<edm::InputTag>        ("VertexInputTag")),
     beamSpotInputTag(iConfig.getParameter<edm::InputTag>   ("BeamSpotInputTag")),
-    conversionsInputTag(iConfig.getParameter<edm::InputTag>("ConversionsInputTag"))
+    conversionsInputTag(iConfig.getParameter<edm::InputTag>("ConversionsInputTag")),
+    likelihoodInputTag(iConfig.getParameter<edm::InputTag> ("LikelihoodInputTag"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -49,18 +50,18 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "E1x5OverE5x5" + suffix );
   produces <std::vector<double> > ( prefix + "E2x5OverE5x5" + suffix );
   produces <std::vector<int> >    ( prefix + "HeepID" + suffix );
-  produces <std::vector<int> >    ( prefix + "PassID" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkIso" + suffix );
-  produces <std::vector<double> > ( prefix + "EcalIso" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIso" + suffix );
-  produces <std::vector<double> > ( prefix + "RelIso" + suffix );
-  produces <std::vector<int> >    ( prefix + "PassIso" + suffix );
-  produces <std::vector<double> > ( prefix + "EcalIsoHeep" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoHeep" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoHeepFullCone" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoD1Heep" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoD2Heep" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkIsoHeep" + suffix );
+  produces <std::vector<int> >    ( prefix + "PassIDPAT" + suffix );
+  produces <std::vector<double> > ( prefix + "TrkIsoPAT" + suffix );
+  produces <std::vector<double> > ( prefix + "EcalIsoPAT" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoPAT" + suffix );
+  produces <std::vector<double> > ( prefix + "RelIsoPAT" + suffix );
+  produces <std::vector<int> >    ( prefix + "PassIsoPAT" + suffix );
+  produces <std::vector<double> > ( prefix + "EcalIsoDR03" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoDR03" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoDR03FullCone" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoD1DR03" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoD2DR03" + suffix );
+  produces <std::vector<double> > ( prefix + "TrkIsoDR03" + suffix );
   produces <std::vector<int> >    ( prefix + "MissingHits" + suffix );
   produces <std::vector<double> > ( prefix + "Dist" + suffix );
   produces <std::vector<double> > ( prefix + "DCotTheta" + suffix );
@@ -99,18 +100,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  e1x5overe5x5  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e2x5overe5x5  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     heepID  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     passID  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  trkIso   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ecalIso  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIso  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  relIso   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     passIso  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  ecalIsoHeep  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoHeep  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoHeepFullCone  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoD1Heep  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoD2Heep  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkIsoHeep  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     passIDPAT  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  trkIsoPAT   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ecalIsoPAT  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoPAT  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  relIsoPAT   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     passIsoPAT  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  ecalIsoDR03  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoDR03  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoDR03FullCone  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoD1DR03  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoD2DR03  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkIsoDR03  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     missingHits  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  dist_vec  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  dCotTheta  ( new std::vector<double>()  );
@@ -179,7 +180,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(inputTag, electrons);
 
   std::vector<edm::Handle<edm::ValueMap<float> > > eIDValueMap(1); 
-  iEvent.getByLabel( "egammaIDLikelihood" , eIDValueMap[0] );
+  iEvent.getByLabel( likelihoodInputTag , eIDValueMap[0] );
   const edm::ValueMap<float> & eIDmapLikelihood = * eIDValueMap[0] ;
 
   if(electrons.isValid()) {
@@ -308,27 +309,27 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       e1x5overe5x5->push_back( (it->e5x5()>0) ? (it->e1x5()/it->e5x5()) : 0 );
       e2x5overe5x5->push_back( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
       heepID->push_back( it->userInt("HEEPId") );
-      passID->push_back( passId );
+      passIDPAT->push_back( passId );
       likelihood->push_back( likelihood_ );
       numberOfBrems->push_back( it->numberOfBrems() );
       // Iso variables (PAT default...)
-      trkIso->push_back( it->trackIso() );
-      ecalIso->push_back( it->ecalIso() );
-      hcalIso->push_back( it->hcalIso() );
-      relIso->push_back( reliso );
-      passIso->push_back( (reliso<electronIso) ? 1 : 0 );
-      // Iso variables (Heep, VBTF, etc..) --> don't be confused by the Heep in the name!!
-      ecalIsoHeep->push_back( it->dr03EcalRecHitSumEt() );
-      hcalIsoHeep->push_back( it->dr03HcalTowerSumEt() );
-      hcalIsoHeepFullCone->push_back( it->dr03HcalTowerSumEt() 
+      trkIsoPAT->push_back( it->trackIso() );
+      ecalIsoPAT->push_back( it->ecalIso() );
+      hcalIsoPAT->push_back( it->hcalIso() );
+      relIsoPAT->push_back( reliso );
+      passIsoPAT->push_back( (reliso<electronIso) ? 1 : 0 );
+      // Iso variables (Heep, VBTF, etc..)
+      ecalIsoDR03->push_back( it->dr03EcalRecHitSumEt() );
+      hcalIsoDR03->push_back( it->dr03HcalTowerSumEt() );
+      hcalIsoDR03FullCone->push_back( it->dr03HcalTowerSumEt() 
 				      + ( it->hadronicOverEm() 
 					  * it->superCluster()->energy() 
 					  / cosh(it->superCluster()->eta())
 					  )
 				      );
-      hcalIsoD1Heep->push_back( it->dr03HcalDepth1TowerSumEt() );
-      hcalIsoD2Heep->push_back( it->dr03HcalDepth2TowerSumEt() );
-      trkIsoHeep->push_back( it->dr03TkSumPt() );
+      hcalIsoD1DR03->push_back( it->dr03HcalDepth1TowerSumEt() );
+      hcalIsoD2DR03->push_back( it->dr03HcalDepth2TowerSumEt() );
+      trkIsoDR03->push_back( it->dr03TkSumPt() );
       // Conversion variables
       missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
       dist_vec->push_back( dist );
@@ -371,18 +372,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( e1x5overe5x5, prefix + "E1x5OverE5x5" + suffix );
   iEvent.put( e2x5overe5x5, prefix + "E2x5OverE5x5" + suffix );
   iEvent.put( heepID, prefix + "HeepID" + suffix );
-  iEvent.put( passID, prefix + "PassID" + suffix );
-  iEvent.put( trkIso, prefix + "TrkIso" + suffix );
-  iEvent.put( ecalIso, prefix + "EcalIso" + suffix );
-  iEvent.put( hcalIso, prefix + "HcalIso" + suffix );
-  iEvent.put( relIso, prefix + "RelIso" + suffix );
-  iEvent.put( passIso, prefix + "PassIso" + suffix );
-  iEvent.put( ecalIsoHeep, prefix + "EcalIsoHeep" + suffix );
-  iEvent.put( hcalIsoHeep, prefix + "HcalIsoHeep" + suffix );
-  iEvent.put( hcalIsoHeepFullCone, prefix + "HcalIsoHeepFullCone" + suffix );
-  iEvent.put( hcalIsoD1Heep, prefix + "HcalIsoD1Heep" + suffix );
-  iEvent.put( hcalIsoD2Heep, prefix + "HcalIsoD2Heep" + suffix );
-  iEvent.put( trkIsoHeep, prefix + "TrkIsoHeep" + suffix );
+  iEvent.put( passIDPAT, prefix + "PassIDPAT" + suffix );
+  iEvent.put( trkIsoPAT, prefix + "TrkIsoPAT" + suffix );
+  iEvent.put( ecalIsoPAT, prefix + "EcalIsoPAT" + suffix );
+  iEvent.put( hcalIsoPAT, prefix + "HcalIsoPAT" + suffix );
+  iEvent.put( relIsoPAT, prefix + "RelIsoPAT" + suffix );
+  iEvent.put( passIsoPAT, prefix + "PassIsoPAT" + suffix );
+  iEvent.put( ecalIsoDR03, prefix + "EcalIsoDR03" + suffix );
+  iEvent.put( hcalIsoDR03, prefix + "HcalIsoDR03" + suffix );
+  iEvent.put( hcalIsoDR03FullCone, prefix + "HcalIsoDR03FullCone" + suffix );
+  iEvent.put( hcalIsoD1DR03, prefix + "HcalIsoD1DR03" + suffix );
+  iEvent.put( hcalIsoD2DR03, prefix + "HcalIsoD2DR03" + suffix );
+  iEvent.put( trkIsoDR03, prefix + "TrkIsoDR03" + suffix );
   iEvent.put( missingHits, prefix + "MissingHits" + suffix );
   iEvent.put( dist_vec, prefix + "Dist" + suffix );
   iEvent.put( dCotTheta, prefix + "DCotTheta" + suffix );

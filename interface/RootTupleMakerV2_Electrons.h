@@ -16,7 +16,7 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
   const unsigned int    maxSize;
   const double          electronIso, muonPt, muonIso;
   const std::string     muonID;
-  const edm::InputTag   vtxInputTag, beamSpotInputTag, conversionsInputTag;
+  const edm::InputTag   vtxInputTag, beamSpotInputTag, conversionsInputTag, likelihoodInputTag;
 };
 
 #endif

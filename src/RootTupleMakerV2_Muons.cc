@@ -310,9 +310,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			energy->push_back( it->energy() );
 			trkIso->push_back( it->trackIso() );
 			trackerIsoSumPT->push_back( it->isolationR03().sumPt );
-			ecalIso->push_back( it->ecalIso() );
-			hcalIso->push_back( it->hcalIso() );
+			ecalIso->push_back( it->isolationR03().emEt );
+			hcalIso->push_back( it->isolationR03().hadEt );
 			hoIso->push_back( it->isolationR03().hoEt );
+			//expect no difference
+			//std::cout << "it->ecalIso() - it->isolationR03().emEt = " << ( it->ecalIso() - it->isolationR03().emEt ) << std::endl;
+			//std::cout << "it->trackIso() - it->isolationR03().sumPt = " << ( it->trackIso() - it->isolationR03().sumPt ) << std::endl;
+			//std::cout << "it->hcalIso() - it->isolationR03().hadEt = " << ( it->hcalIso() - it->isolationR03().hadEt ) << std::endl;
 
 			passID->push_back( (it->muonID(muonID)) ? 1 : 0 );
 			IsGlobal->push_back( (it->isGlobalMuon()) ? 1 : 0 );

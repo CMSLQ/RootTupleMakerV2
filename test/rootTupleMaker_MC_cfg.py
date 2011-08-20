@@ -80,13 +80,28 @@ addPfMETType1Cor(process, 'PFType1Cor')
 #)
 #process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
+# For L1FastJet Corrections ( https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2504/1.html 
+# and https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections?redirectedfrom=CMS.WorkBookJetEnergyCorrections )
+
+##-------------------- Import the JEC services -----------------------
+process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
+##-------------------- Import the Jet RECO modules -----------------------
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+##-------------------- Turn-on the FastJet density calculation -----------------------
+process.kt6PFJets.doRhoFastjet = True
+##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
+process.ak5PFJets.doAreaFastjet = True
+##-------------------- set rho to True to prevent Exceptions at run time, when L1FastJet is used -----------------------
+process.patJetCorrFactors.useRho = True
+
 from PhysicsTools.PatAlgos.tools.jetTools import *
 # Add PF jets
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute'])),
+    #jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
     doType1MET   = False,
     doL1Cleaning = False,
     doL1Counters = False,
@@ -94,7 +109,8 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJetID      = False
 )
 ## Modify type-I corrected PFMET --> should be consistent with PF Jets (defined above)
-process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3') 
+process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1FastL2L3') 
+#process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL1L2L3') 
 #process.metJESCorAK5PFJet.corrector = cms.string('ak5PFL2L3') #default value
 process.metJESCorAK5PFJet.jetPTthreshold = cms.double(10.0) 
 ## Remove muons from raw pfjet collection
@@ -106,17 +122,21 @@ process.ak5PFJetsNoMuon =  cms.EDFilter("PFJetSelector",
 process.metJESCorAK5PFJet.inputUncorJetsLabel = cms.string('ak5PFJetsNoMuon')
 
 ## Modify JEC for CaloJets (default)
-process.patJetCorrFactors.levels = cms.vstring('L1Offset', 
+process.patJetCorrFactors.levels = cms.vstring('L1FastJet', 
                                                'L2Relative', 
                                                'L3Absolute')
+#process.patJetCorrFactors.levels = cms.vstring('L1Offset', 
+#                                               'L2Relative', 
+#                                               'L3Absolute')
 ## Modify type-I corrected caloMET (default) --> should be consistent with caloJets (defined above)
-process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3') 
+process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1FastL2L3') 
+#process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL1L2L3') 
 #process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3') #default value
 process.metJESCorAK5CaloJet.jetPTthreshold = cms.double(20.0) #default value
 
 ## Read JEC uncertainties (might not be available in some global tag)
-process.rootTupleCaloJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
-process.rootTuplePFJets.ReadJECuncertainty = True # IMPORTANT: put them back when available in global tag
+process.rootTupleCaloJets.ReadJECuncertainty = True 
+process.rootTuplePFJets.ReadJECuncertainty = True 
 
 ## Calculating rho to correct the isolation
 process.load('RecoJets.JetProducers.kt4PFJets_cfi')
@@ -273,6 +293,9 @@ process.p = cms.Path(
     process.LJFilter*
     process.HBHENoiseFilterResultProducer*
     process.pdfWeights*
+    process.kt6PFJetsForIsolation*
+    process.kt6PFJets*
+    process.ak5PFJets*
     process.ak5PFJetsNoMuon*
     process.metJESCorAK5PFJet*
     process.egammaIDLikelihood*
@@ -282,7 +305,6 @@ process.p = cms.Path(
     process.backToBackCompatibility +
     process.overlapCompatibility
     )*
-    process.kt6PFJetsForIsolation*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+

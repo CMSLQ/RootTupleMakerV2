@@ -2,7 +2,8 @@
 #include "FWCore/Framework/interface/Event.h"
 
 RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig) :
-  fastJetForIsolationInputTag(iConfig.getParameter<edm::InputTag>("FastJetForIsolationInputTag"))
+  fastJetForIsolationInputTag(iConfig.getParameter<edm::InputTag>("FastJetForIsolationInputTag")),
+  fastJetForJECInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECInputTag"))
 {
   produces <unsigned int> ( "run"   );
   produces <unsigned int> ( "event" );
@@ -12,7 +13,7 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
   produces <double>       ( "time" );
   produces <bool>         ( "isData" );
   produces <double>       ( "rhoIso" );
-  //  produces <double>       ( "rhoJets" );
+  produces <double>       ( "rhoJets" );
 }
 
 void RootTupleMakerV2_Event::
@@ -36,6 +37,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(fastJetForIsolationInputTag,rhoH);
   std::auto_ptr<double >        rhoIso  ( new double( *rhoH.product() ) );
 
+  edm::Handle<double> rhoHJets;
+  iEvent.getByLabel(fastJetForJECInputTag,rhoHJets);
+  std::auto_ptr<double >        rhoJets  ( new double( *rhoHJets.product() ) );
+
   //-----------------------------------------------------------------
   iEvent.put( run,   "run"   );
   iEvent.put( event, "event" );
@@ -45,5 +50,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( time,  "time"  );
   iEvent.put( isdata,"isData");
   iEvent.put( rhoIso,   "rhoIso"   );
-  //  iEvent.put( rhoJets,   "rhoJets"   );
+  iEvent.put( rhoJets,   "rhoJets"   );
 }

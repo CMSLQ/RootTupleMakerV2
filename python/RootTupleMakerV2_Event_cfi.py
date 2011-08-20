@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleEvent = cms.EDProducer("RootTupleMakerV2_Event",
-                                FastJetForIsolationInputTag = cms.InputTag('kt6PFJetsForIsolation','rho')
+                                FastJetForIsolationInputTag = cms.InputTag('kt6PFJetsForIsolation','rho'),
+                                FastJetForJECInputTag       = cms.InputTag('kt6PFJets','rho')
                                 )
 

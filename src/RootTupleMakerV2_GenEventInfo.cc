@@ -20,6 +20,9 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   produces <std::vector<double> > ( "PDFWeights" );
   produces <std::vector<int> > ( "PileUpInteractions");
   produces <std::vector<int> > ( "PileUpOriginBX" ) ;
+  produces <double>       ( "Weight" );
+//   produces <double>       ( "AlphaQCD" );
+//   produces <double>       ( "AlphaQED" );
 }
 
 void RootTupleMakerV2_GenEventInfo::
@@ -30,9 +33,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pdfWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int >  >   Number_interactions  ( new std::vector<int>() );
   std::auto_ptr<std::vector<int >  >   OriginBX( new std::vector<int>() );
+  std::auto_ptr<double >               weight ( new double() );
+//   std::auto_ptr<double >               alphaQCD ( new double() );
+//   std::auto_ptr<double >               alphaQED ( new double() );
 
   *processID.get() = 0;
   *ptHat.get() = 0.;
+  *weight.get() = 0.;
+//   *alphaQCD.get() = 0.;
+//   *alphaQED.get() = 0.;
 
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
@@ -45,6 +54,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       *processID.get() = genEvtInfoProduct->signalProcessID();
       *ptHat.get() = ( genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0. );
+      *weight.get() = genEvtInfoProduct->weight();
+//       *alphaQCD.get() = genEvtInfoProduct->alphaQCD();
+//       *alphaQED.get() = genEvtInfoProduct->alphaQED();
 
     } else {
       edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
@@ -84,4 +96,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pdfWeights, "PDFWeights" );
   iEvent.put( Number_interactions,   "PileUpInteractions"   );
   iEvent.put( OriginBX,   "PileUpOriginBX" );
+  iEvent.put( weight, "Weight" );
+//   iEvent.put( alphaQCD, "alphaQCD" );
+//   iEvent.put( alphaQED, "alphaQED" );
 }

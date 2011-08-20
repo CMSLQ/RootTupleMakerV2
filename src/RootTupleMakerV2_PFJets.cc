@@ -337,8 +337,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			energy_raw->push_back( it->correctedJet("Uncorrected").energy() );
 			l2l3resJEC_vec->push_back( it->pt()/it->correctedJet("L3Absolute").pt() );
 			l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
-			l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1Offset").pt() );
-			l1offJEC_vec->push_back( it->correctedJet("L1Offset").pt()/it->correctedJet("Uncorrected").pt() );
+			l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1FastJet").pt() );
+			l1offJEC_vec->push_back( it->correctedJet("L1FastJet").pt()/it->correctedJet("Uncorrected").pt() );
 			if(readJECuncertainty)
 				jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
 			else

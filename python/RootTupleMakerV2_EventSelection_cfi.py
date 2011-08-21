@@ -14,7 +14,7 @@ rootTupleEventSelection = cms.EDProducer("RootTupleMakerV2_EventSelection",
     TrackingFailureJets	          = cms.InputTag ('patJetsAK5PF'),                                      
     TrackingFailureDzTrVtzMax     = cms.double(1.0),
     TrackingFailureDxyTrVtxMax    = cms.double(0.2),
-    TrackingFailureMinSumPtOverHT = cms.double(0.10)
-    #EcalMaskedCellDRFilterInputTag = cms.InputTag('simpleDRfilter','deadCellStatus'),
-    #CaloBoundaryDRFilterInputTag = cms.InputTag('simpleDRfilter','boundaryStatus')                                         
+    TrackingFailureMinSumPtOverHT = cms.double(0.10),
+    EcalMaskedCellDRFilterInputTag = cms.InputTag('simpleDRfilter','deadCellStatus'),
+    CaloBoundaryDRFilterInputTag = cms.InputTag('simpleDRfilter','boundaryStatus')  
 )

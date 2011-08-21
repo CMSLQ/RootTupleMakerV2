@@ -25,7 +25,7 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
   const double trackingFilterDxyTrVtxMax   ;
   const double trackingFilterMinSumPtOverHT;
 
-  //const edm::InputTag   ecalMaskedCellDRFilterInputTag , caloBoundaryDRFilterInputTag;
+  const edm::InputTag   ecalMaskedCellDRFilterInputTag , caloBoundaryDRFilterInputTag;
 
 };
 

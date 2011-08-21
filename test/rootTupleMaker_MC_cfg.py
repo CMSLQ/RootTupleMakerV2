@@ -242,15 +242,15 @@ process.patMuons.userData.userFloats.src = ['cosmicCompatibility',
                                             'backToBackCompatibility',
                                             'overlapCompatibility']
 
-# # EcalDeadCell filters
-# #simpleDeltaR filter
-# process.load('JetMETAnalysis.simpleDRfilter.simpleDRfilter_cfi')
-# process.simpleDRfilter.debug = cms.untracked.bool(False)
-# process.simpleDRfilter.jetInputTag = cms.InputTag("ak5PFJets")
-# process.simpleDRfilter.metInputTag = cms.InputTag("metJESCorAK5PFJet")
-# #process.simpleDRfilter.metInputTag = cms.InputTag("pfMet")
-# process.simpleDRfilter.doFilter = cms.untracked.bool(False) # to enable filter or not
-# process.simpleDRfilter.makeProfileRoot = False
+# EcalDeadCell filters
+#simpleDeltaR filter
+process.load('JetMETAnalysis.simpleDRfilter.simpleDRfilter_cfi')
+process.simpleDRfilter.debug = cms.untracked.bool(False)
+process.simpleDRfilter.jetInputTag = cms.InputTag("ak5PFJets")
+process.simpleDRfilter.metInputTag = cms.InputTag("metJESCorAK5PFJet")
+#process.simpleDRfilter.metInputTag = cms.InputTag("pfMet")
+process.simpleDRfilter.doFilter = cms.untracked.bool(False) # to enable filter or not
+process.simpleDRfilter.makeProfileRoot = False
 
 # Load EcalSeverityLevelESProducer (needed only if the SuperCluster module is run)
 #process.load('RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi')
@@ -309,7 +309,7 @@ process.p = cms.Path(
     process.ak5PFJetsNoMuon*
     process.metJESCorAK5PFJet*
     process.egammaIDLikelihood*
-    #process.simpleDRfilter*
+    process.simpleDRfilter*
     (
     process.cosmicCompatibility +
     process.timeCompatibility +

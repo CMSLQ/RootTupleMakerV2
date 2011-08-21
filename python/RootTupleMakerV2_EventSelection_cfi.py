@@ -15,4 +15,6 @@ rootTupleEventSelection = cms.EDProducer("RootTupleMakerV2_EventSelection",
     TrackingFailureDzTrVtzMax     = cms.double(1.0),
     TrackingFailureDxyTrVtxMax    = cms.double(0.2),
     TrackingFailureMinSumPtOverHT = cms.double(0.10)
+    #EcalMaskedCellDRFilterInputTag = cms.InputTag('simpleDRfilter','deadCellStatus'),
+    #CaloBoundaryDRFilterInputTag = cms.InputTag('simpleDRfilter','boundaryStatus')                                         
 )

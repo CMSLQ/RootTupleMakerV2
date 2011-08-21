@@ -25,6 +25,8 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
     trackingFilterDzTrVtxMax    (iConfig.getParameter<double>       ("TrackingFailureDzTrVtzMax")),   
     trackingFilterDxyTrVtxMax   (iConfig.getParameter<double>       ("TrackingFailureDxyTrVtxMax")) ,
     trackingFilterMinSumPtOverHT(iConfig.getParameter<double>       ("TrackingFailureMinSumPtOverHT"))
+//     ecalMaskedCellDRFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalMaskedCellDRFilterInputTag")),
+//     caloBoundaryDRFilterInputTag(iConfig.getParameter<edm::InputTag>("CaloBoundaryDRFilterInputTag"))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -36,6 +38,8 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passBeamHaloFilterLoose");
   produces <bool> ("passBeamHaloFilterTight");
   produces <bool> ("isTrackingFailure");
+//   produces <bool> ("passEcalMaskedCellDRFilter");
+//   produces <bool> ("passCaloBoundaryDRFilter");
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -51,6 +55,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> passbeamhalofilterloose( new bool() );
   std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
   std::auto_ptr<bool> istrackingfailure ( new bool() ) ;
+//   std::auto_ptr<bool> passEcalMaskedCellDRFilter ( new bool() ) ;
+//   std::auto_ptr<bool> passCaloBoundaryDRFilter ( new bool() ) ;
 
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
@@ -61,6 +67,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passhbhenoisefilter.get() = true;
   *passbeamhalofilterloose.get() = true;
   *passbeamhalofiltertight.get() = true;
+//   *passEcalMaskedCellDRFilter.get() = true;
+//   *passCaloBoundaryDRFilter.get() = true;
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
@@ -177,6 +185,27 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   *istrackingfailure.get() = ((sumpt/ht) < trackingFilterMinSumPtOverHT );
 
+  
+//   //Ecal maksed cell and calo boundary filter ( https://twiki.cern.ch/twiki/bin/view/CMS/SusyEcalMaskedCellSummary ):
+//   edm::Handle<int> EcalMaskedCellDRFilterResult;
+//   iEvent.getByLabel(ecalMaskedCellDRFilterInputTag, EcalMaskedCellDRFilterResult);
+
+//   edm::Handle<int> CaloBoundaryDRFilterResult;
+//   iEvent.getByLabel(caloBoundaryDRFilterInputTag, CaloBoundaryDRFilterResult);
+
+//   if(EcalMaskedCellDRFilterResult.isValid()) {
+//     *passEcalMaskedCellDRFilter.get()=!(*EcalMaskedCellDRFilterResult);
+//   } else {
+//     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << ecalMaskedCellDRFilterInputTag;
+//   }
+
+//   if(CaloBoundaryDRFilterResult.isValid()) {
+//     *passCaloBoundaryDRFilter.get()=!(*CaloBoundaryDRFilterResult);
+//   } else {
+//     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << caloBoundaryDRFilterInputTag;
+//   }
+  
+
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
   iEvent.put(isbptx0,"isBPTX0");
@@ -188,5 +217,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(passbeamhalofilterloose,"passBeamHaloFilterLoose");
   iEvent.put(passbeamhalofiltertight,"passBeamHaloFilterTight");
   iEvent.put(istrackingfailure, "isTrackingFailure");
+//   iEvent.put(passEcalMaskedCellDRFilter, "passEcalMaskedCellDRFilter");
+//   iEvent.put(passCaloBoundaryDRFilter, "passCaloBoundaryDRFilter");
 
 }

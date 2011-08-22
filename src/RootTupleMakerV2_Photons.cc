@@ -39,10 +39,12 @@ RootTupleMakerV2_Photons::RootTupleMakerV2_Photons(const edm::ParameterSet& iCon
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
   produces <std::vector<double> > ( prefix + "EcalIsoDR04" + suffix );
   produces <std::vector<double> > ( prefix + "HcalIsoDR04" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoDR04FullCone" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoSolidDR04" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoHollowDR04" + suffix );
   produces <std::vector<double> > ( prefix + "EcalIsoDR03" + suffix );
   produces <std::vector<double> > ( prefix + "HcalIsoDR03" + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoDR03FullCone" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoSolidDR03" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoHollowDR03" + suffix );
   produces <std::vector<double> > ( prefix + "HoE" + suffix );
@@ -250,10 +252,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ecalIsoDR04  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hcalIsoDR04  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoDR04FullCone  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIsoSolidDR04  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIsoHollowDR04  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ecalIsoDR03  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hcalIsoDR03  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoDR03FullCone  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIsoSolidDR03  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIsoHollowDR03  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hoe  ( new std::vector<double>()  );
@@ -465,10 +469,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       energy->push_back( it->energy() );
       ecalIsoDR04->push_back( it->ecalRecHitSumEtConeDR04() );
       hcalIsoDR04->push_back( it->hcalTowerSumEtConeDR04() );
+      hcalIsoDR04FullCone->push_back( it->hcalTowerSumEtConeDR04()
+				      + ( it->hadronicOverEm() 
+					  * it->superCluster()->energy() 
+					  / cosh(it->superCluster()->eta())
+					  )				     
+				      );
       trkIsoHollowDR04->push_back( it->trkSumPtHollowConeDR04() );
       trkIsoSolidDR04->push_back( it->trkSumPtSolidConeDR04() );
       ecalIsoDR03->push_back( it->ecalRecHitSumEtConeDR03() );
       hcalIsoDR03->push_back( it->hcalTowerSumEtConeDR03() );
+      hcalIsoDR03FullCone->push_back( it->hcalTowerSumEtConeDR03()
+				      + ( it->hadronicOverEm() 
+					  * it->superCluster()->energy() 
+					  / cosh(it->superCluster()->eta())
+					  )				     
+				      );
       trkIsoHollowDR03->push_back( it->trkSumPtHollowConeDR03() );
       trkIsoSolidDR03->push_back( it->trkSumPtSolidConeDR03() );
       hoe->push_back( it->hadronicOverEm() );
@@ -523,10 +539,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( ecalIsoDR04, prefix + "EcalIsoDR04" + suffix );
   iEvent.put( hcalIsoDR04, prefix + "HcalIsoDR04" + suffix );
+  iEvent.put( hcalIsoDR04FullCone, prefix + "HcalIsoDR04FullCone" + suffix );
   iEvent.put( trkIsoHollowDR04, prefix + "TrkIsoHollowDR04" + suffix );
   iEvent.put( trkIsoSolidDR04, prefix + "TrkIsoSolidDR04" + suffix );
   iEvent.put( ecalIsoDR03, prefix + "EcalIsoDR03" + suffix );
   iEvent.put( hcalIsoDR03, prefix + "HcalIsoDR03" + suffix );
+  iEvent.put( hcalIsoDR03FullCone, prefix + "HcalIsoDR03FullCone" + suffix );
   iEvent.put( trkIsoHollowDR03, prefix + "TrkIsoHollowDR03" + suffix );
   iEvent.put( trkIsoSolidDR03, prefix + "TrkIsoSolidDR03" + suffix );
   iEvent.put( hoe, prefix + "HoE" + suffix );

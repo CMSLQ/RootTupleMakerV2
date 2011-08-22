@@ -50,7 +50,7 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "TrackChi2" + suffix );
 	produces <std::vector<double> > ( prefix + "GlobalChi2" + suffix );
 	produces <std::vector<double> > ( prefix + "TrkIso" + suffix );
-	produces <std::vector<double> > ( prefix + "TrackerkIsoSumPT" + suffix );
+	produces <std::vector<double> > ( prefix + "TrackerIsoSumPT" + suffix );
 	produces <std::vector<double> > ( prefix + "EcalIso" + suffix );
 	produces <std::vector<double> > ( prefix + "HcalIso" + suffix );
 	produces <std::vector<double> > ( prefix + "HOIso" + suffix );
@@ -378,7 +378,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( trackChi2, prefix + "TrackChi2" + suffix );
 	iEvent.put( globalChi2, prefix + "GlobalChi2" + suffix );
 	iEvent.put( trkIso, prefix + "TrkIso" + suffix );
-	iEvent.put( trackerIsoSumPT, prefix + "TrackerkIsoSumPT" + suffix );
+	iEvent.put( trackerIsoSumPT, prefix + "TrackerIsoSumPT" + suffix );
 	iEvent.put( ecalIso, prefix + "EcalIso" + suffix );
 	iEvent.put( hcalIso, prefix + "HcalIso" + suffix );
 	iEvent.put( hoIso, prefix + "HOIso" + suffix );

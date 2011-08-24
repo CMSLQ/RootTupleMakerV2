@@ -16,3 +16,4 @@ from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenParticles_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenJets_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_GenMET_cfi import *
 from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_Photons_cfi import *
+from Leptoquarks.RootTupleMakerV2.RootTupleMakerV2_PFCandidates_cfi import *

@@ -47,9 +47,10 @@ from PhysicsTools.PatAlgos.tools.metTools import *
 addTcMET(process, 'TC')
 addPfMET(process, 'PF')
 
-# Add type-I corrected pfMET
+# Add type-I corrected pfMET and charged pfMET
 from Leptoquarks.RootTupleMakerV2.tools import *
 addPfMETType1Cor(process, 'PFType1Cor')
+addPfChargedMET(process, 'PFCharged')
 
 ## Add JEC Fall10 ==> Not needed if the corrections are already in the global tag <==
 ## See https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetEnCor2010
@@ -251,6 +252,19 @@ process.simpleDRfilter.makeProfileRoot = False
 # Load EcalSeverityLevelESProducer (needed only if the SuperCluster module is run)
 #process.load('RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi')
 
+# ChargedPFMET and related tools (from HWW analysis 2011)
+#reduced PF Candidates (only charged + compatible with primary vertex)
+process.load('Leptoquarks.MetTools.reducedCandidatesProducer_cfi')
+process.reducedPFCands = cms.EDProducer("ReducedCandidatesProducer",
+                                        srcCands = cms.InputTag('particleFlow'),
+                                        srcVertices = cms.InputTag('offlinePrimaryVertices'),
+                                        dz = cms.double(0.1)
+                                        )
+#chargedMET (using all reduced PF Candidates)
+process.chargedPFMet = cms.EDProducer('ChargedPFMetProducer',
+                                      collectionTag = cms.InputTag("reducedPFCands")
+                                      )
+
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
@@ -265,6 +279,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
+        'keep *_rootTuplePFChargedMET_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleVertex_*_*',
@@ -272,7 +287,8 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
-        'keep *_rootTuplePhotons_*_*'
+        'keep *_rootTuplePhotons_*_*',
+        'keep *_rootTuplePFCandidates_*_*'
     )
 )
 
@@ -293,6 +309,8 @@ process.p = cms.Path(
     process.backToBackCompatibility +
     process.overlapCompatibility
     )*
+    process.reducedPFCands*
+    process.chargedPFMet*
     process.patDefaultSequence*
     (
     process.rootTupleEvent+
@@ -305,6 +323,7 @@ process.p = cms.Path(
     process.rootTupleTCMET+
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
+    process.rootTuplePFChargedMET+
     process.rootTupleMuons+
     process.rootTupleTrigger+
     process.rootTupleVertex+
@@ -312,19 +331,20 @@ process.p = cms.Path(
     process.rootTupleGenParticles+
     process.rootTupleGenJets+
     process.rootTupleGenMETTrue+
-    process.rootTuplePhotons
+    process.rootTuplePhotons+
+    process.rootTuplePFCandidates
     )
     *process.rootTupleTree
 )
 
 ###################
-#process.dump = cms.OutputModule("PoolOutputModule",
-#                                  outputCommands = cms.untracked.vstring(
-#           'keep *',
-#                  ),
-#                                  fileName = cms.untracked.string('dump.root')
-#                                )
-#process.DUMP    = cms.EndPath (process.dump)
+# process.dump = cms.OutputModule("PoolOutputModule",
+#                                   outputCommands = cms.untracked.vstring(
+#            'keep *',
+#                   ),
+#                                   fileName = cms.untracked.string('dump.root')
+#                                 )
+# process.DUMP    = cms.EndPath (process.dump)
 ###################
 
 # Delete predefined Endpath (needed for running with CRAB)

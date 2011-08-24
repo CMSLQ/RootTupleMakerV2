@@ -31,3 +31,11 @@ rootTuplePFMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False)
 )
+
+rootTuplePFChargedMET = cms.EDProducer("RootTupleMakerV2_MET",
+    InputTag = cms.InputTag('patMETsPFCharged'),
+    Prefix = cms.string('PF'),
+    Suffix = cms.string('Charged'),
+    StoreUncorrectedMET = cms.bool(False),
+    StoreMETSignificance = cms.bool(False)
+)

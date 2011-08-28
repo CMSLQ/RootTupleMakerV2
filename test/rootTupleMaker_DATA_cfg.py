@@ -287,6 +287,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleGenParticles_*_*',
         'keep *_rootTupleGenJets_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
+        'keep *_rootTupleGenMETCalo_*_*',       
         'keep *_rootTuplePhotons_*_*',
         'keep *_rootTuplePFCandidates_*_*'
     )
@@ -331,6 +332,7 @@ process.p = cms.Path(
     process.rootTupleGenParticles+
     process.rootTupleGenJets+
     process.rootTupleGenMETTrue+
+    process.rootTupleGenMETCalo+    
     process.rootTuplePhotons+
     process.rootTuplePFCandidates
     )

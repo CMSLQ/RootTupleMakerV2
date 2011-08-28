@@ -11,7 +11,7 @@ class RootTupleMakerV2_CaloJets : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTag;
+  const edm::InputTag   inputTag  , inputTagL1Offset;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const double          electronPt, electronIso, muonPt, muonIso;

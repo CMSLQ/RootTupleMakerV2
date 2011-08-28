@@ -15,6 +15,7 @@
 
 RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iConfig) :
     inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
+    inputTagL1Offset(iConfig.getParameter<edm::InputTag>("InputTagL1Offset")),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
@@ -38,7 +39,8 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
   produces <std::vector<double> > ( prefix + "L2L3ResJEC" + suffix );
   produces <std::vector<double> > ( prefix + "L3AbsJEC" + suffix );
   produces <std::vector<double> > ( prefix + "L2RelJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "L1OffJEC" + suffix );
+  produces <std::vector<double> > ( prefix + "L1FastJetJEC" + suffix );
+  produces <std::vector<double> > ( prefix + "L1OffsetJEC" + suffix );
   produces <std::vector<int> >    ( prefix + "Overlaps" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
   produces <std::vector<double> > ( prefix + "EMF" + suffix );
@@ -77,7 +79,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  l2l3resJEC_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  l3absJEC_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  l2relJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l1offJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  l1fastjetJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  l1offsetJEC_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     overlaps ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  emf  ( new std::vector<double>()  );
@@ -130,7 +133,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   edm::Handle<std::vector<pat::Jet> > jets;
   iEvent.getByLabel(inputTag, jets);
-  
+
+  edm::Handle<std::vector<pat::Jet> > jetsL1Offset;
+  iEvent.getByLabel(inputTagL1Offset, jetsL1Offset);
+
   if(jets.isValid()) {
     edm::LogInfo("RootTupleMakerV2_CaloJetsInfo") << "Total # CaloJets: " << jets->size();
     
@@ -230,7 +236,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       l2l3resJEC_vec->push_back( it->pt()/it->correctedJet("L3Absolute").pt() );
       l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
       l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1FastJet").pt() );
-      l1offJEC_vec->push_back( it->correctedJet("L1FastJet").pt()/it->correctedJet("Uncorrected").pt() );
+      l1fastjetJEC_vec->push_back( it->correctedJet("L1FastJet").pt()/it->correctedJet("Uncorrected").pt() );
       if(readJECuncertainty)
 	jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
       else
@@ -258,6 +264,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;
   }
 
+  //L1Offset JEC
+  if(jetsL1Offset.isValid())
+    {
+      
+      for( std::vector<pat::Jet>::const_iterator it = jetsL1Offset->begin(); it != jetsL1Offset->end(); ++it )
+	{
+	  // exit from loop when you reach the required number of jets
+	  if(l1offsetJEC_vec->size() >= maxSize)
+	    break;
+	  
+	  l1offsetJEC_vec->push_back( it->correctedJet("L1Offset").pt()/it->correctedJet("Uncorrected").pt() );
+	}
+    }
+  else
+    {
+      edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTagL1Offset;
+    }
+  
   //OLD
   delete jecUnc;
   //   delete ResJetCorPar;
@@ -275,7 +299,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix );
   iEvent.put( l3absJEC_vec, prefix + "L3AbsJEC" + suffix );
   iEvent.put( l2relJEC_vec, prefix + "L2RelJEC" + suffix );
-  iEvent.put( l1offJEC_vec, prefix + "L1OffJEC" + suffix );
+  iEvent.put( l1fastjetJEC_vec, prefix + "L1FastJetJEC" + suffix );
+  iEvent.put( l1offsetJEC_vec, prefix + "L1OffsetJEC" + suffix );
   iEvent.put( overlaps, prefix + "Overlaps" + suffix );
   iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );
   iEvent.put( emf, prefix + "EMF" + suffix );

@@ -89,10 +89,13 @@ addPfChargedMET(process, 'PFCharged')
 process.load('JetMETCorrections.Configuration.DefaultJEC_cff')
 ##-------------------- Import the Jet RECO modules -----------------------
 process.load('RecoJets.Configuration.RecoPFJets_cff')
+process.load('RecoJets.Configuration.RecoJets_cff')
 ##-------------------- Turn-on the FastJet density calculation -----------------------
 process.kt6PFJets.doRhoFastjet = True
+process.kt6CaloJets.doRhoFastjet = True
 ##-------------------- Turn-on the FastJet jet area calculation for your favorite algorithm -----------------------
 process.ak5PFJets.doAreaFastjet = True
+process.ak5CaloJets.doAreaFastjet = True
 ##-------------------- set rho to True to prevent Exceptions at run time, when L1FastJet is used -----------------------
 process.patJetCorrFactors.useRho = True
 
@@ -104,6 +107,21 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doBTagging   = True,
     jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute','L2L3Residual'])), 
     #jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), 
+    #jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
+                 # check L1 corrections
+                 # see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPATDataFormats#JetCorrFactors
+    doType1MET   = False,
+    doL1Cleaning = False,
+    doL1Counters = False,
+    genJetCollection = cms.InputTag("ak5GenJets"),
+    doJetID      = False
+)
+addJetCollection(process,cms.InputTag('ak5PFJets'),
+    'AK5', 'PFL1Offset',
+    doJTA        = True,
+    doBTagging   = True,
+    #jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute','L2L3Residual'])), 
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), 
     #jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
                  # check L1 corrections
                  # see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPATDataFormats#JetCorrFactors
@@ -131,6 +149,22 @@ process.metJESCorAK5PFJet.inputUncorJetsLabel = cms.string('ak5PFJetsNoMuon')
 process.patJetCorrFactors.levels = cms.vstring('L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual') 
 #process.patJetCorrFactors.levels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute', 'L2L3Residual') 
 #process.patJetCorrFactors.levels = cms.vstring('L1Offset', 'L2Relative', 'L3Absolute') 
+
+addJetCollection(process,cms.InputTag('ak5CaloJets'),
+    'AK5', 'CaloL1Offset',
+    doJTA        = True,
+    doBTagging   = True,
+    #jetCorrLabel = ('AK5Calo', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute','L2L3Residual'])), 
+    jetCorrLabel = ('AK5Calo', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), 
+    #jetCorrLabel = ('AK5Calo', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
+                 # check L1 corrections
+                 # see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookPATDataFormats#JetCorrFactors
+    doType1MET   = False,
+    doL1Cleaning = False,
+    doL1Counters = False,
+    genJetCollection = cms.InputTag("ak5GenJets"),
+    doJetID      = False
+)
                                                
 ## Modify type-I corrected caloMET (default) --> should be consistent with caloJets (defined above)
 #process.metJESCorAK5CaloJet.corrector = cms.string('ak5CaloL2L3') #default value
@@ -340,13 +374,13 @@ process.p = cms.Path(
 )
 
 ###################
-# process.dump = cms.OutputModule("PoolOutputModule",
-#                                   outputCommands = cms.untracked.vstring(
-#            'keep *',
-#                   ),
-#                                   fileName = cms.untracked.string('dump.root')
-#                                 )
-# process.DUMP    = cms.EndPath (process.dump)
+#process.dump = cms.OutputModule("PoolOutputModule",
+#                                outputCommands = cms.untracked.vstring(
+#                                'keep *',
+#                                ),
+#                                fileName = cms.untracked.string('dump.root')
+#                                )
+#process.DUMP    = cms.EndPath (process.dump)
 ###################
 
 # Delete predefined Endpath (needed for running with CRAB)

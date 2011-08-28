@@ -61,6 +61,9 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
 	produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
 	produces <std::vector<double> > ( prefix + "PrimaryVertexDXY" + suffix );
+	produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError" + suffix );
+	produces <std::vector<double> > ( prefix + "BeamSpotDXY" + suffix );
+	produces <std::vector<double> > ( prefix + "BeamSpotDXYError" + suffix );
 	produces <std::vector<int> >    ( prefix + "IsGlobal" + suffix );
 	produces <std::vector<int> >    ( prefix + "IsTracker" + suffix );
 
@@ -141,6 +144,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  primaryVertexDXY  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  primaryVertexDXYError  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  beamspotDXY  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  beamspotDXYError  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<int> >     IsGlobal   ( new std::vector<int>()  );
 	std::auto_ptr<std::vector<int> >     IsTracker   ( new std::vector<int>()  );
 
@@ -270,7 +276,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			trackChi2->push_back( it->track()->normalizedChi2() );
 			relIso->push_back( reliso );
 			passIso->push_back( (reliso<muonIso) ? 1 : 0 );
-			primaryVertexDXY->push_back( it->dB() );
+
+// 			std::cout << "With PRIMARY VERTEX" << std::endl;
+// 			std::cout << " it->dB() , it->edB() : " << it->dB() << " , " << it->edB() << std::endl;
+// 			std::cout << " it->dB(pat::Muon::PV2D) , it->edB(pat::Muon::PV2D) : " 
+// 				  << it->dB(pat::Muon::PV2D) << " , " << it->edB(pat::Muon::PV2D) << std::endl;
+// 			std::cout << "With BEAMSPOT" << std::endl;
+// 			std::cout << " trkd0 , it->track()->d0Error()  : " << trkd0 << " , " << it->track()->d0Error() << std::endl;
+// 			std::cout << " it->dB(pat::Muon::BS2D) , it->edB(pat::Muon::BS2D) : " 
+// 				  << it->dB(pat::Muon::BS2D) << " , " << it->edB(pat::Muon::BS2D) << std::endl;
 
 			if ( useCocktailRefits )
 			{
@@ -324,6 +338,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			vtxIndex->push_back( vtxIndex_ );
 			vtxDistXY->push_back( vtxDistXY_ );
 			vtxDistZ->push_back( vtxDistZ_ );
+			primaryVertexDXY->push_back( it->dB() );
+			primaryVertexDXYError->push_back( it->edB() );
+			beamspotDXY->push_back( it->dB(pat::Muon::BS2D) );
+			beamspotDXYError->push_back( it->edB(pat::Muon::BS2D) );
 
 			// See https://indico.cern.ch/getFile.py/access?contribId=7&resId=0&materialId=slides&confId=102306
 			// and https://indico.cern.ch/getFile.py/access?contribId=5&resId=0&materialId=slides&confId=128840
@@ -391,7 +409,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
 	iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
 	iEvent.put( primaryVertexDXY, prefix + "PrimaryVertexDXY" + suffix );
-
+	iEvent.put( primaryVertexDXYError, prefix + "PrimaryVertexDXYError" + suffix );
+	iEvent.put( beamspotDXY, prefix + "BeamSpotDXY" + suffix );
+	iEvent.put( beamspotDXYError, prefix + "BeamSpotDXYError" + suffix );
 
 	if ( useCocktailRefits )
 	{

@@ -74,6 +74,10 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
+  produces <std::vector<double> > ( prefix + "PrimaryVertexDXY" + suffix );
+  produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError" + suffix );
+  produces <std::vector<double> > ( prefix + "BeamSpotDXY" + suffix );
+  produces <std::vector<double> > ( prefix + "BeamSpotDXYError" + suffix );
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot" + suffix );
   produces <std::vector<double> > ( prefix + "Likelihood" + suffix );
   produces <std::vector<int> >    ( prefix + "NumberOfBrems" + suffix );
@@ -124,6 +128,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  primaryVertexDXY  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  primaryVertexDXYError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  beamspotDXY  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  beamspotDXYError  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot  ( new std::vector<bool>()  );
   std::auto_ptr<std::vector<double> >  likelihood  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     numberOfBrems  ( new std::vector<int>()  );
@@ -347,6 +355,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       vtxIndex->push_back( vtxIndex_ );
       vtxDistXY->push_back( vtxDistXY_ );
       vtxDistZ->push_back( vtxDistZ_ );
+      primaryVertexDXY->push_back( it->dB() );
+      primaryVertexDXYError->push_back( it->edB() );
+      beamspotDXY->push_back( it->dB(pat::Electron::BS2D) );
+      beamspotDXYError->push_back( it->edB(pat::Electron::BS2D) );
     }
   } else {
     edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << inputTag;
@@ -396,6 +408,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
   iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
   iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
+  iEvent.put( primaryVertexDXY, prefix + "PrimaryVertexDXY" + suffix );
+  iEvent.put( primaryVertexDXYError, prefix + "PrimaryVertexDXYError" + suffix );
+  iEvent.put( beamspotDXY, prefix + "BeamSpotDXY" + suffix );
+  iEvent.put( beamspotDXYError, prefix + "BeamSpotDXYError" + suffix );
   iEvent.put( hasMatchedConvPhot, prefix + "HasMatchedConvPhot" + suffix );
   iEvent.put( likelihood, prefix + "Likelihood" + suffix );
   iEvent.put( numberOfBrems, prefix + "NumberOfBrems" + suffix );

@@ -47,6 +47,8 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "NeutralEmEnergyFraction"  + suffix );
 	produces <std::vector<double> > ( prefix + "NeutralHadronEnergyFraction"  + suffix );
 	produces <std::vector<double> > ( prefix + "PhotonEnergyFraction"  + suffix );
+	produces <std::vector<double> > ( prefix + "HFHadronEnergyFraction"  + suffix );
+	produces <std::vector<double> > ( prefix + "HFEMEnergyFraction"  + suffix );
 	produces <std::vector<int> >    ( prefix + "ChargedHadronMultiplicity"  + suffix );
 	produces <std::vector<int> >    ( prefix + "ChargedMultiplicity"  + suffix );
 	produces <std::vector<int> >    ( prefix + "ElectronMultiplicity"  + suffix );
@@ -54,6 +56,8 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<int> >    ( prefix + "NeutralHadronMultiplicity"  + suffix );
 	produces <std::vector<int> >    ( prefix + "NeutralMultiplicity"  + suffix );
 	produces <std::vector<int> >    ( prefix + "PhotonMultiplicity"  + suffix );
+	produces <std::vector<int> >    ( prefix + "HFHadronMultiplicity"  + suffix );
+	produces <std::vector<int> >    ( prefix + "HFEMMultiplicity"  + suffix );
 	produces <std::vector<int> >    ( prefix + "NConstituents"  + suffix );
 	produces <std::vector<double> > ( prefix + "TrackCountingHighEffBTag" + suffix );
 	produces <std::vector<double> > ( prefix + "TrackCountingHighPurBTag" + suffix );
@@ -105,6 +109,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::auto_ptr<std::vector<double> >  neutralEmEnergyFraction  ( new std::vector<double>()  ) ;
 	std::auto_ptr<std::vector<double> >  neutralHadronEnergyFraction  ( new std::vector<double>()  ) ;
 	std::auto_ptr<std::vector<double> >  photonEnergyFraction  ( new std::vector<double>()  ) ;
+	std::auto_ptr<std::vector<double> >  hfHadronEnergyFraction  ( new std::vector<double>()  ) ;
+	std::auto_ptr<std::vector<double> >  hfEMEnergyFraction  ( new std::vector<double>()  ) ;
 	std::auto_ptr<std::vector<int> >     chargedHadronMultiplicity  ( new std::vector<int>()  ) ;
 	std::auto_ptr<std::vector<int> >     chargedMultiplicity  ( new std::vector<int>()  ) ;
 	std::auto_ptr<std::vector<int> >     electronMultiplicity  ( new std::vector<int>()  ) ;
@@ -112,6 +118,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::auto_ptr<std::vector<int> >     neutralHadronMultiplicity  ( new std::vector<int>()  ) ;
 	std::auto_ptr<std::vector<int> >     neutralMultiplicity  ( new std::vector<int>()  ) ;
 	std::auto_ptr<std::vector<int> >     photonMultiplicity  ( new std::vector<int>()  ) ;
+	std::auto_ptr<std::vector<int> >     hfHadronMultiplicity ( new std::vector<int>()  ) ;
+	std::auto_ptr<std::vector<int> >     hfEMMultiplicity ( new std::vector<int>()  ) ;
 	std::auto_ptr<std::vector<int> >     nConstituents  ( new std::vector<int>()  ) ;
 	std::auto_ptr<std::vector<double> >  trackCountingHighEffBTag  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  trackCountingHighPurBTag  ( new std::vector<double>()  );
@@ -352,12 +360,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			partonFlavour->push_back( it->partonFlavour() );
 			chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
 			chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
+			// same as : it->chargedHadronEnergy() / it->correctedJet("Uncorrected").energy()
 			chargedMuEnergyFraction->push_back( it->chargedMuEnergyFraction() );
-			electronEnergyFraction->push_back( it->electronEnergy()/it->energy() );
+			electronEnergyFraction->push_back( it->electronEnergy() / it->correctedJet("Uncorrected").energy() );
+			// 'const class pat::Jet' has no member named 'electronEnergyFraction'
 			muonEnergyFraction->push_back( it->muonEnergyFraction() );
 			neutralEmEnergyFraction->push_back( it->neutralEmEnergyFraction() );
 			neutralHadronEnergyFraction->push_back( it->neutralHadronEnergyFraction() );
 			photonEnergyFraction->push_back( it->photonEnergyFraction() );
+			hfHadronEnergyFraction->push_back( it->HFHadronEnergyFraction() );
+			hfEMEnergyFraction->push_back( it->HFEMEnergyFraction() );
 			chargedHadronMultiplicity->push_back( it->chargedHadronMultiplicity() );
 			chargedMultiplicity->push_back( it->chargedMultiplicity() );
 			electronMultiplicity->push_back( it->electronMultiplicity() );
@@ -365,7 +377,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			neutralHadronMultiplicity->push_back( it->neutralHadronMultiplicity() );
 			neutralMultiplicity->push_back( it->neutralMultiplicity() );
 			photonMultiplicity->push_back( it->photonMultiplicity() );
-			nConstituents->push_back( it->numberOfDaughters() );
+			hfHadronMultiplicity->push_back( it->HFHadronMultiplicity() );
+			hfEMMultiplicity->push_back( it->HFEMMultiplicity() );
+			nConstituents->push_back( it->numberOfDaughters() ); // same as it->getPFConstituents().size()
 			trackCountingHighEffBTag->push_back( it->bDiscriminator("trackCountingHighEffBJetTags") );
 			trackCountingHighPurBTag->push_back( it->bDiscriminator("trackCountingHighPurBJetTags") );
 			simpleSecondaryVertexHighEffBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags") );
@@ -374,8 +388,26 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
 			passLooseID->push_back( passjetLoose );
 			passTightID->push_back( passjetTight );
-			
-			
+
+// 			//////////////////////////////////////////////////////////////////// 
+// 			if( fabs(it->eta()) > 3) 
+// 			  {
+//  			    double SUM = it->chargedEmEnergyFraction() + it->chargedHadronEnergyFraction() + it->neutralEmEnergyFraction() + it->neutralHadronEnergyFraction() + it->chargedMuEnergyFraction() + it->HFHadronEnergyFraction() + it->HFEMEnergyFraction() ; 
+			    
+//  			    std::cout << "eta,chargedEmEnergy,chargedHadronEnergy,neutralEmEnergy,neutralHadronEnergy,chargedMuEnergy,HFHadronEnergy,HFEMEnergy,SUM: "  
+//  				      << it->eta() << " , "
+//  				      << it->chargedEmEnergyFraction() << " , " 
+//  				      << it->chargedHadronEnergyFraction() << " , " 
+//  				      << it->neutralEmEnergyFraction() << " , "  
+//  				      << it->neutralHadronEnergyFraction() << " , "
+//  				      << it->chargedMuEnergyFraction() << " , "
+//  				      << it->HFHadronEnergyFraction() << " , "
+//  				      << it->HFEMEnergyFraction() << " , "
+//  				      << SUM
+//  				      << std::endl; 
+// 			  }
+// 			////////////////////////////////////////////////////////////////////
+
 		}
 	}
 	else
@@ -441,6 +473,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( neutralEmEnergyFraction,  prefix + "NeutralEmEnergyFraction"  + suffix );
 	iEvent.put( neutralHadronEnergyFraction,  prefix + "NeutralHadronEnergyFraction"  + suffix );
 	iEvent.put( photonEnergyFraction,  prefix + "PhotonEnergyFraction"  + suffix );
+	iEvent.put( hfHadronEnergyFraction,  prefix + "HFHadronEnergyFraction"  + suffix );
+	iEvent.put( hfEMEnergyFraction,  prefix + "HFEMEnergyFraction"  + suffix );
 	iEvent.put( chargedHadronMultiplicity,  prefix + "ChargedHadronMultiplicity"  + suffix );
 	iEvent.put( chargedMultiplicity,  prefix + "ChargedMultiplicity"  + suffix );
 	iEvent.put( electronMultiplicity,  prefix + "ElectronMultiplicity"  + suffix );
@@ -448,6 +482,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( neutralHadronMultiplicity,  prefix + "NeutralHadronMultiplicity"  + suffix );
 	iEvent.put( neutralMultiplicity,  prefix + "NeutralMultiplicity"  + suffix );
 	iEvent.put( photonMultiplicity,  prefix + "PhotonMultiplicity"  + suffix );
+	iEvent.put( hfHadronMultiplicity,  prefix + "HFHadronMultiplicity"  + suffix );
+	iEvent.put( hfEMMultiplicity,  prefix + "HFEMMultiplicity"  + suffix );
 	iEvent.put( nConstituents,  prefix + "NConstituents"  + suffix );
 	iEvent.put( trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix );
 	iEvent.put( trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix );

@@ -15,7 +15,6 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
-
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
     trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
     dcsInputTag(iConfig.getParameter<edm::InputTag>("DCSInputTag")),
@@ -35,6 +34,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
+  produces <std::vector<double> > ( prefix + "PtHeep" + suffix );
   produces <std::vector<double> > ( prefix + "TrackPt" + suffix );
   produces <std::vector<double> > ( prefix + "TrackValidFractionOfHits" + suffix );
   produces <std::vector<double> > ( prefix + "Energy" + suffix );
@@ -49,7 +49,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<int> >    ( prefix + "Classif" + suffix );
   produces <std::vector<double> > ( prefix + "E1x5OverE5x5" + suffix );
   produces <std::vector<double> > ( prefix + "E2x5OverE5x5" + suffix );
-  produces <std::vector<int> >    ( prefix + "HeepID" + suffix );
+  //produces <std::vector<int> >    ( prefix + "HeepID" + suffix );
   produces <std::vector<int> >    ( prefix + "PassIDPAT" + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoPAT" + suffix );
   produces <std::vector<double> > ( prefix + "EcalIsoPAT" + suffix );
@@ -81,6 +81,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot" + suffix );
   produces <std::vector<double> > ( prefix + "Likelihood" + suffix );
   produces <std::vector<int> >    ( prefix + "NumberOfBrems" + suffix );
+  produces <std::vector<bool> >   ( prefix + "HasEcalDrivenSeed" + suffix );
 }
 
 void RootTupleMakerV2_Electrons::
@@ -89,6 +90,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ptHeep  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trackPt  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  caloEnergy  ( new std::vector<double>()  );
@@ -103,7 +105,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     classif  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  e1x5overe5x5  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e2x5overe5x5  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     heepID  ( new std::vector<int>()  );
+  //std::auto_ptr<std::vector<int> >     heepID  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     passIDPAT  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  trkIsoPAT   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ecalIsoPAT  ( new std::vector<double>()  );
@@ -135,6 +137,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot  ( new std::vector<bool>()  );
   std::auto_ptr<std::vector<double> >  likelihood  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     numberOfBrems  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<bool> >    hasEcalDrivenSeed  ( new std::vector<bool>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::TrackCollection> tracks;
@@ -201,8 +204,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         break;
 
       // if electron is not ECAL driven, continue
-      if(!it->ecalDrivenSeed())
-        continue;
+      //if(!it->ecalDrivenSeed())
+      //  continue;
 
       // Overlaps
       int ovrlps = 0;
@@ -224,14 +227,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
          bit 2: eidLoose
          bit 3: eidTight
          bit 4: eidRobustHighEnergy
-         bit 5: HEEPId
+         //bit 5: HEEPId
       */
       if (it->electronID("eidRobustLoose")>0) passId = passId | 1<<0;
       if (it->electronID("eidRobustTight")>0) passId = passId | 1<<1;
       if (it->electronID("eidLoose")>0) passId = passId | 1<<2;
       if (it->electronID("eidTight")>0) passId = passId | 1<<3;
       if (it->electronID("eidRobustHighEnergy")>0) passId = passId | 1<<4;
-      if (it->userInt("HEEPId")==0) passId = passId | 1<<5;
+      //if (it->userInt("HEEPId")==0) passId = passId | 1<<5;
 
       // Conversion (variables)
       ConversionFinder convFinder;
@@ -297,10 +300,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
  	}
 
       //-------------------------------------------
+
+      hasEcalDrivenSeed->push_back( it->ecalDrivenSeed() );
       
       eta->push_back( it->eta() );
       phi->push_back( it->phi() );
       pt->push_back( it->pt() );
+      ptHeep->push_back( it->caloEnergy()*sin(it->p4().theta()) );
       trackPt->push_back( it->gsfTrack()->pt() );
       energy->push_back( it->energy() );
       caloEnergy->push_back( it->caloEnergy() );
@@ -316,7 +322,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       classif->push_back( it->classification() );
       e1x5overe5x5->push_back( (it->e5x5()>0) ? (it->e1x5()/it->e5x5()) : 0 );
       e2x5overe5x5->push_back( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
-      heepID->push_back( it->userInt("HEEPId") );
+      //heepID->push_back( it->userInt("HEEPId") );
       passIDPAT->push_back( passId );
       likelihood->push_back( likelihood_ );
       numberOfBrems->push_back( it->numberOfBrems() );
@@ -369,6 +375,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
+  iEvent.put( ptHeep, prefix + "PtHeep" + suffix );
   iEvent.put( trackPt, prefix + "TrackPt" + suffix );
   iEvent.put( energy, prefix + "Energy" + suffix );
   iEvent.put( caloEnergy, prefix + "CaloEnergy" + suffix );
@@ -383,7 +390,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( classif, prefix + "Classif" + suffix );
   iEvent.put( e1x5overe5x5, prefix + "E1x5OverE5x5" + suffix );
   iEvent.put( e2x5overe5x5, prefix + "E2x5OverE5x5" + suffix );
-  iEvent.put( heepID, prefix + "HeepID" + suffix );
+  //iEvent.put( heepID, prefix + "HeepID" + suffix );
   iEvent.put( passIDPAT, prefix + "PassIDPAT" + suffix );
   iEvent.put( trkIsoPAT, prefix + "TrkIsoPAT" + suffix );
   iEvent.put( ecalIsoPAT, prefix + "EcalIsoPAT" + suffix );
@@ -415,4 +422,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( hasMatchedConvPhot, prefix + "HasMatchedConvPhot" + suffix );
   iEvent.put( likelihood, prefix + "Likelihood" + suffix );
   iEvent.put( numberOfBrems, prefix + "NumberOfBrems" + suffix );
+  iEvent.put( hasEcalDrivenSeed, prefix + "HasEcalDrivenSeed" + suffix );
 }

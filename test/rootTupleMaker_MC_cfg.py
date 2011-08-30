@@ -179,16 +179,16 @@ process.kt6PFJetsForIsolation = process.kt4PFJets.clone( rParam = 0.6, doRhoFast
 process.kt6PFJetsForIsolation.Rho_EtaMax = cms.double(2.5)
 
 # HEEPify PAT electrons
-from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *
-process.heepPatElectrons = cms.EDProducer("HEEPAttStatusToPAT",
-    eleLabel = cms.InputTag("patElectrons"),
-    barrelCuts = cms.PSet(heepBarrelCuts),
-    endcapCuts = cms.PSet(heepEndcapCuts)
-)
+#from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *
+#process.heepPatElectrons = cms.EDProducer("HEEPAttStatusToPAT",
+#    eleLabel = cms.InputTag("patElectrons"),
+#    barrelCuts = cms.PSet(heepBarrelCuts),
+#    endcapCuts = cms.PSet(heepEndcapCuts)
+#)
 
 # Add 'heepPatElectrons' in the right place and point 'selectedLayer1Electrons' to them
-process.patDefaultSequence.replace( process.patElectrons, process.patElectrons*process.heepPatElectrons )
-process.selectedPatElectrons.src = cms.InputTag("heepPatElectrons")
+#process.patDefaultSequence.replace( process.patElectrons, process.patElectrons*process.heepPatElectrons )
+#process.selectedPatElectrons.src = cms.InputTag("heepPatElectrons")
 
 # LikelihoodEle
 process.load('RecoEgamma.ElectronIdentification.electronIdLikelihoodExt_cfi')

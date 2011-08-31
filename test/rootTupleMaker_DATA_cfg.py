@@ -219,6 +219,8 @@ process.patTaus.tauIDSources.byIsolation                    = cms.InputTag("shri
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 ##################################################################
+#### Just pass all the events, but still store the histogram (use for MC signal events, for example)
+#process.LJFilter.allEventsPassFilter = True 
 #### Electron based skim
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'

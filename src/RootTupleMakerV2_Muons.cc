@@ -47,6 +47,9 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "TrkD0Error" + suffix );
 	produces <std::vector<double> > ( prefix + "TrkDz" + suffix );
 	produces <std::vector<double> > ( prefix + "TrkDzError" + suffix );
+	produces <std::vector<double> > ( prefix + "TrkVx" + suffix );
+	produces <std::vector<double> > ( prefix + "TrkVy" + suffix );
+	produces <std::vector<double> > ( prefix + "TrkVz" + suffix );
 	produces <std::vector<double> > ( prefix + "TrackChi2" + suffix );
 	produces <std::vector<double> > ( prefix + "GlobalChi2" + suffix );
 	produces <std::vector<double> > ( prefix + "TrkIso" + suffix );
@@ -130,6 +133,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::auto_ptr<std::vector<double> >  trkD0Error ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  trkDz   ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  trkDzError ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  trkVx ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  trkVy ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  trkVz ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  trackChi2 ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  globalChi2 ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  trkIso   ( new std::vector<double>()  );
@@ -272,6 +278,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			trkD0Error->push_back( it->track()->d0Error() );
 			trkDz->push_back( it->track()->dz() );
 			trkDzError->push_back( it->track()->dzError() );
+			trkVx->push_back( it->track()->vx() );
+			trkVy->push_back( it->track()->vy() );
+			trkVz->push_back( it->track()->vz() );
 			globalChi2->push_back( it->globalTrack()->normalizedChi2() );
 			trackChi2->push_back( it->track()->normalizedChi2() );
 			relIso->push_back( reliso );
@@ -393,6 +402,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( trkD0Error, prefix + "TrkD0Error" + suffix );
 	iEvent.put( trkDz, prefix + "TrkDz" + suffix );
 	iEvent.put( trkDzError, prefix + "TrkDzError" + suffix );
+	iEvent.put( trkVx, prefix + "TrkVx" + suffix );
+	iEvent.put( trkVy, prefix + "TrkVy" + suffix );
+	iEvent.put( trkVz, prefix + "TrkVz" + suffix );
 	iEvent.put( trackChi2, prefix + "TrackChi2" + suffix );
 	iEvent.put( globalChi2, prefix + "GlobalChi2" + suffix );
 	iEvent.put( trkIso, prefix + "TrkIso" + suffix );

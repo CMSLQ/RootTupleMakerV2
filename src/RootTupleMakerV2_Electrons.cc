@@ -78,6 +78,9 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError" + suffix );
   produces <std::vector<double> > ( prefix + "BeamSpotDXY" + suffix );
   produces <std::vector<double> > ( prefix + "BeamSpotDXYError" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackVx" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackVy" + suffix );
+  produces <std::vector<double> > ( prefix + "TrackVz" + suffix );
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot" + suffix );
   produces <std::vector<double> > ( prefix + "Likelihood" + suffix );
   produces <std::vector<int> >    ( prefix + "NumberOfBrems" + suffix );
@@ -134,6 +137,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  primaryVertexDXYError  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  beamspotDXY  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  beamspotDXYError  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackVx  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackVy  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackVz  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot  ( new std::vector<bool>()  );
   std::auto_ptr<std::vector<double> >  likelihood  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     numberOfBrems  ( new std::vector<int>()  );
@@ -361,10 +367,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       vtxIndex->push_back( vtxIndex_ );
       vtxDistXY->push_back( vtxDistXY_ );
       vtxDistZ->push_back( vtxDistZ_ );
-      primaryVertexDXY->push_back( it->dB() );
-      primaryVertexDXYError->push_back( it->edB() );
-      beamspotDXY->push_back( it->dB(pat::Electron::BS2D) );
-      beamspotDXYError->push_back( it->edB(pat::Electron::BS2D) );
+      primaryVertexDXY->push_back( fabs( it->dB() ) );      
+      primaryVertexDXYError->push_back( fabs( it->edB() ) );
+      beamspotDXY->push_back( fabs( it->dB(pat::Electron::BS2D) ) );
+      beamspotDXYError->push_back( fabs( it->edB(pat::Electron::BS2D) ) );
+      trackVx->push_back( it->gsfTrack()->vx() );
+      trackVy->push_back( it->gsfTrack()->vy() );
+      trackVz->push_back( it->gsfTrack()->vz() );
     }
   } else {
     edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << inputTag;
@@ -419,6 +428,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( primaryVertexDXYError, prefix + "PrimaryVertexDXYError" + suffix );
   iEvent.put( beamspotDXY, prefix + "BeamSpotDXY" + suffix );
   iEvent.put( beamspotDXYError, prefix + "BeamSpotDXYError" + suffix );
+  iEvent.put( trackVx, prefix + "TrackVx" + suffix );
+  iEvent.put( trackVy, prefix + "TrackVy" + suffix );
+  iEvent.put( trackVz, prefix + "TrackVz" + suffix );
   iEvent.put( hasMatchedConvPhot, prefix + "HasMatchedConvPhot" + suffix );
   iEvent.put( likelihood, prefix + "Likelihood" + suffix );
   iEvent.put( numberOfBrems, prefix + "NumberOfBrems" + suffix );

@@ -5,9 +5,6 @@ from PhysicsTools.PatAlgos.tools.coreTools import *
 
 import os
 
-#from PhysicsTools.PythonAnalysis.LumiList import *
-#from FWCore.ParameterSet.Types import *
-
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
@@ -35,7 +32,7 @@ process.maxEvents.input = 10000
 process.options.wantSummary = True
 
 # Input files
-process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange("179959:70")
+#process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange("179959:70")
 
 process.source.fileNames = [
 #    'file:/tmp/santanas/CC1F559B-1800-E111-97EC-003048F01E88.root'

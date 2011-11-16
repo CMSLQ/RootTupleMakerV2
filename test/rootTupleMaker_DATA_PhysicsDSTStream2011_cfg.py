@@ -17,7 +17,9 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RootTupleMakerV2_output_DATA_PhysicsDSTStream2011.root')                                  
+                                   #fileName = cms.string('RootTupleMakerV2_output_DATA_PhysicsDSTStream2011.root')
+                                   fileName = cms.string('RootTupleMakerV2_output_DATA_HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252.root')
+                                   
 )
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
@@ -26,17 +28,31 @@ process.GlobalTag.globaltag = 'GR_R_42_V19::All' # ===> First complete JEC set f
 #process.GlobalTag.globaltag = 'GR_R_41_V0::All' # ===> for 41X prompt reco (contains Jec10V3)
 
 # Events to process
-process.maxEvents.input = 10000
+process.maxEvents.input = -1
 
 # Options and Output Report
 process.options.wantSummary = True
 
 # Input files
-#process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange("179959:70")
+#########
+######### ==> IMPORTANT : MAKE SURE THAT HLT INPUT TAG IN python/RootTupleMakerV2_PhysicsDSTStream2011_cfi.py IS CORRECT ("HLT" or "TEST" or ...)
+#########
+
+#process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange("180072:80")
 
 process.source.fileNames = [
 #    'file:/tmp/santanas/CC1F559B-1800-E111-97EC-003048F01E88.root'
-    '/store/data/Run2011B/PhysicsDST/RAW/v1/000/179/959/CC1F559B-1800-E111-97EC-003048F01E88.root'
+#    '/store/data/Run2011B/PhysicsDST/RAW/v1/000/179/959/CC1F559B-1800-E111-97EC-003048F01E88.root'
+#    'file:/data/santanas/Releases/CMSSW_4_2_9_HLT3_hltpatch3/src/outputPhysicsDST.root'
+#        'file:/data/santanas/Releases/CMSSW_4_2_9_HLT3_hltpatch3/src/outputPhysicsDST_lowHTskim.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_179959.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_179977.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_180072.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_180076.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_180093.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_180241.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_180250.root',
+'file:/data/santanas/Data/HT150_OR_HT200_OR_HT250__PhysicsDSTContent__179959-180252/outputPhysicsDST_180252.root'
 ]
 
 # RootTupleMakerV2 tree

@@ -18,7 +18,9 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
                                    #fileName = cms.string('RootTupleMakerV2_output_DATA_PhysicsDSTStream2011.root')
-                                   fileName = cms.string('RootTupleMakerV2_output_MC__QstarToJJ_M-500_4KevTest__PhysicsDSTContent.root')                                   
+                                   fileName = cms.string('QstarToJJ_M-500_TuneD6T_7TeV_pythia6__Fall11-PU_S6_START42_V14B-v1__GEN-RAW_1_1_bbb.root')
+                                   #fileName = cms.string('QstarToJJ_M-700_TuneD6T_7TeV_pythia6__Fall11-PU_S6_START42_V14B-v1__GEN-RAW_1_1_bbb.root')
+                                   #fileName = cms.string('QstarToJJ_M-1200_TuneD6T_7TeV_pythia6__Fall11-PU_S6_START42_V14B-v1__GEN-RAW_1_1_bbb.root')                                   
 )
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
@@ -36,37 +38,45 @@ process.options.wantSummary = True
 #########
 ######### ==> IMPORTANT : MAKE SURE THAT HLT INPUT TAG IN python/RootTupleMakerV2_PhysicsDSTStream2011_cfi.py IS CORRECT ("HLT" or "TEST" or ...)
 #########
+
 process.source.fileNames = [
-'file:/data/santanas/Releases/CMSSW_4_2_9_HLT3_hltpatch3/src/RunHLT_MC/outputPhysicsDST.root'
+'file:/data/santanas/Releases/CMSSW_4_2_9_HLT3_hltpatch3/src/myoutput2.root'
+# they do not include gen info (used for preliminary studies)
+#'file:/data/santanas/Data/QstarToJJ_PhysicsDST_ForTest_16_11_2011/outputPhysicsDST_QstarToJJ_M-500.root',
+#'file:/data/santanas/Data/QstarToJJ_PhysicsDST_ForTest_16_11_2011/outputPhysicsDST_QstarToJJ_M-700.root',
+#'file:/data/santanas/Data/QstarToJJ_PhysicsDST_ForTest_16_11_2011/outputPhysicsDST_QstarToJJ_M-1200.root'
 ]
 
 # RootTupleMakerV2 tree
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
         'drop *',
-        #'keep *_rootTupleEvent_*_*',
         'keep *_rootTuplePhysicsDSTStream2011_*_*',
+        'keep *_rootTupleGenEventInfo_*_*',
+        'keep *_rootTupleGenParticles_*_*'
     )
 )
 
-## Produce PDF weights (maximum is 3)
-#process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-#    # Fix POWHEG if buggy (this PDF set will also appear on output,
-#    # so only two more PDF sets can be added in PdfSetNames if not "")
-#    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
-#    #GenTag = cms.untracked.InputTag("genParticles"),
-#    PdfInfoTag = cms.untracked.InputTag("generator"),
-#    PdfSetNames = cms.untracked.vstring(
-#            "cteq66.LHgrid"
-#          #, "MRST2006nnlo.LHgrid"
-#          #, "MRST2007lomod.LHgrid"
-#    )
-#)
+# Produce PDF weights (maximum is 3)
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+    # Fix POWHEG if buggy (this PDF set will also appear on output,
+    # so only two more PDF sets can be added in PdfSetNames if not "")
+    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
+    #GenTag = cms.untracked.InputTag("genParticles"),
+    PdfInfoTag = cms.untracked.InputTag("generator"),
+    PdfSetNames = cms.untracked.vstring(
+            "cteq66.LHgrid"
+          #, "MRST2006nnlo.LHgrid"
+          #, "MRST2007lomod.LHgrid"
+    )
+)
 
 # Path definition
 process.p = cms.Path(
-    #process.pdfWeights*
-    process.rootTuplePhysicsDSTStream2011
+    process.pdfWeights
+    *process.rootTuplePhysicsDSTStream2011
+    *process.rootTupleGenEventInfo
+    *process.rootTupleGenParticles
     *process.rootTupleTree
 )
 

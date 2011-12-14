@@ -17,7 +17,8 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RootTupleMakerV2_output_DATA_AOD-PhysicsDSTStream2011.root')
+                                   #fileName = cms.string('RootTupleMakerV2_output_DATA_AOD-PhysicsDSTStream2011.root')
+                                   fileName = cms.string('RootTupleMakerV2_output_DATA_AOD-PhysicsDSTStream2011_180072_1kevents.root')
 )
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
@@ -26,12 +27,24 @@ process.GlobalTag.globaltag = 'GR_R_42_V19::All' # ===> First complete JEC set f
 #process.GlobalTag.globaltag = 'GR_R_41_V0::All' # ===> for 41X prompt reco (contains Jec10V3)
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = -1
 
 # Options and Output Report
 process.options.wantSummary = True
 
 # Input files
+#########
+######### ==> IMPORTANT : MAKE SURE THAT HLT INPUT TAG IN python/RootTupleMakerV2_PhysicsDSTStream2011_cfi.py IS CORRECT ("HLT" or "TEST" or ...)
+#########
+
+#########
+######### ==> IMPORTANT : MAKE SURE THAT HLT INPUT TAG IN python/RootTupleMakerV2_CaloJets_cfi.py IS CORRECT ( MaxSize = cms.uint32(1000) )
+#########
+
+#########
+######### ==> IMPORTANT : MAKE SURE THAT HLT INPUT TAG IN python/RootTupleMakerV2_PFJets_cfi.py IS CORRECT ( MaxSize = cms.uint32(1000) )
+#########
+
 process.source.fileNames = [
     'file:/data/santanas/Data/HT__RAW-PhyscsDST-RECO__180072_1kevents/RECO/HT-Run2011B-PhysicsDST-AOD-180072_1kevents.root' #AOD + PhysicsDST (42X)
     #'file:/tmp/santanas/SingleElectron-AOD-May10ReReco-v1_42X.root'

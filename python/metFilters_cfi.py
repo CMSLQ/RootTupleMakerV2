@@ -1,0 +1,91 @@
+import FWCore.ParameterSet.Config as cms
+
+# ------------------------------------------------------------------------------------
+# This python cfi file contains the recommended MET filters for 2012 analysis.
+# See: https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters
+# ------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------
+# CSC beam halo filter: 
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#CSC_Beam_Halo_Filter
+# ------------------------------------------------------------------------------------
+from RecoMET.METAnalyzers.CSCHaloFilter_cfi import *
+CSCTightHaloFilter.taggingMode = cms.bool ( True ) 
+
+# ------------------------------------------------------------------------------------
+# HBHE noise filter:
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#HBHE_Noise_Filter
+# ------------------------------------------------------------------------------------
+from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
+HBHENoiseFilter.taggingMode = cms.bool ( True ) 
+
+# ------------------------------------------------------------------------------------
+# HBHE noise filter results producer
+# https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2012
+# ------------------------------------------------------------------------------------
+
+HBHENoiseFilterResultProducer = cms.EDProducer( 'HBHENoiseFilterResultProducer',
+                                                noiselabel = cms.InputTag('hcalnoise','','RECO'),
+                                                minRatio = cms.double(-999),
+                                                maxRatio = cms.double(999),
+                                                minHPDHits = cms.int32(17),
+                                                minRBXHits = cms.int32(999),
+                                                minHPDNoOtherHits = cms.int32(10),
+                                                minZeros = cms.int32(10),
+                                                minHighEHitTime = cms.double(-9999.0),
+                                                maxHighEHitTime = cms.double(9999.0),
+                                                maxRBXEMF = cms.double(-999.0),
+                                                minNumIsolatedNoiseChannels = cms.int32(9999),
+                                                minIsolatedNoiseSumE = cms.double(9999),
+                                                minIsolatedNoiseSumEt = cms.double(9999),
+                                                useTS4TS5 = cms.bool(True)
+                                                )
+
+# ------------------------------------------------------------------------------------
+# HCAL laser filter:
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#HCAL_laser_events
+# ------------------------------------------------------------------------------------
+from RecoMET.METFilters.hcalLaserEventFilter_cfi import *
+
+hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
+hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
+hcalLaserEventFilter.taggingMode = cms.bool(True)
+
+# ------------------------------------------------------------------------------------
+# ECAL dead cell filter:
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#ECAL_dead_cell_filter
+# ------------------------------------------------------------------------------------
+
+from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import *
+
+# The section below is for the filter on Boundary Energy. Available in AOD in CMSSW>44x
+# For releases earlier than 44x, one should make the following changes
+# process.EcalDeadCellBoundaryEnergyFilter.recHitsEB = cms.InputTag("ecalRecHit","EcalRecHitsEB")
+# process.EcalDeadCellBoundaryEnergyFilter.recHitsEE = cms.InputTag("ecalRecHit","EcalRecHitsEE")
+
+from RecoMET.METFilters.EcalDeadCellBoundaryEnergyFilter_cfi import * 
+EcalDeadCellBoundaryEnergyFilter.taggingMode = cms.bool(True)
+EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyDeadCellsEB=cms.untracked.double(10)
+EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyDeadCellsEE=cms.untracked.double(10)
+EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyGapEB=cms.untracked.double(100)
+EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyGapEE=cms.untracked.double(100)
+EcalDeadCellBoundaryEnergyFilter.enableGap=cms.untracked.bool(False)
+EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEB = cms.vint32(12,14)
+EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEE = cms.vint32(12,14)
+# End of Boundary Energy filter configuration 
+
+# ------------------------------------------------------------------------------------
+# Tracking failure filter:
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#Tracking_failure_filter_updated
+# ------------------------------------------------------------------------------------
+
+from RecoMET.METFilters.trackingFailureFilter_cfi import *
+
+goodVertices = cms.EDFilter( "VertexSelector",
+  filter = cms.bool(False),
+  src = cms.InputTag("offlinePrimaryVertices"),
+  cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2")
+)
+
+trackingFailureFilter.JetSource = cms.InputTag('ak5PFJetsL2L3Residual')
+trackingFailureFilter.taggingMode = cms.bool (True) 

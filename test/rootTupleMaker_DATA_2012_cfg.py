@@ -93,6 +93,28 @@ process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
 process.load("Leptoquarks.RootTupleMakerV2.metFilters_cfi")
 
 #----------------------------------------------------------------------------------------------------
+# Add ShrinkingCone Taus
+#----------------------------------------------------------------------------------------------------
+from PhysicsTools.PatAlgos.tools.tauTools import *
+addTauCollection(process, tauCollection = cms.InputTag('shrinkingConePFTauProducer'), algoLabel = "shrinkingCone", typeLabel = "PFTau")
+
+#----------------------------------------------------------------------------------------------------
+# Modify cleanPatTaus (HPS Taus) - loosen up a bit
+# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/PhysicsTools/PatAlgos/python/cleaningLayer1/tauCleaner_cfi.py?revision=1.11&view=markup
+#----------------------------------------------------------------------------------------------------
+process.cleanPatTaus.preselection = cms.string(' tauID("decayModeFinding") > 0.5 ')
+process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5      ')
+
+#----------------------------------------------------------------------------------------------------
+# Add tau id sources (HPS Taus)
+#----------------------------------------------------------------------------------------------------
+process.patTaus.tauIDSources.byVLooseIsolation = cms.InputTag("hpsPFTauDiscriminationByVLooseIsolation")
+process.patTaus.tauIDSources.byLooseIsolation  = cms.InputTag("hpsPFTauDiscriminationByLooseIsolation")
+process.patTaus.tauIDSources.byMediumIsolation = cms.InputTag("hpsPFTauDiscriminationByMediumIsolation")
+process.patTaus.tauIDSources.byTightIsolation  = cms.InputTag("hpsPFTauDiscriminationByTightIsolation")
+
+
+#----------------------------------------------------------------------------------------------------
 # Add MVA electron ID
 #
 # MVA electron ID details on this twiki:
@@ -173,7 +195,11 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleCaloJets_*_*',
         'keep *_rootTuplePFJets_*_*',
         'keep *_rootTupleElectrons_*_*',
-        'keep *_rootTupleTaus_*_*',
+        # ---
+        #'keep *_rootTupleTaus_*_*',
+        'keep *_rootTupleSCTaus_*_*',
+        'keep *_rootTupleHPSTaus_*_*',
+        # ---
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
@@ -213,7 +239,11 @@ process.p = cms.Path(
     process.rootTupleEventSelection+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
-    process.rootTupleTaus+
+    # ---
+    #process.rootTupleTaus+
+    process.rootTupleSCTaus+
+    process.rootTupleHPSTaus+
+    # ---
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
     process.rootTuplePFMET+

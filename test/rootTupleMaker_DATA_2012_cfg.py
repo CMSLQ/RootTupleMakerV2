@@ -1,10 +1,10 @@
+#----------------------------------------------------------------------------------------------------
+# Load PAT template
+#----------------------------------------------------------------------------------------------------
+
+
 # Starting with a skeleton process which gets imported with the following line
-# from patTuple_standard_cfg import *
-
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-
-# load the standard PAT config
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 # load the coreTools of PAT
 from PhysicsTools.PatAlgos.tools.coreTools import *
@@ -21,13 +21,20 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.MessageLogger.cerr.default.limit = 10
 #################################################################
 
-# Load RootTupleMakerV2 modules
+#----------------------------------------------------------------------------------------------------
+# Load our RootTupleMakerV2 modules
+#----------------------------------------------------------------------------------------------------
+
 process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string('RootTupleMakerV2_output_DATA.root')
 )
+
+#----------------------------------------------------------------------------------------------------
+# Set global settings (number of events, global tag, input files, etc)
+#----------------------------------------------------------------------------------------------------
 
 # Make sure a correct global tag is used (please refer to https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release)
 process.GlobalTag.globaltag = 'GR_R_52_V7::All'
@@ -40,43 +47,95 @@ process.options.wantSummary = False
 
 # Input files
 process.source.fileNames = [
-    'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
 
+#----------------------------------------------------------------------------------------------------
+# Add PFMET and TCMET
+#----------------------------------------------------------------------------------------------------
+
+from PhysicsTools.PatAlgos.tools.metTools import *
+addPfMET(process, 'PF')
+addTcMET(process, 'TC')
+
+#----------------------------------------------------------------------------------------------------
+# Add PFMET corrections:
+# - Type 0 : PU corrections
+# - Type 1 : JES corrections
+# - MET x/y shift correction: phi modulation
+# - See: 
+#----------------------------------------------------------------------------------------------------
+
+# type-0 MET corrections
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
+
+# type-1 MET corrections (see jets)
+
+# MET x/y shift correction: phi modulation
+process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+
+process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
+
+process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
+   cms.InputTag('patPFJetMETtype1p2Corr', 'type1'),
+   cms.InputTag('patPFMETtype0Corr'),
+   cms.InputTag('pfMEtSysShiftCorr')
+)
+
+#----------------------------------------------------------------------------------------------------
+# Add MET filters
+#----------------------------------------------------------------------------------------------------
+
+process.load("Leptoquarks.RootTupleMakerV2.metFilters_cfi")
+
+#----------------------------------------------------------------------------------------------------
+# Add MVA electron ID
+#
+# MVA electron ID details on this twiki:
+# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentification#MVA_based_Id_in_PAT
+#
+# Taken from the example:
+# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/EGamma/EGammaAnalysisTools/test/patTuple_electronId_cfg.py?revision=1.2&view=markup&pathrev=V00-00-21
+#----------------------------------------------------------------------------------------------------
+
+process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi')
+process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaNonTrigV0 )
+process.patElectrons.electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0"   )
+process.patElectrons.electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
+
+#----------------------------------------------------------------------------------------------------
 # Add PF jets --> See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
+#----------------------------------------------------------------------------------------------------
+
+# With FastJet corrections, do Type 1 MET corrections
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
+
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
     jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute','L2L3Residual'])), 
-    doType1MET   = False,
-    doL1Cleaning = False,
-    doL1Counters = False,
+    doType1MET   = True,
     genJetCollection = cms.InputTag("ak5GenJets"),
-    doJetID      = False
+    doJetID      = True,
 )
+
+# With Offset corrections
+
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PFL1Offset',
     doJTA        = True,
     doBTagging   = True,
     jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), 
     doType1MET   = False,
-    doL1Cleaning = False,
-    doL1Counters = False,
     genJetCollection = cms.InputTag("ak5GenJets"),
-    doJetID      = False
+    doJetID      = True,
 )
-
-# Add PFMET
-from PhysicsTools.PatAlgos.tools.metTools import *
-addPfMET(process, 'PF')
-addTcMET(process, 'TC')
-
-
-# MET filters:
-process.load("Leptoquarks.RootTupleMakerV2.metFilters_cfi")
 
 # Skim definition
 # process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
@@ -136,42 +195,39 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 # Path definition
 process.p = cms.Path(
     process.goodVertices*
-    # process.ak5PFJetsL2L3Residual*
-    
+    process.type0PFMEtCorrection*
     # MET filters (required):
     process.CSCTightHaloFilter*
     process.EcalDeadCellTriggerPrimitiveFilter*
     process.HBHENoiseFilter*
     process.HBHENoiseFilterResultProducer*
     process.hcalLaserEventFilter*
-    # process.trackingFailureFilter*
-
-    # MET filters (optional):
-    
+    process.trackingFailureFilter*
+    # MVA electron ID
+    process.mvaID + 
     # PAT sequence
     process.patDefaultSequence*
-    
     # RootTupleMakerV2
     (
     process.rootTupleEvent+
     process.rootTupleEventSelection+
     process.rootTuplePFJets+
-    # process.rootTupleElectrons
-    # process.rootTupleTaus
+    process.rootTupleElectrons+
+    process.rootTupleTaus+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
-    process.rootTuplePFMET
+    process.rootTuplePFMET+
     # process.rootTuplePFMETType1Cor+
     # process.rootTuplePFChargedMET+
-    # process.rootTupleMuons+
-    # process.rootTupleTrigger+
-    # process.rootTupleVertex+
-    # process.rootTupleGenEventInfo+
-    # process.rootTupleGenParticles+
-    # process.rootTupleGenJets+
-    # process.rootTupleGenMETTrue+
-    # process.rootTupleGenMETCalo+    
-    # process.rootTuplePhotons+
+    process.rootTupleMuons+
+    process.rootTupleTrigger+
+    process.rootTupleVertex+
+    process.rootTupleGenEventInfo+
+    process.rootTupleGenParticles+
+    process.rootTupleGenJets+
+    process.rootTupleGenMETTrue+
+    process.rootTupleGenMETCalo+    
+    process.rootTuplePhotons
     # process.rootTuplePFCandidates
     )
     *process.rootTupleTree

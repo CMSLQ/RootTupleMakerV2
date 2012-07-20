@@ -1,3 +1,22 @@
+//------------------------------------------------------------------------
+// To do:
+//
+// - Muon isolation (for overlaps) is done with relative isolation.  Is this correct?
+// 
+// - HEEP ID variables need to be checked / updated to 4.0
+//   https://twiki.cern.ch/twiki/bin/view/CMS/HEEPElectronID
+// 
+// - EGamma cut-based ID variables need to be checked / updated
+//   https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification
+//
+// - Conversion information needs to be checked / updated
+//      
+//------------------------------------------------------------------------
+
+//------------------------------------------------------------------------
+// Include files
+//------------------------------------------------------------------------
+
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Electrons.h"
 #include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -15,205 +34,299 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
+//------------------------------------------------------------------------
+// Constructor
+//------------------------------------------------------------------------
+
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
-    trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
-    dcsInputTag(iConfig.getParameter<edm::InputTag>("DCSInputTag")),
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
-    prefix  (iConfig.getParameter<std::string>  ("Prefix")),
-    suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
-    electronIso (iConfig.getParameter<double>   ("ElectronIso")),
-    muonPt (iConfig.getParameter<double>        ("MuonPt")),
-    muonIso (iConfig.getParameter<double>       ("MuonIso")),
-    muonID  (iConfig.getParameter<std::string>  ("MuonID")),
-    vtxInputTag(iConfig.getParameter<edm::InputTag>        ("VertexInputTag")),
-    beamSpotInputTag(iConfig.getParameter<edm::InputTag>   ("BeamSpotInputTag")),
-    conversionsInputTag(iConfig.getParameter<edm::InputTag>("ConversionsInputTag")),
-    likelihoodInputTag(iConfig.getParameter<edm::InputTag> ("LikelihoodInputTag"))
-{
-  produces <std::vector<double> > ( prefix + "Eta" + suffix );
-  produces <std::vector<double> > ( prefix + "Phi" + suffix );
-  produces <std::vector<double> > ( prefix + "Pt" + suffix );
-  produces <std::vector<double> > ( prefix + "PtHeep" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackPt" + suffix );
+    trkInputTag        (iConfig.getParameter<edm::InputTag>("TracksInputTag"      )),
+    dcsInputTag        (iConfig.getParameter<edm::InputTag>("DCSInputTag"         )),
+    inputTag           (iConfig.getParameter<edm::InputTag>("InputTag"            )),
+    vtxInputTag        (iConfig.getParameter<edm::InputTag>("VertexInputTag"      )), 
+    beamSpotInputTag   (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"    )),
+    conversionsInputTag(iConfig.getParameter<edm::InputTag>("ConversionsInputTag" )),
+    electronIso        (iConfig.getParameter<double>       ("ElectronIso"         )),
+    muonPt             (iConfig.getParameter<double>       ("MuonPt"              )),
+    muonIso            (iConfig.getParameter<double>       ("MuonIso"             )),
+    muonID             (iConfig.getParameter<std::string>  ("MuonID"              )),
+    prefix             (iConfig.getParameter<std::string>  ("Prefix"              )),
+    suffix             (iConfig.getParameter<std::string>  ("Suffix"              )),
+    maxSize            (iConfig.getParameter<unsigned int> ("MaxSize"             )) {
+  
+  //------------------------------------------------------------------------
+  // What variables will this producer push into the event?
+  //------------------------------------------------------------------------
+  
+  // Kinematic variables
+
+  produces <std::vector<double> > ( prefix + "Eta"                      + suffix );
+  produces <std::vector<double> > ( prefix + "Phi"                      + suffix );
+  produces <std::vector<double> > ( prefix + "Pt"                       + suffix );
+  produces <std::vector<double> > ( prefix + "PtHeep"                   + suffix );
+  produces <std::vector<double> > ( prefix + "Energy"                   + suffix );
+  produces <std::vector<double> > ( prefix + "CaloEnergy"               + suffix );
+  produces <std::vector<int> >    ( prefix + "Charge"                   + suffix );
+  produces <std::vector<double> > ( prefix + "HoE"                      + suffix );
+								        
+  // Supercluster kinematic variables				        
+								        
+  produces <std::vector<double> > ( prefix + "ESuperClusterOverP"       + suffix );
+  produces <std::vector<double> > ( prefix + "SCEta"                    + suffix );
+  produces <std::vector<double> > ( prefix + "SCPhi"                    + suffix );
+  produces <std::vector<double> > ( prefix + "SCPt"                     + suffix );
+  produces <std::vector<double> > ( prefix + "SCRawEnergy"              + suffix );
+  								        
+  // Does this electron overlap with a muon?			        
+  produces <std::vector<int> >    ( prefix + "Overlaps"                 + suffix );
+								        
+  // Number of Brems = number of basic clusters minus one	        
+  produces <std::vector<int> >    ( prefix + "NumberOfBrems"            + suffix );
+								        
+  // Is this ECAL driven? Or PFlow?  				        
+  produces <std::vector<bool> >   ( prefix + "HasEcalDrivenSeed"        + suffix );
+								        
+  // ECAL eta/phi vs tracker eta/phi				        
+								        
+  produces <std::vector<double> > ( prefix + "DeltaPhiTrkSC"            + suffix );
+  produces <std::vector<double> > ( prefix + "DeltaEtaTrkSC"            + suffix );
+								        
+  // Shower shape						        
+								        
+  produces <std::vector<double> > ( prefix + "SigmaEtaEta"              + suffix );
+  produces <std::vector<double> > ( prefix + "SigmaIEtaIEta"            + suffix );
+  produces <std::vector<int> >    ( prefix + "Classif"                  + suffix );
+  produces <std::vector<double> > ( prefix + "E1x5OverE5x5"             + suffix );
+  produces <std::vector<double> > ( prefix + "E2x5OverE5x5"             + suffix );
+  								        
+  // Isolation variables: PAT					        
+								        
+  produces <std::vector<double> > ( prefix + "TrkIsoPAT"                + suffix );
+  produces <std::vector<double> > ( prefix + "EcalIsoPAT"               + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoPAT"               + suffix );
+  produces <std::vector<double> > ( prefix + "RelIsoPAT"                + suffix );
+  produces <std::vector<int> >    ( prefix + "PassIsoPAT"               + suffix );
+								        
+  // Isolation variables: DR 0.3				        
+								        
+  produces <std::vector<double> > ( prefix + "EcalIsoDR03"              + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoDR03"              + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoDR03FullCone"      + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoD1DR03"            + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIsoD2DR03"            + suffix );
+  produces <std::vector<double> > ( prefix + "TrkIsoDR03"               + suffix );
+								        
+  // Conversion variables					        
+								        
+  produces <std::vector<int> >    ( prefix + "MissingHits"              + suffix );
+  produces <std::vector<double> > ( prefix + "Dist"                     + suffix );
+  produces <std::vector<double> > ( prefix + "DCotTheta"                + suffix );
+  produces <std::vector<double> > ( prefix + "Fbrem"                    + suffix );
+  produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot"       + suffix );
+
+  // Vertex and beamspot information
+
+  produces <std::vector<int> >    ( prefix + "VtxIndex"                 + suffix );
+  produces <std::vector<double> > ( prefix + "VtxDistXY"                + suffix );
+  produces <std::vector<double> > ( prefix + "VtxDistZ"                 + suffix );
+  produces <std::vector<double> > ( prefix + "PrimaryVertexDXY"         + suffix );
+  produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError"    + suffix );
+  produces <std::vector<double> > ( prefix + "BeamSpotDXY"              + suffix );
+  produces <std::vector<double> > ( prefix + "BeamSpotDXYError"         + suffix );
+
+  // Track information
+
+  produces <std::vector<double> > ( prefix + "TrackVx"                  + suffix );
+  produces <std::vector<double> > ( prefix + "TrackVy"                  + suffix );
+  produces <std::vector<double> > ( prefix + "TrackVz"                  + suffix );
+  produces <std::vector<double> > ( prefix + "TrackPt"                  + suffix );
   produces <std::vector<double> > ( prefix + "TrackValidFractionOfHits" + suffix );
-  produces <std::vector<double> > ( prefix + "Energy" + suffix );
-  produces <std::vector<double> > ( prefix + "CaloEnergy" + suffix );
-  produces <std::vector<int> >    ( prefix + "Charge" + suffix );
-  produces <std::vector<int> >    ( prefix + "Overlaps" + suffix );
-  produces <std::vector<double> > ( prefix + "HoE" + suffix );
-  produces <std::vector<double> > ( prefix + "SigmaEtaEta" + suffix );
-  produces <std::vector<double> > ( prefix + "SigmaIEtaIEta" + suffix );
-  produces <std::vector<double> > ( prefix + "DeltaPhiTrkSC" + suffix );
-  produces <std::vector<double> > ( prefix + "DeltaEtaTrkSC" + suffix );
-  produces <std::vector<int> >    ( prefix + "Classif" + suffix );
-  produces <std::vector<double> > ( prefix + "E1x5OverE5x5" + suffix );
-  produces <std::vector<double> > ( prefix + "E2x5OverE5x5" + suffix );
-  //produces <std::vector<int> >    ( prefix + "HeepID" + suffix );
-  produces <std::vector<int> >    ( prefix + "PassIDPAT" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkIsoPAT" + suffix );
-  produces <std::vector<double> > ( prefix + "EcalIsoPAT" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoPAT" + suffix );
-  produces <std::vector<double> > ( prefix + "RelIsoPAT" + suffix );
-  produces <std::vector<int> >    ( prefix + "PassIsoPAT" + suffix );
-  produces <std::vector<double> > ( prefix + "EcalIsoDR03" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoDR03" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoDR03FullCone" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoD1DR03" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIsoD2DR03" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkIsoDR03" + suffix );
-  produces <std::vector<int> >    ( prefix + "MissingHits" + suffix );
-  produces <std::vector<double> > ( prefix + "Dist" + suffix );
-  produces <std::vector<double> > ( prefix + "DCotTheta" + suffix );
-  produces <std::vector<double> > ( prefix + "Fbrem" + suffix );
-  produces <std::vector<double> > ( prefix + "ESuperClusterOverP" + suffix );
-  produces <std::vector<double> > ( prefix + "SCEta" + suffix );
-  produces <std::vector<double> > ( prefix + "SCPhi" + suffix );
-  produces <std::vector<double> > ( prefix + "SCPt" + suffix );
-  produces <std::vector<double> > ( prefix + "SCRawEnergy" + suffix );
-  produces <std::vector<int> >    ( prefix + "VtxIndex" + suffix );
-  produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
-  produces <std::vector<double> > ( prefix + "VtxDistZ" + suffix );
-  produces <std::vector<double> > ( prefix + "PrimaryVertexDXY" + suffix );
-  produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError" + suffix );
-  produces <std::vector<double> > ( prefix + "BeamSpotDXY" + suffix );
-  produces <std::vector<double> > ( prefix + "BeamSpotDXYError" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackVx" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackVy" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackVz" + suffix );
-  produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot" + suffix );
-  produces <std::vector<double> > ( prefix + "Likelihood" + suffix );
-  produces <std::vector<int> >    ( prefix + "NumberOfBrems" + suffix );
-  produces <std::vector<bool> >   ( prefix + "HasEcalDrivenSeed" + suffix );
+
 }
+
+//------------------------------------------------------------------------
+// Event-per-event processing
+//------------------------------------------------------------------------
 
 void RootTupleMakerV2_Electrons::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ptHeep  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackPt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  caloEnergy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     charge  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     overlaps  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  trackValidFractionOfHits  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hoe   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  sigmaEtaEta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  sigmaIEtaIEta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  deltaPhiTrkSC  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  deltaEtaTrkSC  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     classif  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  e1x5overe5x5  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  e2x5overe5x5  ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<int> >     heepID  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     passIDPAT  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  trkIsoPAT   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ecalIsoPAT  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoPAT  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  relIsoPAT   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     passIsoPAT  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  ecalIsoDR03  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoDR03  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoDR03FullCone  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoD1DR03  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIsoD2DR03  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkIsoDR03  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     missingHits  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  dist_vec  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  dCotTheta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  fbrem  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  eSuperClusterOverP  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  scEta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  scPhi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  scPt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  scRawEnergy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     vtxIndex  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  vtxDistZ  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  primaryVertexDXY  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  primaryVertexDXYError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  beamspotDXY  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  beamspotDXYError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackVx  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackVy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackVz  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot  ( new std::vector<bool>()  );
-  std::auto_ptr<std::vector<double> >  likelihood  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     numberOfBrems  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<bool> >    hasEcalDrivenSeed  ( new std::vector<bool>()  );
+  //------------------------------------------------------------------------
+  // Declare items to push into the event
+  //------------------------------------------------------------------------
 
-  //-----------------------------------------------------------------
+  // Kinematic variables
+
+  std::auto_ptr<std::vector<double> >  eta                       ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  phi                       ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pt                        ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ptHeep                    ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  energy                    ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  caloEnergy                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     charge                    ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<double> >  hoe                       ( new std::vector<double>()  );
+
+  // Supercluster kinematic variables
+
+  std::auto_ptr<std::vector<double> >  eSuperClusterOverP        ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scEta                     ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scPhi                     ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scPt                      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scRawEnergy               ( new std::vector<double>()  );
+  
+  // Does this electron overlap with a muon?
+  std::auto_ptr<std::vector<int> >     overlaps                  ( new std::vector<int>   ()  );
+
+  // Number of Brems = number of basic clusters minus one
+  std::auto_ptr<std::vector<int> >     numberOfBrems             ( new std::vector<int>   ()  );
+
+  // Is this ECAL driven? Or PFlow?  
+  std::auto_ptr<std::vector<bool> >    hasEcalDrivenSeed         ( new std::vector<bool>  ()  );
+  
+  // ECAL eta/phi vs tracker eta/phi
+
+  std::auto_ptr<std::vector<double> >  deltaPhiTrkSC             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  deltaEtaTrkSC             ( new std::vector<double>()  );
+
+  // Shower shape
+
+  std::auto_ptr<std::vector<double> >  sigmaEtaEta               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  sigmaIEtaIEta             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  e1x5overe5x5              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  e2x5overe5x5              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     classif                   ( new std::vector<int>   ()  );
+
+  // Isolation variables: PAT
+  
+  std::auto_ptr<std::vector<double> >  trkIsoPAT                 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ecalIsoPAT                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoPAT                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  relIsoPAT                 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     passIsoPAT                ( new std::vector<int>   ()  );
+
+  // Isolation variables: DR 0.3
+
+  std::auto_ptr<std::vector<double> >  ecalIsoDR03               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoDR03               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoDR03FullCone       ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoD1DR03             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIsoD2DR03             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkIsoDR03                ( new std::vector<double>()  );
+
+  // Conversion variables
+
+  std::auto_ptr<std::vector<int> >     missingHits               ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<double> >  dist_vec                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  dCotTheta                 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  fbrem                     ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot        ( new std::vector<bool>  ()  );
+
+  // Vertex and beamspot information
+  
+  std::auto_ptr<std::vector<int> >     vtxIndex                  ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<double> >  vtxDistXY                 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  vtxDistZ                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  primaryVertexDXY          ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  primaryVertexDXYError     ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  beamspotDXY               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  beamspotDXYError          ( new std::vector<double>()  );
+
+  // Track information 
+
+  std::auto_ptr<std::vector<double> >  trackVx                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackVy                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackVz                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackPt                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackValidFractionOfHits  ( new std::vector<double>()  );  
+
+  //------------------------------------------------------------------------
+  // Get handles for the event
+  //------------------------------------------------------------------------
+  
+  // Tracks
+
   edm::Handle<reco::TrackCollection> tracks;
   iEvent.getByLabel(trkInputTag, tracks);
 
+  // DCS information
+
   edm::Handle<DcsStatusCollection> dcsHandle;
   iEvent.getByLabel(dcsInputTag, dcsHandle);
+  
+  // Primary vertices
+  
+  edm::Handle<reco::VertexCollection> primaryVertices;
+  iEvent.getByLabel(vtxInputTag,primaryVertices);
+
+  // Beamspot information
+  
+  edm::Handle<reco::BeamSpot> bsHandle; 
+  iEvent.getByLabel(beamSpotInputTag, bsHandle); 
+
+  // Photon conversion information
+
+  edm::Handle<reco::ConversionCollection> hConversions;
+  iEvent.getByLabel(conversionsInputTag, hConversions); 
+
+  // PAT electrons
+
+  edm::Handle<std::vector<pat::Electron> > electrons;
+  iEvent.getByLabel(inputTag, electrons);
+
+  //------------------------------------------------------------------------
+  // Get magnetic field (need this for photon conversion information):
+  //   - if isRealData then derive bfield using the magnet current from DcsStatus
+  //     scale factor = 3.801 Tesla /18166.0 Amps, which are
+  //     average values taken over a stable two-week period
+  //   - otherwise take it from the IdealMagneticFieldRecord
+  //------------------------------------------------------------------------
 
   double evt_bField = 3.8;
-  // need the magnetic field
-  //
-  // if isRealData then derive bfield using the
-  // magnet current from DcsStatus
-  // otherwise take it from the IdealMagneticFieldRecord
+  double currentToBFieldScaleFactor = 2.09237036221512717e-04;
+
   if(iEvent.isRealData()) {
     if(dcsHandle.isValid()) {
       edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Successfully obtained " << dcsInputTag;
-      // scale factor = 3.801/18166.0 which are
-      // average values taken over a stable two-week period
-      double currentToBFieldScaleFactor = 2.09237036221512717e-04;
       if( (*dcsHandle).size()>0 ) {
         double current = (*dcsHandle)[0].magnetCurrent();
         evt_bField = current*currentToBFieldScaleFactor;
       }
-    } else {
-      edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << dcsInputTag;
-    }
-  } else {
+    } 
+    else edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << dcsInputTag;
+  } 
+
+  else {
     edm::ESHandle<MagneticField> magneticField;
     iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
 
     if(magneticField.isValid()) {
       edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Successfully obtained IdealMagneticFieldRecord";
-
       evt_bField = magneticField->inTesla(GlobalPoint(0.,0.,0.)).z();
-    } else {
-      edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get IdealMagneticFieldRecord";
-    }
+    } 
+
+    else edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get IdealMagneticFieldRecord";
   }
 
-  edm::Handle<reco::VertexCollection> primaryVertices;
-  iEvent.getByLabel(vtxInputTag,primaryVertices);
+  //------------------------------------------------------------------------
+  // Loop over electrons (finally!)
+  //------------------------------------------------------------------------
 
-  edm::Handle<reco::BeamSpot> bsHandle; 
-  iEvent.getByLabel(beamSpotInputTag, bsHandle); 
-
-  edm::Handle<reco::ConversionCollection> hConversions;
-  iEvent.getByLabel(conversionsInputTag, hConversions); 
-
-  edm::Handle<std::vector<pat::Electron> > electrons;
-  iEvent.getByLabel(inputTag, electrons);
-
-  std::vector<edm::Handle<edm::ValueMap<float> > > eIDValueMap(1); 
-  iEvent.getByLabel( likelihoodInputTag , eIDValueMap[0] );
-  const edm::ValueMap<float> & eIDmapLikelihood = * eIDValueMap[0] ;
-
+  std::vector<pat::Electron::IdPair>::const_iterator iElectronIDs, iElectronIDs_end;
+  
   if(electrons.isValid()) {
     edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Electrons: " << electrons->size();
 
     for( std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it ) {
 
-      // exit from loop when you reach the required number of electrons
-      if(eta->size() >= maxSize)
-        break;
+      //------------------------------------------------------------------------
+      // Break from the loop once we have enough electrons
+      //------------------------------------------------------------------------
 
-      // if electron is not ECAL driven, continue
-      //if(!it->ecalDrivenSeed())
-      //  continue;
+      if(eta->size() >= maxSize) break;
 
-      // Overlaps
+      //------------------------------------------------------------------------
+      // Do any of these electrons overlap with muons?
+      //------------------------------------------------------------------------
+      
       int ovrlps = 0;
       const reco::CandidatePtrVector & muons = it->overlaps("muons");
       for (size_t i = 0; i < muons.size(); ++i) {
@@ -225,22 +338,40 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
                && muon->pt()>muonPt ) ovrlps = 1;
         }
       }
-      double reliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/it->pt();
+      
+      //------------------------------------------------------------------------
+      // Look at bits for electron ID (whatever is stored in PAT)
+      // passID for different electron IDs is assigned bitwise
+      //  - bit 0: eidRobustLoose
+      //  - bit 1: eidRobustTight
+      //  - bit 2: eidLoose
+      //  - bit 3: eidTight
+      //  - bit 4: eidRobustHighEnergy
+      //------------------------------------------------------------------------
+
+      const std::vector<pat::Electron::IdPair> & electronIDs = it->electronIDs();
+      iElectronIDs     = electronIDs.begin();
+      iElectronIDs_end = electronIDs.end();
+      std::cout << "Electron IDs:" << std::endl;
+      for (; iElectronIDs != iElectronIDs_end; ++iElectronIDs )
+	std::cout << "\t" << iElectronIDs -> first << std::endl;
+ 
       int passId = 0;
-      /* passID for different electron IDs is assigned bitwise
-         bit 0: eidRobustLoose
-         bit 1: eidRobustTight
-         bit 2: eidLoose
-         bit 3: eidTight
-         bit 4: eidRobustHighEnergy
-         //bit 5: HEEPId
-      */
-      if (it->electronID("eidRobustLoose")>0) passId = passId | 1<<0;
-      if (it->electronID("eidRobustTight")>0) passId = passId | 1<<1;
-      if (it->electronID("eidLoose")>0) passId = passId | 1<<2;
-      if (it->electronID("eidTight")>0) passId = passId | 1<<3;
+      if (it->electronID("eidRobustLoose"     )>0) passId = passId | 1<<0;
+      if (it->electronID("eidRobustTight"     )>0) passId = passId | 1<<1;
+      if (it->electronID("eidLoose"           )>0) passId = passId | 1<<2;
+      if (it->electronID("eidTight"           )>0) passId = passId | 1<<3;
       if (it->electronID("eidRobustHighEnergy")>0) passId = passId | 1<<4;
-      //if (it->userInt("HEEPId")==0) passId = passId | 1<<5;
+
+      //------------------------------------------------------------------------
+      // Relative isolation (not currently used in any analysis... remove?) 
+      //------------------------------------------------------------------------
+      
+      double reliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/it->pt();
+
+      //------------------------------------------------------------------------
+      // Conversion information
+      //------------------------------------------------------------------------
 
       // Conversion (variables)
       ConversionFinder convFinder;
@@ -272,7 +403,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << conversionsInputTag;
 	}
       
+      //------------------------------------------------------------------------
       // Vertex association
+      //------------------------------------------------------------------------
+
       double minVtxDist3D = 9999.;
       int vtxIndex_ = -1;
       double vtxDistXY_ = -9999.;
@@ -297,142 +431,190 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       } else {
         edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
       }
-      
-      // Likelihood Based Ele ID ( https://twiki.cern.ch/twiki/bin/view/CMS/LikelihoodBasedEleID2011 )
-      double likelihood_ = -999.;
-      if(eIDValueMap[0].isValid())
- 	{
-	  likelihood_ = eIDmapLikelihood[it->originalObjectRef()];	 
- 	}
 
-      //-------------------------------------------
-
-      hasEcalDrivenSeed->push_back( it->ecalDrivenSeed() );
+      //------------------------------------------------------------------------ 
+      // Assign values to variables
+      //------------------------------------------------------------------------
       
-      eta->push_back( it->eta() );
-      phi->push_back( it->phi() );
-      pt->push_back( it->pt() );
-      ptHeep->push_back( it->caloEnergy()*sin(it->p4().theta()) );
-      trackPt->push_back( it->gsfTrack()->pt() );
-      energy->push_back( it->energy() );
-      caloEnergy->push_back( it->caloEnergy() );
-      charge->push_back( it->charge() );
-      overlaps->push_back( ovrlps );
-      // ID variables
-      trackValidFractionOfHits->push_back ( validFraction ( it->gsfTrack() ) );
-      hoe->push_back( it->hadronicOverEm() );
-      sigmaEtaEta->push_back( it->sigmaEtaEta() );
-      sigmaIEtaIEta->push_back( it->sigmaIetaIeta() );
-      deltaPhiTrkSC->push_back( it->deltaPhiSuperClusterTrackAtVtx() );
-      deltaEtaTrkSC->push_back( it->deltaEtaSuperClusterTrackAtVtx() );
-      classif->push_back( it->classification() );
-      e1x5overe5x5->push_back( (it->e5x5()>0) ? (it->e1x5()/it->e5x5()) : 0 );
-      e2x5overe5x5->push_back( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
-      //heepID->push_back( it->userInt("HEEPId") );
-      passIDPAT->push_back( passId );
-      likelihood->push_back( likelihood_ );
-      numberOfBrems->push_back( it->numberOfBrems() );
-      // Iso variables (PAT default...)
-      trkIsoPAT->push_back( it->trackIso() );
-      ecalIsoPAT->push_back( it->ecalIso() );
-      hcalIsoPAT->push_back( it->hcalIso() );
-      relIsoPAT->push_back( reliso );
-      passIsoPAT->push_back( (reliso<electronIso) ? 1 : 0 );
-      // Iso variables (Heep, VBTF, etc..)
-      ecalIsoDR03->push_back( it->dr03EcalRecHitSumEt() );
-      hcalIsoDR03->push_back( it->dr03HcalTowerSumEt() );
-      hcalIsoDR03FullCone->push_back( it->dr03HcalTowerSumEt() 
-				      + ( it->hadronicOverEm() 
-					  * it->superCluster()->energy() 
-					  / cosh(it->superCluster()->eta())
-					  )
-				      );
-      hcalIsoD1DR03->push_back( it->dr03HcalDepth1TowerSumEt() );
-      hcalIsoD2DR03->push_back( it->dr03HcalDepth2TowerSumEt() );
-      trkIsoDR03->push_back( it->dr03TkSumPt() );
+      // Kinematic variables
+      
+      eta                      -> push_back ( it->eta() );
+      phi                      -> push_back ( it->phi() );
+      pt                       -> push_back ( it->pt() );
+      ptHeep                   -> push_back ( it->caloEnergy()*sin(it->p4().theta()) );
+      energy                   -> push_back ( it->energy() );
+      caloEnergy               -> push_back ( it->caloEnergy() );
+      charge                   -> push_back ( it->charge() );
+      hoe                      -> push_back ( it->hadronicOverEm() );
+      
+      // Supercluster kinematic variables
+
+      scEta                    -> push_back( it->superCluster()->eta() );
+      scPhi                    -> push_back( it->superCluster()->phi() );
+      scPt                     -> push_back( it->superCluster()->energy()/cosh(it->superCluster()->eta()) );
+      scRawEnergy              -> push_back( it->superCluster()->rawEnergy() );
+      eSuperClusterOverP       -> push_back( it->eSuperClusterOverP() );
+      
+      // Does this electron overlap with a muon?
+      overlaps                 -> push_back( ovrlps );
+      
+      // Number of Brems = number of basic clusters minus one
+      numberOfBrems            -> push_back( it->numberOfBrems() );
+      
+      // Is this ECAL driven? Or PFlow?  
+      hasEcalDrivenSeed        -> push_back( it->ecalDrivenSeed() );
+      
+      // ECAL eta/phi vs tracker eta/phi
+
+      deltaPhiTrkSC            -> push_back ( it->deltaPhiSuperClusterTrackAtVtx() );
+      deltaEtaTrkSC            -> push_back ( it->deltaEtaSuperClusterTrackAtVtx() );
+
+      // Shower shape
+
+      sigmaEtaEta              -> push_back ( it->sigmaEtaEta() );
+      sigmaIEtaIEta            -> push_back ( it->sigmaIetaIeta() );
+      classif                  -> push_back ( it->classification() );
+      e1x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e1x5()/it->e5x5()) : 0 );
+      e2x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
+
+      // Isolation variables: DR 0.3
+      
+      trkIsoPAT                -> push_back( it->trackIso() );
+      ecalIsoPAT               -> push_back( it->ecalIso() );
+      hcalIsoPAT               -> push_back( it->hcalIso() );
+      relIsoPAT                -> push_back( reliso );
+      passIsoPAT               -> push_back( (reliso<electronIso) ? 1 : 0 ); 
+     
+      // Isolation variables: PAT
+
+      ecalIsoDR03              -> push_back ( it->dr03EcalRecHitSumEt() );
+      hcalIsoDR03              -> push_back ( it->dr03HcalTowerSumEt() );
+      hcalIsoDR03FullCone      -> push_back ( it->dr03HcalTowerSumEt() +
+					      ( it->hadronicOverEm() 
+						* it->superCluster()->energy() 
+						/ cosh(it->superCluster()->eta())));
+      hcalIsoD1DR03            -> push_back( it->dr03HcalDepth1TowerSumEt() );
+      hcalIsoD2DR03            -> push_back( it->dr03HcalDepth2TowerSumEt() );
+      trkIsoDR03               -> push_back( it->dr03TkSumPt() );
+      
       // Conversion variables
-      missingHits->push_back( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
-      dist_vec->push_back( dist );
-      dCotTheta->push_back( dcot );
-      hasMatchedConvPhot->push_back( matchesConv );
-      //Other variables
-      fbrem->push_back( it->fbrem() );
-      eSuperClusterOverP->push_back( it->eSuperClusterOverP() );
-      // SC associated with electron
-      scEta->push_back( it->superCluster()->eta() );
-      scPhi->push_back( it->superCluster()->phi() );
-      scPt->push_back( it->superCluster()->energy()/cosh(it->superCluster()->eta()) );
-      scRawEnergy->push_back( it->superCluster()->rawEnergy() );
+      
+      missingHits              -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
+      dist_vec                 -> push_back ( dist );
+      dCotTheta                -> push_back ( dcot );
+      hasMatchedConvPhot       -> push_back ( matchesConv );
+      fbrem                    -> push_back ( it->fbrem() );
+      
       // Vertex association variables
-      vtxIndex->push_back( vtxIndex_ );
-      vtxDistXY->push_back( vtxDistXY_ );
-      vtxDistZ->push_back( vtxDistZ_ );
-      primaryVertexDXY->push_back( fabs( it->dB() ) );      
-      primaryVertexDXYError->push_back( fabs( it->edB() ) );
-      beamspotDXY->push_back( fabs( it->dB(pat::Electron::BS2D) ) );
-      beamspotDXYError->push_back( fabs( it->edB(pat::Electron::BS2D) ) );
-      trackVx->push_back( it->gsfTrack()->vx() );
-      trackVy->push_back( it->gsfTrack()->vy() );
-      trackVz->push_back( it->gsfTrack()->vz() );
+      
+      vtxIndex                 -> push_back( vtxIndex_  );
+      vtxDistXY                -> push_back( vtxDistXY_ );
+      vtxDistZ                 -> push_back( vtxDistZ_  );
+      primaryVertexDXY         -> push_back( fabs( it->dB() ) );      
+      primaryVertexDXYError    -> push_back( fabs( it->edB() ) );
+      beamspotDXY              -> push_back( fabs( it->dB (pat::Electron::BS2D) ) );
+      beamspotDXYError         -> push_back( fabs( it->edB(pat::Electron::BS2D) ) );
+			       
+      // Track information     
+      			       
+      trackVx                  -> push_back( it->gsfTrack()->vx() );
+      trackVy                  -> push_back( it->gsfTrack()->vy() );
+      trackVz                  -> push_back( it->gsfTrack()->vz() );
+      trackPt                  -> push_back( it->gsfTrack()->pt() );
+      trackValidFractionOfHits -> push_back( validFraction ( it->gsfTrack() ) );
+
     }
   } else {
     edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << inputTag;
   }
 
-  //-----------------------------------------------------------------
-  // put vectors in the event
-  iEvent.put( eta, prefix + "Eta" + suffix );
-  iEvent.put( phi, prefix + "Phi" + suffix );
-  iEvent.put( pt, prefix + "Pt" + suffix );
-  iEvent.put( ptHeep, prefix + "PtHeep" + suffix );
-  iEvent.put( trackPt, prefix + "TrackPt" + suffix );
-  iEvent.put( energy, prefix + "Energy" + suffix );
-  iEvent.put( caloEnergy, prefix + "CaloEnergy" + suffix );
-  iEvent.put( charge, prefix + "Charge" + suffix );
-  iEvent.put( overlaps, prefix + "Overlaps" + suffix );
+  //------------------------------------------------------------------------
+  // Put vectors in the event
+  //------------------------------------------------------------------------
+
+  // Kinematic variables
+
+  iEvent.put( eta                     , prefix + "Eta"                      + suffix );
+  iEvent.put( phi                     , prefix + "Phi"                      + suffix );
+  iEvent.put( pt                      , prefix + "Pt"                       + suffix );
+  iEvent.put( ptHeep                  , prefix + "PtHeep"                   + suffix );
+  iEvent.put( energy                  , prefix + "Energy"                   + suffix );
+  iEvent.put( caloEnergy              , prefix + "CaloEnergy"               + suffix );
+  iEvent.put( charge                  , prefix + "Charge"                   + suffix );
+  iEvent.put( hoe                     , prefix + "HoE"                      + suffix );
+
+  // Supercluster kinematic variables				        
+
+  iEvent.put( eSuperClusterOverP      , prefix + "ESuperClusterOverP"       + suffix );
+  iEvent.put( scEta                   , prefix + "SCEta"                    + suffix );
+  iEvent.put( scPhi                   , prefix + "SCPhi"                    + suffix );
+  iEvent.put( scPt                    , prefix + "SCPt"                     + suffix );
+  iEvent.put( scRawEnergy             , prefix + "SCRawEnergy"              + suffix );
+
+
+  // Does this electron overlap with a muon?			        
+  iEvent.put( overlaps                , prefix + "Overlaps"                 + suffix );
+
+  // Number of Brems = number of basic clusters minus one	        
+  iEvent.put( numberOfBrems           , prefix + "NumberOfBrems"            + suffix );
+  
+  // Is this ECAL driven? Or PFlow?  				        
+  iEvent.put( hasEcalDrivenSeed       , prefix + "HasEcalDrivenSeed"        + suffix );
+
+  // ECAL eta/phi vs tracker eta/phi				        
+
+  iEvent.put( deltaPhiTrkSC           , prefix + "DeltaPhiTrkSC"            + suffix );
+  iEvent.put( deltaEtaTrkSC           , prefix + "DeltaEtaTrkSC"            + suffix );
+
+  // Shower shape						        
+
+  iEvent.put( sigmaEtaEta             , prefix + "SigmaEtaEta"              + suffix );
+  iEvent.put( sigmaIEtaIEta           , prefix + "SigmaIEtaIEta"            + suffix );
+  iEvent.put( e1x5overe5x5            , prefix + "E1x5OverE5x5"             + suffix );
+  iEvent.put( e2x5overe5x5            , prefix + "E2x5OverE5x5"             + suffix );
+  iEvent.put( classif                 , prefix + "Classif"                  + suffix );
+  
+  // Isolation variables: PAT					        
+
+  iEvent.put( trkIsoPAT               , prefix + "TrkIsoPAT"                + suffix );
+  iEvent.put( ecalIsoPAT              , prefix + "EcalIsoPAT"               + suffix );
+  iEvent.put( hcalIsoPAT              , prefix + "HcalIsoPAT"               + suffix );
+  iEvent.put( relIsoPAT               , prefix + "RelIsoPAT"                + suffix );
+  iEvent.put( passIsoPAT              , prefix + "PassIsoPAT"               + suffix );
+
+  // Isolation variables: DR 0.3				        
+
+  iEvent.put( ecalIsoDR03             , prefix + "EcalIsoDR03"              + suffix );
+  iEvent.put( hcalIsoDR03             , prefix + "HcalIsoDR03"              + suffix );
+  iEvent.put( hcalIsoDR03FullCone     , prefix + "HcalIsoDR03FullCone"      + suffix );
+  iEvent.put( hcalIsoD1DR03           , prefix + "HcalIsoD1DR03"            + suffix );
+  iEvent.put( hcalIsoD2DR03           , prefix + "HcalIsoD2DR03"            + suffix );
+  iEvent.put( trkIsoDR03              , prefix + "TrkIsoDR03"               + suffix );
+
+  // Conversion variables					        
+  
+  iEvent.put( missingHits             , prefix + "MissingHits"              + suffix );
+  iEvent.put( dist_vec                , prefix + "Dist"                     + suffix );
+  iEvent.put( dCotTheta               , prefix + "DCotTheta"                + suffix );
+  iEvent.put( fbrem                   , prefix + "Fbrem"                    + suffix );
+  iEvent.put( hasMatchedConvPhot      , prefix + "HasMatchedConvPhot"       + suffix );
+
+  // Vertex and beamspot information
+
+  iEvent.put( vtxIndex                , prefix + "VtxIndex"                 + suffix );
+  iEvent.put( vtxDistXY               , prefix + "VtxDistXY"                + suffix );
+  iEvent.put( vtxDistZ                , prefix + "VtxDistZ"                 + suffix );
+  iEvent.put( primaryVertexDXY        , prefix + "PrimaryVertexDXY"         + suffix );
+  iEvent.put( primaryVertexDXYError   , prefix + "PrimaryVertexDXYError"    + suffix );
+  iEvent.put( beamspotDXY             , prefix + "BeamSpotDXY"              + suffix );
+  iEvent.put( beamspotDXYError        , prefix + "BeamSpotDXYError"         + suffix );
+
+  // Track information
+
+  iEvent.put( trackVx                 , prefix + "TrackVx"                  + suffix );
+  iEvent.put( trackVy                 , prefix + "TrackVy"                  + suffix );
+  iEvent.put( trackVz                 , prefix + "TrackVz"                  + suffix );
+  iEvent.put( trackPt                 , prefix + "TrackPt"                  + suffix );
   iEvent.put( trackValidFractionOfHits, prefix + "TrackValidFractionOfHits" + suffix );
-  iEvent.put( hoe, prefix + "HoE" + suffix );
-  iEvent.put( sigmaEtaEta, prefix + "SigmaEtaEta" + suffix );
-  iEvent.put( sigmaIEtaIEta, prefix + "SigmaIEtaIEta" + suffix );
-  iEvent.put( deltaPhiTrkSC, prefix + "DeltaPhiTrkSC" + suffix );
-  iEvent.put( deltaEtaTrkSC, prefix + "DeltaEtaTrkSC" + suffix );
-  iEvent.put( classif, prefix + "Classif" + suffix );
-  iEvent.put( e1x5overe5x5, prefix + "E1x5OverE5x5" + suffix );
-  iEvent.put( e2x5overe5x5, prefix + "E2x5OverE5x5" + suffix );
-  //iEvent.put( heepID, prefix + "HeepID" + suffix );
-  iEvent.put( passIDPAT, prefix + "PassIDPAT" + suffix );
-  iEvent.put( trkIsoPAT, prefix + "TrkIsoPAT" + suffix );
-  iEvent.put( ecalIsoPAT, prefix + "EcalIsoPAT" + suffix );
-  iEvent.put( hcalIsoPAT, prefix + "HcalIsoPAT" + suffix );
-  iEvent.put( relIsoPAT, prefix + "RelIsoPAT" + suffix );
-  iEvent.put( passIsoPAT, prefix + "PassIsoPAT" + suffix );
-  iEvent.put( ecalIsoDR03, prefix + "EcalIsoDR03" + suffix );
-  iEvent.put( hcalIsoDR03, prefix + "HcalIsoDR03" + suffix );
-  iEvent.put( hcalIsoDR03FullCone, prefix + "HcalIsoDR03FullCone" + suffix );
-  iEvent.put( hcalIsoD1DR03, prefix + "HcalIsoD1DR03" + suffix );
-  iEvent.put( hcalIsoD2DR03, prefix + "HcalIsoD2DR03" + suffix );
-  iEvent.put( trkIsoDR03, prefix + "TrkIsoDR03" + suffix );
-  iEvent.put( missingHits, prefix + "MissingHits" + suffix );
-  iEvent.put( dist_vec, prefix + "Dist" + suffix );
-  iEvent.put( dCotTheta, prefix + "DCotTheta" + suffix );
-  iEvent.put( fbrem, prefix + "Fbrem" + suffix );
-  iEvent.put( eSuperClusterOverP, prefix + "ESuperClusterOverP" + suffix );
-  iEvent.put( scEta, prefix + "SCEta" + suffix );
-  iEvent.put( scPhi, prefix + "SCPhi" + suffix );
-  iEvent.put( scPt, prefix + "SCPt" + suffix );
-  iEvent.put( scRawEnergy, prefix + "SCRawEnergy" + suffix );
-  iEvent.put( vtxIndex, prefix + "VtxIndex" + suffix );
-  iEvent.put( vtxDistXY, prefix + "VtxDistXY" + suffix );
-  iEvent.put( vtxDistZ, prefix + "VtxDistZ" + suffix );
-  iEvent.put( primaryVertexDXY, prefix + "PrimaryVertexDXY" + suffix );
-  iEvent.put( primaryVertexDXYError, prefix + "PrimaryVertexDXYError" + suffix );
-  iEvent.put( beamspotDXY, prefix + "BeamSpotDXY" + suffix );
-  iEvent.put( beamspotDXYError, prefix + "BeamSpotDXYError" + suffix );
-  iEvent.put( trackVx, prefix + "TrackVx" + suffix );
-  iEvent.put( trackVy, prefix + "TrackVy" + suffix );
-  iEvent.put( trackVz, prefix + "TrackVz" + suffix );
-  iEvent.put( hasMatchedConvPhot, prefix + "HasMatchedConvPhot" + suffix );
-  iEvent.put( likelihood, prefix + "Likelihood" + suffix );
-  iEvent.put( numberOfBrems, prefix + "NumberOfBrems" + suffix );
-  iEvent.put( hasEcalDrivenSeed, prefix + "HasEcalDrivenSeed" + suffix );
+
 }

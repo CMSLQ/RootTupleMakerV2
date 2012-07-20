@@ -14,6 +14,8 @@ class RootTupleMakerV2_Taus : public edm::EDProducer {
   const edm::InputTag   inputTag;
   const std::string     prefix, suffix;
   const unsigned int    maxSize;
+  const bool            isSCTau;
+  const bool            isHPSTau;
 };
 
 #endif

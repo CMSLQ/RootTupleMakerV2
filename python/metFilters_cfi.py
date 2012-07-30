@@ -88,3 +88,12 @@ goodVertices = cms.EDFilter(
 )
 
 trackingFailureFilter.taggingMode = cms.bool (True) 
+
+
+# ------------------------------------------------------------------------------------
+# Bad EE Supercrystal filter: 
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#Bad_EE_Supercrystal_filter_added
+# ------------------------------------------------------------------------------------
+
+from RecoMET.METFilters.eeBadScFilter_cfi import *
+eeBadScFilter.taggingMode = cms.bool (True)

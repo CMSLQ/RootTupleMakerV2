@@ -47,9 +47,9 @@ process.options.wantSummary = False
 
 # Input files
 process.source.fileNames = [
-    # 'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
-    'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
-    #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
+    #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -268,6 +268,7 @@ process.p = cms.Path(
     process.HBHENoiseFilterResultProducer*
     process.hcalLaserEventFilter*
     process.trackingFailureFilter*
+    process.eeBadScFilter*
     # PAT sequence
     process.patDefaultSequence*
     # RootTupleMakerV2

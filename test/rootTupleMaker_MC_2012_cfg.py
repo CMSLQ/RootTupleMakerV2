@@ -37,7 +37,7 @@ process.TFileService = cms.Service("TFileService",
 
 # Make sure a correct global tag is used:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
-process.GlobalTag.globaltag = 'GR_R_52_V9D::All'
+process.GlobalTag.globaltag = 'START52_V11C'
 
 # Events to process
 process.maxEvents.input = 300
@@ -47,8 +47,8 @@ process.options.wantSummary = False
 
 # Input files
 process.source.fileNames = [
-    # 'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
-    'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
+    #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
     #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
 
@@ -168,7 +168,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute','L2L3Residual'])), 
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute'])),
     doType1MET   = True,
     genJetCollection = cms.InputTag("ak5GenJets"),
     doJetID      = True,
@@ -180,7 +180,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PFL1Offset',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), 
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
     doType1MET   = False,
     genJetCollection = cms.InputTag("ak5GenJets"),
     doJetID      = True,

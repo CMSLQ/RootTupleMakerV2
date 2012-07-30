@@ -3,14 +3,11 @@
 //
 // - Muon isolation (for overlaps) is done with relative isolation.  Is this correct?
 // 
-// - HEEP ID variables need to be checked / updated to 4.0
-//   https://twiki.cern.ch/twiki/bin/view/CMS/HEEPElectronID
-// 
 // - EGamma cut-based ID variables need to be checked / updated
 //   https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification
 //
 // - Conversion information needs to be checked / updated
-//      
+//
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
@@ -18,7 +15,7 @@
 //------------------------------------------------------------------------
 
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Electrons.h"
-#include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
+// #include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -36,22 +33,22 @@
 
 //------------------------------------------------------------------------
 // Constructor
-//------------------------------------------------------------------------
+//------------------------------------------------------------------------s
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
-    trkInputTag        (iConfig.getParameter<edm::InputTag>("TracksInputTag"      )),
-    dcsInputTag        (iConfig.getParameter<edm::InputTag>("DCSInputTag"         )),
-    inputTag           (iConfig.getParameter<edm::InputTag>("InputTag"            )),
-    vtxInputTag        (iConfig.getParameter<edm::InputTag>("VertexInputTag"      )), 
-    beamSpotInputTag   (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"    )),
-    conversionsInputTag(iConfig.getParameter<edm::InputTag>("ConversionsInputTag" )),
-    electronIso        (iConfig.getParameter<double>       ("ElectronIso"         )),
-    muonPt             (iConfig.getParameter<double>       ("MuonPt"              )),
-    muonIso            (iConfig.getParameter<double>       ("MuonIso"             )),
-    muonID             (iConfig.getParameter<std::string>  ("MuonID"              )),
-    prefix             (iConfig.getParameter<std::string>  ("Prefix"              )),
-    suffix             (iConfig.getParameter<std::string>  ("Suffix"              )),
-    maxSize            (iConfig.getParameter<unsigned int> ("MaxSize"             )) {
+  trkInputTag           (iConfig.getParameter<edm::InputTag>("TracksInputTag"       )),
+  dcsInputTag           (iConfig.getParameter<edm::InputTag>("DCSInputTag"          )),
+  inputTag              (iConfig.getParameter<edm::InputTag>("InputTag"             )),
+  vtxInputTag           (iConfig.getParameter<edm::InputTag>("VertexInputTag"       )), 
+  beamSpotInputTag      (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"     )),
+  conversionsInputTag   (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"  )),
+  electronIso           (iConfig.getParameter<double>       ("ElectronIso"          )),
+  muonPt                (iConfig.getParameter<double>       ("MuonPt"               )),
+  muonIso               (iConfig.getParameter<double>       ("MuonIso"              )),
+  muonID                (iConfig.getParameter<std::string>  ("MuonID"               )),
+  prefix                (iConfig.getParameter<std::string>  ("Prefix"               )),
+  suffix                (iConfig.getParameter<std::string>  ("Suffix"               )),
+  maxSize               (iConfig.getParameter<unsigned int> ("MaxSize"              )) {
   
   //------------------------------------------------------------------------
   // What variables will this producer push into the event?
@@ -75,6 +72,9 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "SCPhi"                    + suffix );
   produces <std::vector<double> > ( prefix + "SCPt"                     + suffix );
   produces <std::vector<double> > ( prefix + "SCRawEnergy"              + suffix );
+
+  // ID information
+  produces <std::vector<int> >    ( prefix + "PassId"                   + suffix );
   								        
   // Does this electron overlap with a muon?			        
   produces <std::vector<int> >    ( prefix + "Overlaps"                 + suffix );
@@ -172,6 +172,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  scPhi                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPt                      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scRawEnergy               ( new std::vector<double>()  );
+
+  // ID information
+  std::auto_ptr<std::vector<int > >    passIds                   ( new std::vector<int>   ()  );
   
   // Does this electron overlap with a muon?
   std::auto_ptr<std::vector<int> >     overlaps                  ( new std::vector<int>   ()  );
@@ -347,21 +350,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //  - bit 2: eidLoose
       //  - bit 3: eidTight
       //  - bit 4: eidRobustHighEnergy
+      //  - bit 5: MVA "trig" 
+      //  - bit 6: MVA "non-trig"
       //------------------------------------------------------------------------
-
-      const std::vector<pat::Electron::IdPair> & electronIDs = it->electronIDs();
-      iElectronIDs     = electronIDs.begin();
-      iElectronIDs_end = electronIDs.end();
-      std::cout << "Electron IDs:" << std::endl;
-      for (; iElectronIDs != iElectronIDs_end; ++iElectronIDs )
-	std::cout << "\t" << iElectronIDs -> first << std::endl;
- 
+      
       int passId = 0;
       if (it->electronID("eidRobustLoose"     )>0) passId = passId | 1<<0;
       if (it->electronID("eidRobustTight"     )>0) passId = passId | 1<<1;
       if (it->electronID("eidLoose"           )>0) passId = passId | 1<<2;
       if (it->electronID("eidTight"           )>0) passId = passId | 1<<3;
       if (it->electronID("eidRobustHighEnergy")>0) passId = passId | 1<<4;
+      if (it->electronID("mvaTrigV0"          )>0) passId = passId | 1<<5;
+      if (it->electronID("mvaNonTrigV0"       )>0) passId = passId | 1<<6;
 
       //------------------------------------------------------------------------
       // Relative isolation (not currently used in any analysis... remove?) 
@@ -447,6 +447,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       charge                   -> push_back ( it->charge() );
       hoe                      -> push_back ( it->hadronicOverEm() );
       
+      passIds                  -> push_back ( passId );
+
       // Supercluster kinematic variables
 
       scEta                    -> push_back( it->superCluster()->eta() );
@@ -455,6 +457,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       scRawEnergy              -> push_back( it->superCluster()->rawEnergy() );
       eSuperClusterOverP       -> push_back( it->eSuperClusterOverP() );
       
+      // ID information
+      passIds                  -> push_back( passId );
+
       // Does this electron overlap with a muon?
       overlaps                 -> push_back( ovrlps );
       
@@ -477,7 +482,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       e1x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e1x5()/it->e5x5()) : 0 );
       e2x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
 
-      // Isolation variables: DR 0.3
+      // Isolation variables: PAT
       
       trkIsoPAT                -> push_back( it->trackIso() );
       ecalIsoPAT               -> push_back( it->ecalIso() );
@@ -485,7 +490,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       relIsoPAT                -> push_back( reliso );
       passIsoPAT               -> push_back( (reliso<electronIso) ? 1 : 0 ); 
      
-      // Isolation variables: PAT
+      // Isolation variables: DR 0.3
 
       ecalIsoDR03              -> push_back ( it->dr03EcalRecHitSumEt() );
       hcalIsoDR03              -> push_back ( it->dr03HcalTowerSumEt() );
@@ -521,7 +526,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       trackVy                  -> push_back( it->gsfTrack()->vy() );
       trackVz                  -> push_back( it->gsfTrack()->vz() );
       trackPt                  -> push_back( it->gsfTrack()->pt() );
-      trackValidFractionOfHits -> push_back( validFraction ( it->gsfTrack() ) );
+      trackValidFractionOfHits -> push_back( it->gsfTrack()->validFraction() );
 
     }
   } else {
@@ -551,7 +556,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( scPt                    , prefix + "SCPt"                     + suffix );
   iEvent.put( scRawEnergy             , prefix + "SCRawEnergy"              + suffix );
 
-
+  // ID information 
+  iEvent.put( passIds                 , prefix + "PassId"                   + suffix );
+  
   // Does this electron overlap with a muon?			        
   iEvent.put( overlaps                , prefix + "Overlaps"                 + suffix );
 

@@ -8,9 +8,6 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 # load the coreTools of PAT
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
-# Remove MC matching for data analysis 
-removeMCMatching(process, ['All'])
-
 import os
 
 ############## IMPORTANT ########################################
@@ -37,7 +34,7 @@ process.TFileService = cms.Service("TFileService",
 
 # Make sure a correct global tag is used:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
-process.GlobalTag.globaltag = 'START52_V11C'
+process.GlobalTag.globaltag = 'GR_R_52_V9D::All'
 
 # Events to process
 process.maxEvents.input = 300
@@ -51,6 +48,40 @@ process.source.fileNames = [
     #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
     #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
+
+#----------------------------------------------------------------------------------------------------
+# Ensure that PF isolation for EGamma cut-based electron ID:
+# - uses recommended calculation (not the one included in gsf by default)
+# - uses a cone size of 0.3 (recommended)
+# 
+# Recommendation comes from here:
+# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification#Particle_Flow_Isolation
+# 
+# Recipe comes from here:
+# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPFBasedIsolation#for_PAT_electron_users_using_sta
+#
+# Note: This block has to go early in the python cfg, or cmsRun won't work
+#----------------------------------------------------------------------------------------------------
+
+from PhysicsTools.PatAlgos.tools.pfTools import *
+usePFIso( process )
+
+process.patElectrons.isolationValues = cms.PSet(
+    pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03PFIdPFIso"),
+    pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFIso"),
+    pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03PFIdPFIso"),
+    pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03PFIdPFIso"),
+    pfPhotons = cms.InputTag("elPFIsoValueGamma03PFIdPFIso")
+)
+
+process.patElectrons.isolationValuesNoPFId = cms.PSet(
+    pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03NoPFIdPFIso"),
+    pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03NoPFIdPFIso"),
+    pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03NoPFIdPFIso"),
+    pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03NoPFIdPFIso"),
+    pfPhotons = cms.InputTag("elPFIsoValueGamma03NoPFIdPFIso")
+)
+
 
 #----------------------------------------------------------------------------------------------------
 # Add PFMET and TCMET
@@ -317,5 +348,4 @@ swapCollectionModuleAndProductLabels(process,"particleFlow","electrons","remadeP
 #                                 fileName = cms.untracked.string('dump.root')
 #                                 )
 # process.DUMP    = cms.EndPath (process.dump)
-
 

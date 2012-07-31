@@ -15,7 +15,6 @@
 //------------------------------------------------------------------------
 
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Electrons.h"
-// #include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -105,7 +104,15 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HcalIsoPAT"               + suffix );
   produces <std::vector<double> > ( prefix + "RelIsoPAT"                + suffix );
   produces <std::vector<int> >    ( prefix + "PassIsoPAT"               + suffix );
-								        
+
+  // Isolation variables: particle flow
+  
+  produces <std::vector<double> > ( prefix + "PFParticleIso"            + suffix );
+  produces <std::vector<double> > ( prefix + "PFChargedHadronIso"       + suffix );
+  produces <std::vector<double> > ( prefix + "PFNeutralHadronIso"       + suffix );
+  produces <std::vector<double> > ( prefix + "PFPhotonIso"              + suffix );
+  produces <std::vector<double> > ( prefix + "PFPUChargedHadronIso"     + suffix );
+  
   // Isolation variables: DR 0.3				        
 								        
   produces <std::vector<double> > ( prefix + "EcalIsoDR03"              + suffix );
@@ -128,6 +135,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<int> >    ( prefix + "VtxIndex"                 + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistXY"                + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ"                 + suffix );
+  produces <std::vector<double> > ( prefix + "LeadVtxDistXY"            + suffix );
+  produces <std::vector<double> > ( prefix + "LeadVtxDistZ"             + suffix );
   produces <std::vector<double> > ( prefix + "PrimaryVertexDXY"         + suffix );
   produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError"    + suffix );
   produces <std::vector<double> > ( prefix + "BeamSpotDXY"              + suffix );
@@ -206,6 +215,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  relIsoPAT                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     passIsoPAT                ( new std::vector<int>   ()  );
 
+  // Isolation variables: particle flow 
+  
+  std::auto_ptr<std::vector<double> >  pfParticleIso             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfChargedHadronIso        ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfNeutralHadronIso        ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfPhotonIso               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfPUChargedHadronIso      ( new std::vector<double>()  );
+  
   // Isolation variables: DR 0.3
 
   std::auto_ptr<std::vector<double> >  ecalIsoDR03               ( new std::vector<double>()  );
@@ -228,6 +245,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<int> >     vtxIndex                  ( new std::vector<int>   ()  );
   std::auto_ptr<std::vector<double> >  vtxDistXY                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  vtx0DistXY                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  vtx0DistZ                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  primaryVertexDXY          ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  primaryVertexDXYError     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  beamspotDXY               ( new std::vector<double>()  );
@@ -411,15 +430,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       int vtxIndex_ = -1;
       double vtxDistXY_ = -9999.;
       double vtxDistZ_ = -9999.;
+      
+      double vtx0DistXY_;
+      double vtx0DistZ_;
 
       if(primaryVertices.isValid()) {
         edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
+	int i_vertex = 0;
         for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ) {
 
           double distXY = it->gsfTrack()->dxy(v_it->position());
           double distZ = it->gsfTrack()->dz(v_it->position());
           double dist3D = sqrt(pow(distXY,2) + pow(distZ,2));
+
+	  if ( i_vertex == 0 ) { 
+	    vtx0DistXY_ = distXY;
+	    vtx0DistZ_  = distZ ;
+	  }
 
           if( dist3D<minVtxDist3D ) {
             minVtxDist3D = dist3D;
@@ -427,6 +455,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
             vtxDistXY_ = distXY;
             vtxDistZ_ = distZ;
           }
+
+	  i_vertex++;
         }
       } else {
         edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
@@ -489,7 +519,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hcalIsoPAT               -> push_back( it->hcalIso() );
       relIsoPAT                -> push_back( reliso );
       passIsoPAT               -> push_back( (reliso<electronIso) ? 1 : 0 ); 
-     
+
+      // Isolation variables: particle flow
+
+      pfParticleIso            -> push_back ( it->particleIso       () );
+      pfChargedHadronIso       -> push_back ( it->chargedHadronIso  () );
+      pfNeutralHadronIso       -> push_back ( it->neutralHadronIso  () );
+      pfPhotonIso              -> push_back ( it->photonIso         () );
+      pfPUChargedHadronIso     -> push_back ( it->puChargedHadronIso() );
+      
       // Isolation variables: DR 0.3
 
       ecalIsoDR03              -> push_back ( it->dr03EcalRecHitSumEt() );
@@ -515,6 +553,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       vtxIndex                 -> push_back( vtxIndex_  );
       vtxDistXY                -> push_back( vtxDistXY_ );
       vtxDistZ                 -> push_back( vtxDistZ_  );
+      vtx0DistXY               -> push_back( vtx0DistXY_);
+      vtx0DistZ                -> push_back( vtx0DistZ_ );
       primaryVertexDXY         -> push_back( fabs( it->dB() ) );      
       primaryVertexDXYError    -> push_back( fabs( it->edB() ) );
       beamspotDXY              -> push_back( fabs( it->dB (pat::Electron::BS2D) ) );
@@ -598,6 +638,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( hcalIsoD2DR03           , prefix + "HcalIsoD2DR03"            + suffix );
   iEvent.put( trkIsoDR03              , prefix + "TrkIsoDR03"               + suffix );
 
+  // Isolation variables: particle flow
+
+  iEvent.put( pfParticleIso           , prefix + "PFParticleIso"            + suffix );
+  iEvent.put( pfChargedHadronIso      , prefix + "PFChargedHadronIso"       + suffix );
+  iEvent.put( pfNeutralHadronIso      , prefix + "PFNeutralHadronIso"       + suffix );
+  iEvent.put( pfPhotonIso             , prefix + "PFPhotonIso"              + suffix );
+  iEvent.put( pfPUChargedHadronIso    , prefix + "PFPUChargedHadronIso"     + suffix );
+
   // Conversion variables					        
   
   iEvent.put( missingHits             , prefix + "MissingHits"              + suffix );
@@ -611,6 +659,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( vtxIndex                , prefix + "VtxIndex"                 + suffix );
   iEvent.put( vtxDistXY               , prefix + "VtxDistXY"                + suffix );
   iEvent.put( vtxDistZ                , prefix + "VtxDistZ"                 + suffix );
+  iEvent.put( vtx0DistXY              , prefix + "LeadVtxDistXY"            + suffix );
+  iEvent.put( vtx0DistZ               , prefix + "LeadVtxDistZ"             + suffix );
   iEvent.put( primaryVertexDXY        , prefix + "PrimaryVertexDXY"         + suffix );
   iEvent.put( primaryVertexDXYError   , prefix + "PrimaryVertexDXYError"    + suffix );
   iEvent.put( beamspotDXY             , prefix + "BeamSpotDXY"              + suffix );

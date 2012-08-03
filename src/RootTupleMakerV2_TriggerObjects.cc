@@ -69,30 +69,32 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       std::string          name = triggerEvent -> filterTag ( iFilter ).label();
       const trigger::Keys& keys = triggerEvent -> filterKeys( iFilter );
+      const trigger::Vids& vids = triggerEvent -> filterIds ( iFilter );
       
       //------------------------------------------------------------------------
       // Loop over the keys to get to the trigger objects that pass the filter
       //------------------------------------------------------------------------
       
-      trigger::Keys::const_iterator iKey   = keys.begin();
-      trigger::Keys::const_iterator endKey = keys.end();
+      int nKeys = (int) keys.size();
+      int nVids = (int) vids.size();
+      assert ( nKeys == nVids ) ;
 
       // useful variables
-      int nFilterObjects = 0;
       std::vector<TLorentzVector> triggerObjectP4s;
       std::vector<int>            triggerObjectIds;
       
-      for (; iKey != endKey ; ++iKey ) {
+      for (int iTriggerObject = 0; iTriggerObject < nKeys; ++iTriggerObject ) { 
 
-	// Keep track of how many filter objects there are
+	// Get the object ID and key
+
+	int                id  = vids[iTriggerObject];
+	trigger::size_type key = keys[iTriggerObject];
+
+	// Get the trigger object from the key
+
+	const trigger::TriggerObject & triggerObject = triggerObjects [key];
 	
-	++nFilterObjects;
-
-	// Get the trigger object associated with this key
-
-	const trigger::TriggerObject & triggerObject = triggerObjects [*iKey];
-
-	// Store the trigger object as a TLorentzVector
+	// Store the trigger object as a TLorentzVector (borrowed from S. Harper)
 
 	TLorentzVector p4;
 	p4.SetPtEtaPhiM ( triggerObject.pt  (),
@@ -101,7 +103,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 			  triggerObject.mass() );
 
 	triggerObjectP4s.push_back ( p4 ) ;
-	triggerObjectIds.push_back ( int(triggerObject.id()));
+	triggerObjectIds.push_back ( id ) ;
 	
       } // end loop over keys/trigger objects passing filters
 
@@ -109,7 +111,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // If the filter passed, store its information
       //------------------------------------------------------------------------
 
-      if ( nFilterObjects > 0 ) { 
+      if ( nKeys > 0 ) { 
 	
 	v_filter_names -> push_back ( name                 );
 	v_filter_ids   -> push_back ( std::vector<int  >() );
@@ -117,7 +119,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	v_filter_etas  -> push_back ( std::vector<float>() );
 	v_filter_phis  -> push_back ( std::vector<float>() ); 
 	
-	for (int iFilterObject = 0; iFilterObject < nFilterObjects; ++iFilterObject) {
+	for (int iFilterObject = 0; iFilterObject < nKeys; ++iFilterObject) {
 
 	  int id = int (triggerObjectIds[iFilterObject]);
 

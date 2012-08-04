@@ -82,6 +82,17 @@ process.patElectrons.isolationValuesNoPFId = cms.PSet(
     pfPhotons = cms.InputTag("elPFIsoValueGamma03NoPFIdPFIso")
 )
 
+#----------------------------------------------------------------------------------------------------
+# Turn on trigger matching
+#----------------------------------------------------------------------------------------------------
+
+# define a trigger matcher
+# from Leptoquarks.RootTupleMakerV2.triggerMatching_cfi  import cleanElectronTriggerMatch_HLTElectron_HEEPandWP80
+# process.myMatcher = cleanElectronTriggerMatch_HLTElectron_HEEPandWP80.clone()
+# load the PAT trigger Python tools
+# from PhysicsTools.PatAlgos.tools.trigTools import *
+# switch on the trigger matching
+# switchOnTriggerMatching( process, [process.myMatcher] )
 
 #----------------------------------------------------------------------------------------------------
 # Add PFMET and TCMET
@@ -244,6 +255,24 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 ##################################################################
 
 #----------------------------------------------------------------------------------------------------
+# PDF weights
+#----------------------------------------------------------------------------------------------------
+
+# Produce PDF weights (maximum is 3)
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+    # Fix POWHEG if buggy (this PDF set will also appear on output,
+    # so only two more PDF sets can be added in PdfSetNames if not "")
+    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
+    #GenTag = cms.untracked.InputTag("genParticles"),
+    PdfInfoTag = cms.untracked.InputTag("generator"),
+    PdfSetNames = cms.untracked.vstring(
+            "cteq66.LHgrid"
+          #, "MRST2006nnlo.LHgrid"
+          #, "MRST2007lomod.LHgrid"
+    )
+)
+
+#----------------------------------------------------------------------------------------------------
 # Define the output tree for RootTupleMakerV2
 #----------------------------------------------------------------------------------------------------
 
@@ -268,6 +297,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFChargedMET_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleTrigger_*_*',
+        'keep *_rootTupleTriggerObjects_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
@@ -284,6 +314,8 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 #----------------------------------------------------------------------------------------------------
 
 process.p = cms.Path(
+    # pdf weights
+    # process.pdfWeights*
     # Use correct electron energies and re-run the electron ID sequence and particle flow link sequence
     process.gsfElectronsHEEPCorr*process.eIdSequence*process.remadePFEleLinks*
     # MVA electron ID
@@ -317,6 +349,7 @@ process.p = cms.Path(
     # process.rootTuplePFChargedMET+
     process.rootTupleMuons+
     process.rootTupleTrigger+
+    process.rootTupleTriggerObjects+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+

@@ -326,7 +326,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 
 process.p = cms.Path(
     # pdf weights
-    # process.pdfWeights*
+    process.pdfWeights*
     # Use correct electron energies and re-run the electron ID sequence and particle flow link sequence
     process.gsfElectronsHEEPCorr*process.eIdSequence*process.remadePFEleLinks*
     # MVA electron ID

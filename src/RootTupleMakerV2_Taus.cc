@@ -66,7 +66,7 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "AgainstElectronDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstMuonDiscr"  + suffix );
     //
-    produces <std::vector<double> > ( prefix + "TaNCDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "TaNCDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "TaNCfrOnePercentDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "TaNCfrHalfPercentDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "TaNCfrQuarterPercentDiscr"  + suffix );
@@ -105,18 +105,20 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsPhi"  + suffix );
     produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsCount"  + suffix );
     //
-    produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsPt"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsEta"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsPhi"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsCount"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsPt"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsEta"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsPhi"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsCount"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsPt"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsEta"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsPhi"  + suffix );
-    produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsCount"  + suffix );
+    // Optional Isolation information
+    //produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsPt"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsEta"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsPhi"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFChargedHadrCandsCount"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsPt"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsEta"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsPhi"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFNeutrHadrCandsCount"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsPt"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsEta"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsPhi"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "IsolationPFGammaCandsCount"  + suffix );
+    //
   }
   //
 }
@@ -198,18 +200,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  signalpfgammacandsphi ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  signalpfgammacandscount ( new std::vector<double>()   );
   //
-  std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandspt  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandseta  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandsphi  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandscount  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandspt  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandseta  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandsphi  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandscount  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfgammacandspt ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfgammacandseta ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfgammacandsphi ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  isolationpfgammacandscount ( new std::vector<double>()   );
+  // Optional Isolation information
+  //std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandspt  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandseta  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandsphi  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandscount  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandspt  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandseta  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandsphi  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfneutrhadrcandscount  ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfgammacandspt ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfgammacandseta ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfgammacandsphi ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  isolationpfgammacandscount ( new std::vector<double>()   );
   //
   edm::Handle<std::vector<pat::Tau> > taus;
   iEvent.getByLabel(inputTag, taus);
@@ -342,8 +345,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //
       if(isHPSTau){
 	reco::PFCandidateRefVector signalPFChargedHadrCands_RefVector = it->signalPFChargedHadrCands();
-	signalpfchargedhadrcandscount -> push_back((double)(signalPFChargedHadrCands_RefVector.size()));
+	double signalPFChargedHadrCands_RefVector_size=0;
 	if(signalPFChargedHadrCands_RefVector.isNonnull()){
+	  signalPFChargedHadrCands_RefVector_size=(double)(signalPFChargedHadrCands_RefVector.size());
 	  reco::PFCandidateRefVector::iterator itSignalChargedHad     = signalPFChargedHadrCands_RefVector.begin();
 	  reco::PFCandidateRefVector::iterator itSignalChargedHad_end = signalPFChargedHadrCands_RefVector.end();
 	  for (; itSignalChargedHad != itSignalChargedHad_end; ++itSignalChargedHad ) {
@@ -352,9 +356,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	    signalpfchargedhadrcandsphi -> push_back((double)(*itSignalChargedHad)->phi());
 	  }
 	}
+	signalpfchargedhadrcandscount -> push_back(signalPFChargedHadrCands_RefVector_size);
+	//
 	reco::PFCandidateRefVector signalPFNeutrHadrCands_RefVector = it->signalPFNeutrHadrCands();
-	signalpfneutrhadrcandscount -> push_back((double)(signalPFNeutrHadrCands_RefVector.size()));
+	double signalPFNeutrHadrCands_RefVector_size=0;
 	if(signalPFNeutrHadrCands_RefVector.isNonnull()){
+  	  signalPFNeutrHadrCands_RefVector_size=(double)(signalPFNeutrHadrCands_RefVector.size());
 	  reco::PFCandidateRefVector::iterator itSignalNeutrHadr     = signalPFNeutrHadrCands_RefVector.begin();
 	  reco::PFCandidateRefVector::iterator itSignalNeutrHadr_end = signalPFNeutrHadrCands_RefVector.end();
 	  for (; itSignalNeutrHadr != itSignalNeutrHadr_end; ++itSignalNeutrHadr ) {
@@ -363,9 +370,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	    signalpfneutrhadrcandsphi -> push_back((double)(*itSignalNeutrHadr)->phi());	
 	  }
 	}
+	signalpfneutrhadrcandscount -> push_back(signalPFNeutrHadrCands_RefVector_size);
+	//
 	reco::PFCandidateRefVector signalPFGammaCands_RefVector = it->signalPFGammaCands();
-	signalpfgammacandscount -> push_back((double)(signalPFGammaCands_RefVector.size()));		 
+	double signalPFGammaCands_RefVector_size=0;
 	if(signalPFGammaCands_RefVector.isNonnull()){
+	  signalPFGammaCands_RefVector_size=(double)(signalPFGammaCands_RefVector.size());
 	  reco::PFCandidateRefVector::iterator itSignalGamma     = signalPFGammaCands_RefVector.begin();
 	  reco::PFCandidateRefVector::iterator itSignalGamma_end = signalPFGammaCands_RefVector.end();
 	  for (; itSignalGamma != itSignalGamma_end; ++itSignalGamma ) {
@@ -374,40 +384,43 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	    signalpfgammacandsphi -> push_back((double)(*itSignalGamma)->phi());
 	  }
 	}
+	signalpfgammacandscount -> push_back(signalPFGammaCands_RefVector_size);
 	//	
-	reco::PFCandidateRefVector isoPFChargedHadrCands_RefVector = it->isolationPFChargedHadrCands();
-	isolationpfchargedhadrcandscount ->push_back((double)(isoPFChargedHadrCands_RefVector.size()));
-	if(isoPFChargedHadrCands_RefVector.isNonnull()){
-	  reco::PFCandidateRefVector::iterator itIsoChargedHad     = isoPFChargedHadrCands_RefVector.begin();
-	  reco::PFCandidateRefVector::iterator itIsoChargedHad_end = isoPFChargedHadrCands_RefVector.end();
-	  for (; itIsoChargedHad != itIsoChargedHad_end; ++itIsoChargedHad ) {
-	    isolationpfchargedhadrcandspt  -> push_back((double)(*itIsoChargedHad)->pt());
-	    isolationpfchargedhadrcandseta -> push_back((double)(*itIsoChargedHad)->eta());
-	    isolationpfchargedhadrcandsphi -> push_back((double)(*itIsoChargedHad)->phi());
-	  }
-	}
-	reco::PFCandidateRefVector isoPFNeutrHadrCands_RefVector = it->isolationPFNeutrHadrCands();
-	isolationpfneutrhadrcandscount -> push_back((double)(isoPFNeutrHadrCands_RefVector.size()));
-	if(isoPFNeutrHadrCands_RefVector.isNonnull()){
-	  reco::PFCandidateRefVector::iterator itIsoNeutrHadr     = isoPFNeutrHadrCands_RefVector.begin();
-	  reco::PFCandidateRefVector::iterator itIsoNeutrHadr_end = isoPFNeutrHadrCands_RefVector.end();
-	  for (; itIsoNeutrHadr != itIsoNeutrHadr_end; ++itIsoNeutrHadr ) {
-	    isolationpfneutrhadrcandspt  -> push_back((double)(*itIsoNeutrHadr)->pt());
-	    isolationpfneutrhadrcandseta -> push_back((double)(*itIsoNeutrHadr)->eta());
-	    isolationpfneutrhadrcandsphi -> push_back((double)(*itIsoNeutrHadr)->phi());
-	  }
-	}
-	reco::PFCandidateRefVector isoPFGammaCands_RefVector = it->isolationPFGammaCands();
-	isolationpfgammacandscount -> push_back((double)(isoPFGammaCands_RefVector.size()));
-	if(isoPFGammaCands_RefVector.isNonnull()){
-	  reco::PFCandidateRefVector::iterator itIsoGamma     = isoPFGammaCands_RefVector.begin();
-	  reco::PFCandidateRefVector::iterator itIsoGamma_end = isoPFGammaCands_RefVector.end();
-	  for (; itIsoGamma != itIsoGamma_end; ++itIsoGamma ) {
-	    isolationpfgammacandspt  -> push_back((double)(*itIsoGamma)->pt());
-	    isolationpfgammacandseta -> push_back((double)(*itIsoGamma)->eta());
-	    isolationpfgammacandsphi -> push_back((double)(*itIsoGamma)->phi());
-	  }
-	}
+	// Optional Isolation information
+	//reco::PFCandidateRefVector isoPFChargedHadrCands_RefVector = it->isolationPFChargedHadrCands();
+	//isolationpfchargedhadrcandscount ->push_back((double)(isoPFChargedHadrCands_RefVector.size()));
+	//if(isoPFChargedHadrCands_RefVector.isNonnull()){
+	//  reco::PFCandidateRefVector::iterator itIsoChargedHad     = isoPFChargedHadrCands_RefVector.begin();
+	//  reco::PFCandidateRefVector::iterator itIsoChargedHad_end = isoPFChargedHadrCands_RefVector.end();
+	//  for (; itIsoChargedHad != itIsoChargedHad_end; ++itIsoChargedHad ) {
+	//    isolationpfchargedhadrcandspt  -> push_back((double)(*itIsoChargedHad)->pt());
+	//    isolationpfchargedhadrcandseta -> push_back((double)(*itIsoChargedHad)->eta());
+	//    isolationpfchargedhadrcandsphi -> push_back((double)(*itIsoChargedHad)->phi());
+	//  }
+	//}
+	//reco::PFCandidateRefVector isoPFNeutrHadrCands_RefVector = it->isolationPFNeutrHadrCands();
+	//isolationpfneutrhadrcandscount -> push_back((double)(isoPFNeutrHadrCands_RefVector.size()));
+	//if(isoPFNeutrHadrCands_RefVector.isNonnull()){
+	//  reco::PFCandidateRefVector::iterator itIsoNeutrHadr     = isoPFNeutrHadrCands_RefVector.begin();
+	//  reco::PFCandidateRefVector::iterator itIsoNeutrHadr_end = isoPFNeutrHadrCands_RefVector.end();
+	//  for (; itIsoNeutrHadr != itIsoNeutrHadr_end; ++itIsoNeutrHadr ) {
+	//    isolationpfneutrhadrcandspt  -> push_back((double)(*itIsoNeutrHadr)->pt());
+	//    isolationpfneutrhadrcandseta -> push_back((double)(*itIsoNeutrHadr)->eta());
+	//    isolationpfneutrhadrcandsphi -> push_back((double)(*itIsoNeutrHadr)->phi());
+	//  }
+	//}
+	//reco::PFCandidateRefVector isoPFGammaCands_RefVector = it->isolationPFGammaCands();
+	//isolationpfgammacandscount -> push_back((double)(isoPFGammaCands_RefVector.size()));
+	//if(isoPFGammaCands_RefVector.isNonnull()){
+	//  reco::PFCandidateRefVector::iterator itIsoGamma     = isoPFGammaCands_RefVector.begin();
+	//  reco::PFCandidateRefVector::iterator itIsoGamma_end = isoPFGammaCands_RefVector.end();
+	//  for (; itIsoGamma != itIsoGamma_end; ++itIsoGamma ) {
+	//    isolationpfgammacandspt  -> push_back((double)(*itIsoGamma)->pt());
+	//    isolationpfgammacandseta -> push_back((double)(*itIsoGamma)->eta());
+	//    isolationpfgammacandsphi -> push_back((double)(*itIsoGamma)->phi());
+	//  }
+	//}
+	//
       }
       //
     }
@@ -489,17 +502,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.put( signalpfgammacandsphi,        prefix +  "SignalPFGammaCandsPhi"        + suffix );
     iEvent.put( signalpfgammacandscount,      prefix +  "SignalPFGammaCandsCount"      + suffix );
     //
-    iEvent.put( isolationpfchargedhadrcandspt,   prefix +  "IsolationPFChargedHadrCandsPt"   + suffix );
-    iEvent.put( isolationpfchargedhadrcandseta,  prefix +  "IsolationPFChargedHadrCandsEta"  + suffix );
-    iEvent.put( isolationpfchargedhadrcandsphi,  prefix +  "IsolationPFChargedHadrCandsPhi"  + suffix );
-    iEvent.put( isolationpfchargedhadrcandscount,prefix +  "IsolationPFChargedHadrCandsCount"+ suffix );
-    iEvent.put( isolationpfneutrhadrcandspt,     prefix +  "IsolationPFNeutrHadrCandsPt"     + suffix );
-    iEvent.put( isolationpfneutrhadrcandseta,    prefix +  "IsolationPFNeutrHadrCandsEta"    + suffix );
-    iEvent.put( isolationpfneutrhadrcandsphi,    prefix +  "IsolationPFNeutrHadrCandsPhi"    + suffix );
-    iEvent.put( isolationpfneutrhadrcandscount,  prefix +  "IsolationPFNeutrHadrCandsCount"  + suffix );
-    iEvent.put( isolationpfgammacandspt,         prefix +  "IsolationPFGammaCandsPt"         + suffix );
-    iEvent.put( isolationpfgammacandseta,        prefix +  "IsolationPFGammaCandsEta"        + suffix );
-    iEvent.put( isolationpfgammacandsphi,        prefix +  "IsolationPFGammaCandsPhi"        + suffix );
-    iEvent.put( isolationpfgammacandscount,      prefix +  "IsolationPFGammaCandsCount"      + suffix );
+    // Optional Isolation information
+    //iEvent.put( isolationpfchargedhadrcandspt,   prefix +  "IsolationPFChargedHadrCandsPt"   + suffix );
+    //iEvent.put( isolationpfchargedhadrcandseta,  prefix +  "IsolationPFChargedHadrCandsEta"  + suffix );
+    //iEvent.put( isolationpfchargedhadrcandsphi,  prefix +  "IsolationPFChargedHadrCandsPhi"  + suffix );
+    //iEvent.put( isolationpfchargedhadrcandscount,prefix +  "IsolationPFChargedHadrCandsCount"+ suffix );
+    //iEvent.put( isolationpfneutrhadrcandspt,     prefix +  "IsolationPFNeutrHadrCandsPt"     + suffix );
+    //iEvent.put( isolationpfneutrhadrcandseta,    prefix +  "IsolationPFNeutrHadrCandsEta"    + suffix );
+    //iEvent.put( isolationpfneutrhadrcandsphi,    prefix +  "IsolationPFNeutrHadrCandsPhi"    + suffix );
+    //iEvent.put( isolationpfneutrhadrcandscount,  prefix +  "IsolationPFNeutrHadrCandsCount"  + suffix );
+    //iEvent.put( isolationpfgammacandspt,         prefix +  "IsolationPFGammaCandsPt"         + suffix );
+    //iEvent.put( isolationpfgammacandseta,        prefix +  "IsolationPFGammaCandsEta"        + suffix );
+    //iEvent.put( isolationpfgammacandsphi,        prefix +  "IsolationPFGammaCandsPhi"        + suffix );
+    //iEvent.put( isolationpfgammacandscount,      prefix +  "IsolationPFGammaCandsCount"      + suffix );
+    //
   }
 }

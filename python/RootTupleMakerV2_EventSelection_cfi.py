@@ -16,11 +16,11 @@ rootTupleEventSelection = cms.EDProducer("RootTupleMakerV2_EventSelection",
     TrackingFailureDxyTrVtxMax    = cms.double(0.2),
     TrackingFailureMinSumPtOverHT = cms.double(0.10),
     EcalMaskedCellDRFilterInputTag = cms.InputTag('simpleDRfilter','deadCellStatus'),
-    CaloBoundaryDRFilterInputTag = cms.InputTag('simpleDRfilter','boundaryStatus')
+    CaloBoundaryDRFilterInputTag = cms.InputTag('simpleDRfilter','boundaryStatus'),
     #
-    HcalLaserEventFilterInputTag               = cms.InputTag('hcalLaserEventFilter');
-    EcalDeadCellTriggerPrimitiveFilterInputTag = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter');
-    EcalDeadCellBoundaryEnergyFilterInputTag   = cms.InputTag('EcalDeadCellBoundaryEnergyFilter');
-    TrackingFailureFilterInputTag              = cms.InputTag('trackingFailureFilter');
-    BadEESupercrystalFilterInputTag            = cms.InputTag('eeBadScFilter');
+    HcalLaserEventFilterInputTag               = cms.InputTag('hcalLaserEventFilter'),
+    EcalDeadCellTriggerPrimitiveFilterInputTag = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
+    EcalDeadCellBoundaryEnergyFilterInputTag   = cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
+    TrackingFailureFilterInputTag              = cms.InputTag('trackingFailureFilter'),
+    BadEESupercrystalFilterInputTag            = cms.InputTag('eeBadScFilter')
 )

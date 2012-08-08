@@ -26,7 +26,9 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
   const double trackingFilterMinSumPtOverHT;
 
   const edm::InputTag   ecalMaskedCellDRFilterInputTag , caloBoundaryDRFilterInputTag;
-
+  //
+  const edm::InputTag   hcalLaserEventFilterInputTag , ecalDeadCellTriggerPrimitiveFilterInputTag , ecalDeadCellBoundaryEnergyFilterInputTag;
+  const edm::InputTag   trackingFailureFilterInputTag , badEESupercrystalFilterInputTag;
 };
 
 #endif

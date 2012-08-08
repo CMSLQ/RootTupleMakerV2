@@ -9,6 +9,7 @@
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
+//#include "RecoMET/METFilters/interface/EcalBoundaryInfoCalculator.h"
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
     l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
@@ -26,7 +27,13 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
     trackingFilterDxyTrVtxMax   (iConfig.getParameter<double>       ("TrackingFailureDxyTrVtxMax")) ,
     trackingFilterMinSumPtOverHT(iConfig.getParameter<double>       ("TrackingFailureMinSumPtOverHT")),
     ecalMaskedCellDRFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalMaskedCellDRFilterInputTag")),
-    caloBoundaryDRFilterInputTag(iConfig.getParameter<edm::InputTag>("CaloBoundaryDRFilterInputTag"))
+    caloBoundaryDRFilterInputTag(iConfig.getParameter<edm::InputTag>("CaloBoundaryDRFilterInputTag")),
+    //
+    hcalLaserEventFilterInputTag(iConfig.getParameter<edm::InputTag>("HcalLaserEventFilterInputTag")),
+    ecalDeadCellTriggerPrimitiveFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellTriggerPrimitiveFilterInputTag")),
+    ecalDeadCellBoundaryEnergyFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellBoundaryEnergyFilterInputTag")),
+    trackingFailureFilterInputTag(iConfig.getParameter<edm::InputTag>("TrackingFailureFilterInputTag")),
+    badEESupercrystalFilterInputTag(iConfig.getParameter<edm::InputTag>("BadEESupercrystalFilterInputTag"))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -40,6 +47,12 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("isTrackingFailure");
   produces <bool> ("passEcalMaskedCellDRFilter");
   produces <bool> ("passCaloBoundaryDRFilter");
+  //
+  produces <bool> ("passHcalLaserEventFilter");
+  produces <bool> ("passEcalDeadCellTriggerPrimitiveFilter");
+  produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
+  produces <bool> ("passTrackingFailureFilter");
+  produces <bool> ("passBadEESupercrystalFilter");
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -57,6 +70,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> istrackingfailure ( new bool() ) ;
   std::auto_ptr<bool> passEcalMaskedCellDRFilter ( new bool() ) ;
   std::auto_ptr<bool> passCaloBoundaryDRFilter ( new bool() ) ;
+  //
+  std::auto_ptr<bool> passHcalLaserEventFilter ( new bool() ) ;
+  std::auto_ptr<bool> passEcalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
+  std::auto_ptr<bool> passEcalDeadCellBoundaryEnergyFilter ( new bool() ) ;
+  std::auto_ptr<bool> passTrackingFailureFilter ( new bool() ) ;
+  std::auto_ptr<bool> passBadEESupercrystalFilter ( new bool() ) ;
 
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
@@ -69,6 +88,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passbeamhalofiltertight.get() = true;
   *passEcalMaskedCellDRFilter.get() = true;
   *passCaloBoundaryDRFilter.get() = true;
+  //
+  *passHcalLaserEventFilter.get()               = true;
+  *passEcalDeadCellTriggerPrimitiveFilter.get() = true;
+  *passEcalDeadCellBoundaryEnergyFilter.get()   = true;
+  *passTrackingFailureFilter.get()              = true;
+  *passBadEESupercrystalFilter.get()            = true;
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
@@ -206,6 +231,47 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //    } else {
   //      edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << caloBoundaryDRFilterInputTag;
   //    }
+
+
+  //HCAL laser filter:
+  edm::Handle<bool> HcalLaserEventFilterResult;
+  iEvent.getByLabel(hcalLaserEventFilterInputTag, HcalLaserEventFilterResult);
+  if(HcalLaserEventFilterResult.isValid()) {
+    if((*HcalLaserEventFilterResult)==false)std::cout<<"              passHcalLaserEventFilter: "<<(*HcalLaserEventFilterResult)<<std::endl;
+    *passHcalLaserEventFilter.get()=!(*HcalLaserEventFilterResult);
+  }
+
+  // ECAL dead cell filter:
+  edm::Handle<bool> EcalDeadCellTriggerPrimitiveFilterResult;
+  iEvent.getByLabel(ecalDeadCellTriggerPrimitiveFilterInputTag, EcalDeadCellTriggerPrimitiveFilterResult);
+  if(EcalDeadCellTriggerPrimitiveFilterResult.isValid()) {
+    if((*EcalDeadCellTriggerPrimitiveFilterResult)==false)std::cout<<"passEcalDeadCellTriggerPrimitiveFilter: "<<(*EcalDeadCellTriggerPrimitiveFilterResult)<<std::endl;
+    *passEcalDeadCellTriggerPrimitiveFilter.get()=!(*EcalDeadCellTriggerPrimitiveFilterResult);
+  }
+  edm::Handle<bool> EcalDeadCellBoundaryEnergyFilterResult;
+  iEvent.getByLabel(ecalDeadCellBoundaryEnergyFilterInputTag, EcalDeadCellBoundaryEnergyFilterResult);
+  if(EcalDeadCellBoundaryEnergyFilterResult.isValid()) {
+    if((*EcalDeadCellBoundaryEnergyFilterResult)==false)std::cout<<"  passEcalDeadCellBoundaryEnergyFilter: "<<(*EcalDeadCellBoundaryEnergyFilterResult)<<std::endl;
+    *passEcalDeadCellBoundaryEnergyFilter.get()=!(*EcalDeadCellBoundaryEnergyFilterResult);
+  }
+
+  //Tracking failure filter:
+  edm::Handle<bool> TrackingFailureFilterResult;
+  iEvent.getByLabel(trackingFailureFilterInputTag, TrackingFailureFilterResult);
+  if(TrackingFailureFilterResult.isValid()) {
+    if((*TrackingFailureFilterResult)==false)std::cout<<"             passTrackingFailureFilter: "<<(*TrackingFailureFilterResult)<<std::endl;
+    *passTrackingFailureFilter.get()=!(*TrackingFailureFilterResult);
+  }
+
+  //Bad EE Supercrystal Filter  
+  edm::Handle<bool> BadEESupercrystalFilterResult;
+  iEvent.getByLabel(badEESupercrystalFilterInputTag, BadEESupercrystalFilterResult);
+  if(BadEESupercrystalFilterResult.isValid()) {
+    if((*BadEESupercrystalFilterResult)==false)std::cout<<"           passBadEESupercrystalFilter: "<< (*BadEESupercrystalFilterResult) <<std::endl;
+    *passBadEESupercrystalFilter.get()=!(*BadEESupercrystalFilterResult);
+  }
+
+
   
 
   //-----------------------------------------------------------------
@@ -221,5 +287,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(istrackingfailure, "isTrackingFailure");
   iEvent.put(passEcalMaskedCellDRFilter, "passEcalMaskedCellDRFilter");
   iEvent.put(passCaloBoundaryDRFilter, "passCaloBoundaryDRFilter");
-
+  //
+  iEvent.put(passHcalLaserEventFilter,"passHcalLaserEventFilter");
+  iEvent.put(passEcalDeadCellTriggerPrimitiveFilter,"passEcalDeadCellTriggerPrimitiveFilter");
+  iEvent.put(passEcalDeadCellBoundaryEnergyFilter,"passEcalDeadCellBoundaryEnergyFilter");
+  iEvent.put(passTrackingFailureFilter,"passTrackingFailureFilter");
+  iEvent.put(passBadEESupercrystalFilter, "passBadEESupercrystalFilter");
 }

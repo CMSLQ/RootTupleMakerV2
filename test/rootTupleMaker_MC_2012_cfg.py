@@ -84,15 +84,24 @@ process.patElectrons.isolationValuesNoPFId = cms.PSet(
 
 #----------------------------------------------------------------------------------------------------
 # Turn on trigger matching
+# 
+# Example taken from PAT SWGuide twiki
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTriggerMatchExercise#TrigProduce
+#
+# Don't include this line (recommended by instructions): removeCleaningFromTriggerMatching( process )
+# It will break the matching.
 #----------------------------------------------------------------------------------------------------
 
-# define a trigger matcher
-# from Leptoquarks.RootTupleMakerV2.triggerMatching_cfi  import cleanElectronTriggerMatch_HLTElectron_HEEPandWP80
-# process.myMatcher = cleanElectronTriggerMatch_HLTElectron_HEEPandWP80.clone()
 # load the PAT trigger Python tools
-# from PhysicsTools.PatAlgos.tools.trigTools import *
+from PhysicsTools.PatAlgos.tools.trigTools import *
+
 # switch on the trigger matching
-# switchOnTriggerMatching( process, [process.myMatcher] )
+switchOnTriggerMatching( process, triggerMatchers = [
+        # electrons 
+        'cleanElectronTriggerMatchHLTSingleElectron',
+        'cleanElectronTriggerMatchHLTSingleElectronWP80',
+        'cleanElectronTriggerMatchHLTDoubleElectron'
+] )
 
 #----------------------------------------------------------------------------------------------------
 # Add PFMET and TCMET
@@ -382,3 +391,9 @@ swapCollectionModuleAndProductLabels(process,"particleFlow","electrons","remadeP
 #                                 )
 # process.DUMP    = cms.EndPath (process.dump)
 
+# Delete predefined Endpath (needed for running with CRAB)
+del process.out
+del process.outpath
+
+# Schedule definition
+process.schedule = cms.Schedule(process.p)

@@ -1,13 +1,6 @@
 //------------------------------------------------------------------------
 // To do:
-//
 // - Muon isolation (for overlaps) is done with relative isolation.  Is this correct?
-// 
-// - EGamma cut-based ID variables need to be checked / updated
-//   https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification
-//
-// - Conversion information needs to be checked / updated
-//
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
@@ -29,25 +22,32 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 //------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------s
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
-  trkInputTag           (iConfig.getParameter<edm::InputTag>("TracksInputTag"       )),
-  dcsInputTag           (iConfig.getParameter<edm::InputTag>("DCSInputTag"          )),
-  inputTag              (iConfig.getParameter<edm::InputTag>("InputTag"             )),
-  vtxInputTag           (iConfig.getParameter<edm::InputTag>("VertexInputTag"       )), 
-  beamSpotInputTag      (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"     )),
-  conversionsInputTag   (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"  )),
-  electronIso           (iConfig.getParameter<double>       ("ElectronIso"          )),
-  muonPt                (iConfig.getParameter<double>       ("MuonPt"               )),
-  muonIso               (iConfig.getParameter<double>       ("MuonIso"              )),
-  muonID                (iConfig.getParameter<std::string>  ("MuonID"               )),
-  prefix                (iConfig.getParameter<std::string>  ("Prefix"               )),
-  suffix                (iConfig.getParameter<std::string>  ("Suffix"               )),
-  maxSize               (iConfig.getParameter<unsigned int> ("MaxSize"              )) {
+  trkInputTag              (iConfig.getParameter<edm::InputTag>("TracksInputTag"           )),
+  dcsInputTag              (iConfig.getParameter<edm::InputTag>("DCSInputTag"              )),
+  inputTag                 (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
+  vtxInputTag              (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
+  beamSpotInputTag         (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
+  conversionsInputTag      (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"      )),
+  triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
+  electronIso              (iConfig.getParameter<double>       ("ElectronIso"              )),
+  muonPt                   (iConfig.getParameter<double>       ("MuonPt"                   )),
+  muonIso                  (iConfig.getParameter<double>       ("MuonIso"                  )),
+  muonID                   (iConfig.getParameter<std::string>  ("MuonID"                   )),
+  singleEleTriggerMatch    (iConfig.getParameter<std::string>  ("SingleEleTriggerMatch"    )),
+  singleEleTriggerMatchWP80(iConfig.getParameter<std::string>  ("SingleEleTriggerMatchWP80")),
+  doubleEleTriggerMatch    (iConfig.getParameter<std::string>  ("DoubleEleTriggerMatch"    )),
+  prefix                   (iConfig.getParameter<std::string>  ("Prefix"                   )),
+  suffix                   (iConfig.getParameter<std::string>  ("Suffix"                   )),
+  maxSize                  (iConfig.getParameter<unsigned int> ("MaxSize"                  ))
+ {
   
   //------------------------------------------------------------------------
   // What variables will this producer push into the event?
@@ -125,6 +125,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   // Conversion variables					        
 								        
   produces <std::vector<int> >    ( prefix + "MissingHits"              + suffix );
+  produces <std::vector<int> >    ( prefix + "MissingHitsEG"            + suffix );
   produces <std::vector<double> > ( prefix + "Dist"                     + suffix );
   produces <std::vector<double> > ( prefix + "DCotTheta"                + suffix );
   produces <std::vector<double> > ( prefix + "Fbrem"                    + suffix );
@@ -149,6 +150,27 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "TrackVz"                  + suffix );
   produces <std::vector<double> > ( prefix + "TrackPt"                  + suffix );
   produces <std::vector<double> > ( prefix + "TrackValidFractionOfHits" + suffix );
+
+  // Trigger matching: Double electron
+
+  produces <std::vector<bool  > > ( prefix + "HLTDoubleEleMatched"      + suffix );
+  produces <std::vector<double> > ( prefix + "HLTDoubleEleMatchPt"      + suffix );
+  produces <std::vector<double> > ( prefix + "HLTDoubleEleMatchEta"     + suffix );
+  produces <std::vector<double> > ( prefix + "HLTDoubleEleMatchPhi"     + suffix );
+
+  // Trigger matching: Single electron
+
+  produces <std::vector<bool  > > ( prefix + "HLTSingleEleMatched"      + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleMatchPt"      + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleMatchEta"     + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleMatchPhi"     + suffix );
+
+  // Trigger matching: Single electron (WP80)
+
+  produces <std::vector<bool  > > ( prefix + "HLTSingleEleWP80Matched"  + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchPt"  + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchEta" + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchPhi" + suffix );
 
 }
 
@@ -235,6 +257,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Conversion variables
 
   std::auto_ptr<std::vector<int> >     missingHits               ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int> >     missingHitsEG             ( new std::vector<int>   ()  );
   std::auto_ptr<std::vector<double> >  dist_vec                  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  dCotTheta                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  fbrem                     ( new std::vector<double>()  );
@@ -260,6 +283,27 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  trackPt                   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trackValidFractionOfHits  ( new std::vector<double>()  );  
 
+  // Trigger matching: Double electron
+
+  std::auto_ptr<std::vector<bool  > >  HLTDoubleEleMatched       ( new std::vector<bool  >()  );
+  std::auto_ptr<std::vector<double> >  HLTDoubleEleMatchPt 	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTDoubleEleMatchEta	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTDoubleEleMatchPhi      ( new std::vector<double>()  );
+
+  // Trigger matching: Single electron
+
+  std::auto_ptr<std::vector<bool  > >  HLTSingleEleMatched       ( new std::vector<bool  >()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleMatchPt 	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleMatchEta	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleMatchPhi      ( new std::vector<double>()  );
+
+  // Trigger matching: Single electron (WP80)
+
+  std::auto_ptr<std::vector<bool  > >  HLTSingleEleWP80Matched   ( new std::vector<bool  >()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchPt 	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchEta	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchPhi  ( new std::vector<double>()  );
+  
   //------------------------------------------------------------------------
   // Get handles for the event
   //------------------------------------------------------------------------
@@ -294,6 +338,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<std::vector<pat::Electron> > electrons;
   iEvent.getByLabel(inputTag, electrons);
 
+  // PAT trigger event
+
+  edm::Handle< pat::TriggerEvent > triggerEvent;
+  iEvent.getByLabel( triggerEventInputTag, triggerEvent );
+
+  // PAT trigger helper for trigger matching information
+
+  const pat::helper::TriggerMatchHelper matchHelper;
+  
   //------------------------------------------------------------------------
   // Get magnetic field (need this for photon conversion information):
   //   - if isRealData then derive bfield using the magnet current from DcsStatus
@@ -332,10 +385,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Loop over electrons (finally!)
   //------------------------------------------------------------------------
 
-  std::vector<pat::Electron::IdPair>::const_iterator iElectronIDs, iElectronIDs_end;
-  
   if(electrons.isValid()) {
     edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Electrons: " << electrons->size();
+
+    size_t iElectron = 0;
 
     for( std::vector<pat::Electron>::const_iterator it = electrons->begin(); it != electrons->end(); ++it ) {
 
@@ -381,7 +434,59 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if (it->electronID("eidRobustHighEnergy")>0) passId = passId | 1<<4;
       if (it->electronID("mvaTrigV0"          )>0) passId = passId | 1<<5;
       if (it->electronID("mvaNonTrigV0"       )>0) passId = passId | 1<<6;
+      
+      //------------------------------------------------------------------------
+      // Trigger matching
+      // 
+      // Example taken from PatTriggerAnalyzer:
+      // http://cmslxr.fnal.gov/lxr/source/PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.cc
+      //------------------------------------------------------------------------
 
+      // Double electron
+
+      const pat::TriggerObjectRef doubleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron, doubleEleTriggerMatch, iEvent, *triggerEvent ) );
+      if ( doubleElectronTrigRef.isAvailable() && doubleElectronTrigRef.isNonnull() ) { 
+	HLTDoubleEleMatched  -> push_back ( true ) ;
+	HLTDoubleEleMatchPt  -> push_back ( doubleElectronTrigRef -> pt() );
+	HLTDoubleEleMatchEta -> push_back ( doubleElectronTrigRef -> eta());
+	HLTDoubleEleMatchPhi -> push_back ( doubleElectronTrigRef -> phi());
+      } else { 
+	HLTDoubleEleMatched  -> push_back ( false ) ;
+	HLTDoubleEleMatchPt  -> push_back ( -999. );
+	HLTDoubleEleMatchEta -> push_back ( -999. );
+	HLTDoubleEleMatchPhi -> push_back ( -999. );
+      }
+
+      // Single electron
+      
+      const pat::TriggerObjectRef singleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatch, iEvent, *triggerEvent ) );
+      if ( singleElectronTrigRef.isAvailable() && singleElectronTrigRef.isNonnull() ) { 
+	HLTSingleEleMatched  -> push_back ( true ) ;
+	HLTSingleEleMatchPt  -> push_back ( singleElectronTrigRef -> pt() );
+	HLTSingleEleMatchEta -> push_back ( singleElectronTrigRef -> eta());
+	HLTSingleEleMatchPhi -> push_back ( singleElectronTrigRef -> phi());
+      } else { 
+	HLTSingleEleMatched  -> push_back ( false ) ;
+	HLTSingleEleMatchPt  -> push_back ( -999. );
+	HLTSingleEleMatchEta -> push_back ( -999. );
+	HLTSingleEleMatchPhi -> push_back ( -999. );
+      }
+
+      // Single electron (WP80)
+      
+      const pat::TriggerObjectRef singleElectronWP80TrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatchWP80, iEvent, *triggerEvent ) );
+      if ( singleElectronWP80TrigRef.isAvailable() && singleElectronWP80TrigRef.isNonnull() ) { 
+	HLTSingleEleWP80Matched  -> push_back ( true ) ;
+	HLTSingleEleWP80MatchPt  -> push_back ( singleElectronWP80TrigRef -> pt() );
+	HLTSingleEleWP80MatchEta -> push_back ( singleElectronWP80TrigRef -> eta());
+	HLTSingleEleWP80MatchPhi -> push_back ( singleElectronWP80TrigRef -> phi());
+      } else { 
+	HLTSingleEleWP80Matched  -> push_back ( false ) ;
+	HLTSingleEleWP80MatchPt  -> push_back ( -999. );
+	HLTSingleEleWP80MatchEta -> push_back ( -999. );
+	HLTSingleEleWP80MatchPhi -> push_back ( -999. );
+      }
+      
       //------------------------------------------------------------------------
       // Relative isolation (not currently used in any analysis... remove?) 
       //------------------------------------------------------------------------
@@ -543,6 +648,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // Conversion variables
       
       missingHits              -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
+      missingHitsEG            -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits()     );
+      
       dist_vec                 -> push_back ( dist );
       dCotTheta                -> push_back ( dcot );
       hasMatchedConvPhot       -> push_back ( matchesConv );
@@ -568,6 +675,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       trackPt                  -> push_back( it->gsfTrack()->pt() );
       trackValidFractionOfHits -> push_back( it->gsfTrack()->validFraction() );
 
+
+      ++iElectron;
     }
   } else {
     edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << inputTag;
@@ -649,6 +758,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Conversion variables					        
   
   iEvent.put( missingHits             , prefix + "MissingHits"              + suffix );
+  iEvent.put( missingHitsEG           , prefix + "MissingHitsEG"            + suffix );
   iEvent.put( dist_vec                , prefix + "Dist"                     + suffix );
   iEvent.put( dCotTheta               , prefix + "DCotTheta"                + suffix );
   iEvent.put( fbrem                   , prefix + "Fbrem"                    + suffix );
@@ -674,4 +784,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( trackPt                 , prefix + "TrackPt"                  + suffix );
   iEvent.put( trackValidFractionOfHits, prefix + "TrackValidFractionOfHits" + suffix );
 
+  // Trigger matching: Double electron
+
+  iEvent.put( HLTDoubleEleMatched     , prefix + "HLTDoubleEleMatched"      + suffix );
+  iEvent.put( HLTDoubleEleMatchPt     , prefix + "HLTDoubleEleMatchPt"      + suffix );
+  iEvent.put( HLTDoubleEleMatchEta    , prefix + "HLTDoubleEleMatchEta"     + suffix );
+  iEvent.put( HLTDoubleEleMatchPhi    , prefix + "HLTDoubleEleMatchPhi"     + suffix );
+
+  // Trigger matching: Single electron
+
+  iEvent.put( HLTSingleEleMatched     , prefix + "HLTSingleEleMatched"      + suffix );
+  iEvent.put( HLTSingleEleMatchPt     , prefix + "HLTSingleEleMatchPt"      + suffix );
+  iEvent.put( HLTSingleEleMatchEta    , prefix + "HLTSingleEleMatchEta"     + suffix );
+  iEvent.put( HLTSingleEleMatchPhi    , prefix + "HLTSingleEleMatchPhi"     + suffix );
+
+  // Trigger matching: Single electron (WP80)
+
+  iEvent.put( HLTSingleEleWP80Matched , prefix + "HLTSingleEleWP80Matched"  + suffix );
+  iEvent.put( HLTSingleEleWP80MatchPt , prefix + "HLTSingleEleWP80MatchPt"  + suffix );
+  iEvent.put( HLTSingleEleWP80MatchEta, prefix + "HLTSingleEleWP80MatchEta" + suffix );
+  iEvent.put( HLTSingleEleWP80MatchPhi, prefix + "HLTSingleEleWP80MatchPhi" + suffix );
 }

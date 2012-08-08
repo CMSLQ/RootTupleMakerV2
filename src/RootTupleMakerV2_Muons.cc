@@ -10,14 +10,18 @@
 #include <iostream>
 #include <DataFormats/TrackReco/interface/Track.h>
 #include "TLorentzVector.h"
+#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
+#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
 RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig) :
 inputTag (iConfig.getParameter<edm::InputTag>("InputTag")),
+triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
 prefix   (iConfig.getParameter<std::string>  ("Prefix")),
 suffix   (iConfig.getParameter<std::string>  ("Suffix")),
 maxSize  (iConfig.getParameter<unsigned int> ("MaxSize")),
 muonIso  (iConfig.getParameter<double>       ("MuonIso")),                //  threshold for "passIso" and "passCTIso"
 muonID   (iConfig.getParameter<std::string>  ("MuonID")),                 //  threshold for "passID"
+singleMuonTriggerMatch(iConfig.getParameter<std::string>("SingleMuonTriggerMatch")), // trigger matching string
 beamSpotCorr      (iConfig.getParameter<bool>("BeamSpotCorr")),
 useCocktailRefits (iConfig.getParameter<bool>("UseCocktailRefits")),
 vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // collection of primary vertices to be used.
@@ -90,6 +94,12 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // col
   produces <std::vector<int> >     ( prefix + "IsPF"                       + suffix );
   produces <std::vector<int> >     ( prefix + "TrackLayersWithMeasurement" + suffix );   
 
+  // Variables for trigger matching  
+  produces <std::vector<bool  > > ( prefix + "HLTSingleMuonMatched"      + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchPt"      + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchEta"     + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchPhi"     + suffix );
+  
   //
   if ( useCocktailRefits )
     {
@@ -191,6 +201,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012 
   std::auto_ptr<std::vector<int> >     isPF                       ( new std::vector<int>()    );
   std::auto_ptr<std::vector<int> >     trackLayersWithMeasurement ( new std::vector<int>()    );   
+  // Trigger matching variables
+  
+  std::auto_ptr<std::vector<bool  > >  HLTSingleMuonMatched     ( new std::vector<bool  >()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchPt 	( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchEta	( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchPhi    ( new std::vector<double>()  );
   //
   std::auto_ptr<std::vector<int   > >  ctRefitID    ( new std::vector<int   > () );
   std::auto_ptr<std::vector<double> >  ctEta        ( new std::vector<double> () );
@@ -225,6 +241,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::BeamSpot> beamSpot;
   iEvent.getByLabel("offlineBeamSpot", beamSpot );
 
+  edm::Handle< pat::TriggerEvent > triggerEvent;
+  iEvent.getByLabel( triggerEventInputTag, triggerEvent );
+  
   // For muon cocktails:
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMuonAnalysis#High_pT_muons
 
@@ -239,11 +258,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel("tevMuons", "picky", tevMapH3);
   const reco::TrackToTrackMap tevMap3 = *(tevMapH3.product());
 
+  // PAT trigger helper for trigger matching information
+
+  const pat::helper::TriggerMatchHelper matchHelper;
+  
 
   if(muons.isValid())
     {
       edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Muons: " << muons->size();
       
+      size_t iMuon = 0;
+    
       for( std::vector<pat::Muon>::const_iterator it = muons->begin(); it != muons->end(); ++it )
 	{
 	  // exit from loop when you reach the required number of muons
@@ -295,6 +320,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
 	    }
 	  //
+
+
+	  //------------------------------------------------------------------------
+	  // Trigger matching
+	  // 
+	  // Example taken from PatTriggerAnalyzer:
+	  // http://cmslxr.fnal.gov/lxr/source/PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.cc
+	  //------------------------------------------------------------------------
+	  
+	  // Single muon trigger matching
+	  
+	  const pat::TriggerObjectRef singleMuonTrigRef( matchHelper.triggerMatchObject( muons, iMuon,  singleMuonTriggerMatch, iEvent, *triggerEvent ) );
+	  if ( singleMuonTrigRef.isAvailable() && singleMuonTrigRef.isNonnull() ) { 
+	    HLTSingleMuonMatched  -> push_back ( true ) ;
+	    HLTSingleMuonMatchPt  -> push_back ( singleMuonTrigRef -> pt() );
+	    HLTSingleMuonMatchEta -> push_back ( singleMuonTrigRef -> eta());
+	    HLTSingleMuonMatchPhi -> push_back ( singleMuonTrigRef -> phi());
+	  } else { 
+	    HLTSingleMuonMatched  -> push_back ( false ) ;
+	    HLTSingleMuonMatchPt  -> push_back ( -999. );
+	    HLTSingleMuonMatchEta -> push_back ( -999. );
+	    HLTSingleMuonMatchPhi -> push_back ( -999. );
+	  }
 
 	  eta->push_back( it->eta() );
 	  phi->push_back( it->phi() );
@@ -445,6 +493,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  backToBackCompatibility->push_back( it->userFloat("backToBackCompatibility") );
 	  overlapCompatibility   ->push_back( it->userFloat("overlapCompatibility")    );
 	  
+	  iMuon++;
+
 	}//end of loop over muons
     }
   else
@@ -544,6 +594,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put( ctGlobalChi2             , prefix + "CocktailGlobalChi2"              + suffix ) ;
     }
   
+  // trigger matching
+  
+  iEvent.put( HLTSingleMuonMatched     , prefix + "HLTSingleMuonMatched"      + suffix );
+  iEvent.put( HLTSingleMuonMatchPt     , prefix + "HLTSingleMuonMatchPt"      + suffix );
+  iEvent.put( HLTSingleMuonMatchEta    , prefix + "HLTSingleMuonMatchEta"     + suffix );
+  iEvent.put( HLTSingleMuonMatchPhi    , prefix + "HLTSingleMuonMatchPhi"     + suffix );
+
   iEvent.put( cosmicCompatibility,     prefix + "CosmicCompatibility"     + suffix );
   iEvent.put( timeCompatibility,       prefix + "TimeCompatibility"       + suffix );
   iEvent.put( backToBackCompatibility, prefix + "BackToBackCompatibility" + suffix );

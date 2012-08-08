@@ -10,6 +10,7 @@
 #include <map>
 #include "boost/foreach.hpp"
 #include <TBranch.h>
+#include <TLorentzVector.h>
 
 void RootTupleMakerV2_Tree::
 analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -47,6 +48,9 @@ beginJob() {
   typedef std::map<std::string,       bool> mapStringBool;
   typedef std::map<std::string,        int> mapStringInt;
   typedef std::map<std::string,std::string> mapStringString;
+  typedef std::map<std::string,std::vector<float> > mapStringDoubles;
+  typedef std::vector<std::vector<float> > vectorVectorFloats;
+  typedef std::vector<std::vector<int> > vectorVectorInts;
 
   std::map<std::string, LEAFTYPE> leafmap;
   leafmap["bool"]      = BOOL;       leafmap["bools"]     = BOOL_V;
@@ -61,6 +65,10 @@ beginJob() {
   leafmap["StringStringstdmap"] = STRING_STRING_M;
   leafmap["Stringboolstdmap"  ] = STRING_BOOL_M;
   leafmap["Stringintstdmap"   ] = STRING_INT_M;
+  leafmap["Stringfloatsstdmap"] = STRING_FLOAT_V_M;
+  leafmap["floatss"] = FLOAT_V_V;
+  leafmap["intss"] = INT_V_V;
+  // leafmap[""] = LORENTZ_V_V;
   
   //
   leafmap["String"]     = STRING;     leafmap["Strings"]    = STRING_V;
@@ -114,7 +122,9 @@ beginJob() {
       case STRING_INT_M    :  connectors.push_back( new TypedBranchConnector<mapStringInt>        (selection,   "", tree) ); break;
       case STRING_BOOL_M   :  connectors.push_back( new TypedBranchConnector<mapStringBool>       (selection,   "", tree) ); break;
       case STRING_STRING_M :  connectors.push_back( new TypedBranchConnector<mapStringString>     (selection,   "", tree) ); break;
-      
+      case STRING_FLOAT_V_M:  connectors.push_back( new TypedBranchConnector<mapStringDoubles>    (selection,   "", tree) ); break;
+      case FLOAT_V_V       :  connectors.push_back( new TypedBranchConnector<vectorVectorFloats>  (selection,   "", tree) ); break;
+      case INT_V_V         :  connectors.push_back( new TypedBranchConnector<vectorVectorInts>    (selection,   "", tree) ); break;
 
       default:
         {

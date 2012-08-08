@@ -10,8 +10,8 @@
  *  tree of the selected variables, which it obtains from the EDM
  *  tree.
  *
- *  $Date: 2010/04/23 16:43:34 $
- *  $Revision: 1.3 $
+ *  $Date: 2011/06/28 15:22:17 $
+ *  $Revision: 1.4 $
  *  \author Burt Betchart - University of Rochester <burton.andrew.betchart@cern.ch>
  */
 
@@ -66,7 +66,10 @@ public:
                  FLOAT,   FLOAT_V,           DOUBLE,  DOUBLE_V,
                  LONG,    LONG_V,            U_LONG,  U_LONG_V,
                  STRING,  STRING_V,
-		 STRING_BOOL_M, STRING_INT_M, STRING_STRING_M
+		 STRING_BOOL_M, STRING_INT_M, STRING_STRING_M,
+		 STRING_FLOAT_V_M,
+		 FLOAT_V_V,
+		 INT_V_V
                  };
 };
 

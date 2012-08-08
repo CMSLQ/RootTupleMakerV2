@@ -237,7 +237,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<bool> HcalLaserEventFilterResult;
   iEvent.getByLabel(hcalLaserEventFilterInputTag, HcalLaserEventFilterResult);
   if(HcalLaserEventFilterResult.isValid()) {
-    if((*HcalLaserEventFilterResult)==false)std::cout<<"              passHcalLaserEventFilter: "<<(*HcalLaserEventFilterResult)<<std::endl;
     *passHcalLaserEventFilter.get()=!(*HcalLaserEventFilterResult);
   }
 
@@ -245,13 +244,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<bool> EcalDeadCellTriggerPrimitiveFilterResult;
   iEvent.getByLabel(ecalDeadCellTriggerPrimitiveFilterInputTag, EcalDeadCellTriggerPrimitiveFilterResult);
   if(EcalDeadCellTriggerPrimitiveFilterResult.isValid()) {
-    if((*EcalDeadCellTriggerPrimitiveFilterResult)==false)std::cout<<"passEcalDeadCellTriggerPrimitiveFilter: "<<(*EcalDeadCellTriggerPrimitiveFilterResult)<<std::endl;
     *passEcalDeadCellTriggerPrimitiveFilter.get()=!(*EcalDeadCellTriggerPrimitiveFilterResult);
   }
   edm::Handle<bool> EcalDeadCellBoundaryEnergyFilterResult;
   iEvent.getByLabel(ecalDeadCellBoundaryEnergyFilterInputTag, EcalDeadCellBoundaryEnergyFilterResult);
   if(EcalDeadCellBoundaryEnergyFilterResult.isValid()) {
-    if((*EcalDeadCellBoundaryEnergyFilterResult)==false)std::cout<<"  passEcalDeadCellBoundaryEnergyFilter: "<<(*EcalDeadCellBoundaryEnergyFilterResult)<<std::endl;
     *passEcalDeadCellBoundaryEnergyFilter.get()=!(*EcalDeadCellBoundaryEnergyFilterResult);
   }
 
@@ -259,7 +256,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<bool> TrackingFailureFilterResult;
   iEvent.getByLabel(trackingFailureFilterInputTag, TrackingFailureFilterResult);
   if(TrackingFailureFilterResult.isValid()) {
-    if((*TrackingFailureFilterResult)==false)std::cout<<"             passTrackingFailureFilter: "<<(*TrackingFailureFilterResult)<<std::endl;
     *passTrackingFailureFilter.get()=!(*TrackingFailureFilterResult);
   }
 
@@ -267,13 +263,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<bool> BadEESupercrystalFilterResult;
   iEvent.getByLabel(badEESupercrystalFilterInputTag, BadEESupercrystalFilterResult);
   if(BadEESupercrystalFilterResult.isValid()) {
-    if((*BadEESupercrystalFilterResult)==false)std::cout<<"           passBadEESupercrystalFilter: "<< (*BadEESupercrystalFilterResult) <<std::endl;
     *passBadEESupercrystalFilter.get()=!(*BadEESupercrystalFilterResult);
   }
-
-
   
-
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
   iEvent.put(isbptx0,"isBPTX0");

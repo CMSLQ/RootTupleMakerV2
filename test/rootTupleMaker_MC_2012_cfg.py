@@ -338,6 +338,7 @@ process.p = cms.Path(
     # MET filters (required):
     process.CSCTightHaloFilter*
     process.EcalDeadCellTriggerPrimitiveFilter*
+    process.EcalDeadCellBoundaryEnergyFilter*
     process.HBHENoiseFilter*
     process.HBHENoiseFilterResultProducer*
     process.hcalLaserEventFilter*

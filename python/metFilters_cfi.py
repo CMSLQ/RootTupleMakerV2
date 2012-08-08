@@ -23,7 +23,6 @@ HBHENoiseFilter.taggingMode = cms.bool ( True )
 # HBHE noise filter results producer
 # https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2012
 # ------------------------------------------------------------------------------------
-
 HBHENoiseFilterResultProducer = cms.EDProducer( 'HBHENoiseFilterResultProducer',
                                                 noiselabel = cms.InputTag('hcalnoise','','RECO'),
                                                 minRatio = cms.double(-999),
@@ -46,7 +45,6 @@ HBHENoiseFilterResultProducer = cms.EDProducer( 'HBHENoiseFilterResultProducer',
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#HCAL_laser_events
 # ------------------------------------------------------------------------------------
 from RecoMET.METFilters.hcalLaserEventFilter_cfi import *
-
 hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
 hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
 hcalLaserEventFilter.taggingMode = cms.bool(True)
@@ -55,14 +53,12 @@ hcalLaserEventFilter.taggingMode = cms.bool(True)
 # ECAL dead cell filter:
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#ECAL_dead_cell_filter
 # ------------------------------------------------------------------------------------
-
 from RecoMET.METFilters.EcalDeadCellTriggerPrimitiveFilter_cfi import *
-
+EcalDeadCellTriggerPrimitiveFilter.taggingMode = cms.bool(True)
 # The section below is for the filter on Boundary Energy. Available in AOD in CMSSW>44x
 # For releases earlier than 44x, one should make the following changes
 # process.EcalDeadCellBoundaryEnergyFilter.recHitsEB = cms.InputTag("ecalRecHit","EcalRecHitsEB")
 # process.EcalDeadCellBoundaryEnergyFilter.recHitsEE = cms.InputTag("ecalRecHit","EcalRecHitsEE")
-
 from RecoMET.METFilters.EcalDeadCellBoundaryEnergyFilter_cfi import * 
 EcalDeadCellBoundaryEnergyFilter.taggingMode = cms.bool(True)
 EcalDeadCellBoundaryEnergyFilter.cutBoundEnergyDeadCellsEB=cms.untracked.double(10)
@@ -78,7 +74,6 @@ EcalDeadCellBoundaryEnergyFilter.limitDeadCellToChannelStatusEE = cms.vint32(12,
 # Tracking failure filter:
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#Tracking_failure_filter_updated
 # ------------------------------------------------------------------------------------
-
 from RecoMET.METFilters.trackingFailureFilter_cfi import *
 goodVertices = cms.EDFilter(
   "VertexSelector",
@@ -86,14 +81,11 @@ goodVertices = cms.EDFilter(
   src = cms.InputTag("offlinePrimaryVertices"),
   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 24 && position.rho < 2")
 )
-
 trackingFailureFilter.taggingMode = cms.bool (True) 
-
 
 # ------------------------------------------------------------------------------------
 # Bad EE Supercrystal filter: 
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#Bad_EE_Supercrystal_filter_added
 # ------------------------------------------------------------------------------------
-
 from RecoMET.METFilters.eeBadScFilter_cfi import *
 eeBadScFilter.taggingMode = cms.bool (True)

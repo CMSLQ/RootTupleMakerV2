@@ -1,0 +1,6 @@
+<lcgdict>
+  <class pattern="edm::Wrapper<*>" />
+  <class name="std::map<std::string,std::vector<float> >"/>
+  <class name="std::vector<std::vector<float> >"/>
+  <class name="std::vector<std::vector<int> >"/>
+</lcgdict>

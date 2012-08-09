@@ -48,8 +48,8 @@ process.options.wantSummary = False
 # Input files
 process.source.fileNames = [
     #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
-    #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
-    'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    #'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -84,6 +84,29 @@ process.patElectrons.isolationValuesNoPFId = cms.PSet(
     pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03NoPFIdPFIso"),
     pfPhotons = cms.InputTag("elPFIsoValueGamma03NoPFIdPFIso")
 )
+
+#----------------------------------------------------------------------------------------------------
+# Turn on trigger matching
+# 
+# Example taken from PAT SWGuide twiki
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTriggerMatchExercise#TrigProduce
+#
+# Don't include this line (recommended by instructions): removeCleaningFromTriggerMatching( process )
+# It will break the matching.
+#----------------------------------------------------------------------------------------------------
+
+# load the PAT trigger Python tools
+from PhysicsTools.PatAlgos.tools.trigTools import *
+
+# switch on the trigger matching
+switchOnTriggerMatching( process, triggerMatchers = [
+        # electrons 
+        'cleanElectronTriggerMatchHLTSingleElectron',
+        'cleanElectronTriggerMatchHLTSingleElectronWP80',
+        'cleanElectronTriggerMatchHLTDoubleElectron',
+        # muons
+        'cleanMuonTriggerMatchHLTSingleMuon'
+] )
 
 #----------------------------------------------------------------------------------------------------
 # Add PFMET and TCMET
@@ -270,6 +293,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFChargedMET_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleTrigger_*_*',
+        'keep *_rootTupleTriggerObjects_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
@@ -297,6 +321,7 @@ process.p = cms.Path(
     # MET filters (required):
     process.CSCTightHaloFilter*
     process.EcalDeadCellTriggerPrimitiveFilter*
+    process.EcalDeadCellBoundaryEnergyFilter*
     process.HBHENoiseFilter*
     process.HBHENoiseFilterResultProducer*
     process.hcalLaserEventFilter*
@@ -320,6 +345,7 @@ process.p = cms.Path(
     # process.rootTuplePFChargedMET+
     process.rootTupleMuons+
     process.rootTupleTrigger+
+    process.rootTupleTriggerObjects+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
@@ -352,4 +378,9 @@ swapCollectionModuleAndProductLabels(process,"particleFlow","electrons","remadeP
 #                                 )
 # process.DUMP    = cms.EndPath (process.dump)
 
+# Delete predefined Endpath (needed for running with CRAB)
+del process.out
+del process.outpath
 
+# Schedule definition
+process.schedule = cms.Schedule(process.p)

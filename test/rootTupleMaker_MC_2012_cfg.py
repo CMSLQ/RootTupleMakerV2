@@ -343,6 +343,7 @@ process.p = cms.Path(
     process.HBHENoiseFilterResultProducer*
     process.hcalLaserEventFilter*
     process.trackingFailureFilter*
+    process.eeBadScFilter*
     # PAT sequence
     process.patDefaultSequence*
     # RootTupleMakerV2

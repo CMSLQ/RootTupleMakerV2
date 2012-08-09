@@ -127,7 +127,7 @@ process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
 process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
-process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
+process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
 
 process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
 

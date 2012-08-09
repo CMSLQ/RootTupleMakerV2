@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTuplePFCandidates = cms.EDProducer("RootTupleMakerV2_PFCandidates",
-                                       ReducedPFCandidateInputTag = cms.InputTag('reducedPFCands'),
+                                       ReducedPFCandidateInputTag = cms.InputTag('pfCandsNotInJet'),
                                        ElectronInputTag = cms.InputTag('cleanPatElectrons'),
                                        MuonInputTag = cms.InputTag('cleanPatMuons'),                                    
                                        Prefix = cms.string('PFCand'),

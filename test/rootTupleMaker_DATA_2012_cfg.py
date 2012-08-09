@@ -334,7 +334,6 @@ process.p = cms.Path(
     process.rootTupleEventSelection+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
-    #process.rootTupleTaus+
     process.rootTupleSCTaus+
     process.rootTupleHPSTaus+
     process.rootTupleCaloMET+
@@ -351,8 +350,8 @@ process.p = cms.Path(
     process.rootTupleGenJets+
     process.rootTupleGenMETTrue+
     process.rootTupleGenMETCalo+    
-    process.rootTuplePhotons
-    # process.rootTuplePFCandidates
+    process.rootTuplePhotons+
+    process.rootTuplePFCandidates
     )
     *process.rootTupleTree
 )

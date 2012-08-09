@@ -26,14 +26,15 @@ process.GlobalTag.globaltag = 'GR_R_42_V19::All' # ===> First complete JEC set f
 #process.GlobalTag.globaltag = 'GR_R_41_V0::All' # ===> for 41X prompt reco (contains Jec10V3)
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = -1
 
 # Options and Output Report
 process.options.wantSummary = True
 
 # Input files
 process.source.fileNames = [
-    'file:/tmp/santanas/SingleElectron-AOD-May10ReReco-v1_42X.root'
+    #'file:/data/santanas/SingleElectron-AOD-May10ReReco-v1_42X.root'
+    'file:/data/santanas/DoubleElectron_Run2011B_AOD_PromptReco-v1_180250.root' #AOD (42X)
     #'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v4/000/165/121/D0162694-1382-E011-876E-003048F1BF68.root' #AOD (42X)
     #'/store/data/Run2011A/SingleElectron/AOD/PromptReco-v1/000/161/312/90646AF9-F957-E011-B0DB-003048F118C4.root' #AOD (41X)
     #'/store/data/Run2011A/SingleElectron/RECO/PromptReco-v1/000/160/405/0E58AE5B-D64F-E011-88F1-003048F024DC.root' #RECO
@@ -219,6 +220,8 @@ process.patTaus.tauIDSources.byIsolation                    = cms.InputTag("shri
 # Skim definition
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 ##################################################################
+#### Just pass all the events, but still store the histogram (use for MC signal events, for example)
+#process.LJFilter.allEventsPassFilter = True 
 #### Electron based skim
 process.LJFilter.muLabel = 'muons'
 process.LJFilter.elecLabel = 'gsfElectrons'
@@ -241,6 +244,12 @@ process.LJFilter.counteitherleptontype = False
 # process.LJFilter.photET = 20.
 # process.LJFilter.photHoE = 0.05
 ##################################################################
+
+# HLT filter
+import HLTrigger.HLTfilters.hltHighLevel_cfi
+process.skimHLTFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+process.skimHLTFilter.HLTPaths = cms.vstring("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v*")
+process.skimHLTFilter.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 
 # Load HBHENoiseFilterResultProducer
 process.load('CommonTools/RecoAlgos/HBHENoiseFilterResultProducer_cfi')
@@ -316,6 +325,9 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFChargedMET_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleTrigger_*_*',
+        'keep *_rootTupleTriggerObjectsHLTEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17TrackIsolFilter_*_*',
+        'keep *_rootTupleTriggerObjectsHLTEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17HEDoubleFilter_*_*',
+        'keep *_rootTupleTriggerObjectsHLTEle27WP80TrackIsoFilter_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
@@ -329,7 +341,8 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 
 # Path definition
 process.p = cms.Path(
-    process.LJFilter*
+    #process.LJFilter*
+    process.skimHLTFilter*
     process.HBHENoiseFilterResultProducer*
     process.kt6PFJetsForIsolation*
     process.kt6PFJets*
@@ -361,6 +374,9 @@ process.p = cms.Path(
     process.rootTuplePFChargedMET+
     process.rootTupleMuons+
     process.rootTupleTrigger+
+    process.rootTupleTriggerObjectsHLTEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17TrackIsolFilter+
+    process.rootTupleTriggerObjectsHLTEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17HEDoubleFilter+
+    process.rootTupleTriggerObjectsHLTEle27WP80TrackIsoFilter+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+

@@ -5,8 +5,9 @@
 # Starting with a skeleton process which gets imported with the following line
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
-# load the coreTools of PAT
-from PhysicsTools.PatAlgos.tools.coreTools import *
+# Load PF isolation for muons and electrons
+from PhysicsTools.PatAlgos.tools.pfTools import *
+usePFIso ( process )
 
 import os
 
@@ -62,9 +63,6 @@ process.source.fileNames = [
 #
 # Note: This block has to go early in the python cfg, or cmsRun won't work
 #----------------------------------------------------------------------------------------------------
-
-from PhysicsTools.PatAlgos.tools.pfTools import *
-usePFIso( process )
 
 process.patElectrons.isolationValues = cms.PSet(
     pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03PFIdPFIso"),

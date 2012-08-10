@@ -129,32 +129,6 @@ addPfMET(process, 'PF')
 addTcMET(process, 'TC')
 
 #----------------------------------------------------------------------------------------------------
-# Add PFMET corrections:
-# - Type 0 : PU corrections
-# - Type 1 : JES corrections
-# - MET x/y shift correction: phi modulation
-#----------------------------------------------------------------------------------------------------
-
-# type-0 MET corrections
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
-
-# type-1 MET corrections (see jets)
-
-# MET x/y shift correction: phi modulation
-process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
-process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-
-process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
-
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
-
-process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
-   cms.InputTag('patPFJetMETtype1p2Corr', 'type1'),
-   cms.InputTag('patPFMETtype0Corr'),
-   cms.InputTag('pfMEtSysShiftCorr')
-)
-
-#----------------------------------------------------------------------------------------------------
 # Add MET filters
 #----------------------------------------------------------------------------------------------------
 
@@ -252,6 +226,32 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doType1MET   = False,
     genJetCollection = cms.InputTag("ak5GenJets"),
     doJetID      = True,
+)
+
+#----------------------------------------------------------------------------------------------------
+# Add PFMET corrections:
+# - Type 0 : PU corrections
+# - Type 1 : JES corrections
+# - MET x/y shift correction: phi modulation
+#----------------------------------------------------------------------------------------------------
+
+# type-0 MET corrections
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
+
+# type-1 MET corrections (see jets above)
+
+# MET x/y shift correction: phi modulation
+process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+
+process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+
+process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
+
+process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
+   cms.InputTag('patPFJetMETtype1p2Corr', 'type1'),
+   cms.InputTag('patPFMETtype0Corr'),
+   cms.InputTag('pfMEtSysShiftCorr')
 )
 
 # Skim definition

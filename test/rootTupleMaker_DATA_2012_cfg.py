@@ -30,7 +30,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RootTupleMakerV2_output_MC.root')
+    fileName = cms.string('RootTupleMakerV2_output_DATA.root')
 )
 
 #----------------------------------------------------------------------------------------------------

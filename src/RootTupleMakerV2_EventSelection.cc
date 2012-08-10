@@ -33,7 +33,8 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
     ecalDeadCellTriggerPrimitiveFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellTriggerPrimitiveFilterInputTag")),
     ecalDeadCellBoundaryEnergyFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellBoundaryEnergyFilterInputTag")),
     trackingFailureFilterInputTag(iConfig.getParameter<edm::InputTag>("TrackingFailureFilterInputTag")),
-    badEESupercrystalFilterInputTag(iConfig.getParameter<edm::InputTag>("BadEESupercrystalFilterInputTag"))
+    badEESupercrystalFilterInputTag(iConfig.getParameter<edm::InputTag>("BadEESupercrystalFilterInputTag")),
+    ecalLaserCorrFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalLaserCorrFilterInputTag"))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -53,6 +54,7 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
   produces <bool> ("passTrackingFailureFilter");
   produces <bool> ("passBadEESupercrystalFilter");
+  produces <bool> ("passEcalLaserCorrFilter");
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -76,6 +78,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> passEcalDeadCellBoundaryEnergyFilter ( new bool() ) ;
   std::auto_ptr<bool> passTrackingFailureFilter ( new bool() ) ;
   std::auto_ptr<bool> passBadEESupercrystalFilter ( new bool() ) ;
+  std::auto_ptr<bool> passEcalLaserCorrFilter (new bool() );
 
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
@@ -94,6 +97,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passEcalDeadCellBoundaryEnergyFilter.get()   = true;
   *passTrackingFailureFilter.get()              = true;
   *passBadEESupercrystalFilter.get()            = true;
+  *passEcalLaserCorrFilter.get()                = true;
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
@@ -266,6 +270,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     *passBadEESupercrystalFilter.get()=!(*BadEESupercrystalFilterResult);
   }
   
+  // large ECAL laser correction filter
+  edm::Handle<bool> EcalLaserCorrFilterResult;
+  iEvent.getByLabel(ecalLaserCorrFilterInputTag, EcalLaserCorrFilterResult );
+  if ( EcalLaserCorrFilterResult.isValid() ){
+    *passEcalLaserCorrFilter.get()=!(*EcalLaserCorrFilterResult);
+  }
+
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
   iEvent.put(isbptx0,"isBPTX0");
@@ -285,4 +296,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(passEcalDeadCellBoundaryEnergyFilter,"passEcalDeadCellBoundaryEnergyFilter");
   iEvent.put(passTrackingFailureFilter,"passTrackingFailureFilter");
   iEvent.put(passBadEESupercrystalFilter, "passBadEESupercrystalFilter");
+  iEvent.put(passEcalLaserCorrFilter, "passEcalLaserCorrFilter");
 }

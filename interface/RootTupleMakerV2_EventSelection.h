@@ -28,7 +28,7 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
   const edm::InputTag   ecalMaskedCellDRFilterInputTag , caloBoundaryDRFilterInputTag;
   //
   const edm::InputTag   hcalLaserEventFilterInputTag , ecalDeadCellTriggerPrimitiveFilterInputTag , ecalDeadCellBoundaryEnergyFilterInputTag;
-  const edm::InputTag   trackingFailureFilterInputTag , badEESupercrystalFilterInputTag;
+  const edm::InputTag   trackingFailureFilterInputTag , badEESupercrystalFilterInputTag, ecalLaserCorrFilterInputTag;
 };
 
 #endif

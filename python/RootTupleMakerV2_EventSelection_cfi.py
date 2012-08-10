@@ -22,5 +22,6 @@ rootTupleEventSelection = cms.EDProducer("RootTupleMakerV2_EventSelection",
     EcalDeadCellTriggerPrimitiveFilterInputTag = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     EcalDeadCellBoundaryEnergyFilterInputTag   = cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
     TrackingFailureFilterInputTag              = cms.InputTag('trackingFailureFilter'),
-    BadEESupercrystalFilterInputTag            = cms.InputTag('eeBadScFilter')
+    BadEESupercrystalFilterInputTag            = cms.InputTag('eeBadScFilter'),
+    EcalLaserCorrFilterInputTag                = cms.InputTag('ecalLaserCorrFilter')
 )

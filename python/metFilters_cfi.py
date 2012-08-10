@@ -89,3 +89,12 @@ trackingFailureFilter.taggingMode = cms.bool (True)
 # ------------------------------------------------------------------------------------
 from RecoMET.METFilters.eeBadScFilter_cfi import *
 eeBadScFilter.taggingMode = cms.bool (True)
+
+# ------------------------------------------------------------------------------------
+# Seema Sharma's bad (large laser) ECAL correction filter:
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#EB_or_EE_Xtals_with_large_laser
+# ------------------------------------------------------------------------------------
+
+from SandBox.Skims.ecalLaserCorrFilter_cfi import *
+ecalLaserCorrFilter.TaggingMode = cms.bool (True)
+ecalLaserCorrFilter.Debug = cms.bool (False)

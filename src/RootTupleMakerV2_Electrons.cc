@@ -515,9 +515,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       bool matchesConv = false;
       if( hConversions.isValid() && bsHandle.isValid() ) 
 	{
+	  // See: https://twiki.cern.ch/twiki/bin/view/CMS/ConversionTools#Conversion_veto_for_electron_ID
 	  matchesConv = ConversionTools::hasMatchedConversion(*it,hConversions,bsHandle->position());
-	  //See https://indico.cern.ch/getFile.py/access?contribId=12&sessionId=0&resId=0&materialId=slides&confId=133587
-          //and https://hypernews.cern.ch/HyperNews/CMS/get/egamma/999.html ( N.1 )
+	  
 	}
       else 
 	{

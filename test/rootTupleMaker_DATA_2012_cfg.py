@@ -13,6 +13,9 @@ usePFIso ( process )
 from PhysicsTools.PatAlgos.tools.coreTools import *
 runOnData( process )
 
+# Options and Output Report
+process.options.wantSummary = True
+
 import os
 
 ############## IMPORTANT ########################################
@@ -283,31 +286,24 @@ process.AK5PFType1CorMetXYShift.srcType1Corrections = cms.VInputTag(
 process.patMETsAK5PFXYShift = process.patMETsAK5PF.clone()
 process.patMETsAK5PFXYShift.metSource = cms.InputTag ("AK5PFType1CorMetXYShift")
 
-# Skim definition
-# process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
-##################################################################
-#### Electron based skim
-# process.LJFilter.muLabel = 'muons'
-# process.LJFilter.elecLabel = 'gsfElectrons'
-# process.LJFilter.jetLabel = 'ak5CaloJets'
-# process.LJFilter.tauLabel = 'shrinkingConePFTauProducer'
-# process.LJFilter.muonsMin = -1
-# process.LJFilter.electronsMin = 1
-# process.LJFilter.elecPT = 20.
-# process.LJFilter.counteitherleptontype = False
-##################################################################
-#### Photon based skim
-# process.LJFilter.muLabel = 'muons'
-# process.LJFilter.elecLabel = 'gsfElectrons'
-# process.LJFilter.photLabel = 'photons'
-# process.LJFilter.jetLabel = 'ak5CaloJets'
-# process.LJFilter.tauLabel = 'shrinkingConePFTauProducer'
-# process.LJFilter.muonsMin = -1
-# process.LJFilter.electronsMin = -1
-# process.LJFilter.photMin = 1
-# process.LJFilter.photET = 20.
-# process.LJFilter.photHoE = 0.05
-##################################################################
+#----------------------------------------------------------------------------------------------------
+# Lepton + Jets filter
+#----------------------------------------------------------------------------------------------------
+
+process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
+
+#### Shared Muon/Electron/Tau Skim
+process.LJFilter.tauLabel = cms.InputTag("cleanPatTaus")                        
+process.LJFilter.muLabel = cms.InputTag("cleanPatMuons")
+process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
+process.LJFilter.jetLabel = cms.InputTag("cleanPatJetsAK5PF")
+process.LJFilter.muonsMin = 1
+process.LJFilter.muPT = 20.
+process.LJFilter.electronsMin = 1
+process.LJFilter.elecPT = 20.
+process.LJFilter.tausMin = 1
+process.LJFilter.tauPT = 15
+process.LJFilter.counteitherleptontype = True
 
 #----------------------------------------------------------------------------------------------------
 # Define the output tree for RootTupleMakerV2
@@ -379,6 +375,8 @@ process.p = cms.Path(
     process.ecalLaserCorrFilter*
     # PAT sequence
     process.patDefaultSequence*
+    # L+J filter
+    process.LJFilter*    
     # PAT MET producers
     process.patMETsRawCalo*       # CaloMET: RAW
     process.patMETsRawPF*         # PFMET  : Raw

@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleCaloMET = cms.EDProducer("RootTupleMakerV2_MET",
-    InputTag = cms.InputTag('patMETs'),
+    InputTag = cms.InputTag('patMETsRawCalo'),
     Prefix = cms.string('Calo'),
     Suffix = cms.string(''),
     StoreUncorrectedMET = cms.bool(True),
@@ -17,25 +17,42 @@ rootTupleTCMET = cms.EDProducer("RootTupleMakerV2_MET",
 )
 
 rootTuplePFMET = cms.EDProducer("RootTupleMakerV2_MET",
-    InputTag = cms.InputTag('patMETsPF'),
+    InputTag = cms.InputTag('patMETsRawPF'),
     Prefix = cms.string('PF'),
     Suffix = cms.string(''),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(True)
 )
 
+rootTupleCaloMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
+    InputTag = cms.InputTag('patMETs'),
+    Prefix = cms.string('Calo'),
+    Suffix = cms.string('Type1Cor'),
+    StoreUncorrectedMET = cms.bool(True),
+    StoreMETSignificance = cms.bool(False)
+
+)
+
 rootTuplePFMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
-    InputTag = cms.InputTag('patMETsPFType1Cor'),
+    InputTag = cms.InputTag('patMETsPF'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1Cor'),
     StoreUncorrectedMET = cms.bool(False),
-    StoreMETSignificance = cms.bool(False)
+    StoreMETSignificance = cms.bool(True)
 )
 
-rootTuplePFChargedMET = cms.EDProducer("RootTupleMakerV2_MET",
-    InputTag = cms.InputTag('patMETsPFCharged'),
+rootTuplePFMETType01Cor = cms.EDProducer("RootTupleMakerV2_MET",
+    InputTag = cms.InputTag('patMETsAK5PF'),
     Prefix = cms.string('PF'),
-    Suffix = cms.string('Charged'),
+    Suffix = cms.string('Type01Cor'),
     StoreUncorrectedMET = cms.bool(False),
-    StoreMETSignificance = cms.bool(False)
+    StoreMETSignificance = cms.bool(True)
+)
+
+rootTuplePFMETType01XYCor = cms.EDProducer("RootTupleMakerV2_MET",
+    InputTag = cms.InputTag('patMETsAK5PFXYShift'),
+    Prefix = cms.string('PF'),
+    Suffix = cms.string('Type01XYCor'),
+    StoreUncorrectedMET = cms.bool(False),
+    StoreMETSignificance = cms.bool(True)
 )

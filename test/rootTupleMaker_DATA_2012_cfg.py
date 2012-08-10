@@ -232,32 +232,56 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doJetID      = True,
 )
 
-
 #----------------------------------------------------------------------------------------------------
-# Add PFMET corrections:
-# - Type 0 : PU corrections
-# - Type 1 : JES corrections
-# - MET x/y shift correction: phi modulation
+# Available pat::MET collections
+# - process.patMETsTC          : raw TCMET                    (already included, no extra code needed)
+# - process.patMETsRawCalo     : raw CaloMET
+# - process.patMETs            : Type1-corrected CaloMET      (already included, no extra code needed)
+# - process.patMETsRawPF       : raw PFMET
+# - process.patMETsPF          : Type1-corrected PFMET        (already included, no extra code needed)
+# - process.patMETsAK5PF       : Type0+1-corrected PFMET
+# - process.patMETsAK5PFXYShift: Type0+1-corrected + XY shift-corrected PFMET
+#
+# No Type0 corrections are available for CaloMET
+# No Type0 or Type1 corrections are available for TCMET
+# Type2 corrections are not recommended, since they degrade the MET resolution
+#
+# Thanks to Jared Sturdy
 #----------------------------------------------------------------------------------------------------
 
-# type-0 MET corrections
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
+# CaloMET: raw
 
-# type-1 MET corrections (see jets)
+process.patMETsRawCalo = process.patMETsTC.clone()
+process.patMETsRawCalo.metSource = cms.InputTag("met")
 
-# MET x/y shift correction: phi modulation
-process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+# PFMET: raw
+
+process.patMETsRawPF = process.patMETsTC.clone()
+process.patMETsRawPF.metSource = cms.InputTag("pfMet")
+
+# PFMET: Type 0+1 corrections
+
+process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+
+process.AK5PFType1CorMet.applyType0Corrections = cms.bool(False)
+process.AK5PFType1CorMet.srcType1Corrections   = cms.VInputTag(
+    cms.InputTag('pfMETcorrType0'),
+    cms.InputTag('pfJetMETcorr', 'type1')
+)
+
+# PFMET: Type 0+1 corrections + XY systematic shift correction
+
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
 process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
-
-process.pfType1CorrectedMet.applyType0Corrections = cms.bool(True)
-
-process.patType1CorrectedPFMet.srcType1Corrections = cms.VInputTag(
-   cms.InputTag('patPFJetMETtype1p2Corr', 'type1'),
-   cms.InputTag('patPFMETtype0Corr'),
-   cms.InputTag('pfMEtSysShiftCorr')
+process.AK5PFType1CorMetXYShift = process.AK5PFType1CorMet.clone()
+process.AK5PFType1CorMetXYShift.srcType1Corrections = cms.VInputTag(
+    cms.InputTag('pfMETcorrType0'),      
+    cms.InputTag('pfJetMETcorr', 'type1'),
+    cms.InputTag('pfMEtSysShiftCorr')    
 )
+process.patMETsAK5PFXYShift = process.patMETsAK5PF.clone()
+process.patMETsAK5PFXYShift.metSource = cms.InputTag ("AK5PFType1CorMetXYShift")
 
 # Skim definition
 # process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
@@ -306,8 +330,11 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
+        'keep *_rootTupleCaloMETType1Cor_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
-        'keep *_rootTuplePFChargedMET_*_*',
+        'keep *_rootTuplePFMETType01Cor_*_*',
+        'keep *_rootTuplePFMETType01XYCor_*_*',
+        # 'keep *_rootTuplePFChargedMET_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
@@ -331,10 +358,15 @@ process.p = cms.Path(
     process.gsfElectronsHEEPCorr*process.eIdSequence*process.remadePFEleLinks*
     # MVA electron ID
     process.mvaID*
-    # # Good vertices
+    # Good vertices
     process.goodVertices*
-    # # Type-0 MET correction
+    # PFMET corrections
     process.type0PFMEtCorrection*
+    process.pfMEtSysShiftCorrSequence*
+    process.producePFMETCorrections*
+    # PFMET producers
+    process.AK5PFType1CorMet*
+    process.AK5PFType1CorMetXYShift*
     # MET filters (required):
     process.CSCTightHaloFilter*
     process.EcalDeadCellTriggerPrimitiveFilter*
@@ -347,6 +379,11 @@ process.p = cms.Path(
     process.ecalLaserCorrFilter*
     # PAT sequence
     process.patDefaultSequence*
+    # PAT MET producers
+    process.patMETsRawCalo*       # CaloMET: RAW
+    process.patMETsRawPF*         # PFMET  : Raw
+    process.patMETsAK5PF*         # PFMET  : Type 0+1 corrections
+    process.patMETsAK5PFXYShift*  # PFMET  : Type 0+1 corrections, X/Y shift
     # RootTupleMakerV2
     (
     process.rootTupleEvent+
@@ -358,7 +395,10 @@ process.p = cms.Path(
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
     process.rootTuplePFMET+
-    # process.rootTuplePFMETType1Cor+
+    process.rootTupleCaloMETType1Cor+
+    process.rootTuplePFMETType1Cor+
+    process.rootTuplePFMETType01Cor+
+    process.rootTuplePFMETType01XYCor+
     # process.rootTuplePFChargedMET+
     process.rootTupleMuons+
     process.rootTupleTrigger+

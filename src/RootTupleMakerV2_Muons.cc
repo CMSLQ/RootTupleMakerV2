@@ -201,8 +201,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012 
   std::auto_ptr<std::vector<int> >     isPF                       ( new std::vector<int>()    );
   std::auto_ptr<std::vector<int> >     trackLayersWithMeasurement ( new std::vector<int>()    );   
-  // Trigger matching variables
-  
+  //
+  // Trigger matching variables  
   std::auto_ptr<std::vector<bool  > >  HLTSingleMuonMatched     ( new std::vector<bool  >()  );
   std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchPt 	( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchEta	( new std::vector<double>()  );
@@ -246,17 +246,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   // For muon cocktails:
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMuonAnalysis#High_pT_muons
+  // See: https://hypernews.cern.ch/HyperNews/CMS/get/muon/787/1.html
 
-  edm::Handle<reco::TrackToTrackMap> tevMapH1;
-  edm::Handle<reco::TrackToTrackMap> tevMapH2;
-  edm::Handle<reco::TrackToTrackMap> tevMapH3;
+  //edm::Handle<reco::TrackToTrackMap> tevMapH1;
+  //edm::Handle<reco::TrackToTrackMap> tevMapH2;
+  //edm::Handle<reco::TrackToTrackMap> tevMapH3;
 
-  iEvent.getByLabel("tevMuons", "default", tevMapH1);
-  const reco::TrackToTrackMap tevMap1 = *(tevMapH1.product());
-  iEvent.getByLabel("tevMuons", "firstHit", tevMapH2);
-  const reco::TrackToTrackMap tevMap2 = *(tevMapH2.product());
-  iEvent.getByLabel("tevMuons", "picky", tevMapH3);
-  const reco::TrackToTrackMap tevMap3 = *(tevMapH3.product());
+  //iEvent.getByLabel("tevMuons", "default", tevMapH1);
+  //const reco::TrackToTrackMap tevMap1 = *(tevMapH1.product());
+  //iEvent.getByLabel("tevMuons", "firstHit", tevMapH2);
+  //const reco::TrackToTrackMap tevMap2 = *(tevMapH2.product());
+  //iEvent.getByLabel("tevMuons", "picky", tevMapH3);
+  //const reco::TrackToTrackMap tevMap3 = *(tevMapH3.product());
 
   // PAT trigger helper for trigger matching information
 
@@ -411,7 +412,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      int refit_id = -999;
 
 	      // home-brewed pmcTrack is obsolete for 2012, using tevOptimized instead.
-	      reco::TrackRef cocktail_track = muon::tevOptimized(*it, tevMap1, tevMap2, tevMap3).first;
+	      // reco::TrackRef cocktail_track = muon::tevOptimized(*it, tevMap1, tevMap2, tevMap3).first;
+	      // See: https://hypernews.cern.ch/HyperNews/CMS/get/muon/787/1.html
+	      reco::TrackRef cocktail_track = muon::tevOptimized( *it, 200., 4., 6. ).first;
 
 	      double cttrkd0  = cocktail_track -> d0() ;
 	      if( beamSpotCorr && beamSpot.isValid() )

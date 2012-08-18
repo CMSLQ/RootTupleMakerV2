@@ -406,8 +406,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  trkVz     ->push_back( it->track()->vz()             );
 	  trackChi2 ->push_back( it->track()->normalizedChi2() );
 
-
-	  if ( useCocktailRefits )
+	  // Global High Pt Muons, aka Cocktail Muons
+	  if ( useCocktailRefits && it->isGlobalMuon() )
 	    {	      
 	      int refit_id = -999;
 

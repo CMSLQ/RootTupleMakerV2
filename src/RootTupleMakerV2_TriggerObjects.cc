@@ -124,9 +124,27 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  int id = int (triggerObjectIds[iFilterObject]);
 
 	  (*v_filter_ids )[nFiltersPassed].push_back ( id ) ;
-	  (*v_filter_pts )[nFiltersPassed].push_back ( (float) triggerObjectP4s[iFilterObject].Pt () );
-	  (*v_filter_etas)[nFiltersPassed].push_back ( (float) triggerObjectP4s[iFilterObject].Eta() );
-	  (*v_filter_phis)[nFiltersPassed].push_back ( (float) triggerObjectP4s[iFilterObject].Phi() );
+	  // Some trigger objects fail with the following message:
+	  // ------------------------------------------------//
+	  // Fatal Root Error: @SUB=TVector3::PseudoRapidity //
+	  // transvers momentum = 0! return +/- 10e10        //
+	  // ------------------------------------------------//
+	  // Ex/   hltElectron40CaloIdTTrkIdTCleanedPFHT300
+	  // Ex/   hltElectron60CaloIdTTrkIdTCleanedPFHT300
+	  // Hence, set Pt,Eta,Phi to -99 if Pt=0   
+	  if( (float)(triggerObjectP4s[iFilterObject].Pt())>0 )
+            {
+              (*v_filter_pts )[nFiltersPassed].push_back ( (float) triggerObjectP4s[iFilterObject].Pt () );
+              (*v_filter_etas)[nFiltersPassed].push_back ( (float) triggerObjectP4s[iFilterObject].Eta() );
+              (*v_filter_phis)[nFiltersPassed].push_back ( (float) triggerObjectP4s[iFilterObject].Phi() );
+            }
+          else
+            {
+              (*v_filter_pts )[nFiltersPassed].push_back ( (float)(-99) );
+              (*v_filter_etas)[nFiltersPassed].push_back ( (float)(-99) );
+              (*v_filter_phis)[nFiltersPassed].push_back ( (float)(-99) );
+            }
+	  //
 	}
 	
 	nFiltersPassed++;

@@ -4,6 +4,7 @@
 RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig) :
   //fastJetForIsolationInputTag(iConfig.getParameter<edm::InputTag>("FastJetForIsolationInputTag")),//not used in 2012
   fastJetForJECInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECInputTag")),
+  fastJetForHEEPInputTag(iConfig.getParameter<edm::InputTag>("FastJetForHEEPInputTag")),
   fastJetForJECCCPUInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECCCPUInputTag")),
   fastJetForJECCNInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECCNInputTag")),
   fastJetForJECCNTInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECCNTInputTag"))
@@ -16,7 +17,8 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
   produces <double>       ( "time"   );
   produces <bool>         ( "isData" );
   //produces <double>     ( "rhoIso" );//not used in 2012 
-  produces <double>       ( "rhoJets"     );//used in HEEP ID v4.0
+  produces <double>       ( "rhoJets"     );
+  produces <double>       ( "rhoForHEEP"  );
   produces <double>       ( "rhoJetsCCPU" );
   produces <double>       ( "rhoJetsCN"   );
   produces <double>       ( "rhoJetsCNT"  );
@@ -47,6 +49,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(fastJetForJECInputTag,rhoHJets);
   std::auto_ptr<double >        rhoJets     ( new double( *rhoHJets.product() )     );
 
+  edm::Handle<double> rhoHForHEEP;
+  iEvent.getByLabel(fastJetForHEEPInputTag, rhoHForHEEP);
+  std::auto_ptr<double >        rhoForHEEP  ( new double( *rhoHForHEEP.product() )     );
+
   edm::Handle<double> rhoHJetsCCPU;
   iEvent.getByLabel(fastJetForJECCCPUInputTag,rhoHJetsCCPU);
   std::auto_ptr<double >        rhoJetsCCPU ( new double( *rhoHJetsCCPU.product() ) );
@@ -71,6 +77,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( isdata,"isData");
   //iEvent.put( rhoIso,   "rhoIso"   );
   iEvent.put( rhoJets,     "rhoJets"     );
+  iEvent.put( rhoForHEEP,  "rhoForHEEP"  );
   iEvent.put( rhoJetsCCPU, "rhoJetsCCPU" );
   iEvent.put( rhoJetsCN,   "rhoJetsCN"   );
   iEvent.put( rhoJetsCNT,  "rhoJetsCNT"  );

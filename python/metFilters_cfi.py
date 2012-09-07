@@ -16,6 +16,7 @@ CSCTightHaloFilter.taggingMode = cms.bool ( True )
 # HBHE noise filter:
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#HBHE_Noise_Filter
 # ------------------------------------------------------------------------------------
+
 from CommonTools.RecoAlgos.HBHENoiseFilter_cfi import *
 HBHENoiseFilter.taggingMode = cms.bool ( True ) 
 
@@ -23,22 +24,25 @@ HBHENoiseFilter.taggingMode = cms.bool ( True )
 # HBHE noise filter results producer
 # https://twiki.cern.ch/twiki/bin/view/CMS/HBHEAnomalousSignals2012
 # ------------------------------------------------------------------------------------
-HBHENoiseFilterResultProducer = cms.EDProducer( 'HBHENoiseFilterResultProducer',
-                                                noiselabel = cms.InputTag('hcalnoise','','RECO'),
-                                                minRatio = cms.double(-999),
-                                                maxRatio = cms.double(999),
-                                                minHPDHits = cms.int32(17),
-                                                minRBXHits = cms.int32(999),
-                                                minHPDNoOtherHits = cms.int32(10),
-                                                minZeros = cms.int32(10),
-                                                minHighEHitTime = cms.double(-9999.0),
-                                                maxHighEHitTime = cms.double(9999.0),
-                                                maxRBXEMF = cms.double(-999.0),
-                                                minNumIsolatedNoiseChannels = cms.int32(9999),
-                                                minIsolatedNoiseSumE = cms.double(9999),
-                                                minIsolatedNoiseSumEt = cms.double(9999),
-                                                useTS4TS5 = cms.bool(True)
-                                                )
+
+from CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi import *
+
+# HBHENoiseFilterResultProducer = cms.EDProducer( 'HBHENoiseFilterResultProducer',
+#                                                 noiselabel = cms.InputTag('hcalnoise','','RECO'),
+#                                                 minRatio = cms.double(-999),
+#                                                 maxRatio = cms.double(999),
+#                                                 minHPDHits = cms.int32(17),
+#                                                 minRBXHits = cms.int32(999),
+#                                                 minHPDNoOtherHits = cms.int32(10),
+#                                                 minZeros = cms.int32(10),
+#                                                 minHighEHitTime = cms.double(-9999.0),
+#                                                 maxHighEHitTime = cms.double(9999.0),
+#                                                 maxRBXEMF = cms.double(-999.0),
+#                                                 minNumIsolatedNoiseChannels = cms.int32(9999),
+#                                                 minIsolatedNoiseSumE = cms.double(9999),
+#                                                 minIsolatedNoiseSumEt = cms.double(9999),
+#                                                 useTS4TS5 = cms.bool(True)
+#                                                 )
 
 # ------------------------------------------------------------------------------------
 # HCAL laser filter:

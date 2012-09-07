@@ -25,6 +25,14 @@
 #include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
 #include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 
+#include "DataFormats/RecoCandidate/interface/IsoDepositDirection.h"
+#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
+#include "DataFormats/RecoCandidate/interface/IsoDepositVetos.h"
+#include "DataFormats/PatCandidates/interface/Isolation.h"
+
+#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
+#include "EGamma/EGammaAnalysisTools/interface/EGammaCutBasedEleId.h"
+
 //------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------s
@@ -37,6 +45,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   beamSpotInputTag         (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
   conversionsInputTag      (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"      )),
   triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
+  rhoInputTag              (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
   electronIso              (iConfig.getParameter<double>       ("ElectronIso"              )),
   muonPt                   (iConfig.getParameter<double>       ("MuonPt"                   )),
   muonIso                  (iConfig.getParameter<double>       ("MuonIso"                  )),
@@ -74,6 +83,13 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 
   // ID information
   produces <std::vector<int> >    ( prefix + "PassId"                   + suffix );
+  produces <std::vector<int> >    ( prefix + "PassEGammaIDVeto"         + suffix );
+  produces <std::vector<int> >    ( prefix + "PassEGammaIDLoose"        + suffix );
+  produces <std::vector<int> >    ( prefix + "PassEGammaIDMedium"       + suffix );
+  produces <std::vector<int> >    ( prefix + "PassEGammaIDTight"        + suffix );
+  produces <std::vector<int> >    ( prefix + "PassEGammaIDTrigTight"    + suffix );
+  produces <std::vector<int> >    ( prefix + "PassEGammaIDTrigWP70"     + suffix );
+  produces <std::vector<int> >    ( prefix + "PassEGammaIDEoP"          + suffix );
   								        
   // Does this electron overlap with a muon?			        
   produces <std::vector<int> >    ( prefix + "Overlaps"                 + suffix );
@@ -112,6 +128,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "PFNeutralHadronIso"       + suffix );
   produces <std::vector<double> > ( prefix + "PFPhotonIso"              + suffix );
   produces <std::vector<double> > ( prefix + "PFPUChargedHadronIso"     + suffix );
+
+  produces <std::vector<double> > ( prefix + "RhoEffectiveArea"         + suffix );
   
   // Isolation variables: DR 0.3				        
 								        
@@ -130,6 +148,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "DCotTheta"                + suffix );
   produces <std::vector<double> > ( prefix + "Fbrem"                    + suffix );
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot"       + suffix );
+  produces <std::vector<double> > ( prefix + "ConvFitProb"              + suffix );
 
   // Vertex and beamspot information
 
@@ -206,7 +225,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // ID information
   std::auto_ptr<std::vector<int > >    passIds                   ( new std::vector<int>   ()  );
-  
+  std::auto_ptr<std::vector<int > >    passEGammaIDVeto          ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int > >    passEGammaIDLoose         ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int > >    passEGammaIDMedium        ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int > >    passEGammaIDTight         ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int > >    passEGammaIDTrigTight     ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int > >    passEGammaIDTrigWP70      ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int > >    passEGammaIDEoP           ( new std::vector<int>   ()  ); 
+
   // Does this electron overlap with a muon?
   std::auto_ptr<std::vector<int> >     overlaps                  ( new std::vector<int>   ()  );
 
@@ -244,7 +270,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pfNeutralHadronIso        ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfPhotonIso               ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfPUChargedHadronIso      ( new std::vector<double>()  );
-  
+  std::auto_ptr<std::vector<double> >  rhoEffectiveArea          ( new std::vector<double>()  );
+
   // Isolation variables: DR 0.3
 
   std::auto_ptr<std::vector<double> >  ecalIsoDR03               ( new std::vector<double>()  );
@@ -262,6 +289,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  dCotTheta                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  fbrem                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot        ( new std::vector<bool>  ()  );
+  std::auto_ptr<std::vector<double > > convFitProb_vec           ( new std::vector<double>()  );
 
   // Vertex and beamspot information
   
@@ -346,7 +374,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // PAT trigger helper for trigger matching information
 
   const pat::helper::TriggerMatchHelper matchHelper;
-  
+
+  // rho for EGamma isolation calculation
+
+  edm::Handle<double> rho;
+  iEvent.getByLabel(rhoInputTag, rho);
+  double rhoIso = *(rho.product());
+
   //------------------------------------------------------------------------
   // Get magnetic field (need this for photon conversion information):
   //   - if isRealData then derive bfield using the magnet current from DcsStatus
@@ -493,6 +527,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       double reliso = (it->trackIso() + it->ecalIso() + it->hcalIso())/it->pt();
 
+
+      //------------------------------------------------------------------------
+      // Get effective area for rho-correction of PF isolation
+      //------------------------------------------------------------------------
+      
+      double AEff03 = 0.00;
+      
+      if(iEvent.isRealData()){
+	AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, it->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2011);
+      }else{
+	AEff03 = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, it->superCluster()->eta(), ElectronEffectiveArea::kEleEAFall11MC);
+      }
+      
       //------------------------------------------------------------------------
       // Conversion information
       //------------------------------------------------------------------------
@@ -513,11 +560,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       // Conversion (fit) 
       bool matchesConv = false;
+      double convFitProb = 0.0;
       if( hConversions.isValid() && bsHandle.isValid() ) 
 	{
 	  // See: https://twiki.cern.ch/twiki/bin/view/CMS/ConversionTools#Conversion_veto_for_electron_ID
 	  matchesConv = ConversionTools::hasMatchedConversion(*it,hConversions,bsHandle->position());
-	  
+	  if ( matchesConv ) { 
+	    reco::ConversionRef matchedConv = ConversionTools::matchedConversion   (*it,hConversions,bsHandle->position());
+	    reco::Vertex vertex = matchedConv->conversionVertex();
+	    convFitProb = TMath::Prob( vertex.chi2(), vertex.ndof() );
+	  }
 	}
       else 
 	{
@@ -581,8 +633,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       caloEnergy               -> push_back ( it->caloEnergy() );
       charge                   -> push_back ( it->charge() );
       hoe                      -> push_back ( it->hadronicOverEm() );
-      
-      passIds                  -> push_back ( passId );
 
       // Supercluster kinematic variables
 
@@ -594,7 +644,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       // ID information
       passIds                  -> push_back( passId );
-
+      passEGammaIDVeto         -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::VETO  , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
+      passEGammaIDLoose        -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::LOOSE , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
+      passEGammaIDMedium       -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::MEDIUM, *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
+      passEGammaIDTight        -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::TIGHT , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
+      passEGammaIDTrigTight    -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, *it));
+      passEGammaIDTrigWP70     -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70 , *it));
+      passEGammaIDEoP          -> push_back (EgammaCutBasedEleId::PassEoverPCuts(*it));
+      
       // Does this electron overlap with a muon?
       overlaps                 -> push_back( ovrlps );
       
@@ -632,7 +689,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pfNeutralHadronIso       -> push_back ( it->neutralHadronIso  () );
       pfPhotonIso              -> push_back ( it->photonIso         () );
       pfPUChargedHadronIso     -> push_back ( it->puChargedHadronIso() );
-      
+      rhoEffectiveArea         -> push_back ( AEff03 );
+
       // Isolation variables: DR 0.3
 
       ecalIsoDR03              -> push_back ( it->dr03EcalRecHitSumEt() );
@@ -654,6 +712,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       dCotTheta                -> push_back ( dcot );
       hasMatchedConvPhot       -> push_back ( matchesConv );
       fbrem                    -> push_back ( it->fbrem() );
+      convFitProb_vec          -> push_back ( convFitProb );
       
       // Vertex association variables
       
@@ -707,7 +766,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // ID information 
   iEvent.put( passIds                 , prefix + "PassId"                   + suffix );
-  
+  iEvent.put( passEGammaIDVeto        , prefix + "PassEGammaIDVeto"         + suffix );
+  iEvent.put( passEGammaIDLoose       , prefix + "PassEGammaIDLoose"        + suffix );
+  iEvent.put( passEGammaIDMedium      , prefix + "PassEGammaIDMedium"       + suffix );
+  iEvent.put( passEGammaIDTight       , prefix + "PassEGammaIDTight"        + suffix );
+  iEvent.put( passEGammaIDTrigTight   , prefix + "PassEGammaIDTrigTight"    + suffix );
+  iEvent.put( passEGammaIDTrigWP70    , prefix + "PassEGammaIDTrigWP70"     + suffix );
+  iEvent.put( passEGammaIDEoP         , prefix + "PassEGammaIDEoP"          + suffix );
+  						
   // Does this electron overlap with a muon?			        
   iEvent.put( overlaps                , prefix + "Overlaps"                 + suffix );
 
@@ -754,6 +820,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pfNeutralHadronIso      , prefix + "PFNeutralHadronIso"       + suffix );
   iEvent.put( pfPhotonIso             , prefix + "PFPhotonIso"              + suffix );
   iEvent.put( pfPUChargedHadronIso    , prefix + "PFPUChargedHadronIso"     + suffix );
+  iEvent.put( rhoEffectiveArea        , prefix + "RhoEffectiveArea"         + suffix );
 
   // Conversion variables					        
   
@@ -763,6 +830,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( dCotTheta               , prefix + "DCotTheta"                + suffix );
   iEvent.put( fbrem                   , prefix + "Fbrem"                    + suffix );
   iEvent.put( hasMatchedConvPhot      , prefix + "HasMatchedConvPhot"       + suffix );
+  iEvent.put( convFitProb_vec         , prefix + "ConvFitProb"              + suffix );
 
   // Vertex and beamspot information
 

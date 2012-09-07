@@ -16,6 +16,7 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     ConversionsInputTag = cms.InputTag('allConversions'),
     TriggerEventInputTag = cms.InputTag('patTriggerEvent'),                                    
     LikelihoodInputTag = cms.InputTag('egammaIDLikelihood') ,
+    RhoInputTag = cms.InputTag('kt6PFJets','rho'),
     SingleEleTriggerMatch     = cms.string ("cleanElectronTriggerMatchHLTSingleElectron"),
     SingleEleTriggerMatchWP80 = cms.string ("cleanElectronTriggerMatchHLTSingleElectronWP80"),
     DoubleEleTriggerMatch     = cms.string ("cleanElectronTriggerMatchHLTDoubleElectron")

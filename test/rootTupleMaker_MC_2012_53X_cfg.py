@@ -66,6 +66,7 @@ process.options.wantSummary = False
 # Input files
 process.source.fileNames = [
     'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToUE_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
+    #'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
     #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
@@ -363,6 +364,8 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
+        'keep *_rootTupleGenTausFromLQs_*_*',
+        'keep *_rootTupleGenTausFromLQTops_*_*',
         'keep *_rootTupleGenJets_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
         'keep *_rootTupleGenMETCalo_*_*',       
@@ -372,10 +375,19 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 )
 
 #----------------------------------------------------------------------------------------------------
+# Define GEN particle skimmer
+#----------------------------------------------------------------------------------------------------
+
+process.load ('Leptoquarks.LeptonJetGenTools.genTausFromLQs_cfi')
+
+#----------------------------------------------------------------------------------------------------
 # Define the path 
 #----------------------------------------------------------------------------------------------------
 
 process.p = cms.Path(
+    # gen particles
+    process.genTausFromLQs*
+    process.genTausFromLQTops*
     # pdf weights
     process.pdfWeights*
     # Use correct electron energies and re-run the electron ID sequence and particle flow link sequence
@@ -434,6 +446,8 @@ process.p = cms.Path(
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
+    process.rootTupleGenTausFromLQs+
+    process.rootTupleGenTausFromLQTops+
     process.rootTupleGenJets+
     process.rootTupleGenMETTrue+
     process.rootTupleGenMETCalo+    

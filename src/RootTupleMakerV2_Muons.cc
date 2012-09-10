@@ -88,6 +88,12 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // col
   produces <std::vector<double> > ( prefix + "BeamSpotDXYError"      + suffix );
   produces <std::vector<int> >    ( prefix + "IsGlobal"  + suffix );
   produces <std::vector<int> >    ( prefix + "IsTracker" + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticle1Pt"  + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticle1Eta"  + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticle1Phi"  + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticle3Pt"  + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticle3Eta"  + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticle3Phi"  + suffix );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012
@@ -196,6 +202,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  beamspotDXYError  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     IsGlobal    ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     IsTracker   ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticle1pt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticle1eta ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticle1phi ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticle3pt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticle3eta ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticle3phi ( new std::vector<double>()  );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012 
@@ -280,6 +292,30 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if( !it->isGlobalMuon() && !it->isTrackerMuon() ) continue;
 	  // if muonPt is less than 5GeV, continue.
 	  if( it->pt()<5 ) continue;
+
+	  /// Gen Matching
+	  double genpar1Pt = -999.;  double genpar3Pt = -999.;
+	  double genpar1Eta= -999.;  double genpar3Eta= -999.;
+	  double genpar1Phi= -999.;  double genpar3Phi= -999.;
+	  for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){//it->genParticleRefs().size() should be 0, 1 or 2
+	    if( it->genParticle(igen)->status()==1){
+	      genpar1Pt =it->genParticle(igen)->pt();
+	      genpar1Eta=it->genParticle(igen)->eta();
+	      genpar1Phi=it->genParticle(igen)->phi();
+	    }
+	    if( it->genParticle(igen)->status()==3){
+	      genpar3Pt =it->genParticle(igen)->pt();
+	      genpar3Eta=it->genParticle(igen)->eta();
+	      genpar3Phi=it->genParticle(igen)->phi();
+	    }
+	  }
+	  matchedgenparticle1pt     -> push_back ( (double)(genpar1Pt) );
+	  matchedgenparticle1eta    -> push_back ( (double)(genpar1Eta) );
+	  matchedgenparticle1phi    -> push_back ( (double)(genpar1Phi) );
+	  matchedgenparticle3pt     -> push_back ( (double)(genpar3Pt) );
+	  matchedgenparticle3eta    -> push_back ( (double)(genpar3Eta) );
+	  matchedgenparticle3phi    -> push_back ( (double)(genpar3Phi) );
+	  /// Gen Matching
 	  
 	  double trkd0   = it->track()->d0();
 	  
@@ -569,6 +605,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( primaryVertexDXYError,  prefix + "PrimaryVertexDXYError"   + suffix );
   iEvent.put( beamspotDXY,            prefix + "BeamSpotDXY"             + suffix );
   iEvent.put( beamspotDXYError,       prefix + "BeamSpotDXYError"        + suffix );
+  iEvent.put( matchedgenparticle1pt,  prefix + "MatchedGenParticle1Pt"   + suffix );
+  iEvent.put( matchedgenparticle1eta, prefix + "MatchedGenParticle1Eta"  + suffix );
+  iEvent.put( matchedgenparticle1phi, prefix + "MatchedGenParticle1Phi"  + suffix );
+  iEvent.put( matchedgenparticle3pt,  prefix + "MatchedGenParticle3Pt"   + suffix );
+  iEvent.put( matchedgenparticle3eta, prefix + "MatchedGenParticle3Eta"  + suffix );
+  iEvent.put( matchedgenparticle3phi, prefix + "MatchedGenParticle3Phi"  + suffix );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012 

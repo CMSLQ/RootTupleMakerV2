@@ -51,6 +51,12 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
   produces <std::vector<double> > ( prefix + "EcalStripSumEOverPLead"  + suffix ); 
   produces <std::vector<double> > ( prefix + "BremsRecoveryEOverPLead"  + suffix );
   produces <std::vector<double> > ( prefix + "MaximumHCALPFClusterEt"  + suffix ); 
+  produces <std::vector<double> > ( prefix + "MatchedGenParticlePt"  + suffix ); 
+  produces <std::vector<double> > ( prefix + "MatchedGenParticleEta"  + suffix ); 
+  produces <std::vector<double> > ( prefix + "MatchedGenParticlePhi"  + suffix ); 
+  produces <std::vector<double> > ( prefix + "MatchedGenJetPt"  + suffix ); 
+  produces <std::vector<double> > ( prefix + "MatchedGenJetEta"  + suffix ); 
+  produces <std::vector<double> > ( prefix + "MatchedGenJetPhi"  + suffix ); 
   //
   //shrinkingCone PFTau Discriminators (SCTau)
   if(isSCTau){
@@ -149,6 +155,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  ecalstripsumeoverplead  ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  bremsrecoveryeoverplead  ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  maximumhcalpfclusteret  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  matchedgenparticlept ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  matchedgenparticleeta ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  matchedgenparticlephi ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  matchedgenjetpt ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  matchedgenjeteta ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  matchedgenjetphi ( new std::vector<double>()   );
   //
   //shrinkingCone PFTau Discriminators (SCTau)
   std::auto_ptr<std::vector<double> >     leadingtrackfindingdiscr  ( new std::vector<double>()   );
@@ -319,6 +331,27 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       bremsrecoveryeoverplead          -> push_back( (double)(it->bremsRecoveryEOverPLead()) );
       maximumhcalpfclusteret           -> push_back( (double)(it->maximumHCALPFClusterEt()) );
       //
+      double genparPt =-999.; double genjetPt =-999.;
+      double genparEta=-999.; double genjetEta=-999.;
+      double genparPhi=-999.; double genjetPhi=-999.;
+      for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){//genParticleRefs().size() is either 0 or 1
+	genparPt=it->genParticle(igen)->pt();
+	genparEta=it->genParticle(igen)->eta();
+	genparPhi=it->genParticle(igen)->phi();
+      }
+      if( it->genJet() ){
+	genjetPt=it->genJet()->pt();
+	genjetEta=it->genJet()->eta();
+	genjetPhi=it->genJet()->phi();
+      }
+      matchedgenparticlept   -> push_back ( (double)(genparPt)  );
+      matchedgenparticleeta  -> push_back ( (double)(genparEta) );
+      matchedgenparticlephi  -> push_back ( (double)(genparPhi) );
+      matchedgenjetpt        -> push_back ( (double)(genjetPt)  );
+      matchedgenjeteta       -> push_back ( (double)(genjetEta) );
+      matchedgenjetphi       -> push_back ( (double)(genjetPhi) );
+      //
+      //
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //  --  User Isolation and isoDeposit Methods -- Feb 2012
       // 
@@ -451,6 +484,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( ecalstripsumeoverplead,           prefix + "EcalStripSumEOverPLead"            + suffix );
   iEvent.put( bremsrecoveryeoverplead,          prefix + "BremsRecoveryEOverPLead"           + suffix );
   iEvent.put( maximumhcalpfclusteret,           prefix + "MaximumHCALPFClusterEt"            + suffix );
+  iEvent.put( matchedgenparticlept,             prefix + "MatchedGenParticlePt"              + suffix );
+  iEvent.put( matchedgenparticleeta,            prefix + "MatchedGenParticleEta"             + suffix );
+  iEvent.put( matchedgenparticlephi,            prefix + "MatchedGenParticlePhi"             + suffix );
+  iEvent.put( matchedgenjetpt,                  prefix + "MatchedGenJetPt"                   + suffix );
+  iEvent.put( matchedgenjeteta,                 prefix + "MatchedGenJetEta"                  + suffix );
+  iEvent.put( matchedgenjetphi,                 prefix + "MatchedGenJetPhi"                  + suffix );
   //
   if(isSCTau){
     iEvent.put( leadingtrackfindingdiscr,               prefix + "LeadingTrackFindingDiscr"            + suffix );

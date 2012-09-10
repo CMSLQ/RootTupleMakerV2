@@ -7,3 +7,17 @@ rootTupleGenParticles = cms.EDProducer("RootTupleMakerV2_GenParticles",
     MaxSize = cms.uint32(25)
 )
 
+rootTupleGenTausFromLQs = cms.EDProducer("RootTupleMakerV2_GenParticles",
+    InputTag = cms.InputTag('genTausFromLQs'),
+    Prefix = cms.string('GenLQTau'),
+    Suffix = cms.string(''),
+    MaxSize = cms.uint32(25)
+)
+
+rootTupleGenTausFromLQTops = cms.EDProducer("RootTupleMakerV2_GenParticles",
+    InputTag = cms.InputTag('genTausFromLQTops'),
+    Prefix = cms.string('GenLQTopTau'),
+    Suffix = cms.string(''),
+    MaxSize = cms.uint32(25)
+)
+

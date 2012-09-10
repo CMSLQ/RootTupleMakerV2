@@ -46,7 +46,8 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RootTupleMakerV2_output_MC.root')
+#    fileName = cms.string('RootTupleMakerV2_output_MC.root')
+     fileName = cms.string('RootTupleMakerV2_Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST_wGenMatching.root')
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -58,14 +59,15 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START52_V11C::All'
 
 # Events to process
-process.maxEvents.input = 300
+process.maxEvents.input = 10
 
 # Options and Output Report
 process.options.wantSummary = False
 
 # Input files
 process.source.fileNames = [
-    'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
+    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
+    #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
     #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
@@ -281,6 +283,87 @@ process.AK5PFType1CorMetXYShift.srcType1Corrections = cms.VInputTag(
 )
 process.patMETsAK5PFXYShift = process.patMETsAK5PF.clone()
 process.patMETsAK5PFXYShift.metSource = cms.InputTag ("AK5PFType1CorMetXYShift")
+
+#----------------------------------------------------------------------------------------------------
+# Add Lepton-Gen Matching 
+#
+# Example is provided here:  https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATMCMatchingExercise
+#
+# Access (Electrons - Muons - Taus):
+# for(uint i = 0 ; i < it->genParticleRefs().size() ; ++i ){
+#  it->genParticle(i)->status();
+#  it->genParticle(i)->pt();
+# }
+#
+# Access (Tau Jets):
+# if( it->genJet() ) it->genJet()->pt();
+#
+#----------------------------------------------------------------------------------------------------
+# Electron - Gen Matching
+process.load("PhysicsTools.PatAlgos.mcMatchLayer0.electronMatch_cfi")
+process.elMatch1 = process.electronMatch.clone(mcStatus = [1])
+process.elMatch3 = process.electronMatch.clone(mcStatus = [3])
+process.elMatch1.maxDeltaR = cms.double(0.5)
+process.elMatch3.maxDeltaR = cms.double(0.5)
+process.elMatch1.maxDPtRel = cms.double(999.9)
+process.elMatch3.maxDPtRel = cms.double(999.9)
+process.elMatch1.resolveAmbiguities = cms.bool(True)
+process.elMatch3.resolveAmbiguities = cms.bool(True)
+process.elMatch1.resolveByMatchQuality = cms.bool(True)
+process.elMatch3.resolveByMatchQuality = cms.bool(True)
+process.patDefaultSequence.replace(process.electronMatch,
+                                   process.elMatch1 +
+                                   process.elMatch3
+                                   )
+process.patElectrons.genParticleMatch = cms.VInputTag(
+    cms.InputTag("elMatch3"),
+    cms.InputTag("elMatch1")
+    )
+
+# Muon - Gen Matching
+process.load("PhysicsTools.PatAlgos.mcMatchLayer0.muonMatch_cfi")
+process.muMatch1 = process.muonMatch.clone(mcStatus = [1])
+process.muMatch3 = process.muonMatch.clone(mcStatus = [3])
+process.muMatch1.maxDeltaR = cms.double(0.5)
+process.muMatch3.maxDeltaR = cms.double(0.5)
+process.muMatch1.maxDPtRel = cms.double(999.9)
+process.muMatch3.maxDPtRel = cms.double(999.9)
+process.muMatch1.resolveAmbiguities = cms.bool(True)
+process.muMatch3.resolveAmbiguities = cms.bool(True)
+process.muMatch1.resolveByMatchQuality = cms.bool(True)
+process.muMatch3.resolveByMatchQuality = cms.bool(True)
+process.patDefaultSequence.replace(process.muonMatch,
+                                   process.muMatch1 +
+                                   process.muMatch3
+                                   )
+process.patMuons.genParticleMatch = cms.VInputTag(
+    cms.InputTag("muMatch3"),
+    cms.InputTag("muMatch1")
+    )
+
+# Tau - Gen Matching
+process.load("PhysicsTools.PatAlgos.mcMatchLayer0.tauMatch_cfi")
+process.tauLepMatch = process.tauMatch.clone()
+process.tauLepMatch.maxDeltaR = cms.double(0.7)
+process.tauLepMatch.maxDPtRel = cms.double(999.9)
+process.tauLepMatch.resolveAmbiguities = cms.bool(True)
+process.tauLepMatch.resolveByMatchQuality = cms.bool(True)
+process.patDefaultSequence.replace(process.tauMatch,
+                                   process.tauLepMatch
+                                   )
+process.patTaus.genParticleMatch = cms.VInputTag(
+    cms.InputTag("tauLepMatch")
+    )
+process.tauJetMatch = process.tauGenJetMatch.clone()
+process.tauJetMatch.maxDeltaR = cms.double(0.7)
+process.tauJetMatch.maxDPtRel = cms.double(999.9)
+process.tauJetMatch.resolveAmbiguities = cms.bool(True)
+process.tauJetMatch.resolveByMatchQuality = cms.bool(True)
+process.patDefaultSequence.replace(process.tauGenJetMatch,
+                                   process.tauJetMatch
+                                   )
+process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
+
 
 #----------------------------------------------------------------------------------------------------
 # Lepton + Jets filter

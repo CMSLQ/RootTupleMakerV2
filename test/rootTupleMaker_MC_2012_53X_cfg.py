@@ -151,7 +151,8 @@ switchOnTriggerMatching( process, triggerMatchers = [
         'cleanElectronTriggerMatchHLTSingleElectronWP80',
         'cleanElectronTriggerMatchHLTDoubleElectron',
         # muons
-        'cleanMuonTriggerMatchHLTSingleMuon'
+        'cleanMuonTriggerMatchHLTSingleMuon',
+        'cleanMuonTriggerMatchHLTSingleIsoMuon'
 ] )
 
 #----------------------------------------------------------------------------------------------------

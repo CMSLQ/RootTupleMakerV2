@@ -59,9 +59,6 @@ process.GlobalTag.globaltag = 'START52_V11C::All'
 # Events to process
 process.maxEvents.input = -1
 
-# Options and Output Report
-process.options.wantSummary = False
-
 # Input files
 process.source.fileNames = [
     'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToUE_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'

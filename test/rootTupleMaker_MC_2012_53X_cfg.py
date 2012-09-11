@@ -52,7 +52,6 @@ process.TFileService = cms.Service("TFileService",
 #----------------------------------------------------------------------------------------------------
 # Set global settings (number of events, global tag, input files, etc)
 #----------------------------------------------------------------------------------------------------
-
 # Make sure a correct global tag is used:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 process.GlobalTag.globaltag = 'START52_V11C::All'
@@ -71,6 +70,25 @@ process.source.fileNames = [
     #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
     #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
+
+#----------------------------------------------------------------------------------------------------
+# For 53x Data and MC, the default Jet Probability Calibration from the GlobalTag is not optimal 
+# and needs to be replaced in the following way, when using CRAB:
+# 
+# Hypernews: https://hypernews.cern.ch/HyperNews/CMS/get/exotica/1524.html
+# Twiki: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagJetProbabilityCalibration#Calibration_in_53x_Data_and_MC
+#----------------------------------------------------------------------------------------------------
+
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record  = cms.string          ("BTagTrackProbability2DRcd"              ),
+             tag     = cms.string          ("TrackProbabilityCalibration_2D_MC53X_v2"),
+             connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"  )
+    ),
+    cms.PSet(record  = cms.string          ("BTagTrackProbability3DRcd"              ),
+             tag     = cms.string          ("TrackProbabilityCalibration_3D_MC53X_v2"),
+             connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"  )
+    )
+)
 
 #----------------------------------------------------------------------------------------------------
 # Ensure that PF isolation for EGamma cut-based electron ID:

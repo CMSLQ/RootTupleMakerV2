@@ -295,6 +295,22 @@ process.AK5PFType1CorMetXYShift.srcType1Corrections = cms.VInputTag(
 process.patMETsAK5PFXYShift = process.patMETsAK5PF.clone()
 process.patMETsAK5PFXYShift.metSource = cms.InputTag ("AK5PFType1CorMetXYShift")
 
+
+#----------------------------------------------------------------------------------------------------
+# Set Lepton-Gen Matching Parameters
+#----------------------------------------------------------------------------------------------------
+
+process.load("Leptoquarks.RootTupleMakerV2.leptonGenMatching_cfi")
+process.patDefaultSequence.replace( process.electronMatch, process.elMatch )
+process.patElectrons.genParticleMatch = cms.VInputTag( cms.InputTag("elMatch") )
+process.patDefaultSequence.replace( process.muonMatch, process.muMatch )
+process.patMuons.genParticleMatch = cms.VInputTag( cms.InputTag("muMatch") )
+process.patDefaultSequence.replace( process.tauMatch, process.tauLepMatch )
+process.patTaus.genParticleMatch = cms.VInputTag( cms.InputTag("tauLepMatch") )
+process.patDefaultSequence.replace( process.tauGenJetMatch, process.tauJetMatch )
+process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
+
+
 #----------------------------------------------------------------------------------------------------
 # Lepton + Jets filter
 #----------------------------------------------------------------------------------------------------

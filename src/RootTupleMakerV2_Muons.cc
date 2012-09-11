@@ -22,48 +22,49 @@ maxSize  (iConfig.getParameter<unsigned int> ("MaxSize")),
 muonIso  (iConfig.getParameter<double>       ("MuonIso")),                //  threshold for "passIso" and "passCTIso"
 muonID   (iConfig.getParameter<std::string>  ("MuonID")),                 //  threshold for "passID"
 singleMuonTriggerMatch(iConfig.getParameter<std::string>("SingleMuonTriggerMatch")), // trigger matching string
+singleIsoMuonTriggerMatch(iConfig.getParameter<std::string>("SingleIsoMuonTriggerMatch")), // trigger matching string
 beamSpotCorr      (iConfig.getParameter<bool>("BeamSpotCorr")),
 useCocktailRefits (iConfig.getParameter<bool>("UseCocktailRefits")),
 vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // collection of primary vertices to be used.
 {
-  produces <std::vector<double> > ( prefix + "Eta" + suffix );
-  produces <std::vector<double> > ( prefix + "Phi" + suffix );
-  produces <std::vector<double> > ( prefix + "Pt"  + suffix );
-  produces <std::vector<double> > ( prefix + "EtaError" + suffix );
-  produces <std::vector<double> > ( prefix + "PhiError" + suffix );
-  produces <std::vector<double> > ( prefix + "PtError"  + suffix );
-  produces <std::vector<double> > ( prefix + "TrkEta" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPhi" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPt"  + suffix );
-  produces <std::vector<double> > ( prefix + "TrkEtaError" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPhiError" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPtError"  + suffix );
-  produces <std::vector<double> > ( prefix + "QOverPError" + suffix );
-  produces <std::vector<double> > ( prefix + "P"       + suffix );
-  produces <std::vector<double> > ( prefix + "Energy"  + suffix );
-  produces <std::vector<int> >    ( prefix + "Charge"  + suffix );
-  produces <std::vector<int> >    ( prefix + "TrkHits" + suffix );
-  produces <std::vector<int> >    ( prefix + "TrkHitsTrackerOnly" + suffix );
-  produces <std::vector<int> >    ( prefix + "GlobalTrkValidHits" + suffix );
-  produces <std::vector<int> >    ( prefix + "PixelHits"      + suffix );
-  produces <std::vector<int> >    ( prefix + "TrkPixelHits"   + suffix );
-  produces <std::vector<int> >    ( prefix + "SegmentMatches" + suffix );
-  produces <std::vector<int> >    ( prefix + "StationMatches" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkValidFractionOfHits" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkD0"      + suffix );
-  produces <std::vector<double> > ( prefix + "TrkD0Error" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkDz"      + suffix );
-  produces <std::vector<double> > ( prefix + "TrkDzError" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkVx" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkVy" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkVz" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackChi2"  + suffix );
-  produces <std::vector<double> > ( prefix + "GlobalChi2" + suffix );
-  produces <std::vector<double> > ( prefix + "TrkIso"     + suffix );
-  produces <std::vector<double> > ( prefix + "TrackerIsoSumPT" + suffix );
-  produces <std::vector<double> > ( prefix + "EcalIso" + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIso" + suffix );
-  produces <std::vector<double> > ( prefix + "HOIso"   + suffix );
+  produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
+  produces <std::vector<double> > ( prefix + "Phi"                     + suffix );
+  produces <std::vector<double> > ( prefix + "Pt"                      + suffix );
+  produces <std::vector<double> > ( prefix + "EtaError"                + suffix );
+  produces <std::vector<double> > ( prefix + "PhiError"                + suffix );
+  produces <std::vector<double> > ( prefix + "PtError"                 + suffix );
+  produces <std::vector<double> > ( prefix + "TrkEta"                  + suffix );
+  produces <std::vector<double> > ( prefix + "TrkPhi"                  + suffix );
+  produces <std::vector<double> > ( prefix + "TrkPt"                   + suffix );
+  produces <std::vector<double> > ( prefix + "TrkEtaError"             + suffix );
+  produces <std::vector<double> > ( prefix + "TrkPhiError"             + suffix );
+  produces <std::vector<double> > ( prefix + "TrkPtError"              + suffix );
+  produces <std::vector<double> > ( prefix + "QOverPError"             + suffix );
+  produces <std::vector<double> > ( prefix + "P"                       + suffix );
+  produces <std::vector<double> > ( prefix + "Energy"                  + suffix );
+  produces <std::vector<int> >    ( prefix + "Charge"                  + suffix );
+  produces <std::vector<int> >    ( prefix + "TrkHits"                 + suffix );
+  produces <std::vector<int> >    ( prefix + "TrkHitsTrackerOnly"      + suffix );
+  produces <std::vector<int> >    ( prefix + "GlobalTrkValidHits"      + suffix );
+  produces <std::vector<int> >    ( prefix + "PixelHits"               + suffix );
+  produces <std::vector<int> >    ( prefix + "TrkPixelHits"            + suffix );
+  produces <std::vector<int> >    ( prefix + "SegmentMatches"          + suffix );
+  produces <std::vector<int> >    ( prefix + "StationMatches"          + suffix );
+  produces <std::vector<double> > ( prefix + "TrkValidFractionOfHits"  + suffix );
+  produces <std::vector<double> > ( prefix + "TrkD0"                   + suffix );
+  produces <std::vector<double> > ( prefix + "TrkD0Error"              + suffix );
+  produces <std::vector<double> > ( prefix + "TrkDz"                   + suffix );
+  produces <std::vector<double> > ( prefix + "TrkDzError"              + suffix );
+  produces <std::vector<double> > ( prefix + "TrkVx"                   + suffix );
+  produces <std::vector<double> > ( prefix + "TrkVy"                   + suffix );
+  produces <std::vector<double> > ( prefix + "TrkVz"                   + suffix );
+  produces <std::vector<double> > ( prefix + "TrackChi2"               + suffix );
+  produces <std::vector<double> > ( prefix + "GlobalChi2"              + suffix );
+  produces <std::vector<double> > ( prefix + "TrkIso"                  + suffix );
+  produces <std::vector<double> > ( prefix + "TrackerIsoSumPT"         + suffix );
+  produces <std::vector<double> > ( prefix + "EcalIso"                 + suffix );
+  produces <std::vector<double> > ( prefix + "HcalIso"                 + suffix );
+  produces <std::vector<double> > ( prefix + "HOIso"                   + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03ChargedHadron"   + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03ChargedParticle" + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03NeutralHadron"   + suffix );
@@ -78,22 +79,19 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // col
   produces <std::vector<double> > ( prefix + "PFIsoR04NeutralHadronHT" + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR04PhotonHT"        + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR04PU"              + suffix );
-  produces <std::vector<int> >    ( prefix + "PassID"    + suffix );
-  produces <std::vector<int> >    ( prefix + "VtxIndex"  + suffix );
-  produces <std::vector<double> > ( prefix + "VtxDistXY" + suffix );
-  produces <std::vector<double> > ( prefix + "VtxDistZ"  + suffix );
-  produces <std::vector<double> > ( prefix + "PrimaryVertexDXY"      + suffix );
-  produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError" + suffix );
-  produces <std::vector<double> > ( prefix + "BeamSpotDXY"           + suffix );
-  produces <std::vector<double> > ( prefix + "BeamSpotDXYError"      + suffix );
-  produces <std::vector<int> >    ( prefix + "IsGlobal"  + suffix );
-  produces <std::vector<int> >    ( prefix + "IsTracker" + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticle1Pt"  + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticle1Eta"  + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticle1Phi"  + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticle3Pt"  + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticle3Eta"  + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticle3Phi"  + suffix );
+  produces <std::vector<int> >    ( prefix + "PassID"                  + suffix );
+  produces <std::vector<int> >    ( prefix + "VtxIndex"                + suffix );
+  produces <std::vector<double> > ( prefix + "VtxDistXY"               + suffix );
+  produces <std::vector<double> > ( prefix + "VtxDistZ"                + suffix );
+  produces <std::vector<double> > ( prefix + "PrimaryVertexDXY"        + suffix );
+  produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError"   + suffix );
+  produces <std::vector<double> > ( prefix + "BeamSpotDXY"             + suffix );
+  produces <std::vector<double> > ( prefix + "BeamSpotDXYError"        + suffix );
+  produces <std::vector<int> >    ( prefix + "IsGlobal"                + suffix );
+  produces <std::vector<int> >    ( prefix + "IsTracker"               + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticlePt"    + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticleEta"   + suffix );
+  produces <std::vector<double> > ( prefix + "MatchedGenParticlePhi"   + suffix );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012
@@ -101,10 +99,16 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // col
   produces <std::vector<int> >     ( prefix + "TrackLayersWithMeasurement" + suffix );   
 
   // Variables for trigger matching  
+  //  HLT Single Muon
   produces <std::vector<bool  > > ( prefix + "HLTSingleMuonMatched"      + suffix );
   produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchPt"      + suffix );
   produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchEta"     + suffix );
   produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchPhi"     + suffix );
+  //  HLT Single Iso Muon
+  produces <std::vector<bool  > > ( prefix + "HLTSingleIsoMuonMatched"   + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleIsoMuonMatchPt"   + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleIsoMuonMatchEta"  + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleIsoMuonMatchPhi"  + suffix );
   
   //
   if ( useCocktailRefits )
@@ -128,55 +132,55 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // col
       produces <std::vector<double> > ( prefix + "CocktailGlobalChi2"             + suffix ) ;
     }
   
-  produces <std::vector<double> > ( prefix + "CosmicCompatibility" + suffix );
-  produces <std::vector<double> > ( prefix + "TimeCompatibility" + suffix );
+  produces <std::vector<double> > ( prefix + "CosmicCompatibility"     + suffix );
+  produces <std::vector<double> > ( prefix + "TimeCompatibility"       + suffix );
   produces <std::vector<double> > ( prefix + "BackToBackCompatibility" + suffix );
-  produces <std::vector<double> > ( prefix + "OverlapCompatibility" + suffix );
+  produces <std::vector<double> > ( prefix + "OverlapCompatibility"    + suffix );
 }
 
 
 void RootTupleMakerV2_Muons::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  etaError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phiError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ptError   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkEta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPhi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPt   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkEtaError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPhiError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPtError   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  qoverpError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  p  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     charge  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     trkHits ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     trkHitsTrackerOnly ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     GlobaltrkValidHits ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     pixelHits      ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     trkPixelHits ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     segmentMatches   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     stationMatches   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     Valid ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  trkValidFractionOfHits ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkD0      ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkD0Error ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkDz      ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkDzError ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkVx ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkVy ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkVz ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackChi2  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  globalChi2 ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkIso     ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackerIsoSumPT   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ecalIso  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIso  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hoIso    ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  eta                     ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  phi                     ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pt                      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  etaError                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  phiError                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ptError                 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkEta                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkPhi                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkPt                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkEtaError             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkPhiError             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkPtError              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  qoverpError             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  p                       ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  energy                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     charge                  ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     trkHits                 ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     trkHitsTrackerOnly      ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     GlobaltrkValidHits      ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     pixelHits               ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     trkPixelHits            ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     segmentMatches          ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     stationMatches          ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     Valid                   ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<double> >  trkValidFractionOfHits  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkD0                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkD0Error              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkDz                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkDzError              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkVx                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkVy                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkVz                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackChi2               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  globalChi2              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trkIso                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  trackerIsoSumPT         ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ecalIso                 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalIso                 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hoIso                   ( new std::vector<double>()  );
   //
   std::auto_ptr<std::vector<double> >  pfisor03chargedhadron   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfisor03chargedparticle ( new std::vector<double>()  );
@@ -192,22 +196,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  pfisor04neutralhadronht ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfisor04photonht        ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfisor04pu              ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     passID     ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     vtxIndex   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  vtxDistXY  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  vtxDistZ   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  primaryVertexDXY       ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  primaryVertexDXYError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  beamspotDXY       ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  beamspotDXYError  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     IsGlobal    ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     IsTracker   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticle1pt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticle1eta ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticle1phi ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticle3pt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticle3eta ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticle3phi ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     passID                  ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     vtxIndex                ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<double> >  vtxDistXY               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  vtxDistZ                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  primaryVertexDXY        ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  primaryVertexDXYError   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  beamspotDXY             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  beamspotDXYError        ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     IsGlobal                ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<int> >     IsTracker               ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<double> >  matchedgenparticlept    ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticleeta   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  matchedgenparticlephi   ( new std::vector<double>()  );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012 
@@ -219,6 +220,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchPt 	( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchEta	( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchPhi    ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<bool  > >  HLTSingleIsoMuonMatched  ( new std::vector<bool  >()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleIsoMuonMatchPt 	( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleIsoMuonMatchEta	( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleIsoMuonMatchPhi ( new std::vector<double>()  );
   //
   std::auto_ptr<std::vector<int   > >  ctRefitID    ( new std::vector<int   > () );
   std::auto_ptr<std::vector<double> >  ctEta        ( new std::vector<double> () );
@@ -294,27 +299,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if( it->pt()<5 ) continue;
 
 	  /// Gen Matching
-	  double genpar1Pt = -999.;  double genpar3Pt = -999.;
-	  double genpar1Eta= -999.;  double genpar3Eta= -999.;
-	  double genpar1Phi= -999.;  double genpar3Phi= -999.;
-	  for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){//it->genParticleRefs().size() should be 0, 1 or 2
-	    if( it->genParticle(igen)->status()==1){
-	      genpar1Pt =it->genParticle(igen)->pt();
-	      genpar1Eta=it->genParticle(igen)->eta();
-	      genpar1Phi=it->genParticle(igen)->phi();
-	    }
-	    if( it->genParticle(igen)->status()==3){
-	      genpar3Pt =it->genParticle(igen)->pt();
-	      genpar3Eta=it->genParticle(igen)->eta();
-	      genpar3Phi=it->genParticle(igen)->phi();
+	  double genparPt = -999.;
+	  double genparEta= -999.;
+	  double genparPhi= -999.;
+	  if ( !iEvent.isRealData() ) {
+	    for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){//it->genParticleRefs().size() should be 0 or 1
+	      genparPt =it->genParticle(igen)->pt();
+	      genparEta=it->genParticle(igen)->eta();
+	      genparPhi=it->genParticle(igen)->phi();
 	    }
 	  }
-	  matchedgenparticle1pt     -> push_back ( (double)(genpar1Pt) );
-	  matchedgenparticle1eta    -> push_back ( (double)(genpar1Eta) );
-	  matchedgenparticle1phi    -> push_back ( (double)(genpar1Phi) );
-	  matchedgenparticle3pt     -> push_back ( (double)(genpar3Pt) );
-	  matchedgenparticle3eta    -> push_back ( (double)(genpar3Eta) );
-	  matchedgenparticle3phi    -> push_back ( (double)(genpar3Phi) );
+	  matchedgenparticlept     -> push_back ( (double)(genparPt) );
+	  matchedgenparticleeta    -> push_back ( (double)(genparEta) );
+	  matchedgenparticlephi    -> push_back ( (double)(genparPhi) );
 	  /// Gen Matching
 	  
 	  double trkd0   = it->track()->d0();
@@ -366,8 +363,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // http://cmslxr.fnal.gov/lxr/source/PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.cc
 	  //------------------------------------------------------------------------
 	  
-	  // Single muon trigger matching
-	  
+	  // HLT Single Muon trigger matching	  
 	  const pat::TriggerObjectRef singleMuonTrigRef( matchHelper.triggerMatchObject( muons, iMuon,  singleMuonTriggerMatch, iEvent, *triggerEvent ) );
 	  if ( singleMuonTrigRef.isAvailable() && singleMuonTrigRef.isNonnull() ) { 
 	    HLTSingleMuonMatched  -> push_back ( true ) ;
@@ -379,6 +375,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    HLTSingleMuonMatchPt  -> push_back ( -999. );
 	    HLTSingleMuonMatchEta -> push_back ( -999. );
 	    HLTSingleMuonMatchPhi -> push_back ( -999. );
+	  }
+
+	  // HLT Single Iso Muon trigger matching	  
+	  const pat::TriggerObjectRef singleIsoMuonTrigRef( matchHelper.triggerMatchObject( muons, iMuon,  singleIsoMuonTriggerMatch, iEvent, *triggerEvent ) );
+	  if ( singleIsoMuonTrigRef.isAvailable() && singleIsoMuonTrigRef.isNonnull() ) { 
+	    HLTSingleIsoMuonMatched  -> push_back ( true ) ;
+	    HLTSingleIsoMuonMatchPt  -> push_back ( singleIsoMuonTrigRef -> pt() );
+	    HLTSingleIsoMuonMatchEta -> push_back ( singleIsoMuonTrigRef -> eta());
+	    HLTSingleIsoMuonMatchPhi -> push_back ( singleIsoMuonTrigRef -> phi());
+	  } else { 
+	    HLTSingleIsoMuonMatched  -> push_back ( false ) ;
+	    HLTSingleIsoMuonMatchPt  -> push_back ( -999. );
+	    HLTSingleIsoMuonMatchEta -> push_back ( -999. );
+	    HLTSingleIsoMuonMatchPhi -> push_back ( -999. );
 	  }
 
 	  eta->push_back( it->eta() );
@@ -605,12 +615,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( primaryVertexDXYError,  prefix + "PrimaryVertexDXYError"   + suffix );
   iEvent.put( beamspotDXY,            prefix + "BeamSpotDXY"             + suffix );
   iEvent.put( beamspotDXYError,       prefix + "BeamSpotDXYError"        + suffix );
-  iEvent.put( matchedgenparticle1pt,  prefix + "MatchedGenParticle1Pt"   + suffix );
-  iEvent.put( matchedgenparticle1eta, prefix + "MatchedGenParticle1Eta"  + suffix );
-  iEvent.put( matchedgenparticle1phi, prefix + "MatchedGenParticle1Phi"  + suffix );
-  iEvent.put( matchedgenparticle3pt,  prefix + "MatchedGenParticle3Pt"   + suffix );
-  iEvent.put( matchedgenparticle3eta, prefix + "MatchedGenParticle3Eta"  + suffix );
-  iEvent.put( matchedgenparticle3phi, prefix + "MatchedGenParticle3Phi"  + suffix );
+  iEvent.put( matchedgenparticlept,   prefix + "MatchedGenParticlePt"    + suffix );
+  iEvent.put( matchedgenparticleeta,  prefix + "MatchedGenParticleEta"   + suffix );
+  iEvent.put( matchedgenparticlephi,  prefix + "MatchedGenParticlePhi"   + suffix );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012 
@@ -645,6 +652,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( HLTSingleMuonMatchPt     , prefix + "HLTSingleMuonMatchPt"      + suffix );
   iEvent.put( HLTSingleMuonMatchEta    , prefix + "HLTSingleMuonMatchEta"     + suffix );
   iEvent.put( HLTSingleMuonMatchPhi    , prefix + "HLTSingleMuonMatchPhi"     + suffix );
+  iEvent.put( HLTSingleIsoMuonMatched  , prefix + "HLTSingleIsoMuonMatched"   + suffix );
+  iEvent.put( HLTSingleIsoMuonMatchPt  , prefix + "HLTSingleIsoMuonMatchPt"   + suffix );
+  iEvent.put( HLTSingleIsoMuonMatchEta , prefix + "HLTSingleIsoMuonMatchEta"  + suffix );
+  iEvent.put( HLTSingleIsoMuonMatchPhi , prefix + "HLTSingleIsoMuonMatchPhi"  + suffix );
 
   iEvent.put( cosmicCompatibility,     prefix + "CosmicCompatibility"     + suffix );
   iEvent.put( timeCompatibility,       prefix + "TimeCompatibility"       + suffix );

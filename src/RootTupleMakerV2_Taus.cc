@@ -334,15 +334,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       double genparPt =-999.; double genjetPt =-999.;
       double genparEta=-999.; double genjetEta=-999.;
       double genparPhi=-999.; double genjetPhi=-999.;
-      for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){//genParticleRefs().size() is either 0 or 1
-	genparPt=it->genParticle(igen)->pt();
-	genparEta=it->genParticle(igen)->eta();
-	genparPhi=it->genParticle(igen)->phi();
-      }
-      if( it->genJet() ){
-	genjetPt=it->genJet()->pt();
-	genjetEta=it->genJet()->eta();
-	genjetPhi=it->genJet()->phi();
+      if ( !iEvent.isRealData() ) {
+	for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){//genParticleRefs().size() is either 0 or 1
+	  genparPt=it->genParticle(igen)->pt();
+	  genparEta=it->genParticle(igen)->eta();
+	  genparPhi=it->genParticle(igen)->phi();
+	}
+	if( it->genJet() ){
+	  genjetPt=it->genJet()->pt();
+	  genjetEta=it->genJet()->eta();
+	  genjetPhi=it->genJet()->phi();
+	}
       }
       matchedgenparticlept   -> push_back ( (double)(genparPt)  );
       matchedgenparticleeta  -> push_back ( (double)(genparEta) );

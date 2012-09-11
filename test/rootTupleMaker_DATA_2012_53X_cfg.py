@@ -84,7 +84,8 @@ process.maxEvents.input = 10
 process.source.fileNames = [
     #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
     # 'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
-    'file:///afs/cern.ch/user/e/eberry/9EE168D0-71FB-E111-B552-BCAEC5329717.root'
+    #'file:///afs/cern.ch/user/e/eberry/9EE168D0-71FB-E111-B552-BCAEC5329717.root'
+    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Run2012C_SingleElectron_AOD_PromptReco-v2_TEST.root'
     #'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
 

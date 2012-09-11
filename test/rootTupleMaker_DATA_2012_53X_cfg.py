@@ -9,6 +9,10 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.pfTools import *
 usePFIso ( process )
 
+# Remove MC matching *and* use the right JECs for data analysis 
+from PhysicsTools.PatAlgos.tools.coreTools import *
+runOnData( process )
+
 # Options and Output Report
 process.options.wantSummary = True
 
@@ -46,7 +50,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RootTupleMakerV2_output_MC.root')
+    fileName = cms.string('RootTupleMakerV2_output_DATA.root')
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -68,19 +72,20 @@ process.TFileService = cms.Service("TFileService",
 # 2012 A          Data ReReco      (*/Run2012A-recover-06Aug2012-v1/AOD)           : FT_53_V6C_AN2
 # 2012 A+B        Data ReReco      (*/Run2012*-13Jul2012-v1/AOD)                   : FT_53_V6_AN2
 # 2012 C          Data PromptReco  (*/Run2012C-PromptReco-v*/AOD)                  : GR_P_V41_AN2
+# Make sure a correct global tag is used:
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 
-process.GlobalTag.globaltag = 'START53_V7F::All'
+process.GlobalTag.globaltag = 'GR_P_V41_AN2::All'
 
 # Events to process
 process.maxEvents.input = 10
 
 # Input files
 process.source.fileNames = [
-    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToUE_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
-    #'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
-    #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
-    #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    # 'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    'file:///afs/cern.ch/user/e/eberry/9EE168D0-71FB-E111-B552-BCAEC5329717.root'
+    #'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -93,11 +98,11 @@ process.source.fileNames = [
 
 process.GlobalTag.toGet = cms.VPSet(
     cms.PSet(record  = cms.string          ("BTagTrackProbability2DRcd"                ),
-             tag     = cms.string          ("TrackProbabilityCalibration_2D_MC53X_v2"  ),
+             tag     = cms.string          ("TrackProbabilityCalibration_2D_Data53X_v2"),
              connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"    )
-    ),                                                                                 
+    ),
     cms.PSet(record  = cms.string          ("BTagTrackProbability3DRcd"                ),
-             tag     = cms.string          ("TrackProbabilityCalibration_3D_MC53X_v2"  ),
+             tag     = cms.string          ("TrackProbabilityCalibration_3D_Data53X_v2"),
              connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"    )
     )
 )
@@ -165,6 +170,7 @@ switchOnTriggerMatching( process, triggerMatchers = [
         # muons
         'cleanMuonTriggerMatchHLTSingleMuon',
         'cleanMuonTriggerMatchHLTSingleIsoMuon'
+
 ] )
 
 #----------------------------------------------------------------------------------------------------
@@ -257,7 +263,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute'])),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute','L2L3Residual'])), 
     doType1MET   = True,
     genJetCollection = cms.InputTag("ak5GenJets"),
     doJetID      = True,
@@ -269,7 +275,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PFL1Offset',
     doJTA        = True,
     doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
+    jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute','L2L3Residual'])), 
     doType1MET   = False,
     genJetCollection = cms.InputTag("ak5GenJets"),
     doJetID      = True,
@@ -316,7 +322,7 @@ process.AK5PFType1CorMet.srcType1Corrections   = cms.VInputTag(
 
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
-process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
+process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_data
 process.AK5PFType1CorMetXYShift = process.AK5PFType1CorMet.clone()
 process.AK5PFType1CorMetXYShift.srcType1Corrections = cms.VInputTag(
     cms.InputTag('pfMETcorrType0'),      
@@ -360,24 +366,6 @@ process.LJFilter.elecPT = 20.
 process.LJFilter.tausMin = 1
 process.LJFilter.tauPT = 15
 process.LJFilter.counteitherleptontype = True
-
-#----------------------------------------------------------------------------------------------------
-# PDF weights
-#----------------------------------------------------------------------------------------------------
-
-# Produce PDF weights (maximum is 3)
-process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-    # Fix POWHEG if buggy (this PDF set will also appear on output,
-    # so only two more PDF sets can be added in PdfSetNames if not "")
-    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
-    #GenTag = cms.untracked.InputTag("genParticles"),
-    PdfInfoTag = cms.untracked.InputTag("generator"),
-    PdfSetNames = cms.untracked.vstring(
-            "cteq66.LHgrid"
-          #, "MRST2006nnlo.LHgrid"
-          #, "MRST2007lomod.LHgrid"
-    )
-)
 
 #----------------------------------------------------------------------------------------------------
 # Define the output tree for RootTupleMakerV2
@@ -435,8 +423,6 @@ process.p = cms.Path(
     # gen particles
     process.genTausFromLQs*
     process.genTausFromLQTops*
-    # pdf weights
-    process.pdfWeights*
     # Use correct electron energies and re-run the electron ID sequence and particle flow link sequence
     process.gsfElectronsHEEPCorr*process.eIdSequence*process.remadePFEleLinks*
     # MVA electron ID

@@ -35,7 +35,7 @@
 
 //------------------------------------------------------------------------
 // Constructor
-//------------------------------------------------------------------------s
+//------------------------------------------------------------------------
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
   trkInputTag              (iConfig.getParameter<edm::InputTag>("TracksInputTag"           )),
@@ -146,6 +146,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "DCotTheta"                + suffix );
   produces <std::vector<double> > ( prefix + "Fbrem"                    + suffix );
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot"       + suffix );
+  produces <std::vector<double> > ( prefix + "ConvFitProb"              + suffix );
 
   // Vertex and beamspot information
 
@@ -188,7 +189,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchEta" + suffix );
   produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchPhi" + suffix );
 
-  // Gen matching: status 1 and 3
+  // Gen matching: status 3 only 
 
   produces <std::vector<double> > ( prefix + "MatchedGenParticlePt"   + suffix );
   produces <std::vector<double> > ( prefix + "MatchedGenParticleEta"  + suffix );
@@ -290,7 +291,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  dCotTheta                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  fbrem                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot        ( new std::vector<bool>  ()  );
-
+  std::auto_ptr<std::vector<double > > convFitProb_vec           ( new std::vector<double>()  );
+  
   // Vertex and beamspot information
   
   std::auto_ptr<std::vector<int> >     vtxIndex                  ( new std::vector<int>   ()  );
@@ -528,7 +530,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
 
       //------------------------------------------------------------------------
-      // Gen matching: Status 1 and 3
+      // Gen matching: Status 3 only
       //------------------------------------------------------------------------
 
       double genPartPt = -999.;
@@ -575,19 +577,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       // Conversion (fit) 
       bool matchesConv = false;
-      if( hConversions.isValid() && bsHandle.isValid() ) 
-	{
-	  // See: https://twiki.cern.ch/twiki/bin/view/CMS/ConversionTools#Conversion_veto_for_electron_ID
-	  matchesConv = ConversionTools::hasMatchedConversion(*it,hConversions,bsHandle->position());
-	  
+      double convFitProb = 0.0;
+      
+      if( hConversions.isValid() && bsHandle.isValid() ) {
+	// See: https://twiki.cern.ch/twiki/bin/view/CMS/ConversionTools#Conversion_veto_for_electron_ID
+	matchesConv = ConversionTools::hasMatchedConversion(*it,hConversions,bsHandle->position());
+	if ( matchesConv ) { 
+	  reco::ConversionRef matchedConv = ConversionTools::matchedConversion   (*it,hConversions,bsHandle->position());
+	  reco::Vertex vertex = matchedConv->conversionVertex();
+	  convFitProb = TMath::Prob( vertex.chi2(), vertex.ndof() );
 	}
-      else 
-	{
-	  if( !bsHandle.isValid() )
-	    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << beamSpotInputTag;
-	  if( !hConversions.isValid() )
-	    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << conversionsInputTag;
-	}
+      } else {
+	if( !bsHandle.isValid() )
+	  edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << beamSpotInputTag;
+	if( !hConversions.isValid() )
+	  edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << conversionsInputTag;
+      }
       
       //------------------------------------------------------------------------
       // Vertex association
@@ -721,6 +726,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       dCotTheta                -> push_back ( dcot );
       hasMatchedConvPhot       -> push_back ( matchesConv );
       fbrem                    -> push_back ( it->fbrem() );
+      convFitProb_vec          -> push_back ( convFitProb );
       
       // Vertex association variables
       
@@ -837,6 +843,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( dCotTheta               , prefix + "DCotTheta"                + suffix );
   iEvent.put( fbrem                   , prefix + "Fbrem"                    + suffix );
   iEvent.put( hasMatchedConvPhot      , prefix + "HasMatchedConvPhot"       + suffix );
+  iEvent.put( convFitProb_vec         , prefix + "ConvFitProb"              + suffix );
 
   // Vertex and beamspot information
 
@@ -881,8 +888,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Gen matching: Status 3 only
 
-  iEvent.put( matchedGenParticlePt ,   prefix + "MatchedGenParticlePt"    + suffix );
-  iEvent.put( matchedGenParticleEta,   prefix + "MatchedGenParticleEta"   + suffix );
-  iEvent.put( matchedGenParticlePhi,   prefix + "MatchedGenParticlePhi"   + suffix );
+  iEvent.put( matchedGenParticlePt ,   prefix + "MatchedGenParticlePt"      + suffix );
+  iEvent.put( matchedGenParticleEta,   prefix + "MatchedGenParticleEta"     + suffix );
+  iEvent.put( matchedGenParticlePhi,   prefix + "MatchedGenParticlePhi"     + suffix );
 
 }

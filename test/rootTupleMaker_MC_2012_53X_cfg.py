@@ -359,8 +359,6 @@ process.LJFilter.electronsMin = 1
 process.LJFilter.elecPT = 25.0
 process.LJFilter.tausMin = 1
 process.LJFilter.tauPT = 25.0
-process.LJFilter.jetsMin = 1
-process.LJFilter.jetPT = 25.0
 process.LJFilter.counteitherleptontype = True
 
 #----------------------------------------------------------------------------------------------------

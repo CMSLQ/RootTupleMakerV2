@@ -12,12 +12,16 @@
 RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::ParameterSet& iConfig) :
     genEvtInfoInputTag(iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag")),
     storePDFWeights(iConfig.getParameter<bool>("StorePDFWeights")),
-    pdfWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFWeightsInputTag")),
+    pdfCTEQWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFCTEQWeightsInputTag")),
+    pdfMSTWWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFMSTWWeightsInputTag")),
+    pdfNNPDFWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFNNPDFWeightsInputTag")),
     pileupInfoSrc(iConfig.getParameter<edm::InputTag>("pileupInfo"))
 {
   produces <unsigned int> ( "ProcessID" );
   produces <double>       ( "PtHat" );
-  produces <std::vector<double> > ( "PDFWeights" );
+  produces <std::vector<double> > ( "PDFCTEQWeights" );
+  produces <std::vector<double> > ( "PDFMSTWWeights" );
+  produces <std::vector<double> > ( "PDFNNPDFWeights" );
   produces <std::vector<int> > ( "PileUpInteractions");
   produces <std::vector<int> > ( "PileUpOriginBX" ) ;
   produces <double>       ( "Weight" );
@@ -30,7 +34,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<unsigned int >         processID   ( new unsigned int() );
   std::auto_ptr<double >               ptHat ( new double() );
-  std::auto_ptr<std::vector<double> >  pdfWeights  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pdfCTEQWeights  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pdfMSTWWeights  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pdfNNPDFWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int >  >   Number_interactions  ( new std::vector<int>() );
   std::auto_ptr<std::vector<int >  >   OriginBX( new std::vector<int>() );
   std::auto_ptr<double >               weight ( new double() );
@@ -63,17 +69,37 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
     // PDF Weights Part
     if( storePDFWeights ) {
-      edm::Handle<std::vector<double> > pdfWeightsHandle;
-      iEvent.getByLabel(pdfWeightsInputTag, pdfWeightsHandle);
 
-      if( pdfWeightsHandle.isValid() ) {
-        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfWeightsInputTag;
+      edm::Handle<std::vector<double> > pdfCTEQWeightsHandle;
+      edm::Handle<std::vector<double> > pdfMSTWWeightsHandle;
+      edm::Handle<std::vector<double> > pdfNNPDFWeightsHandle;
 
-        *pdfWeights.get() = *pdfWeightsHandle;
+      iEvent.getByLabel(pdfCTEQWeightsInputTag, pdfCTEQWeightsHandle);
+      iEvent.getByLabel(pdfMSTWWeightsInputTag, pdfMSTWWeightsHandle);
+      iEvent.getByLabel(pdfNNPDFWeightsInputTag, pdfNNPDFWeightsHandle);
 
+      if( pdfCTEQWeightsHandle.isValid() ) {
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfCTEQWeightsInputTag;
+        *pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
       } else {
-        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfWeightsInputTag;
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfCTEQWeightsInputTag;
       }
+
+      if( pdfMSTWWeightsHandle.isValid() ) {
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfMSTWWeightsInputTag;
+        *pdfMSTWWeights.get() = *pdfMSTWWeightsHandle;
+      } else {
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfMSTWWeightsInputTag;
+      }
+
+      if( pdfNNPDFWeightsHandle.isValid() ) {
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfNNPDFWeightsInputTag;
+
+        *pdfNNPDFWeights.get() = *pdfNNPDFWeightsHandle;
+      } else {
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfNNPDFWeightsInputTag;
+      }
+
     }
     // PileupSummary Part
     edm::Handle<std::vector<PileupSummaryInfo> >  puInfo;
@@ -93,7 +119,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-----------------------------------------------------------------
   iEvent.put( processID, "ProcessID" );
   iEvent.put( ptHat, "PtHat" );
-  iEvent.put( pdfWeights, "PDFWeights" );
+  iEvent.put( pdfCTEQWeights, "PDFCTEQWeights" );
+  iEvent.put( pdfMSTWWeights, "PDFMSTWWeights" );
+  iEvent.put( pdfNNPDFWeights, "PDFNNPDFWeights" );
   iEvent.put( Number_interactions,   "PileUpInteractions"   );
   iEvent.put( OriginBX,   "PileUpOriginBX" );
   iEvent.put( weight, "Weight" );

@@ -72,11 +72,11 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START53_V7F::All'
 
 # Events to process
-process.maxEvents.input = 10
+process.maxEvents.input = 100
 
 # Input files
 process.source.fileNames = [
-    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToUE_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
+    '/store/group/phys_exotica/darinb/Reco_AOD_Examples/LQToCMu_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_Example.root'
     #'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
@@ -354,11 +354,13 @@ process.LJFilter.muLabel = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
 process.LJFilter.jetLabel = cms.InputTag("cleanPatJetsAK5PF")
 process.LJFilter.muonsMin = 1
-process.LJFilter.muPT = 20.
+process.LJFilter.muPT = 25.0
 process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT = 20.
+process.LJFilter.elecPT = 25.0
 process.LJFilter.tausMin = 1
-process.LJFilter.tauPT = 15
+process.LJFilter.tauPT = 25.0
+process.LJFilter.jetsMin = 1
+process.LJFilter.jetPT = 25.0
 process.LJFilter.counteitherleptontype = True
 
 #----------------------------------------------------------------------------------------------------
@@ -366,17 +368,30 @@ process.LJFilter.counteitherleptontype = True
 #----------------------------------------------------------------------------------------------------
 
 # Produce PDF weights (maximum is 3)
+#process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+    ## Fix POWHEG if buggy (this PDF set will also appear on output,
+    ## so only two more PDF sets can be added in PdfSetNames if not "")
+    ##FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
+    ##GenTag = cms.untracked.InputTag("genParticles"),
+    #PdfInfoTag = cms.untracked.InputTag("generator"),
+    #PdfSetNames = cms.untracked.vstring(
+            #"cteq66.LHgrid"
+          ##, "MRST2006nnlo.LHgrid"
+          ##, "MRST2007lomod.LHgrid"
+    #)
+#)
+
 process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-    # Fix POWHEG if buggy (this PDF set will also appear on output,
-    # so only two more PDF sets can be added in PdfSetNames if not "")
-    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
-    #GenTag = cms.untracked.InputTag("genParticles"),
-    PdfInfoTag = cms.untracked.InputTag("generator"),
-    PdfSetNames = cms.untracked.vstring(
-            "cteq66.LHgrid"
-          #, "MRST2006nnlo.LHgrid"
-          #, "MRST2007lomod.LHgrid"
-    )
+	# Fix POWHEG if buggy (this PDF set will also appear on output,
+	# so only two more PDF sets can be added in PdfSetNames if not "")
+	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
+	GenTag = cms.untracked.InputTag("genParticles"),
+	PdfInfoTag = cms.untracked.InputTag("generator"),
+	PdfSetNames = cms.untracked.vstring(
+			"CT10.LHgrid" , 
+			"MSTW2008nlo68cl.LHgrid",
+            "NNPDF20_100.LHgrid"
+	)
 )
 
 #----------------------------------------------------------------------------------------------------

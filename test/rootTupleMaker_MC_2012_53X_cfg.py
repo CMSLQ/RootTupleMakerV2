@@ -76,8 +76,9 @@ process.maxEvents.input = 100
 
 # Input files
 process.source.fileNames = [
-    '/store/group/phys_exotica/darinb/Reco_AOD_Examples/LQToCMu_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_Example.root'
-    #'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
+    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToUE_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
+    # '/store/group/phys_exotica/darinb/Reco_AOD_Examples/LQToCMu_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_Example.root'
+    # 'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
     #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'

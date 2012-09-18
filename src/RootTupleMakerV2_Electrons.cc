@@ -82,6 +82,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "SCRawEnergy"              + suffix );
 
   // ID information
+  
   produces <std::vector<int> >    ( prefix + "PassId"                   + suffix );
   produces <std::vector<int> >    ( prefix + "PassEGammaIDVeto"         + suffix );
   produces <std::vector<int> >    ( prefix + "PassEGammaIDLoose"        + suffix );
@@ -90,16 +91,28 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<int> >    ( prefix + "PassEGammaIDTrigTight"    + suffix );
   produces <std::vector<int> >    ( prefix + "PassEGammaIDTrigWP70"     + suffix );
   produces <std::vector<int> >    ( prefix + "PassEGammaIDEoP"          + suffix );
-  
+
   // Does this electron overlap with a muon?			        
   produces <std::vector<int> >    ( prefix + "Overlaps"                 + suffix );
 								        
   // Number of Brems = number of basic clusters minus one	        
   produces <std::vector<int> >    ( prefix + "NumberOfBrems"            + suffix );
-								        
+
   // Is this ECAL driven? Or PFlow?  				        
   produces <std::vector<bool> >   ( prefix + "HasEcalDrivenSeed"        + suffix );
-								        
+  produces <std::vector<bool> >   ( prefix + "HasTrackerDrivenSeed"     + suffix );
+
+  // Charge consistency variables - Ferdinando Giordano
+
+  produces <std::vector<bool> >   ( prefix + "GsfCtfScPixCharge"        + suffix );
+  produces <std::vector<bool> >   ( prefix + "GsfScPixCharge"           + suffix );
+  produces <std::vector<bool> >   ( prefix + "GsfCtfCharge"             + suffix );
+
+  // EE or EB - Ferdinando Giordano
+
+  produces <std::vector<bool> >   ( prefix + "IsEB"                     + suffix );
+  produces <std::vector<bool> >   ( prefix + "IsEE"                     + suffix );
+  
   // ECAL eta/phi vs tracker eta/phi				        
 								        
   produces <std::vector<double> > ( prefix + "DeltaPhiTrkSC"            + suffix );
@@ -244,6 +257,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Is this ECAL driven? Or PFlow?  
   std::auto_ptr<std::vector<bool> >    hasEcalDrivenSeed         ( new std::vector<bool>  ()  );
+  std::auto_ptr<std::vector<bool> >    hasTrackerDrivenSeed      ( new std::vector<bool>  ()  );
+  
+  // Charge consistency variables: Ferdinando Giordano
+  std::auto_ptr<std::vector<bool> >    gsfCtfScPixCharge         ( new std::vector<bool>  ()  );
+  std::auto_ptr<std::vector<bool> >    gsfScPixCharge            ( new std::vector<bool>  ()  );
+  std::auto_ptr<std::vector<bool> >    gsfCtfCharge              ( new std::vector<bool>  ()  );
+  
+  // EB or EE: Ferdinando Giordano
+  std::auto_ptr<std::vector<bool> >    isEB                      ( new std::vector<bool>  ()  );
+  std::auto_ptr<std::vector<bool> >    isEE                      ( new std::vector<bool>  ()  );
   
   // ECAL eta/phi vs tracker eta/phi
 
@@ -675,6 +698,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       // Is this ECAL driven? Or PFlow?  
       hasEcalDrivenSeed        -> push_back( it->ecalDrivenSeed() );
+      hasTrackerDrivenSeed     -> push_back( it->trackerDrivenSeed() );
+
+      // Charge consistency variables - Ferdinando Giordano
+      gsfCtfScPixCharge        -> push_back( it->isGsfCtfScPixChargeConsistent() );
+      gsfScPixCharge           -> push_back( it->isGsfScPixChargeConsistent() );
+      gsfCtfCharge             -> push_back( it->isGsfCtfChargeConsistent() );
+
+      // EB or EE - Ferdinando Giordano
+      isEB                     -> push_back( it->isEB() );
+      isEE                     -> push_back( it->isEE() );
       
       // ECAL eta/phi vs tracker eta/phi
 
@@ -796,7 +829,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   // Is this ECAL driven? Or PFlow?  				        
   iEvent.put( hasEcalDrivenSeed       , prefix + "HasEcalDrivenSeed"        + suffix );
+  iEvent.put( hasTrackerDrivenSeed    , prefix + "HasTrackerDrivenSeed"     + suffix );
 
+  // Charge consistency variables - Ferdinando Giordano
+  iEvent.put( gsfCtfScPixCharge       , prefix + "GsfCtfScPixCharge"        + suffix );
+  iEvent.put( gsfScPixCharge          , prefix + "GsfScPixCharge"           + suffix );
+  iEvent.put( gsfCtfCharge            , prefix + "GsfCtfCharge"             + suffix );
+
+  // EB or EE - Ferdinando Giordano
+
+  iEvent.put( isEB                    , prefix + "IsEB"                     + suffix );
+  iEvent.put( isEE                    , prefix + "IsEE"                     + suffix );
+  
   // ECAL eta/phi vs tracker eta/phi				        
 
   iEvent.put( deltaPhiTrkSC           , prefix + "DeltaPhiTrkSC"            + suffix );

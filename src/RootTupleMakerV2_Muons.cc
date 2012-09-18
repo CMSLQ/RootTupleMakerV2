@@ -65,6 +65,8 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // col
   produces <std::vector<double> > ( prefix + "EcalIso"                 + suffix );
   produces <std::vector<double> > ( prefix + "HcalIso"                 + suffix );
   produces <std::vector<double> > ( prefix + "HOIso"                   + suffix );
+  produces <std::vector<double> > ( prefix + "EcalVetoIso"             + suffix );
+  produces <std::vector<double> > ( prefix + "HcalVetoIso"             + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03ChargedHadron"   + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03ChargedParticle" + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03NeutralHadron"   + suffix );
@@ -181,6 +183,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  ecalIso                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hcalIso                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hoIso                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ecalVetoIso             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  hcalVetoIso             ( new std::vector<double>()  );
   //
   std::auto_ptr<std::vector<double> >  pfisor03chargedhadron   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfisor03chargedparticle ( new std::vector<double>()  );
@@ -495,11 +499,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  energy->push_back( it->energy() );
 	  //
 	  // 2011 isolation parameters..
+	  // See: http://cmslxr.fnal.gov/lxr/source/DataFormats/MuonReco/interface/MuonIsolation.h?v=CMSSW_5_3_3_cand1#019
 	  trkIso         ->push_back( it->trackIso()           );
 	  trackerIsoSumPT->push_back( it->isolationR03().sumPt );
 	  ecalIso        ->push_back( it->isolationR03().emEt  );
 	  hcalIso        ->push_back( it->isolationR03().hadEt );
 	  hoIso          ->push_back( it->isolationR03().hoEt  );
+	  //
+	  ecalVetoIso    ->push_back( it->isolationR03().emVetoEt  );
+	  hcalVetoIso    ->push_back( it->isolationR03().hadVetoEt );
 	  //
 	  // Adding PF isolation for 2012..
 	  //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId
@@ -591,6 +599,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( ecalIso,                prefix + "EcalIso"                 + suffix );
   iEvent.put( hcalIso,                prefix + "HcalIso"                 + suffix );
   iEvent.put( hoIso,                  prefix + "HOIso"                   + suffix );
+  iEvent.put( ecalVetoIso,            prefix + "EcalVetoIso"             + suffix );
+  iEvent.put( hcalVetoIso,            prefix + "HcalVetoIso"             + suffix );
   iEvent.put( pfisor03chargedhadron,  prefix + "PFIsoR03ChargedHadron"   + suffix );
   iEvent.put( pfisor03chargedparticle,prefix + "PFIsoR03ChargedParticle" + suffix );
   iEvent.put( pfisor03neutralhadron,  prefix + "PFIsoR03NeutralHadron"   + suffix );

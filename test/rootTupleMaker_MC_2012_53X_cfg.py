@@ -204,31 +204,9 @@ process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5     
 
 #----------------------------------------------------------------------------------------------------
 # Add tau id sources (HPS Taus)
-#
-# Out-of-the-box available IDs are:
-#  'againstElectronLoose' 'againstElectronMVA' 'againstElectronMedium' 'againstElectronTight' 'againstMuonLoose'
-#  'againstMuonMedium' 'againstMuonTight' 'byLooseCombinedIsolationDeltaBetaCorr' 'byMediumCombinedIsolationDeltaBetaCorr'
-#  'byTightCombinedIsolationDeltaBetaCorr' 'byVLooseCombinedIsolationDeltaBetaCorr' 'decayModeFinding' .
 #----------------------------------------------------------------------------------------------------
 
-process.patTaus.tauIDSources.byVLooseIsolation              = cms.InputTag("hpsPFTauDiscriminationByVLooseIsolation")
-process.patTaus.tauIDSources.byLooseIsolation               = cms.InputTag("hpsPFTauDiscriminationByLooseIsolation")
-process.patTaus.tauIDSources.byMediumIsolation              = cms.InputTag("hpsPFTauDiscriminationByMediumIsolation")
-process.patTaus.tauIDSources.byTightIsolation               = cms.InputTag("hpsPFTauDiscriminationByTightIsolation")
-process.patTaus.tauIDSources.byVLooseIsolationDeltaBetaCorr = cms.InputTag("hpsPFTauDiscriminationByVLooseIsolationDBSumPtCorr")
-process.patTaus.tauIDSources.byLooseIsolationDeltaBetaCorr  = cms.InputTag("hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr")
-process.patTaus.tauIDSources.byMediumIsolationDeltaBetaCorr = cms.InputTag("hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr")
-process.patTaus.tauIDSources.byTightIsolationDeltaBetaCorr  = cms.InputTag("hpsPFTauDiscriminationByTightIsolationDBSumPtCorr")
-process.patTaus.tauIDSources.byIsolationMVAraw              = cms.InputTag("hpsPFTauDiscriminationByIsolationMVAraw")
-process.patTaus.tauIDSources.byLooseIsolationMVA            = cms.InputTag("hpsPFTauDiscriminationByLooseIsolationMVA")
-process.patTaus.tauIDSources.byMediumIsolationMVA           = cms.InputTag("hpsPFTauDiscriminationByMediumIsolationMVA")
-process.patTaus.tauIDSources.byTightIsolationMVA            = cms.InputTag("hpsPFTauDiscriminationByTightIsolationMVA")
-process.patTaus.tauIDSources.againstElectronMVA2raw         = cms.InputTag("hpsPFTauDiscriminationByMVA2rawElectronRejection")
-process.patTaus.tauIDSources.againstElectronMVA2category    = cms.InputTag("hpsPFTauDiscriminationByMVA2rawElectronRejection:category")
-process.patTaus.tauIDSources.againstElectronVLooseMVA2      = cms.InputTag("hpsPFTauDiscriminationByMVA2VLooseElectronRejection")
-process.patTaus.tauIDSources.againstElectronLooseMVA2       = cms.InputTag("hpsPFTauDiscriminationByMVA2LooseElectronRejection")
-process.patTaus.tauIDSources.againstElectronMediumMVA2      = cms.InputTag("hpsPFTauDiscriminationByMVA2MediumElectronRejection")
-process.patTaus.tauIDSources.againstElectronTightMVA2       = cms.InputTag("hpsPFTauDiscriminationByMVA2TightElectronRejection")
+process.load("Leptoquarks.RootTupleMakerV2.tauIDsources_cfi")
 
 #----------------------------------------------------------------------------------------------------
 # Add MVA electron ID
@@ -379,16 +357,18 @@ process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")
 process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
 process.LJFilter.jetLabel  = cms.InputTag("cleanPatJetsAK5PF")
-process.LJFilter.jetsMin = 1
-process.LJFilter.jetPT   = 30.0
 process.LJFilter.muonsMin = 1
-process.LJFilter.muPT     = 15.0
+process.LJFilter.muPT     = 25.0
 process.LJFilter.electronsMin = 1
 process.LJFilter.elecPT       = 25.0
 process.LJFilter.tausMin = 1
-process.LJFilter.tauPT   = 20.0
+process.LJFilter.tauPT   = 25.0
 process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = True
+# -- WARNING :
+# "customfilterEMuTauJet2012" configuration is hard-coded. If enabled, other configuration parameters will NOT have any effect.
+# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc?revision=1.12&view=markup )
+# "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
 
 #----------------------------------------------------------------------------------------------------
 # PDF weights

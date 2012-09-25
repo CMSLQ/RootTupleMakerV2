@@ -71,7 +71,6 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "EcalIsolationUsingLeadingPionDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstMuonDiscr"  + suffix );
-    //
     produces <std::vector<double> >    ( prefix + "TaNCDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "TaNCfrOnePercentDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "TaNCfrHalfPercentDiscr"  + suffix );
@@ -85,6 +84,12 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "AgainstElectronMediumDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronTightDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronMVADiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "AgainstElectronMVA2rawDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "AgainstElectronMVA2categoryDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "AgainstElectronVLooseMVA2Discr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "AgainstElectronLooseMVA2Discr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "AgainstElectronMediumMVA2Discr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "AgainstElectronTightMVA2Discr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstMuonLooseDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstMuonMediumDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstMuonTightDiscr"  + suffix );
@@ -93,10 +98,18 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "LooseIsolationDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "MediumIsolationDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "TightIsolationDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "VLooseIsolationDeltaBetaCorrDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "LooseIsolationDeltaBetaCorrDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "MediumIsolationDeltaBetaCorrDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "TightIsolationDeltaBetaCorrDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "VLooseCombinedIsolationDeltaBetaCorrDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "LooseCombinedIsolationDeltaBetaCorrDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "MediumCombinedIsolationDeltaBetaCorrDiscr"  + suffix );
     produces <std::vector<double> >    ( prefix + "TightCombinedIsolationDeltaBetaCorrDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "IsolationMVArawDiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "LooseIsolationMVADiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "MediumIsolationMVADiscr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "TightIsolationMVADiscr"  + suffix );
     //
     produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsPt"  + suffix );
     produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsEta"  + suffix );
@@ -131,6 +144,7 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
 
 void RootTupleMakerV2_Taus::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+  //
   std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()   );
@@ -163,42 +177,56 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  matchedgenjetphi ( new std::vector<double>()   );
   //
   //shrinkingCone PFTau Discriminators (SCTau)
-  std::auto_ptr<std::vector<double> >     leadingtrackfindingdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     leadingtrackptcutdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     leadingpionptcutdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     isolationdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     trackisolationdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     ecalisolationdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     isolationusingleadingpiondiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     trackisolationusingleadingpiondiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     ecalisolationusingleadingpiondiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstelectrondiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstmuondiscr  ( new std::vector<double>()   );
-  //
-  std::auto_ptr<std::vector<double> >     tancdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     tancfronepercentdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     tancfrhalfpercentdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     tancfrquarterpercentdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     tancfrtenthpercentdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  leadingtrackfindingdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  leadingtrackptcutdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  leadingpionptcutdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  isolationdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  trackisolationdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  ecalisolationdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  isolationusingleadingpiondiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  trackisolationusingleadingpiondiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  ecalisolationusingleadingpiondiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectrondiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuondiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tancdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tancfronepercentdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tancfrhalfpercentdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tancfrquarterpercentdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tancfrtenthpercentdiscr  ( new std::vector<double>()   );
   //
   //hps PFTau Discriminators (HPSTau)
-  std::auto_ptr<std::vector<double> >     decaymodefindingdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     vlooseisolationdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     looseisolationdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     mediumisolationdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     tightisolationdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstelectronloosediscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstelectronmediumdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstelectrontightdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstelectronmvadiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstmuonloosediscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstmuonmediumdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     againstmuontightdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     vloosecombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     loosecombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     mediumcombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >     tightcombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  decaymodefindingdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  vlooseisolationdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  looseisolationdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  mediumisolationdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tightisolationdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronloosediscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronmediumdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectrontightdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronmvadiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuonloosediscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuonmediumdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuontightdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  vloosecombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  loosecombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  mediumcombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tightcombinedisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  vlooseisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  looseisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  mediumisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tightisolationdeltabetacorrdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  isolationmvarawdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  looseisolationmvadiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  mediumisolationmvadiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  tightisolationmvadiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronmva2rawdiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronmva2categorydiscr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronvloosemva2discr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronloosemva2discr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectronmediummva2discr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstelectrontightmva2discr  ( new std::vector<double>()   );
   //
+  //Signal Particles (HPSTau)  
   std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandspt  ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandseta  ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandsphi  ( new std::vector<double>()   );
@@ -212,7 +240,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  signalpfgammacandsphi ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  signalpfgammacandscount ( new std::vector<double>()   );
   //
-  // Optional Isolation information
+  // Optional Isolation information (HPSTau) 
   //std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandspt  ( new std::vector<double>()   );
   //std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandseta  ( new std::vector<double>()   );
   //std::auto_ptr<std::vector<double> >  isolationpfchargedhadrcandsphi  ( new std::vector<double>()   );
@@ -299,6 +327,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	loosecombinedisolationdeltabetacorrdiscr  -> push_back( it->tauID("byLooseCombinedIsolationDeltaBetaCorr" ) );//applied in cleanPatTaus 
 	mediumcombinedisolationdeltabetacorrdiscr -> push_back( it->tauID("byMediumCombinedIsolationDeltaBetaCorr") );
 	tightcombinedisolationdeltabetacorrdiscr  -> push_back( it->tauID("byTightCombinedIsolationDeltaBetaCorr" ) );
+	//
+	vlooseisolationdeltabetacorrdiscr -> push_back( it->tauID("byVLooseIsolationDeltaBetaCorr") );
+	looseisolationdeltabetacorrdiscr  -> push_back( it->tauID("byLooseIsolationDeltaBetaCorr") );
+	mediumisolationdeltabetacorrdiscr -> push_back( it->tauID("byMediumIsolationDeltaBetaCorr") );
+	tightisolationdeltabetacorrdiscr  -> push_back( it->tauID("byTightIsolationDeltaBetaCorr") );
+	//
+	isolationmvarawdiscr    -> push_back( it->tauID("byIsolationMVAraw") );
+	looseisolationmvadiscr  -> push_back( it->tauID("byLooseIsolationMVA") );
+	mediumisolationmvadiscr -> push_back( it->tauID("byMediumIsolationMVA") );
+	tightisolationmvadiscr  -> push_back( it->tauID("byTightIsolationMVA") );
+	//
+	againstelectronmva2rawdiscr      -> push_back( it->tauID("againstElectronMVA2raw") );
+	againstelectronmva2categorydiscr -> push_back( it->tauID("againstElectronMVA2category") );
+	againstelectronvloosemva2discr   -> push_back( it->tauID("againstElectronVLooseMVA2") );
+	againstelectronloosemva2discr    -> push_back( it->tauID("againstElectronLooseMVA2") );
+	againstelectronmediummva2discr   -> push_back( it->tauID("againstElectronMediumMVA2") );
+	againstelectrontightmva2discr    -> push_back( it->tauID("againstElectronTightMVA2") );
       }
       //
       eta -> push_back ( (double)(it -> eta()) ) ;
@@ -352,7 +397,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       matchedgenjetpt        -> push_back ( (double)(genjetPt)  );
       matchedgenjeteta       -> push_back ( (double)(genjetEta) );
       matchedgenjetphi       -> push_back ( (double)(genjetPhi) );
-      //
       //
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //  --  User Isolation and isoDeposit Methods -- Feb 2012
@@ -529,6 +573,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.put( loosecombinedisolationdeltabetacorrdiscr,  prefix + "LooseCombinedIsolationDeltaBetaCorrDiscr"    + suffix );
     iEvent.put( mediumcombinedisolationdeltabetacorrdiscr, prefix + "MediumCombinedIsolationDeltaBetaCorrDiscr"   + suffix );
     iEvent.put( tightcombinedisolationdeltabetacorrdiscr,  prefix + "TightCombinedIsolationDeltaBetaCorrDiscr"    + suffix );
+    iEvent.put( vlooseisolationdeltabetacorrdiscr,         prefix + "VLooseIsolationDeltaBetaCorrDiscr"           + suffix );
+    iEvent.put( looseisolationdeltabetacorrdiscr,          prefix + "LooseIsolationDeltaBetaCorrDiscr"            + suffix );
+    iEvent.put( mediumisolationdeltabetacorrdiscr,         prefix + "MediumIsolationDeltaBetaCorrDiscr"           + suffix );
+    iEvent.put( tightisolationdeltabetacorrdiscr,          prefix + "TightIsolationDeltaBetaCorrDiscr"            + suffix );
+    iEvent.put( isolationmvarawdiscr,                      prefix + "IsolationMVArawDiscr"                        + suffix );
+    iEvent.put( looseisolationmvadiscr,                    prefix + "LooseIsolationMVADiscr"                      + suffix );
+    iEvent.put( mediumisolationmvadiscr,                   prefix + "MediumIsolationMVADiscr"                     + suffix );
+    iEvent.put( tightisolationmvadiscr,                    prefix + "TightIsolationMVADiscr"                      + suffix );
+    iEvent.put( againstelectronmva2rawdiscr,               prefix + "AgainstElectronMVA2rawDiscr"                 + suffix );
+    iEvent.put( againstelectronmva2categorydiscr,          prefix + "AgainstElectronMVA2categoryDiscr"            + suffix );
+    iEvent.put( againstelectronvloosemva2discr,            prefix + "AgainstElectronVLooseMVA2Discr"              + suffix );
+    iEvent.put( againstelectronloosemva2discr,             prefix + "AgainstElectronLooseMVA2Discr"               + suffix );
+    iEvent.put( againstelectronmediummva2discr,            prefix + "AgainstElectronMediumMVA2Discr"              + suffix );
+    iEvent.put( againstelectrontightmva2discr,             prefix + "AgainstElectronTightMVA2Discr"               + suffix );
     //
     iEvent.put( signalpfchargedhadrcandspt,   prefix +  "SignalPFChargedHadrCandsPt"   + suffix );
     iEvent.put( signalpfchargedhadrcandseta,  prefix +  "SignalPFChargedHadrCandsEta"  + suffix );
@@ -542,7 +600,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.put( signalpfgammacandseta,        prefix +  "SignalPFGammaCandsEta"        + suffix );
     iEvent.put( signalpfgammacandsphi,        prefix +  "SignalPFGammaCandsPhi"        + suffix );
     iEvent.put( signalpfgammacandscount,      prefix +  "SignalPFGammaCandsCount"      + suffix );
-    //
+
     // Optional Isolation information
     //iEvent.put( isolationpfchargedhadrcandspt,   prefix +  "IsolationPFChargedHadrCandsPt"   + suffix );
     //iEvent.put( isolationpfchargedhadrcandseta,  prefix +  "IsolationPFChargedHadrCandsEta"  + suffix );
@@ -556,6 +614,5 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     //iEvent.put( isolationpfgammacandseta,        prefix +  "IsolationPFGammaCandsEta"        + suffix );
     //iEvent.put( isolationpfgammacandsphi,        prefix +  "IsolationPFGammaCandsPhi"        + suffix );
     //iEvent.put( isolationpfgammacandscount,      prefix +  "IsolationPFGammaCandsCount"      + suffix );
-    //
   }
 }

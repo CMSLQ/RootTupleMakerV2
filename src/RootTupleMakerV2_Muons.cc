@@ -19,13 +19,13 @@ triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInput
 prefix   (iConfig.getParameter<std::string>  ("Prefix")),
 suffix   (iConfig.getParameter<std::string>  ("Suffix")),
 maxSize  (iConfig.getParameter<unsigned int> ("MaxSize")),
-muonIso  (iConfig.getParameter<double>       ("MuonIso")),                //  threshold for "passIso" and "passCTIso"
-muonID   (iConfig.getParameter<std::string>  ("MuonID")),                 //  threshold for "passID"
-singleMuonTriggerMatch(iConfig.getParameter<std::string>("SingleMuonTriggerMatch")), // trigger matching string
+muonIso  (iConfig.getParameter<double>       ("MuonIso")),                                 // threshold for "passIso" and "passCTIso"
+muonID   (iConfig.getParameter<std::string>  ("MuonID")),                                  // threshold for "passID"
+singleMuonTriggerMatch(iConfig.getParameter<std::string>("SingleMuonTriggerMatch")),       // trigger matching string
 singleIsoMuonTriggerMatch(iConfig.getParameter<std::string>("SingleIsoMuonTriggerMatch")), // trigger matching string
 beamSpotCorr      (iConfig.getParameter<bool>("BeamSpotCorr")),
 useCocktailRefits (iConfig.getParameter<bool>("UseCocktailRefits")),
-vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // collection of primary vertices to be used.
+vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag"))                  // collection of primary vertices to be used.
 {
   produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
   produces <std::vector<double> > ( prefix + "Phi"                     + suffix );
@@ -85,6 +85,9 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag")) // col
   produces <std::vector<int> >    ( prefix + "VtxIndex"                + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistXY"               + suffix );
   produces <std::vector<double> > ( prefix + "VtxDistZ"                + suffix );
+  produces <std::vector<int> >    ( prefix + "BestTrackVtxIndex"      + suffix );
+  produces <std::vector<double> > ( prefix + "BestTrackVtxDistXY"     + suffix );
+  produces <std::vector<double> > ( prefix + "BestTrackVtxDistZ"      + suffix );
   produces <std::vector<double> > ( prefix + "PrimaryVertexDXY"        + suffix );
   produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError"   + suffix );
   produces <std::vector<double> > ( prefix + "BeamSpotDXY"             + suffix );
@@ -204,6 +207,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<int> >     vtxIndex                ( new std::vector<int>()     );
   std::auto_ptr<std::vector<double> >  vtxDistXY               ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vtxDistZ                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >     bestTrackVtxIndex       ( new std::vector<int>()     );
+  std::auto_ptr<std::vector<double> >  bestTrackVtxDistXY      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  bestTrackVtxDistZ       ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  primaryVertexDXY        ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  primaryVertexDXYError   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  beamspotDXY             ( new std::vector<double>()  );
@@ -327,30 +333,47 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  
 	  else if( beamSpotCorr && !beamSpot.isValid() ) edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the offlineBeamSpot";
 	  
-	  // Vertex association
+	  // Vertex association 
+	  //-- using pat::muon::track()
 	  double minVtxDist3D = 9999.;
 	  int    vtxIndex_    = -1;
 	  double vtxDistXY_   = -9999.;
 	  double vtxDistZ_    = -9999.;
-	  
+	  //-- using reco::muon::muonBestTrack() - 2012 recommendation  
+	  double bt_minVtxDist3D = 9999.;
+	  int    bt_vtxIndex_    = -1;
+	  double bt_vtxDistXY_   = -9999.;
+	  double bt_vtxDistZ_    = -9999.;
+
 	  if(primaryVertices.isValid())
 	    {
 	      edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 	      
 	      for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
 		{
-		  //
+		  //-- using pat::muon::track()
 		  double distXY = it->track()->dxy(v_it->position());
 		  double distZ  = it->track()->dz(v_it->position());
 		  double dist3D = sqrt(pow(distXY,2) + pow(distZ,2));
-		  
-		  if( dist3D < minVtxDist3D )
-		    {
-		      minVtxDist3D = dist3D;
-		      vtxIndex_    = int(std::distance(primaryVertices->begin(),v_it));
-		      vtxDistXY_   = distXY;
-		      vtxDistZ_    = distZ;
+		  if( dist3D < minVtxDist3D ){
+		    minVtxDist3D = dist3D;
+		    vtxIndex_    = int(std::distance(primaryVertices->begin(),v_it));
+		    vtxDistXY_   = distXY;
+		    vtxDistZ_    = distZ;
+		  }
+		  //-- using reco::muon::muonBestTrack() - 2012 recommendation    
+		  if( it->isGlobalMuon() ){
+		    double bt_distXY = it->muonBestTrack()->dxy(v_it->position());
+		    double bt_distZ  = it->muonBestTrack()->dz(v_it->position());
+		    double bt_dist3D = sqrt( pow(bt_distXY,2) + pow(bt_distZ,2) );
+		    if( bt_dist3D < bt_minVtxDist3D ){
+		      bt_minVtxDist3D = bt_dist3D;
+		      bt_vtxIndex_    = int(std::distance(primaryVertices->begin(),v_it));
+		      bt_vtxDistXY_   = bt_distXY;
+		      bt_vtxDistZ_    = bt_distZ;
 		    }
+		  }
+		  
 		}
 	    }
 	  else
@@ -358,7 +381,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
 	    }
 	  //
-
 
 	  //------------------------------------------------------------------------
 	  // Trigger matching
@@ -538,6 +560,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  vtxIndex               ->push_back( vtxIndex_                     );
 	  vtxDistXY              ->push_back( vtxDistXY_                    );
 	  vtxDistZ               ->push_back( vtxDistZ_                     );
+	  bestTrackVtxIndex      ->push_back( bt_vtxIndex_                  );
+	  bestTrackVtxDistXY     ->push_back( bt_vtxDistXY_                 );
+	  bestTrackVtxDistZ      ->push_back( bt_vtxDistZ_                  );
 	  primaryVertexDXY       ->push_back( it->dB()                      );
 	  primaryVertexDXYError  ->push_back( it->edB()                     );
 	  beamspotDXY            ->push_back( it->dB(pat::Muon::BS2D)       );
@@ -561,78 +586,78 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( eta,                    prefix + "Eta"                     + suffix );
-  iEvent.put( phi,                    prefix + "Phi"                     + suffix );
-  iEvent.put( pt,                     prefix + "Pt"                      + suffix );
-  iEvent.put( etaError,               prefix + "EtaError"                + suffix );
-  iEvent.put( phiError,               prefix + "PhiError"                + suffix );
-  iEvent.put( ptError,                prefix + "PtError"                 + suffix );
-  iEvent.put( trkEta,                 prefix + "TrkEta"                  + suffix );
-  iEvent.put( trkPhi,                 prefix + "TrkPhi"                  + suffix );
-  iEvent.put( trkPt,                  prefix + "TrkPt"                   + suffix );
-  iEvent.put( trkEtaError,            prefix + "TrkEtaError"             + suffix );
-  iEvent.put( trkPhiError,            prefix + "TrkPhiError"             + suffix );
-  iEvent.put( trkPtError,             prefix + "TrkPtError"              + suffix );
-  iEvent.put( qoverpError,            prefix + "QOverPError"             + suffix );
-  iEvent.put( p,                      prefix + "P"                       + suffix );
-  iEvent.put( energy,                 prefix + "Energy"                  + suffix );
-  iEvent.put( charge,                 prefix + "Charge"                  + suffix );
-  iEvent.put( trkHits,                prefix + "TrkHits"                 + suffix );
-  iEvent.put( trkHitsTrackerOnly,     prefix + "TrkHitsTrackerOnly"      + suffix );
-  iEvent.put( GlobaltrkValidHits,     prefix + "GlobalTrkValidHits"      + suffix );
-  iEvent.put( pixelHits,              prefix + "PixelHits"               + suffix );
-  iEvent.put( trkPixelHits,           prefix + "TrkPixelHits"            + suffix );
-  iEvent.put( segmentMatches,         prefix + "SegmentMatches"          + suffix );
-  iEvent.put( stationMatches,         prefix + "StationMatches"          + suffix );
-  iEvent.put( trkValidFractionOfHits, prefix + "TrkValidFractionOfHits"  + suffix );
-  iEvent.put( trkD0,                  prefix + "TrkD0"                   + suffix );
-  iEvent.put( trkD0Error,             prefix + "TrkD0Error"              + suffix );
-  iEvent.put( trkDz,                  prefix + "TrkDz"                   + suffix );
-  iEvent.put( trkDzError,             prefix + "TrkDzError"              + suffix );
-  iEvent.put( trkVx,                  prefix + "TrkVx"                   + suffix );
-  iEvent.put( trkVy,                  prefix + "TrkVy"                   + suffix );
-  iEvent.put( trkVz,                  prefix + "TrkVz"                   + suffix );
-  iEvent.put( trackChi2,              prefix + "TrackChi2"               + suffix );
-  iEvent.put( globalChi2,             prefix + "GlobalChi2"              + suffix );
-  iEvent.put( trkIso,                 prefix + "TrkIso"                  + suffix );
-  iEvent.put( trackerIsoSumPT,        prefix + "TrackerIsoSumPT"         + suffix );
-  iEvent.put( ecalIso,                prefix + "EcalIso"                 + suffix );
-  iEvent.put( hcalIso,                prefix + "HcalIso"                 + suffix );
-  iEvent.put( hoIso,                  prefix + "HOIso"                   + suffix );
-  iEvent.put( ecalVetoIso,            prefix + "EcalVetoIso"             + suffix );
-  iEvent.put( hcalVetoIso,            prefix + "HcalVetoIso"             + suffix );
-  iEvent.put( pfisor03chargedhadron,  prefix + "PFIsoR03ChargedHadron"   + suffix );
-  iEvent.put( pfisor03chargedparticle,prefix + "PFIsoR03ChargedParticle" + suffix );
-  iEvent.put( pfisor03neutralhadron,  prefix + "PFIsoR03NeutralHadron"   + suffix );
-  iEvent.put( pfisor03photon,         prefix + "PFIsoR03Photon"          + suffix );
-  iEvent.put( pfisor03neutralhadronht,prefix + "PFIsoR03NeutralHadronHT" + suffix );
-  iEvent.put( pfisor03photonht,       prefix + "PFIsoR03PhotonHT"        + suffix );
-  iEvent.put( pfisor03pu,             prefix + "PFIsoR03PU"              + suffix );
-  iEvent.put( pfisor04chargedhadron,  prefix + "PFIsoR04ChargedHadron"   + suffix );
-  iEvent.put( pfisor04chargedparticle,prefix + "PFIsoR04ChargedParticle" + suffix );
-  iEvent.put( pfisor04neutralhadron,  prefix + "PFIsoR04NeutralHadron"   + suffix );
-  iEvent.put( pfisor04photon,         prefix + "PFIsoR04Photon"          + suffix );
-  iEvent.put( pfisor04neutralhadronht,prefix + "PFIsoR04NeutralHadronHT" + suffix );
-  iEvent.put( pfisor04photonht,       prefix + "PFIsoR04PhotonHT"        + suffix );
-  iEvent.put( pfisor04pu,             prefix + "PFIsoR04PU"              + suffix );
-  iEvent.put( passID,                 prefix + "PassID"                  + suffix );
-  iEvent.put( IsGlobal,               prefix + "IsGlobal"                + suffix );
-  iEvent.put( IsTracker,              prefix + "IsTracker"               + suffix );
-  iEvent.put( vtxIndex,               prefix + "VtxIndex"                + suffix );
-  iEvent.put( vtxDistXY,              prefix + "VtxDistXY"               + suffix );
-  iEvent.put( vtxDistZ,               prefix + "VtxDistZ"                + suffix );
-  iEvent.put( primaryVertexDXY,       prefix + "PrimaryVertexDXY"        + suffix );
-  iEvent.put( primaryVertexDXYError,  prefix + "PrimaryVertexDXYError"   + suffix );
-  iEvent.put( beamspotDXY,            prefix + "BeamSpotDXY"             + suffix );
-  iEvent.put( beamspotDXYError,       prefix + "BeamSpotDXYError"        + suffix );
-  iEvent.put( matchedgenparticlept,   prefix + "MatchedGenParticlePt"    + suffix );
-  iEvent.put( matchedgenparticleeta,  prefix + "MatchedGenParticleEta"   + suffix );
-  iEvent.put( matchedgenparticlephi,  prefix + "MatchedGenParticlePhi"   + suffix );
-  //
-  // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
-  // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012 
-  iEvent.put( isPF,                       prefix + "IsPF"                       + suffix );
-  iEvent.put( trackLayersWithMeasurement, prefix + "TrackLayersWithMeasurement" + suffix );
+  iEvent.put( eta,                        prefix + "Eta"                         + suffix );
+  iEvent.put( phi,                        prefix + "Phi"                         + suffix );
+  iEvent.put( pt,                         prefix + "Pt"                          + suffix );
+  iEvent.put( etaError,                   prefix + "EtaError"                    + suffix );
+  iEvent.put( phiError,                   prefix + "PhiError"                    + suffix );
+  iEvent.put( ptError,                    prefix + "PtError"                     + suffix );
+  iEvent.put( trkEta,                     prefix + "TrkEta"                      + suffix );
+  iEvent.put( trkPhi,                     prefix + "TrkPhi"                      + suffix );
+  iEvent.put( trkPt,                      prefix + "TrkPt"                       + suffix );
+  iEvent.put( trkEtaError,                prefix + "TrkEtaError"                 + suffix );
+  iEvent.put( trkPhiError,                prefix + "TrkPhiError"                 + suffix );
+  iEvent.put( trkPtError,                 prefix + "TrkPtError"                  + suffix );
+  iEvent.put( qoverpError,                prefix + "QOverPError"                 + suffix );
+  iEvent.put( p,                          prefix + "P"                           + suffix );
+  iEvent.put( energy,                     prefix + "Energy"                      + suffix );
+  iEvent.put( charge,                     prefix + "Charge"                      + suffix );
+  iEvent.put( trkHits,                    prefix + "TrkHits"                     + suffix );
+  iEvent.put( trkHitsTrackerOnly,         prefix + "TrkHitsTrackerOnly"          + suffix );
+  iEvent.put( GlobaltrkValidHits,         prefix + "GlobalTrkValidHits"          + suffix );
+  iEvent.put( pixelHits,                  prefix + "PixelHits"                   + suffix );
+  iEvent.put( trkPixelHits,               prefix + "TrkPixelHits"                + suffix );
+  iEvent.put( segmentMatches,             prefix + "SegmentMatches"              + suffix );
+  iEvent.put( stationMatches,             prefix + "StationMatches"              + suffix );
+  iEvent.put( trkValidFractionOfHits,     prefix + "TrkValidFractionOfHits"      + suffix );
+  iEvent.put( trkD0,                      prefix + "TrkD0"                       + suffix );
+  iEvent.put( trkD0Error,                 prefix + "TrkD0Error"                  + suffix );
+  iEvent.put( trkDz,                      prefix + "TrkDz"                       + suffix );
+  iEvent.put( trkDzError,                 prefix + "TrkDzError"                  + suffix );
+  iEvent.put( trkVx,                      prefix + "TrkVx"                       + suffix );
+  iEvent.put( trkVy,                      prefix + "TrkVy"                       + suffix );
+  iEvent.put( trkVz,                      prefix + "TrkVz"                       + suffix );
+  iEvent.put( trackChi2,                  prefix + "TrackChi2"                   + suffix );
+  iEvent.put( globalChi2,                 prefix + "GlobalChi2"                  + suffix );
+  iEvent.put( trkIso,                     prefix + "TrkIso"                      + suffix );
+  iEvent.put( trackerIsoSumPT,            prefix + "TrackerIsoSumPT"             + suffix );
+  iEvent.put( ecalIso,                    prefix + "EcalIso"                     + suffix );
+  iEvent.put( hcalIso,                    prefix + "HcalIso"                     + suffix );
+  iEvent.put( hoIso,                      prefix + "HOIso"                       + suffix );
+  iEvent.put( ecalVetoIso,                prefix + "EcalVetoIso"                 + suffix );
+  iEvent.put( hcalVetoIso,                prefix + "HcalVetoIso"                 + suffix );
+  iEvent.put( pfisor03chargedhadron,      prefix + "PFIsoR03ChargedHadron"       + suffix );
+  iEvent.put( pfisor03chargedparticle,    prefix + "PFIsoR03ChargedParticle"     + suffix );
+  iEvent.put( pfisor03neutralhadron,      prefix + "PFIsoR03NeutralHadron"       + suffix );
+  iEvent.put( pfisor03photon,             prefix + "PFIsoR03Photon"              + suffix );
+  iEvent.put( pfisor03neutralhadronht,    prefix + "PFIsoR03NeutralHadronHT"     + suffix );
+  iEvent.put( pfisor03photonht,           prefix + "PFIsoR03PhotonHT"            + suffix );
+  iEvent.put( pfisor03pu,                 prefix + "PFIsoR03PU"                  + suffix );
+  iEvent.put( pfisor04chargedhadron,      prefix + "PFIsoR04ChargedHadron"       + suffix );
+  iEvent.put( pfisor04chargedparticle,    prefix + "PFIsoR04ChargedParticle"     + suffix );
+  iEvent.put( pfisor04neutralhadron,      prefix + "PFIsoR04NeutralHadron"       + suffix );
+  iEvent.put( pfisor04photon,             prefix + "PFIsoR04Photon"              + suffix );
+  iEvent.put( pfisor04neutralhadronht,    prefix + "PFIsoR04NeutralHadronHT"     + suffix );
+  iEvent.put( pfisor04photonht,           prefix + "PFIsoR04PhotonHT"            + suffix );
+  iEvent.put( pfisor04pu,                 prefix + "PFIsoR04PU"                  + suffix );
+  iEvent.put( passID,                     prefix + "PassID"                      + suffix );
+  iEvent.put( IsGlobal,                   prefix + "IsGlobal"                    + suffix );
+  iEvent.put( IsTracker,                  prefix + "IsTracker"                   + suffix );
+  iEvent.put( vtxIndex,                   prefix + "VtxIndex"                    + suffix );
+  iEvent.put( vtxDistXY,                  prefix + "VtxDistXY"                   + suffix );
+  iEvent.put( vtxDistZ,                   prefix + "VtxDistZ"                    + suffix );
+  iEvent.put( bestTrackVtxIndex,          prefix + "BestTrackVtxIndex"           + suffix );
+  iEvent.put( bestTrackVtxDistXY,         prefix + "BestTrackVtxDistXY"          + suffix );
+  iEvent.put( bestTrackVtxDistZ,          prefix + "BestTrackVtxDistZ"           + suffix );
+  iEvent.put( primaryVertexDXY,           prefix + "PrimaryVertexDXY"            + suffix );
+  iEvent.put( primaryVertexDXYError,      prefix + "PrimaryVertexDXYError"       + suffix );
+  iEvent.put( beamspotDXY,                prefix + "BeamSpotDXY"                 + suffix );
+  iEvent.put( beamspotDXYError,           prefix + "BeamSpotDXYError"            + suffix );
+  iEvent.put( matchedgenparticlept,       prefix + "MatchedGenParticlePt"        + suffix );
+  iEvent.put( matchedgenparticleeta,      prefix + "MatchedGenParticleEta"       + suffix );
+  iEvent.put( matchedgenparticlephi,      prefix + "MatchedGenParticlePhi"       + suffix );
+  iEvent.put( isPF,                       prefix + "IsPF"                        + suffix );
+  iEvent.put( trackLayersWithMeasurement, prefix + "TrackLayersWithMeasurement"  + suffix );
   //
   
   if ( useCocktailRefits )
@@ -657,7 +682,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   
   // trigger matching
-  
   iEvent.put( HLTSingleMuonMatched     , prefix + "HLTSingleMuonMatched"      + suffix );
   iEvent.put( HLTSingleMuonMatchPt     , prefix + "HLTSingleMuonMatchPt"      + suffix );
   iEvent.put( HLTSingleMuonMatchEta    , prefix + "HLTSingleMuonMatchEta"     + suffix );

@@ -465,7 +465,6 @@ process.p = cms.Path(
     process.AK5PFType1CorMet*
     process.AK5PFType1CorMetXYShift*
     # MET filters (required):
-    process.CSCTightHaloFilter*
     process.EcalDeadCellTriggerPrimitiveFilter*
     process.EcalDeadCellBoundaryEnergyFilter*
     process.HBHENoiseFilterResultProducer*

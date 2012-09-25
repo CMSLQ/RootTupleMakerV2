@@ -83,11 +83,11 @@ process.maxEvents.input = 100
 # Input files
 process.source.fileNames = [
     'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToUE_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
-    # '/store/group/phys_exotica/darinb/Reco_AOD_Examples/LQToCMu_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_Example.root'
-    # 'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
+    #'/store/group/phys_exotica/darinb/Reco_AOD_Examples/LQToCMu_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_Example.root'
+    #'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
     #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
-    #rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
+    #'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -204,12 +204,31 @@ process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5     
 
 #----------------------------------------------------------------------------------------------------
 # Add tau id sources (HPS Taus)
+#
+# Out-of-the-box available IDs are:
+#  'againstElectronLoose' 'againstElectronMVA' 'againstElectronMedium' 'againstElectronTight' 'againstMuonLoose'
+#  'againstMuonMedium' 'againstMuonTight' 'byLooseCombinedIsolationDeltaBetaCorr' 'byMediumCombinedIsolationDeltaBetaCorr'
+#  'byTightCombinedIsolationDeltaBetaCorr' 'byVLooseCombinedIsolationDeltaBetaCorr' 'decayModeFinding' .
 #----------------------------------------------------------------------------------------------------
 
-process.patTaus.tauIDSources.byVLooseIsolation = cms.InputTag("hpsPFTauDiscriminationByVLooseIsolation")
-process.patTaus.tauIDSources.byLooseIsolation  = cms.InputTag("hpsPFTauDiscriminationByLooseIsolation")
-process.patTaus.tauIDSources.byMediumIsolation = cms.InputTag("hpsPFTauDiscriminationByMediumIsolation")
-process.patTaus.tauIDSources.byTightIsolation  = cms.InputTag("hpsPFTauDiscriminationByTightIsolation")
+process.patTaus.tauIDSources.byVLooseIsolation              = cms.InputTag("hpsPFTauDiscriminationByVLooseIsolation")
+process.patTaus.tauIDSources.byLooseIsolation               = cms.InputTag("hpsPFTauDiscriminationByLooseIsolation")
+process.patTaus.tauIDSources.byMediumIsolation              = cms.InputTag("hpsPFTauDiscriminationByMediumIsolation")
+process.patTaus.tauIDSources.byTightIsolation               = cms.InputTag("hpsPFTauDiscriminationByTightIsolation")
+process.patTaus.tauIDSources.byVLooseIsolationDeltaBetaCorr = cms.InputTag("hpsPFTauDiscriminationByVLooseIsolationDBSumPtCorr")
+process.patTaus.tauIDSources.byLooseIsolationDeltaBetaCorr  = cms.InputTag("hpsPFTauDiscriminationByLooseIsolationDBSumPtCorr")
+process.patTaus.tauIDSources.byMediumIsolationDeltaBetaCorr = cms.InputTag("hpsPFTauDiscriminationByMediumIsolationDBSumPtCorr")
+process.patTaus.tauIDSources.byTightIsolationDeltaBetaCorr  = cms.InputTag("hpsPFTauDiscriminationByTightIsolationDBSumPtCorr")
+process.patTaus.tauIDSources.byIsolationMVAraw              = cms.InputTag("hpsPFTauDiscriminationByIsolationMVAraw")
+process.patTaus.tauIDSources.byLooseIsolationMVA            = cms.InputTag("hpsPFTauDiscriminationByLooseIsolationMVA")
+process.patTaus.tauIDSources.byMediumIsolationMVA           = cms.InputTag("hpsPFTauDiscriminationByMediumIsolationMVA")
+process.patTaus.tauIDSources.byTightIsolationMVA            = cms.InputTag("hpsPFTauDiscriminationByTightIsolationMVA")
+process.patTaus.tauIDSources.againstElectronMVA2raw         = cms.InputTag("hpsPFTauDiscriminationByMVA2rawElectronRejection")
+process.patTaus.tauIDSources.againstElectronMVA2category    = cms.InputTag("hpsPFTauDiscriminationByMVA2rawElectronRejection:category")
+process.patTaus.tauIDSources.againstElectronVLooseMVA2      = cms.InputTag("hpsPFTauDiscriminationByMVA2VLooseElectronRejection")
+process.patTaus.tauIDSources.againstElectronLooseMVA2       = cms.InputTag("hpsPFTauDiscriminationByMVA2LooseElectronRejection")
+process.patTaus.tauIDSources.againstElectronMediumMVA2      = cms.InputTag("hpsPFTauDiscriminationByMVA2MediumElectronRejection")
+process.patTaus.tauIDSources.againstElectronTightMVA2       = cms.InputTag("hpsPFTauDiscriminationByMVA2TightElectronRejection")
 
 #----------------------------------------------------------------------------------------------------
 # Add MVA electron ID
@@ -356,17 +375,20 @@ process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 
 #### Shared Muon/Electron/Tau Skim
-process.LJFilter.tauLabel = cms.InputTag("cleanPatTaus")                        
-process.LJFilter.muLabel = cms.InputTag("cleanPatMuons")
+process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")                        
+process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
-process.LJFilter.jetLabel = cms.InputTag("cleanPatJetsAK5PF")
+process.LJFilter.jetLabel  = cms.InputTag("cleanPatJetsAK5PF")
+process.LJFilter.jetsMin = 1
+process.LJFilter.jetPT   = 30.0
 process.LJFilter.muonsMin = 1
-process.LJFilter.muPT = 25.0
+process.LJFilter.muPT     = 15.0
 process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT = 25.0
+process.LJFilter.elecPT       = 25.0
 process.LJFilter.tausMin = 1
-process.LJFilter.tauPT = 25.0
+process.LJFilter.tauPT   = 20.0
 process.LJFilter.counteitherleptontype = True
+process.LJFilter.customfilterEMuTauJet2012 = True
 
 #----------------------------------------------------------------------------------------------------
 # PDF weights
@@ -442,17 +464,19 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 )
 
 #----------------------------------------------------------------------------------------------------
-# Define GEN particle skimmer
+# Define GEN particle skimmer modules
 #----------------------------------------------------------------------------------------------------
 
 process.load ('Leptoquarks.LeptonJetGenTools.genTausFromLQs_cfi')
+#process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromLQs_cfi')
+#process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromZs_cfi')
 
 #----------------------------------------------------------------------------------------------------
 # Define the path 
 #----------------------------------------------------------------------------------------------------
 
 process.p = cms.Path(
-    # gen particles
+    # gen particle skimmer modules
     process.genTausFromLQs*
     process.genTausFromLQTops*
     # pdf weights

@@ -67,11 +67,15 @@ process.TFileService = cms.Service("TFileService",
 # Correct global tags for 2012 ReReco data are here:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Summary_of_Global_Tags_used_in_o
 #
-# Recommendations as of Sept. 11, 2012:
+# Recommendations as of Sept. 25, 2012:
 # Summer12_DR53X  MC               (*/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM) : START53_V7F
 # 2012 A          Data ReReco      (*/Run2012A-recover-06Aug2012-v1/AOD)           : FT_53_V6C_AN2
-# 2012 A+B        Data ReReco      (*/Run2012*-13Jul2012-v1/AOD)                   : FT_53_V6_AN2
-# 2012 C          Data PromptReco  (*/Run2012C-PromptReco-v*/AOD)                  : GR_P_V41_AN2
+# 2012 A          Data ReReco      (*/Run2012A-13Jul2012-v1/AOD)                   : FT_53_V6_AN2
+# 2012 B          Data ReReco      (*/Run2012B-13Jul2012-v1/AOD)                   : FT_53_V6_AN2
+# 2012 C          Data ReReco      (*/Run2012C-24Aug2012-v1/AOD)                   : FT_53_V10_AN2
+# 2012 C          Prompt Reco      (*/Run2012C-PromptReco-v2/AOD)                  : GR_P_V41_AN2
+# 2012 D          Prompt Reco      Coming soon!                                    : GR_P_V42_AN2
+# 
 # Make sure a correct global tag is used:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 

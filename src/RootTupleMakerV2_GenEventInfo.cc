@@ -24,6 +24,7 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   produces <std::vector<double> > ( "PDFNNPDFWeights" );
   produces <std::vector<int> > ( "PileUpInteractions");
   produces <std::vector<int> > ( "PileUpOriginBX" ) ;
+  produces <std::vector<float> > ( "PileUpInteractionsTrue" );
   produces <double>       ( "Weight" );
 //   produces <double>       ( "AlphaQCD" );
 //   produces <double>       ( "AlphaQED" );
@@ -38,6 +39,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pdfMSTWWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pdfNNPDFWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int >  >   Number_interactions  ( new std::vector<int>() );
+  std::auto_ptr<std::vector<float> >   trueNumberInteractions ( new std::vector<float>() );
   std::auto_ptr<std::vector<int >  >   OriginBX( new std::vector<int>() );
   std::auto_ptr<double >               weight ( new double() );
 //   std::auto_ptr<double >               alphaQCD ( new double() );
@@ -107,6 +109,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     
     if(puInfo.isValid()) {
       for( std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it ) {
+	trueNumberInteractions -> push_back ( it -> getTrueNumInteractions() );
 	Number_interactions -> push_back ( it->getPU_NumInteractions() );
 	OriginBX -> push_back ( it -> getBunchCrossing());
       }
@@ -123,6 +126,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pdfMSTWWeights, "PDFMSTWWeights" );
   iEvent.put( pdfNNPDFWeights, "PDFNNPDFWeights" );
   iEvent.put( Number_interactions,   "PileUpInteractions"   );
+  iEvent.put( trueNumberInteractions, "PileUpInteractionsTrue" );
   iEvent.put( OriginBX,   "PileUpOriginBX" );
   iEvent.put( weight, "Weight" );
 //   iEvent.put( alphaQCD, "alphaQCD" );

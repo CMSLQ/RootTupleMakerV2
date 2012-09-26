@@ -224,32 +224,6 @@ process.patElectrons.electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0"  
 process.patElectrons.electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
 
 #----------------------------------------------------------------------------------------------------
-# Electron pt is broken in CMSSW_5_2_X for gsf electrons with pT between 100 and 200 GeV
-# https://twiki.cern.ch/twiki/bin/view/CMS/HEEPSelector
-# 
-# Temporary fix from HEEP group: 
-# - Use new gsf electrons collection to use instead of "gsfElectrons": "gsfElectronsHEEPCorr"
-# - New collection uses GsfElectron::superCluster()->energy(), which is OK
-# - H/E and E/p are adjusted properly
-# - Have to re-run gsf electron -> pf candidate mapping
-# - Have to re-run electron ID mapping
-#
-# Notes: 
-# - PFMET is not affected (since it uses PFlow electrons, not gsf)
-# - Permanently fixed (normal gsf electrons are ok) in CMSSW_5_3_1
-# - Keep using this method so long as we look at data reco'd in CMSSW_5_2_X
-#----------------------------------------------------------------------------------------------------
-
-# Define the heep energy corrector
-process.load("SHarper.HEEPAnalyzer.gsfElectronsHEEPCorr_cfi")
-
-# We also need to re-run the electron ID value maps as they will be no longer valid
-process.load("RecoEgamma.ElectronIdentification.electronIdSequence_cff")
-
-# We need to redo the GsfEle->PFCand Map
-process.load("SHarper.HEEPAnalyzer.remadePFEleLinks_cfi")
-
-#----------------------------------------------------------------------------------------------------
 # Add PF jets --> See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
 #----------------------------------------------------------------------------------------------------
 
@@ -461,8 +435,6 @@ process.p = cms.Path(
     process.genTausFromLQTops*
     # pdf weights
     process.pdfWeights*
-    # Use correct electron energies and re-run the electron ID sequence and particle flow link sequence
-    process.gsfElectronsHEEPCorr*process.eIdSequence*process.remadePFEleLinks*
     # MVA electron ID
     process.mvaID*
     # Good vertices
@@ -525,14 +497,6 @@ process.p = cms.Path(
     )
     *process.rootTupleTree
 )
-
-#----------------------------------------------------------------------------------------------------
-# Switch to correct electron energies (see above comment about gsf electrons) 
-#----------------------------------------------------------------------------------------------------
-
-from SHarper.HEEPAnalyzer.heepTools import *
-swapCollection(process,"gsfElectrons","gsfElectronsHEEPCorr")
-swapCollectionModuleAndProductLabels(process,"particleFlow","electrons","remadePFEleLinks","electrons")
 
 #----------------------------------------------------------------------------------------------------
 # Dump if necessary

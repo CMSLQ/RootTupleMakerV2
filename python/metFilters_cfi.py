@@ -10,7 +10,6 @@ import FWCore.ParameterSet.Config as cms
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#CSC_Beam_Halo_Filter
 # ------------------------------------------------------------------------------------
 from RecoMET.METAnalyzers.CSCHaloFilter_cfi import *
-CSCTightHaloFilter.taggingMode = cms.bool ( True ) 
 
 # ------------------------------------------------------------------------------------
 # HBHE noise filter:

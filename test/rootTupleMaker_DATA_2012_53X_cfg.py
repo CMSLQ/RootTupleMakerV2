@@ -210,10 +210,7 @@ process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5     
 # Add tau id sources (HPS Taus)
 #----------------------------------------------------------------------------------------------------
 
-process.patTaus.tauIDSources.byVLooseIsolation = cms.InputTag("hpsPFTauDiscriminationByVLooseIsolation")
-process.patTaus.tauIDSources.byLooseIsolation  = cms.InputTag("hpsPFTauDiscriminationByLooseIsolation")
-process.patTaus.tauIDSources.byMediumIsolation = cms.InputTag("hpsPFTauDiscriminationByMediumIsolation")
-process.patTaus.tauIDSources.byTightIsolation  = cms.InputTag("hpsPFTauDiscriminationByTightIsolation")
+process.load("Leptoquarks.RootTupleMakerV2.tauIDsources_cfi")
 
 #----------------------------------------------------------------------------------------------------
 # Add MVA electron ID
@@ -229,32 +226,6 @@ process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi')
 process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaNonTrigV0 )
 process.patElectrons.electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0"   )
 process.patElectrons.electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
-
-#----------------------------------------------------------------------------------------------------
-# Electron pt is broken in CMSSW_5_2_X for gsf electrons with pT between 100 and 200 GeV
-# https://twiki.cern.ch/twiki/bin/view/CMS/HEEPSelector
-# 
-# Temporary fix from HEEP group: 
-# - Use new gsf electrons collection to use instead of "gsfElectrons": "gsfElectronsHEEPCorr"
-# - New collection uses GsfElectron::superCluster()->energy(), which is OK
-# - H/E and E/p are adjusted properly
-# - Have to re-run gsf electron -> pf candidate mapping
-# - Have to re-run electron ID mapping
-#
-# Notes: 
-# - PFMET is not affected (since it uses PFlow electrons, not gsf)
-# - Permanently fixed (normal gsf electrons are ok) in CMSSW_5_3_1
-# - Keep using this method so long as we look at data reco'd in CMSSW_5_2_X
-#----------------------------------------------------------------------------------------------------
-
-# Define the heep energy corrector
-process.load("SHarper.HEEPAnalyzer.gsfElectronsHEEPCorr_cfi")
-
-# We also need to re-run the electron ID value maps as they will be no longer valid
-process.load("RecoEgamma.ElectronIdentification.electronIdSequence_cff")
-
-# We need to redo the GsfEle->PFCand Map
-process.load("SHarper.HEEPAnalyzer.remadePFEleLinks_cfi")
 
 #----------------------------------------------------------------------------------------------------
 # Add PF jets --> See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
@@ -352,7 +323,6 @@ process.patTaus.genParticleMatch = cms.VInputTag( cms.InputTag("tauLepMatch") )
 process.patDefaultSequence.replace( process.tauGenJetMatch, process.tauJetMatch )
 process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
 
-
 #----------------------------------------------------------------------------------------------------
 # Lepton + Jets filter
 #----------------------------------------------------------------------------------------------------
@@ -360,17 +330,22 @@ process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 
 #### Shared Muon/Electron/Tau Skim
-process.LJFilter.tauLabel = cms.InputTag("cleanPatTaus")                        
-process.LJFilter.muLabel = cms.InputTag("cleanPatMuons")
+process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")                        
+process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
-process.LJFilter.jetLabel = cms.InputTag("cleanPatJetsAK5PF")
+process.LJFilter.jetLabel  = cms.InputTag("cleanPatJetsAK5PF")
 process.LJFilter.muonsMin = 1
-process.LJFilter.muPT = 20.
+process.LJFilter.muPT     = 25.0
 process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT = 20.
+process.LJFilter.elecPT       = 25.0
 process.LJFilter.tausMin = 1
-process.LJFilter.tauPT = 15
+process.LJFilter.tauPT   = 25.0
 process.LJFilter.counteitherleptontype = True
+process.LJFilter.customfilterEMuTauJet2012 = True
+# -- WARNING :
+# "customfilterEMuTauJet2012" configuration is hard-coded. If enabled, other configuration parameters will NOT have any effect.
+# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc?revision=1.12&view=markup )
+# "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
 
 #----------------------------------------------------------------------------------------------------
 # Define the output tree for RootTupleMakerV2
@@ -415,7 +390,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 )
 
 #----------------------------------------------------------------------------------------------------
-# Define GEN particle skimmer
+# Define GEN particle skimmer (not used for data -- just a place-holder)
 #----------------------------------------------------------------------------------------------------
 
 process.load ('Leptoquarks.LeptonJetGenTools.genTausFromLQs_cfi')
@@ -428,8 +403,6 @@ process.p = cms.Path(
     # gen particles
     process.genTausFromLQs*
     process.genTausFromLQTops*
-    # Use correct electron energies and re-run the electron ID sequence and particle flow link sequence
-    process.gsfElectronsHEEPCorr*process.eIdSequence*process.remadePFEleLinks*
     # MVA electron ID
     process.mvaID*
     # Good vertices
@@ -492,14 +465,6 @@ process.p = cms.Path(
     )
     *process.rootTupleTree
 )
-
-#----------------------------------------------------------------------------------------------------
-# Switch to correct electron energies (see above comment about gsf electrons) 
-#----------------------------------------------------------------------------------------------------
-
-from SHarper.HEEPAnalyzer.heepTools import *
-swapCollection(process,"gsfElectrons","gsfElectronsHEEPCorr")
-swapCollectionModuleAndProductLabels(process,"particleFlow","electrons","remadePFEleLinks","electrons")
 
 #----------------------------------------------------------------------------------------------------
 # Dump if necessary

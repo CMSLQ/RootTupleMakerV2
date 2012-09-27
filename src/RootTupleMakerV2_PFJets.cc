@@ -65,6 +65,15 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
 	produces <std::vector<double> > ( prefix + "JetProbabilityBTag" + suffix );
 	produces <std::vector<double> > ( prefix + "JetBProbabilityBTag" + suffix );
+	produces <std::vector<double> > ( prefix + "CombinedSecondaryVertexBTag" + suffix );    
+	produces <std::vector<double> > ( prefix + "CombinedSecondaryVertexMVABTag" + suffix ); 
+	produces <std::vector<double> > ( prefix + "SoftElectronByPtBTag" + suffix );           
+	produces <std::vector<double> > ( prefix + "SoftElectronByIP3dBTag" + suffix );         
+	produces <std::vector<double> > ( prefix + "SoftMuonBTag" + suffix );                   
+	produces <std::vector<double> > ( prefix + "SoftMuonByPtBTag" + suffix );               
+	produces <std::vector<double> > ( prefix + "SoftMuonByIP3dBTag" + suffix );             
+	produces <std::vector<double> > ( prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
+	produces <std::vector<double> > ( prefix + "CombinedMVABTag" + suffix );
 	produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);
 	produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);
 	produces <std::vector<double> > ( prefix + "BestVertexTrackAssociationFactor" + suffix );
@@ -127,6 +136,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  jetProbabilityBTag  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
+
+	std::auto_ptr<std::vector<double> >  combinedSecondaryVertexBTag          ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  combinedSecondaryVertexMVABTag       ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  softElectronByPtBTag                 ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  softElectronByIP3dBTag               ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  softMuonBTag                         ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  softMuonByPtBTag                     ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  softMuonByIP3dBTag                   ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  combinedInclusiveSecondaryVertexBTag ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  combinedMVABTag                      ( new std::vector<double>()  );
+	
 	std::auto_ptr<std::vector<int> >  passLooseID  ( new std::vector<int>()  );
 	std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );
 	std::auto_ptr <std::vector<double> >  bestVertexTrackAssociationFactor  ( new std::vector<double>()  );
@@ -386,8 +406,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags") );
 			jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
 			jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
+			combinedSecondaryVertexBTag         ->push_back( it->bDiscriminator("combinedSecondaryVertexBJetTags"         ));
+			combinedSecondaryVertexMVABTag      ->push_back( it->bDiscriminator("combinedSecondaryVertexMVABJetTags"      ));
+			softElectronByPtBTag                ->push_back( it->bDiscriminator("softElectronByPtBJetTags"                ));                
+			softElectronByIP3dBTag              ->push_back( it->bDiscriminator("softElectronByIP3dBJetTags"              ));
+			softMuonBTag                        ->push_back( it->bDiscriminator("softMuonBJetTags"                        ));
+			softMuonByPtBTag                    ->push_back( it->bDiscriminator("softMuonByPtBJetTags"                    ));                
+			softMuonByIP3dBTag                  ->push_back( it->bDiscriminator("softMuonByIP3dBJetTags"                  ));
+			combinedInclusiveSecondaryVertexBTag->push_back( it->bDiscriminator("combinedInclusiveSecondaryVertexBJetTags"));
+			combinedMVABTag                     ->push_back( it->bDiscriminator("combinedMVABJetTags"                     ));
 			passLooseID->push_back( passjetLoose );
 			passTightID->push_back( passjetTight );
+			
 
 // 			//////////////////////////////////////////////////////////////////// 
 // 			if( fabs(it->eta()) > 3) 
@@ -491,6 +521,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
 	iEvent.put( jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix );
 	iEvent.put( jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix );
+	iEvent.put( combinedSecondaryVertexBTag         ,prefix + "CombinedSecondaryVertexBTag" + suffix );    
+	iEvent.put( combinedSecondaryVertexMVABTag      ,prefix + "CombinedSecondaryVertexMVABTag" + suffix ); 
+	iEvent.put( softElectronByPtBTag                ,prefix + "SoftElectronByPtBTag" + suffix );           
+	iEvent.put( softElectronByIP3dBTag              ,prefix + "SoftElectronByIP3dBTag" + suffix );         
+	iEvent.put( softMuonBTag                        ,prefix + "SoftMuonBTag" + suffix );                   
+	iEvent.put( softMuonByPtBTag                    ,prefix + "SoftMuonByPtBTag" + suffix );               
+	iEvent.put( softMuonByIP3dBTag                  ,prefix + "SoftMuonByIP3dBTag" + suffix );            
+	iEvent.put( combinedInclusiveSecondaryVertexBTag,prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
+	iEvent.put( combinedMVABTag                     ,prefix + "CombinedMVABTag" + suffix ) ;
 	iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);
 	iEvent.put( passTightID, prefix + "PassTightID" + suffix);
 }

@@ -362,7 +362,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    vtxDistZ_    = distZ;
 		  }
 		  //-- using reco::muon::muonBestTrack() - 2012 recommendation    
-		  if( it->isGlobalMuon() ){
+		  if( (it->muonBestTrack()).isNonnull() ){
 		    double bt_distXY = it->muonBestTrack()->dxy(v_it->position());
 		    double bt_distZ  = it->muonBestTrack()->dz(v_it->position());
 		    double bt_dist3D = sqrt( pow(bt_distXY,2) + pow(bt_distZ,2) );
@@ -374,14 +374,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    }
 		  }
 		  
-		}
+		}//loop over primaryVertices
 	    }
 	  else
 	    {
 	      edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << vtxInputTag;
 	    }
-	  //
 
+	  //
 	  //------------------------------------------------------------------------
 	  // Trigger matching
 	  // 

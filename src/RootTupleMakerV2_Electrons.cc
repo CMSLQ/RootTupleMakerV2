@@ -46,6 +46,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   conversionsInputTag      (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"      )),
   triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
   rhoInputTag              (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
+  pfIsolation03InputTags   (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues03")),
+  pfIsolation04InputTags   (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues04")),
   electronIso              (iConfig.getParameter<double>       ("ElectronIso"              )),
   muonPt                   (iConfig.getParameter<double>       ("MuonPt"                   )),
   muonIso                  (iConfig.getParameter<double>       ("MuonIso"                  )),
@@ -136,11 +138,13 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 
   // Isolation variables: particle flow
   
-  produces <std::vector<double> > ( prefix + "PFParticleIso"            + suffix );
-  produces <std::vector<double> > ( prefix + "PFChargedHadronIso"       + suffix );
-  produces <std::vector<double> > ( prefix + "PFNeutralHadronIso"       + suffix );
-  produces <std::vector<double> > ( prefix + "PFPhotonIso"              + suffix );
-  produces <std::vector<double> > ( prefix + "PFPUChargedHadronIso"     + suffix );
+  produces <std::vector<double> > ( prefix + "PFChargedHadronIso03"     + suffix );
+  produces <std::vector<double> > ( prefix + "PFNeutralHadronIso03"     + suffix );
+  produces <std::vector<double> > ( prefix + "PFPhotonIso03"            + suffix );
+
+  produces <std::vector<double> > ( prefix + "PFChargedHadronIso04"     + suffix );
+  produces <std::vector<double> > ( prefix + "PFNeutralHadronIso04"     + suffix );
+  produces <std::vector<double> > ( prefix + "PFPhotonIso04"            + suffix );
   
   // Isolation variables: DR 0.3				        
 								        
@@ -150,7 +154,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HcalIsoD1DR03"            + suffix );
   produces <std::vector<double> > ( prefix + "HcalIsoD2DR03"            + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoDR03"               + suffix );
-								        
+				        
   // Conversion variables					        
 								        
   produces <std::vector<int> >    ( prefix + "MissingHits"              + suffix );
@@ -291,11 +295,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Isolation variables: particle flow 
   
-  std::auto_ptr<std::vector<double> >  pfParticleIso             ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfChargedHadronIso        ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfNeutralHadronIso        ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfPhotonIso               ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfPUChargedHadronIso      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfChargedHadronIso03      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfNeutralHadronIso03      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfPhotonIso03             ( new std::vector<double>()  );
+
+  std::auto_ptr<std::vector<double> >  pfChargedHadronIso04      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfNeutralHadronIso04      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfPhotonIso04             ( new std::vector<double>()  );
   
   // Isolation variables: DR 0.3
 
@@ -392,6 +398,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<reco::ConversionCollection> hConversions;
   iEvent.getByLabel(conversionsInputTag, hConversions); 
 
+  // ParticleFlow-based isolation
+
+  size_t nPfIsolationTypes = 3;
+
+  IsoDepositVals pfIsolation03Values(nPfIsolationTypes); 
+  IsoDepositVals pfIsolation04Values(nPfIsolationTypes); 
+  
+  for (size_t j = 0; j<nPfIsolationTypes; ++j) {
+    iEvent.getByLabel( pfIsolation03InputTags[j], pfIsolation03Values[j]);
+    iEvent.getByLabel( pfIsolation04InputTags[j], pfIsolation04Values[j]);
+  }
+  
   // PAT electrons
 
   edm::Handle<std::vector<pat::Electron> > electrons;
@@ -732,14 +750,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       // Isolation variables: particle flow
 
-      pfParticleIso            -> push_back ( it->particleIso       () );
-      pfChargedHadronIso       -> push_back ( it->chargedHadronIso  () );
-      pfNeutralHadronIso       -> push_back ( it->neutralHadronIso  () );
-      pfPhotonIso              -> push_back ( it->photonIso         () );
-      pfPUChargedHadronIso     -> push_back ( it->puChargedHadronIso() );
+      edm::Ptr<reco::Candidate> originalGsfElectronRef = it -> originalObjectRef();
       
-      // Isolation variables: DR 0.3
+      pfChargedHadronIso03     -> push_back ( (*pfIsolation03Values[0])[originalGsfElectronRef] );
+      pfPhotonIso03            -> push_back ( (*pfIsolation03Values[1])[originalGsfElectronRef] );
+      pfNeutralHadronIso03     -> push_back ( (*pfIsolation03Values[2])[originalGsfElectronRef] );
+      
+      pfChargedHadronIso04     -> push_back ( (*pfIsolation04Values[0])[originalGsfElectronRef] );
+      pfPhotonIso04            -> push_back ( (*pfIsolation04Values[1])[originalGsfElectronRef] );
+      pfNeutralHadronIso04     -> push_back ( (*pfIsolation04Values[2])[originalGsfElectronRef] );
 
+      // Isolation variables: DR 0.3				        
+      
       ecalIsoDR03              -> push_back ( it->dr03EcalRecHitSumEt() );
       hcalIsoDR03              -> push_back ( it->dr03HcalTowerSumEt() );
       hcalIsoDR03FullCone      -> push_back ( it->dr03HcalTowerSumEt() +
@@ -873,11 +895,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Isolation variables: particle flow
 
-  iEvent.put( pfParticleIso           , prefix + "PFParticleIso"            + suffix );
-  iEvent.put( pfChargedHadronIso      , prefix + "PFChargedHadronIso"       + suffix );
-  iEvent.put( pfNeutralHadronIso      , prefix + "PFNeutralHadronIso"       + suffix );
-  iEvent.put( pfPhotonIso             , prefix + "PFPhotonIso"              + suffix );
-  iEvent.put( pfPUChargedHadronIso    , prefix + "PFPUChargedHadronIso"     + suffix );
+  iEvent.put( pfChargedHadronIso03    , prefix + "PFChargedHadronIso03"     + suffix );
+  iEvent.put( pfNeutralHadronIso03    , prefix + "PFNeutralHadronIso03"     + suffix );
+  iEvent.put( pfPhotonIso03           , prefix + "PFPhotonIso03"            + suffix );
+
+  iEvent.put( pfChargedHadronIso04    , prefix + "PFChargedHadronIso04"     + suffix );
+  iEvent.put( pfNeutralHadronIso04    , prefix + "PFNeutralHadronIso04"     + suffix );
+  iEvent.put( pfPhotonIso04           , prefix + "PFPhotonIso04"            + suffix );
 
   // Conversion variables					        
   

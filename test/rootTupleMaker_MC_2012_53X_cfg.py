@@ -78,7 +78,7 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START53_V7F::All'
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = 5
 
 # Input files
 process.source.fileNames = [
@@ -107,36 +107,6 @@ process.GlobalTag.toGet = cms.VPSet(
              tag     = cms.string          ("TrackProbabilityCalibration_3D_MC53X_v2"  ),
              connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"    )
     )
-)
-
-#----------------------------------------------------------------------------------------------------
-# Ensure that PF isolation for EGamma cut-based electron ID:
-# - uses recommended calculation (not the one included in gsf by default)
-# - uses a cone size of 0.3 (recommended)
-# 
-# Recommendation comes from here:
-# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification#Particle_Flow_Isolation
-# 
-# Recipe comes from here:
-# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPFBasedIsolation#for_PAT_electron_users_using_sta
-#
-# Note: This block has to go early in the python cfg, or cmsRun won't work
-#----------------------------------------------------------------------------------------------------
-
-process.patElectrons.isolationValues = cms.PSet(
-    pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03PFIdPFIso"),
-    pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFIso"),
-    pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03PFIdPFIso"),
-    pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03PFIdPFIso"),
-    pfPhotons = cms.InputTag("elPFIsoValueGamma03PFIdPFIso")
-)
-
-process.patElectrons.isolationValuesNoPFId = cms.PSet(
-    pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03NoPFIdPFIso"),
-    pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03NoPFIdPFIso"),
-    pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03NoPFIdPFIso"),
-    pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03NoPFIdPFIso"),
-    pfPhotons = cms.InputTag("elPFIsoValueGamma03NoPFIdPFIso")
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -502,17 +472,17 @@ process.p = cms.Path(
 # Dump if necessary
 #----------------------------------------------------------------------------------------------------
 
-# process.dump = cms.OutputModule("PoolOutputModule",
-#                                 outputCommands = cms.untracked.vstring(
-#                                 'keep *',
-#                                 ),
-#                                 fileName = cms.untracked.string('dump.root')
-#                                 )
-# process.DUMP    = cms.EndPath (process.dump)
+process.dump = cms.OutputModule("PoolOutputModule",
+                                outputCommands = cms.untracked.vstring(
+                                'keep *',
+                                ),
+                                fileName = cms.untracked.string('dump.root')
+                                )
+process.DUMP    = cms.EndPath (process.dump)
 
 # Delete predefined Endpath (needed for running with CRAB)
 del process.out
 del process.outpath
 
 # Schedule definition
-process.schedule = cms.Schedule(process.p)
+process.schedule = cms.Schedule(process.p,process.DUMP)

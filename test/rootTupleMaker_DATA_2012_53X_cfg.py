@@ -113,36 +113,6 @@ process.GlobalTag.toGet = cms.VPSet(
 )
 
 #----------------------------------------------------------------------------------------------------
-# Ensure that PF isolation for EGamma cut-based electron ID:
-# - uses recommended calculation (not the one included in gsf by default)
-# - uses a cone size of 0.3 (recommended)
-# 
-# Recommendation comes from here:
-# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification#Particle_Flow_Isolation
-# 
-# Recipe comes from here:
-# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPFBasedIsolation#for_PAT_electron_users_using_sta
-#
-# Note: This block has to go early in the python cfg, or cmsRun won't work
-#----------------------------------------------------------------------------------------------------
-
-process.patElectrons.isolationValues = cms.PSet(
-    pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03PFIdPFIso"),
-    pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFIso"),
-    pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03PFIdPFIso"),
-    pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03PFIdPFIso"),
-    pfPhotons = cms.InputTag("elPFIsoValueGamma03PFIdPFIso")
-)
-
-process.patElectrons.isolationValuesNoPFId = cms.PSet(
-    pfChargedHadrons = cms.InputTag("elPFIsoValueCharged03NoPFIdPFIso"),
-    pfChargedAll = cms.InputTag("elPFIsoValueChargedAll03NoPFIdPFIso"),
-    pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU03NoPFIdPFIso"),
-    pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral03NoPFIdPFIso"),
-    pfPhotons = cms.InputTag("elPFIsoValueGamma03NoPFIdPFIso")
-)
-
-#----------------------------------------------------------------------------------------------------
 # HEEP 4.0 (electron ID) still uses the 2011 definitions of rho for isolation corrections.
 # 
 # Recipe taken from here:

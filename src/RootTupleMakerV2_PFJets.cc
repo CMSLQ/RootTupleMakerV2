@@ -26,6 +26,7 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 //    applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
 //    resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
+        produces <bool>                 ( "hasJetWithBadUnc" );
 	produces <std::vector<double> > ( prefix + "Eta" + suffix );
 	produces <std::vector<double> > ( prefix + "Phi" + suffix );
 	produces <std::vector<double> > ( prefix + "Pt" + suffix );
@@ -97,6 +98,7 @@ void RootTupleMakerV2_PFJets::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
+        std::auto_ptr<bool>                  hasJetWithBadUnc ( new bool() );
 	std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
@@ -174,6 +176,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	//   }
 
 	//JEC Uncertainties
+
+	*hasJetWithBadUnc.get() = false;
 	JetCorrectionUncertainty *jecUnc = 0;
 	if(readJECuncertainty)
 	{
@@ -373,10 +377,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
 			l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1FastJet").pt() );
 			l1fastjetJEC_vec->push_back( it->correctedJet("L1FastJet").pt()/it->correctedJet("Uncorrected").pt() );
-			if(readJECuncertainty)
-				jecUnc_vec->push_back( jecUnc->getUncertainty(true) );
-			else
-				jecUnc_vec->push_back( -999 );
+			if(readJECuncertainty){ 
+			  double uncertainty = -999.;
+			  try { 
+			    uncertainty = jecUnc->getUncertainty(true);
+			  } 
+			  catch ( cms::Exception & e ) { 
+			    edm::LogWarning("RootTupleMakerV2_PFJetsError") << "Warning! For PFJet with eta = " << it -> eta() << " caught JEC unc exception: " << e;
+			    uncertainty = -999.;
+			    *hasJetWithBadUnc.get() = true;
+			  }
+			  jecUnc_vec->push_back( uncertainty );
+			}
+			else {
+			  jecUnc_vec->push_back( -999 );
+			}
 			partonFlavour->push_back( it->partonFlavour() );
 			chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
 			chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
@@ -472,7 +487,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// put vectors in the event
 	
 	
-	
+	iEvent.put( hasJetWithBadUnc, "hasJetWithBadUnc" );
 	iEvent.put( bestVertexTrackAssociationFactor,prefix + "BestVertexTrackAssociationFactor" + suffix );
 	iEvent.put( bestVertexTrackAssociationIndex,prefix + "BestVertexTrackAssociationIndex" + suffix);
 	iEvent.put( closestVertexWeighted3DSeparation,prefix + "ClosestVertexWeighted3DSeparation" + suffix );

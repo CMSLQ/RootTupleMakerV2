@@ -78,7 +78,7 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START53_V7F::All'
 
 # Events to process
-process.maxEvents.input = 5
+process.maxEvents.input = -1
 
 # Input files
 process.source.fileNames = [
@@ -472,17 +472,17 @@ process.p = cms.Path(
 # Dump if necessary
 #----------------------------------------------------------------------------------------------------
 
-process.dump = cms.OutputModule("PoolOutputModule",
-                                outputCommands = cms.untracked.vstring(
-                                'keep *',
-                                ),
-                                fileName = cms.untracked.string('dump.root')
-                                )
-process.DUMP    = cms.EndPath (process.dump)
+# process.dump = cms.OutputModule("PoolOutputModule",
+#                                 outputCommands = cms.untracked.vstring(
+#                                 'keep *',
+#                                 ),
+#                                 fileName = cms.untracked.string('dump.root')
+#                                 )
+# process.DUMP    = cms.EndPath (process.dump)
 
 # Delete predefined Endpath (needed for running with CRAB)
 del process.out
 del process.outpath
 
 # Schedule definition
-process.schedule = cms.Schedule(process.p,process.DUMP)
+process.schedule = cms.Schedule(process.p)

@@ -98,6 +98,5 @@ eeBadScFilter.taggingMode = cms.bool (True)
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#EB_or_EE_Xtals_with_large_laser
 # ------------------------------------------------------------------------------------
 
-from SandBox.Skims.ecalLaserCorrFilter_cfi import *
-ecalLaserCorrFilter.TaggingMode = cms.bool (True)
-ecalLaserCorrFilter.Debug = cms.bool (False)
+from RecoMET.METFilters.ecalLaserCorrFilter_cfi import *
+ecalLaserCorrFilter.taggingMode = cms.bool (True)

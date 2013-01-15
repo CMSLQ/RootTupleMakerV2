@@ -271,23 +271,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle< pat::TriggerEvent > triggerEvent;
   iEvent.getByLabel( triggerEventInputTag, triggerEvent );
   
-  // For muon cocktails:
-  // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMuonAnalysis#High_pT_muons
-  // See: https://hypernews.cern.ch/HyperNews/CMS/get/muon/787/1.html
-
-  //edm::Handle<reco::TrackToTrackMap> tevMapH1;
-  //edm::Handle<reco::TrackToTrackMap> tevMapH2;
-  //edm::Handle<reco::TrackToTrackMap> tevMapH3;
-
-  //iEvent.getByLabel("tevMuons", "default", tevMapH1);
-  //const reco::TrackToTrackMap tevMap1 = *(tevMapH1.product());
-  //iEvent.getByLabel("tevMuons", "firstHit", tevMapH2);
-  //const reco::TrackToTrackMap tevMap2 = *(tevMapH2.product());
-  //iEvent.getByLabel("tevMuons", "picky", tevMapH3);
-  //const reco::TrackToTrackMap tevMap3 = *(tevMapH3.product());
-
   // PAT trigger helper for trigger matching information
-
   const pat::helper::TriggerMatchHelper matchHelper;
   
 
@@ -483,10 +467,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    {	      
 	      int refit_id = -999;
 
-	      // home-brewed pmcTrack is obsolete for 2012, using tevOptimized instead.
-	      // reco::TrackRef cocktail_track = muon::tevOptimized(*it, tevMap1, tevMap2, tevMap3).first;
-	      // See: https://hypernews.cern.ch/HyperNews/CMS/get/muon/787/1.html
-	      reco::TrackRef cocktail_track = muon::tevOptimized( *it, 200., 4., 6. ).first;
+	      // -----------------------------------------------------------------------------------------------------------------------------------------//
+	      // HighPT Muon - New Version (recommended) 
+	      // Following new instructions on https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#New_Version_recommended
+	      // To use the new version of TuneP you have to follow these steps:
+	      // Either run CMSSW_5_3_6_patch1 (or newer) or if you need to keep using an older CMSSW verison check out V09-04-03-02 DataFormats/MuonReco 
+	      // (if you have problems getting CMSSW to compile please do also addpkg RecoMuon/MuonIdentification).
+	      // #include "DataFormats/MuonReco/interface/MuonCocktails.h" add this to your analysis code
+	      // reco::TrackRef cktTrack = (muon::tevOptimized(*recoMu, 200, 17., 40., 0.25)).first; call to get the optimal muon track
+	      // cktTrack->pt() - to get the pT of the muon
+	      //
+	      //Then you can apply the new HighPT ID, which still differs from Tight Muon selection in the following points:
+	      //The Particle-Flow muon id is not required
+	      //The cut of dpT/pT<0.3 for the track used for momentum determination is applied, i.e. cktTrack->ptError()/cktTrack->pt()<0.3
+	      //The cuts applied on recoMu.muonBestTrack (impact parameter cuts) need to be applied to cktTrack since this is the new best track now. 
+	      // -----------------------------------------------------------------------------------------------------------------------------------------//
+
+	      reco::TrackRef cocktail_track = (muon::tevOptimized(*it, 200, 17., 40., 0.25)).first;
 
 	      double cttrkd0  = cocktail_track -> d0() ;
 	      if( beamSpotCorr && beamSpot.isValid() )

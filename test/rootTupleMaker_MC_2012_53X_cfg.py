@@ -46,7 +46,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('RootTupleMakerV2_output_MC.root')
+    fileName = cms.string( 'rootTupleMaker_CRAB_MC_2012_Top_53X_LOCALTEST.root' )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -78,17 +78,15 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START53_V7F::All'
 
 # Events to process
-process.maxEvents.input = -1
+process.maxEvents.input = 1000
 
 # Input files
 process.source.fileNames = [
-    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToUE_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
-    #'/store/group/phys_exotica/darinb/Reco_AOD_Examples/LQToCMu_M-300_TuneZ2star_8TeV-pythia6_AODSIM_PU_S10_START53_V7A-v1_Example.root'
+    #Specified by the InputList.txt
+    #'root://eoscms//eos/cms/store/user/hsaka/2012prep/TTJets_FullLeptMGDecays_8TeV-madgraph_PU_S10_START53_V7A-v1.root'
     #'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
-    #'file:///afs/cern.ch/user/e/eberry/work/ZprimePSIToEE_M-2000_TuneZ2star_8TeV-pythia6_TEST.root'
-    #'file:///afs/cern.ch/user/e/eberry/work/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
-    #'rfio:///castor/cern.ch/user/h/hsaka/2012prep/Run2012B_ElectronHad_AOD_PromptReco-v1_TEST.root'
-]
+    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12__DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball__AODSIM__PU_S7_START52_V9-v1__TEST.root'
+    ]
 
 #----------------------------------------------------------------------------------------------------
 # For 53x Data and MC, the default Jet Probability Calibration from the GlobalTag is not optimal 
@@ -159,21 +157,29 @@ addTcMET(process, 'TC')
 process.load("Leptoquarks.RootTupleMakerV2.metFilters_cfi")
 
 #----------------------------------------------------------------------------------------------------
-# Add ShrinkingCone Taus
+# Rerun full HPS sequence to fully profit from the fix of high pT taus
 #----------------------------------------------------------------------------------------------------
 
-from PhysicsTools.PatAlgos.tools.tauTools import *
-addTauCollection(process, tauCollection = cms.InputTag('shrinkingConePFTauProducer'), algoLabel = "shrinkingCone", typeLabel = "PFTau")
+process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
+
+#----------------------------------------------------------------------------------------------------
+# Optional: Add ShrinkingCone Taus
+# Does not work after "V01-04-17 RecoTauTag/RecoTau" due to shrinkingConePFTauDiscriminationByDeadECALElectronRejection problems.
+#----------------------------------------------------------------------------------------------------
+
+#from PhysicsTools.PatAlgos.tools.tauTools import *
+#addTauCollection(process, tauCollection = cms.InputTag('shrinkingConePFTauProducer'), algoLabel = "shrinkingCone", typeLabel = "PFTau")
 
 #----------------------------------------------------------------------------------------------------
 # Modify cleanPatTaus (HPS Taus) - loosen up a bit
 # http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/PhysicsTools/PatAlgos/python/cleaningLayer1/tauCleaner_cfi.py?revision=1.11&view=markup
 #----------------------------------------------------------------------------------------------------
+
 process.cleanPatTaus.preselection = cms.string(' tauID("decayModeFinding") > 0.5 ')
 process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5      ')
 
 #----------------------------------------------------------------------------------------------------
-# Add tau id sources (HPS Taus)
+# Add Tau ID sources (HPS Taus)
 #----------------------------------------------------------------------------------------------------
 
 process.load("Leptoquarks.RootTupleMakerV2.tauIDsources_cfi")
@@ -301,17 +307,19 @@ process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")
 process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
 process.LJFilter.jetLabel  = cms.InputTag("cleanPatJetsAK5PF")
-process.LJFilter.muonsMin = 1
-process.LJFilter.muPT     = 25.0
-process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT       = 25.0
-process.LJFilter.tausMin = 1
-process.LJFilter.tauPT   = 25.0
+process.LJFilter.muonsMin = 0
+process.LJFilter.muPT     = 15.0
+process.LJFilter.electronsMin = 0
+process.LJFilter.elecPT       = 15.0
+process.LJFilter.tausMin = 0
+process.LJFilter.tauPT   = 15.0
+process.LJFilter.jetsMin = 0
+process.LJFilter.jetPT   = 15.0
 process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = True
 # -- WARNING :
-# "customfilterEMuTauJet2012" configuration is hard-coded. If enabled, other configuration parameters will NOT have any effect.
-# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc?revision=1.12&view=markup )
+# "customfilterEMuTauJet2012" configuration is hard-coded.
+# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc )
 # "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
 
 #----------------------------------------------------------------------------------------------------
@@ -360,7 +368,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleElectrons_*_*',
         # ---
         #'keep *_rootTupleTaus_*_*',
-        'keep *_rootTupleSCTaus_*_*',
+        #'keep *_rootTupleSCTaus_*_*',
         'keep *_rootTupleHPSTaus_*_*',
         # ---
         'keep *_rootTupleCaloMET_*_*',
@@ -377,8 +385,21 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
-        'keep *_rootTupleGenTausFromLQs_*_*',
-        'keep *_rootTupleGenTausFromLQTops_*_*',
+        # Gen particles - Generic
+        'keep *_rootTupleGenTausFromWs_*_*',
+        'keep *_rootTupleGenMuonsFromWs_*_*',
+        'keep *_rootTupleGenElectronsFromWs_*_*',
+        'keep *_rootTupleGenTausFromZs_*_*',
+        'keep *_rootTupleGenMuonsFromZs_*_*',
+        'keep *_rootTupleGenElectronsFromZs_*_*',
+        # Gen particles - LQ3 Specific
+        #'keep *_rootTupleGenTausFromLQTaus_*_*',
+        #'keep *_rootTupleGenMuonsFromLQTaus_*_*',
+        #'keep *_rootTupleGenElectronsFromLQTaus_*_*',
+        #'keep *_rootTupleGenTausFromLQTops_*_*',
+        #'keep *_rootTupleGenMuonsFromLQTops_*_*',
+        #'keep *_rootTupleGenElectronsFromLQTops_*_*',
+        #
         'keep *_rootTupleGenJets_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
         'keep *_rootTupleGenMETCalo_*_*',       
@@ -391,9 +412,9 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 # Define GEN particle skimmer modules
 #----------------------------------------------------------------------------------------------------
 
-process.load ('Leptoquarks.LeptonJetGenTools.genTausFromLQs_cfi')
 #process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromLQs_cfi')
-#process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromZs_cfi')
+process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromZs_cfi')
+process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi') 
 
 #----------------------------------------------------------------------------------------------------
 # Define the path 
@@ -401,8 +422,18 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTausFromLQs_cfi')
 
 process.p = cms.Path(
     # gen particle skimmer modules
-    process.genTausFromLQs*
-    process.genTausFromLQTops*
+    process.genTausFromWs*
+    process.genMuonsFromWs*
+    process.genElectronsFromWs*
+    process.genTausFromZs*
+    process.genMuonsFromZs*
+    process.genElectronsFromZs*
+    #process.genTausFromLQTaus*
+    #process.genMuonsFromLQTaus*
+    #process.genElectronsFromLQTaus*
+    #process.genTausFromLQTops*
+    #process.genMuonsFromLQTops*
+    #process.genElectronsFromLQTops*
     # pdf weights
     process.pdfWeights*
     # MVA electron ID
@@ -429,19 +460,21 @@ process.p = cms.Path(
     # PAT sequence
     process.patDefaultSequence*
     # L+J filter
-    process.LJFilter*    
+    ###process.LJFilter*    
     # PAT MET producers
     process.patMETsRawCalo*       # CaloMET: RAW
     process.patMETsRawPF*         # PFMET  : Raw
     process.patMETsAK5PF*         # PFMET  : Type 0+1 corrections
     process.patMETsAK5PFXYShift*  # PFMET  : Type 0+1 corrections, X/Y shift
+    # Re-run full HPS sequence to fully profit from the fix of high pT taus
+    process.recoTauClassicHPSSequence*
     # RootTupleMakerV2
     (
     process.rootTupleEvent+
     process.rootTupleEventSelection+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
-    process.rootTupleSCTaus+
+    #process.rootTupleSCTaus+
     process.rootTupleHPSTaus+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
@@ -456,9 +489,21 @@ process.p = cms.Path(
     process.rootTupleTriggerObjects+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
-    process.rootTupleGenParticles+
-    process.rootTupleGenTausFromLQs+
-    process.rootTupleGenTausFromLQTops+
+    #process.rootTupleGenParticles+
+    #
+    process.rootTupleGenTausFromWs+
+    process.rootTupleGenMuonsFromWs+
+    process.rootTupleGenElectronsFromWs+
+    process.rootTupleGenTausFromZs+
+    process.rootTupleGenMuonsFromZs+
+    process.rootTupleGenElectronsFromZs+
+    #process.rootTupleGenTausFromLQTaus+
+    #process.rootTupleGenMuonsFromLQTaus+
+    #process.rootTupleGenElectronsFromLQTaus+
+    #process.rootTupleGenTausFromLQTops+
+    #process.rootTupleGenMuonsFromLQTops+
+    #process.rootTupleGenElectronsFromLQTops+
+    #
     process.rootTupleGenJets+
     process.rootTupleGenMETTrue+
     process.rootTupleGenMETCalo+    
@@ -472,13 +517,13 @@ process.p = cms.Path(
 # Dump if necessary
 #----------------------------------------------------------------------------------------------------
 
-# process.dump = cms.OutputModule("PoolOutputModule",
-#                                 outputCommands = cms.untracked.vstring(
-#                                 'keep *',
-#                                 ),
-#                                 fileName = cms.untracked.string('dump.root')
-#                                 )
-# process.DUMP    = cms.EndPath (process.dump)
+#process.dump = cms.OutputModule("PoolOutputModule",
+#                                outputCommands = cms.untracked.vstring(
+#                                'keep *',
+#                                ),
+#                                fileName = cms.untracked.string('dump.root')
+#                                )
+#process.DUMP    = cms.EndPath (process.dump)
 
 # Delete predefined Endpath (needed for running with CRAB)
 del process.out

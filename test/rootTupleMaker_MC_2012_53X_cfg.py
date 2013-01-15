@@ -489,7 +489,7 @@ process.p = cms.Path(
     process.rootTupleTriggerObjects+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
-    #process.rootTupleGenParticles+
+    process.rootTupleGenParticles+
     #
     process.rootTupleGenTausFromWs+
     process.rootTupleGenMuonsFromWs+

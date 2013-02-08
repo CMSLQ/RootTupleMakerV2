@@ -27,6 +27,7 @@ beamSpotCorr      (iConfig.getParameter<bool>("BeamSpotCorr")),
 useCocktailRefits (iConfig.getParameter<bool>("UseCocktailRefits")),
 vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag"))                  // collection of primary vertices to be used.
 {
+  produces <bool>                 ( "hasVeryForwardPFMuon" );
   produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
   produces <std::vector<double> > ( prefix + "Phi"                     + suffix );
   produces <std::vector<double> > ( prefix + "Pt"                      + suffix );
@@ -147,6 +148,7 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag"))       
 void RootTupleMakerV2_Muons::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  std::auto_ptr<bool>                  hasVeryForwardPFMuon    ( new bool() );
   std::auto_ptr<std::vector<double> >  eta                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt                      ( new std::vector<double>()  );
@@ -274,18 +276,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // PAT trigger helper for trigger matching information
   const pat::helper::TriggerMatchHelper matchHelper;
   
+  *hasVeryForwardPFMuon.get() = false;
 
   if(muons.isValid())
     {
       edm::LogInfo("RootTupleMakerV2_MuonsInfo") << "Total # Muons: " << muons->size();
       
       size_t iMuon = 0;
-    
+
       for( std::vector<pat::Muon>::const_iterator it = muons->begin(); it != muons->end(); ++it )
 	{
 	  // exit from loop when you reach the required number of muons
 	  if(eta->size() >= maxSize)
 	    break;
+
+	  if( it->isPFMuon() && fabs(it->eta)>2.2 ) *hasVeryForwardPFMuon.get() = true;
 	  
 	  //if muon is neither global nor tracker muon, continue.
 	  if( !it->isGlobalMuon() && !it->isTrackerMuon() ) continue;
@@ -583,6 +588,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   //-----------------------------------------------------------------
   // put vectors in the event
+  iEvent.put( hasVeryForwardPFMuon, "hasVeryForwardPFMuon" );
   iEvent.put( eta,                        prefix + "Eta"                         + suffix );
   iEvent.put( phi,                        prefix + "Phi"                         + suffix );
   iEvent.put( pt,                         prefix + "Pt"                          + suffix );

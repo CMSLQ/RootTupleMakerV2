@@ -67,22 +67,23 @@ process.TFileService = cms.Service("TFileService",
 # Correct global tags for 2012 ReReco data are here:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Summary_of_Global_Tags_used_in_o
 #
-# Recommendations as of Sept. 25, 2012:
-# Summer12_DR53X  MC               (*/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM) : START53_V7F
-# 2012 A          Data ReReco      (*/Run2012A-recover-06Aug2012-v1/AOD)           : FT_53_V6C_AN2
-# 2012 A          Data ReReco      (*/Run2012A-13Jul2012-v1/AOD)                   : FT_53_V6_AN2
-# 2012 B          Data ReReco      (*/Run2012B-13Jul2012-v1/AOD)                   : FT_53_V6_AN2
-# 2012 C          Data ReReco      (*/Run2012C-24Aug2012-v1/AOD)                   : FT_53_V10_AN2
-# 2012 C          Prompt Reco      (*/Run2012C-PromptReco-v2/AOD)                  : GR_P_V41_AN2
-# 2012 D          Prompt Reco      Coming soon!                                    : GR_P_V42_AN2
+# Recommendations as of Feb 8, 2013:
+# Summer12_DR53X  MC               (*/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM) : START53_V7G
+# 2012 A          Data ReReco      (*/Run2012A-recover-06Aug2012-v1/AOD)           : FT_53_V6C_AN3
+# 2012 A          Data ReReco      (*/Run2012A-13Jul2012-v1/AOD)                   : FT_53_V6_AN3
+# 2012 B          Data ReReco      (*/Run2012B-13Jul2012-v1/AOD)                   : FT_53_V6_AN3
+# 2012 C          Data ReReco      (*/Run2012C-24Aug2012-v1/AOD)                   : FT_53_V10_AN3
+# 2012 C          Data ReReco      (*/Run2012C-EcalRecover_11Dec2012-v1/AOD)       : FT_P_V42C_AN3
+# 2012 C          Prompt Reco      (*/Run2012C-PromptReco-v2/AOD)                  : GR_P_V41_AN3
+# 2012 D          Prompt Reco      (*/Run2012D-PromptReco-v1/AOD)                  : GR_P_V42_AN3
 # 
 # Make sure a correct global tag is used:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 
-process.GlobalTag.globaltag = 'GR_P_V41_AN2::All'
+process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'
 
 # Events to process
-process.maxEvents.input = 10
+process.maxEvents.input = -1
 
 # Input files
 process.source.fileNames = [
@@ -161,13 +162,6 @@ addTcMET(process, 'TC')
 #----------------------------------------------------------------------------------------------------
 
 process.load("Leptoquarks.RootTupleMakerV2.metFilters_cfi")
-
-#----------------------------------------------------------------------------------------------------
-# Add ShrinkingCone Taus
-#----------------------------------------------------------------------------------------------------
-
-from PhysicsTools.PatAlgos.tools.tauTools import *
-addTauCollection(process, tauCollection = cms.InputTag('shrinkingConePFTauProducer'), algoLabel = "shrinkingCone", typeLabel = "PFTau")
 
 #----------------------------------------------------------------------------------------------------
 # Modify cleanPatTaus (HPS Taus) - loosen up a bit
@@ -330,11 +324,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleCaloJets_*_*',
         'keep *_rootTuplePFJets_*_*',
         'keep *_rootTupleElectrons_*_*',
-        # ---
-        #'keep *_rootTupleTaus_*_*',
-        'keep *_rootTupleSCTaus_*_*',
         'keep *_rootTupleHPSTaus_*_*',
-        # ---
         'keep *_rootTupleCaloMET_*_*',
         'keep *_rootTupleTCMET_*_*',
         'keep *_rootTuplePFMET_*_*',
@@ -342,15 +332,18 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTuplePFMETType01Cor_*_*',
         'keep *_rootTuplePFMETType01XYCor_*_*',
-        # 'keep *_rootTuplePFChargedMET_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
         'keep *_rootTupleVertex_*_*',
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
-        'keep *_rootTupleGenTausFromLQs_*_*',
-        'keep *_rootTupleGenTausFromLQTops_*_*',
+        'keep *_rootTupleGenTausFromWs_*_*',
+        'keep *_rootTupleGenMuonsFromWs_*_*',
+        'keep *_rootTupleGenElectronsFromWs_*_*',
+        'keep *_rootTupleGenTausFromZs_*_*',
+        'keep *_rootTupleGenMuonsFromZs_*_*',
+        'keep *_rootTupleGenElectronsFromZs_*_*',
         'keep *_rootTupleGenJets_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
         'keep *_rootTupleGenMETCalo_*_*',       
@@ -363,16 +356,21 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
 # Define GEN particle skimmer (not used for data -- just a place-holder)
 #----------------------------------------------------------------------------------------------------
 
-process.load ('Leptoquarks.LeptonJetGenTools.genTausFromLQs_cfi')
+process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromZs_cfi')
+process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi') 
 
 #----------------------------------------------------------------------------------------------------
 # Define the path 
 #----------------------------------------------------------------------------------------------------
 
 process.p = cms.Path(
-    # gen particles
-    process.genTausFromLQs*
-    process.genTausFromLQTops*
+    # gen particle skimmer modules
+    process.genTausFromWs*
+    process.genMuonsFromWs*
+    process.genElectronsFromWs*
+    process.genTausFromZs*
+    process.genMuonsFromZs*
+    process.genElectronsFromZs*
     # MVA electron ID
     process.mvaID*
     # Good vertices
@@ -388,10 +386,11 @@ process.p = cms.Path(
     process.EcalDeadCellTriggerPrimitiveFilter*
     process.EcalDeadCellBoundaryEnergyFilter*
     process.HBHENoiseFilterResultProducer*
-    process.hcalLaserEventFilter*
+    process.hcallasereventfilter2012*
     process.trackingFailureFilter*
     process.eeBadScFilter*
     process.ecalLaserCorrFilter*
+    process.trkPOGFilters*
     # HEEP rho for isolation correction
     process.kt6PFJetsForHEEPIsolation*
     # PAT sequence
@@ -409,7 +408,6 @@ process.p = cms.Path(
     process.rootTupleEventSelection+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
-    process.rootTupleSCTaus+
     process.rootTupleHPSTaus+
     process.rootTupleCaloMET+
     process.rootTupleTCMET+
@@ -418,15 +416,20 @@ process.p = cms.Path(
     process.rootTuplePFMETType1Cor+
     process.rootTuplePFMETType01Cor+
     process.rootTuplePFMETType01XYCor+
-    # process.rootTuplePFChargedMET+
     process.rootTupleMuons+
     process.rootTupleTrigger+
     process.rootTupleTriggerObjects+
     process.rootTupleVertex+
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+
-    process.rootTupleGenTausFromLQs+
-    process.rootTupleGenTausFromLQTops+
+    #
+    process.rootTupleGenTausFromWs+
+    process.rootTupleGenMuonsFromWs+
+    process.rootTupleGenElectronsFromWs+
+    process.rootTupleGenTausFromZs+
+    process.rootTupleGenMuonsFromZs+
+    process.rootTupleGenElectronsFromZs+
+    # 
     process.rootTupleGenJets+
     process.rootTupleGenMETTrue+
     process.rootTupleGenMETCalo+    

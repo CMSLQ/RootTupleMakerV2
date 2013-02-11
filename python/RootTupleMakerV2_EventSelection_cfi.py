@@ -18,10 +18,12 @@ rootTupleEventSelection = cms.EDProducer("RootTupleMakerV2_EventSelection",
     EcalMaskedCellDRFilterInputTag = cms.InputTag('simpleDRfilter','deadCellStatus'),
     CaloBoundaryDRFilterInputTag = cms.InputTag('simpleDRfilter','boundaryStatus'),
     #
-    HcalLaserEventFilterInputTag               = cms.InputTag('hcalLaserEventFilter'),
     EcalDeadCellTriggerPrimitiveFilterInputTag = cms.InputTag('EcalDeadCellTriggerPrimitiveFilter'),
     EcalDeadCellBoundaryEnergyFilterInputTag   = cms.InputTag('EcalDeadCellBoundaryEnergyFilter'),
     TrackingFailureFilterInputTag              = cms.InputTag('trackingFailureFilter'),
     BadEESupercrystalFilterInputTag            = cms.InputTag('eeBadScFilter'),
-    EcalLaserCorrFilterInputTag                = cms.InputTag('ecalLaserCorrFilter')
+    EcalLaserCorrFilterInputTag                = cms.InputTag('ecalLaserCorrFilter'),
+    LogErrorTooManyClustersInputTag            = cms.InputTag('logErrorTooManyClusters'),
+    ManyStripClus53XInputTag                   = cms.InputTag('manystripclus53X'),
+    TooManyStripClus53XInputTag                = cms.InputTag('toomanystripclus53X')                                         
 )

@@ -12,29 +12,31 @@
 //#include "RecoMET/METFilters/interface/EcalBoundaryInfoCalculator.h"
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
-    l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
-    vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag")),
-    vtxMinNDOF(iConfig.getParameter<unsigned int>("VertexMinimumNDOF")),
-    vtxMaxAbsZ(iConfig.getParameter<double>("VertexMaxAbsZ")),
-    vtxMaxd0(iConfig.getParameter<double>("VertexMaxd0")),
-    trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
-    numTracks(iConfig.getParameter<unsigned int>("NumTracks")),
-    hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
-    hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag")),
-    beamHaloInputTag(iConfig.getParameter<edm::InputTag>("BeamHaloInputTag")),
-    trackingFilterJetInputTag   (iConfig.getParameter<edm::InputTag>("TrackingFailureJets")),	      
-    trackingFilterDzTrVtxMax    (iConfig.getParameter<double>       ("TrackingFailureDzTrVtzMax")),   
-    trackingFilterDxyTrVtxMax   (iConfig.getParameter<double>       ("TrackingFailureDxyTrVtxMax")) ,
-    trackingFilterMinSumPtOverHT(iConfig.getParameter<double>       ("TrackingFailureMinSumPtOverHT")),
-    ecalMaskedCellDRFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalMaskedCellDRFilterInputTag")),
-    caloBoundaryDRFilterInputTag(iConfig.getParameter<edm::InputTag>("CaloBoundaryDRFilterInputTag")),
-    //
-    hcalLaserEventFilterInputTag(iConfig.getParameter<edm::InputTag>("HcalLaserEventFilterInputTag")),
-    ecalDeadCellTriggerPrimitiveFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellTriggerPrimitiveFilterInputTag")),
-    ecalDeadCellBoundaryEnergyFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellBoundaryEnergyFilterInputTag")),
-    trackingFailureFilterInputTag(iConfig.getParameter<edm::InputTag>("TrackingFailureFilterInputTag")),
-    badEESupercrystalFilterInputTag(iConfig.getParameter<edm::InputTag>("BadEESupercrystalFilterInputTag")),
-    ecalLaserCorrFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalLaserCorrFilterInputTag"))
+  l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
+  vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag")),
+  vtxMinNDOF(iConfig.getParameter<unsigned int>("VertexMinimumNDOF")),
+  vtxMaxAbsZ(iConfig.getParameter<double>("VertexMaxAbsZ")),
+  vtxMaxd0(iConfig.getParameter<double>("VertexMaxd0")),
+  trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
+  numTracks(iConfig.getParameter<unsigned int>("NumTracks")),
+  hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
+  hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag")),
+  beamHaloInputTag(iConfig.getParameter<edm::InputTag>("BeamHaloInputTag")),
+  trackingFilterJetInputTag   (iConfig.getParameter<edm::InputTag>("TrackingFailureJets")),	      
+  trackingFilterDzTrVtxMax    (iConfig.getParameter<double>       ("TrackingFailureDzTrVtzMax")),   
+  trackingFilterDxyTrVtxMax   (iConfig.getParameter<double>       ("TrackingFailureDxyTrVtxMax")) ,
+  trackingFilterMinSumPtOverHT(iConfig.getParameter<double>       ("TrackingFailureMinSumPtOverHT")),
+  ecalMaskedCellDRFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalMaskedCellDRFilterInputTag")),
+  caloBoundaryDRFilterInputTag(iConfig.getParameter<edm::InputTag>("CaloBoundaryDRFilterInputTag")),
+//
+  ecalDeadCellTriggerPrimitiveFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellTriggerPrimitiveFilterInputTag")),
+  ecalDeadCellBoundaryEnergyFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellBoundaryEnergyFilterInputTag")),
+  trackingFailureFilterInputTag(iConfig.getParameter<edm::InputTag>("TrackingFailureFilterInputTag")),
+  badEESupercrystalFilterInputTag(iConfig.getParameter<edm::InputTag>("BadEESupercrystalFilterInputTag")),
+  ecalLaserCorrFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalLaserCorrFilterInputTag")),
+  logErrorTooManyClustersInputTag(iConfig.getParameter<edm::InputTag>("LogErrorTooManyClustersInputTag")),      
+  manyStripClus53XInputTag       (iConfig.getParameter<edm::InputTag>("ManyStripClus53XInputTag"       )),      
+  tooManyStripClus53XInputTag    (iConfig.getParameter<edm::InputTag>("TooManyStripClus53XInputTag"    ))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -49,12 +51,15 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passEcalMaskedCellDRFilter");
   produces <bool> ("passCaloBoundaryDRFilter");
   //
-  produces <bool> ("passHcalLaserEventFilter");
   produces <bool> ("passEcalDeadCellTriggerPrimitiveFilter");
   produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
   produces <bool> ("passTrackingFailureFilter");
   produces <bool> ("passBadEESupercrystalFilter");
   produces <bool> ("passEcalLaserCorrFilter");
+  // 
+  produces <bool> ("passLogErrorTooManyClusters");
+  produces <bool> ("passManyStripClus53X"       );
+  produces <bool> ("passTooManyStripClus53X"    );
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -73,13 +78,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> passEcalMaskedCellDRFilter ( new bool() ) ;
   std::auto_ptr<bool> passCaloBoundaryDRFilter ( new bool() ) ;
   //
-  std::auto_ptr<bool> passHcalLaserEventFilter ( new bool() ) ;
   std::auto_ptr<bool> passEcalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
   std::auto_ptr<bool> passEcalDeadCellBoundaryEnergyFilter ( new bool() ) ;
   std::auto_ptr<bool> passTrackingFailureFilter ( new bool() ) ;
   std::auto_ptr<bool> passBadEESupercrystalFilter ( new bool() ) ;
   std::auto_ptr<bool> passEcalLaserCorrFilter (new bool() );
-
+  //
+  std::auto_ptr<bool> passLogErrorTooManyClusters(new bool());
+  std::auto_ptr<bool> passManyStripClus53X       (new bool());
+  std::auto_ptr<bool> passTooManyStripClus53X    (new bool());
+  
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
   *isbscminbias.get() = false;
@@ -92,13 +100,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passEcalMaskedCellDRFilter.get() = true;
   *passCaloBoundaryDRFilter.get() = true;
   //
-  *passHcalLaserEventFilter.get()               = true;
   *passEcalDeadCellTriggerPrimitiveFilter.get() = true;
   *passEcalDeadCellBoundaryEnergyFilter.get()   = true;
   *passTrackingFailureFilter.get()              = true;
   *passBadEESupercrystalFilter.get()            = true;
   *passEcalLaserCorrFilter.get()                = true;
-
+  // 
+  *passLogErrorTooManyClusters.get() = true;
+  *passManyStripClus53X       .get() = true;
+  *passTooManyStripClus53X    .get() = true;
+  
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
   iEvent.getByLabel(l1InputTag, l1GtReadoutRecord);
@@ -235,15 +246,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //    } else {
   //      edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << caloBoundaryDRFilterInputTag;
   //    }
-
-
-  //HCAL laser filter:
-  edm::Handle<bool> HcalLaserEventFilterResult;
-  iEvent.getByLabel(hcalLaserEventFilterInputTag, HcalLaserEventFilterResult);
-  if(HcalLaserEventFilterResult.isValid()) {
-    *passHcalLaserEventFilter.get()=!(*HcalLaserEventFilterResult);
-  }
-
+  
   // ECAL dead cell filter:
   edm::Handle<bool> EcalDeadCellTriggerPrimitiveFilterResult;
   iEvent.getByLabel(ecalDeadCellTriggerPrimitiveFilterInputTag, EcalDeadCellTriggerPrimitiveFilterResult);
@@ -254,6 +257,26 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(ecalDeadCellBoundaryEnergyFilterInputTag, EcalDeadCellBoundaryEnergyFilterResult);
   if(EcalDeadCellBoundaryEnergyFilterResult.isValid()) {
     *passEcalDeadCellBoundaryEnergyFilter.get()=!(*EcalDeadCellBoundaryEnergyFilterResult);
+  }
+
+  // Tracking POG filters
+  
+  edm::Handle<bool> LogErrorTooManyClusters;
+  iEvent.getByLabel( logErrorTooManyClustersInputTag, LogErrorTooManyClusters );
+  if (LogErrorTooManyClusters.isValid()){
+    *passLogErrorTooManyClusters.get() = !(*LogErrorTooManyClusters);
+  }
+
+  edm::Handle<bool> ManyStripClus53X;
+  iEvent.getByLabel( manyStripClus53XInputTag, ManyStripClus53X );
+  if (ManyStripClus53X.isValid()){
+    *passManyStripClus53X.get() = !(*ManyStripClus53X);
+  }
+
+  edm::Handle<bool> TooManyStripClus53X;
+  iEvent.getByLabel( tooManyStripClus53XInputTag, TooManyStripClus53X );
+  if (TooManyStripClus53X.isValid()){
+    *passTooManyStripClus53X.get() = !(*TooManyStripClus53X);
   }
 
   //Tracking failure filter:
@@ -291,10 +314,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(passEcalMaskedCellDRFilter, "passEcalMaskedCellDRFilter");
   iEvent.put(passCaloBoundaryDRFilter, "passCaloBoundaryDRFilter");
   //
-  iEvent.put(passHcalLaserEventFilter,"passHcalLaserEventFilter");
   iEvent.put(passEcalDeadCellTriggerPrimitiveFilter,"passEcalDeadCellTriggerPrimitiveFilter");
   iEvent.put(passEcalDeadCellBoundaryEnergyFilter,"passEcalDeadCellBoundaryEnergyFilter");
   iEvent.put(passTrackingFailureFilter,"passTrackingFailureFilter");
   iEvent.put(passBadEESupercrystalFilter, "passBadEESupercrystalFilter");
   iEvent.put(passEcalLaserCorrFilter, "passEcalLaserCorrFilter");
+  // 
+  iEvent.put(passLogErrorTooManyClusters,"passLogErrorTooManyClusters");
+  iEvent.put(passManyStripClus53X       ,"passManyStripClus53X");
+  iEvent.put(passTooManyStripClus53X    ,"passTooManyStripClus53X");
+  
 }

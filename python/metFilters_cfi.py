@@ -43,14 +43,13 @@ from CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi import *
 #                                                 useTS4TS5 = cms.bool(True)
 #                                                 )
 
+
 # ------------------------------------------------------------------------------------
 # HCAL laser filter:
-# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#HCAL_laser_events
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#HCAL_laser_events_updated
 # ------------------------------------------------------------------------------------
-from RecoMET.METFilters.hcalLaserEventFilter_cfi import *
-hcalLaserEventFilter.vetoByRunEventNumber=cms.untracked.bool(False)
-hcalLaserEventFilter.vetoByHBHEOccupancy=cms.untracked.bool(True)
-hcalLaserEventFilter.taggingMode = cms.bool(True)
+
+from EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi import * 
 
 # ------------------------------------------------------------------------------------
 # ECAL dead cell filter:
@@ -100,3 +99,18 @@ eeBadScFilter.taggingMode = cms.bool (True)
 
 from RecoMET.METFilters.ecalLaserCorrFilter_cfi import *
 ecalLaserCorrFilter.taggingMode = cms.bool (True)
+
+# ------------------------------------------------------------------------------------
+# Tracking POG filters in tagging mode
+# ------------------------------------------------------------------------------------
+
+from RecoMET.METFilters.trackingPOGFilters_cff import *
+
+manystripclus53X.taggedMode         = cms.untracked.bool(True )
+manystripclus53X.forcedValue        = cms.untracked.bool(False)
+
+toomanystripclus53X.taggedMode      = cms.untracked.bool(True )
+toomanystripclus53X.forcedValue     = cms.untracked.bool(False)
+
+logErrorTooManyClusters.taggedMode  = cms.untracked.bool(True )
+logErrorTooManyClusters.forcedValue = cms.untracked.bool(False)

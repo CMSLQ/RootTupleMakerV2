@@ -85,7 +85,10 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<int> >    ( prefix + "ClosestVertex3DIndex" + suffix);
 	produces <std::vector<int> >    ( prefix + "ClosestVertexXYIndex" + suffix);
 	produces <std::vector<int> >    ( prefix + "ClosestVertexZIndex" + suffix);
-
+	produces <std::vector<double> > ( prefix + "Beta" + suffix ) ;
+	produces <std::vector<double> > ( prefix + "BetaStar" + suffix ) ;
+	produces <std::vector<double> > ( prefix + "BetaClassic" + suffix ) ;
+	produces <std::vector<double> > ( prefix + "BetaStarClassic" + suffix ) ;
 }
 
 
@@ -159,6 +162,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::auto_ptr <std::vector<int> >     closestVertex3DIndex            ( new std::vector<int>()  );
 	std::auto_ptr <std::vector<int> >     closestVertexXYIndex           ( new std::vector<int>()  );
 	std::auto_ptr <std::vector<int> >     closestVertexZIndex            ( new std::vector<int>()  );
+
+	std::auto_ptr <std::vector<double > > betaStar        ( new std::vector<double>());
+	std::auto_ptr <std::vector<double > > betaStarClassic ( new std::vector<double>());
+	std::auto_ptr <std::vector<double > > beta            ( new std::vector<double>());
+	std::auto_ptr <std::vector<double > > betaClassic     ( new std::vector<double>());
+	
 	//-----------------------------------------------------------------
 
 	// OLD
@@ -223,7 +232,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if(readJECuncertainty)
 			{
 				jecUnc->setJetEta( it->eta() );
-								 // the uncertainty is a function of the corrected pt
+				// the uncertainty is a function of the corrected pt
 				jecUnc->setJetPt( it->pt() );
 			}
 
@@ -265,10 +274,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			
 			// Loop on primary Vertices and jets and perform associations 
 			
+			reco::VertexCollection::const_iterator lead_vertex = primaryVertices->end();
+
 			if(primaryVertices.isValid())
 			{
 				edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
+				bool found_lead_vertex = false;
+				
 				// Main Vertex Loop
 				for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
 				{
@@ -280,6 +293,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					double assocsumpttracks = 0.0;
 					double trackassociationratio = 0.000001;
 	
+					if ( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
+					if ( !found_lead_vertex ) { 
+					  lead_vertex = v_it;
+					  found_lead_vertex = true;
+					}
+
 					// Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
 					const reco::TrackRefVector &jtracks=it->associatedTracks();
 					for(reco::TrackRefVector::const_iterator jtIt=jtracks.begin(); jtIt!=jtracks.end(); ++jtIt)
@@ -353,11 +372,78 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			{
 				edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
 			}
+
+			// Get the constituents of the PFJet
+
+			std::vector <reco::PFCandidatePtr> constituents  = it -> getPFConstituents();
+			std::vector <reco::PFCandidatePtr>::iterator i_constituent   = constituents.begin();
+			std::vector <reco::PFCandidatePtr>::iterator end_constituent = constituents.end();
+			double sum_track_pt = 0.;
+	
+			double jetBetaStar        = 0.0 ;
+			double jetBetaStarClassic = 0.0 ;
+			double jetBeta            = 0.0 ;
+			double jetBetaClassic     = 0.0 ;
+	
+			for (; i_constituent != end_constituent; ++i_constituent ) { 
+			  reco::PFCandidatePtr & constituent = *i_constituent;
+			  if ( ! constituent -> trackRef().isNonnull()   ) continue;
+			  if ( ! constituent -> trackRef().isAvailable() ) continue;
+			  
+			  try { 
+			    double track_pt = constituent -> trackRef() -> pt();
+			    sum_track_pt += track_pt;
+
+			    bool track_from_lead_vertex = find( lead_vertex->tracks_begin(), 
+								lead_vertex->tracks_end()  , 
+								reco::TrackBaseRef( constituent -> trackRef())) != lead_vertex -> tracks_end();
+			    
+			    bool track_from_other_vertex = false;
+			    
+			    double dZ0 = fabs(constituent ->trackRef()->dz(lead_vertex->position()));
+			    double dZ = dZ0; 
+			    
+			    for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ){
+			      if( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
+			      bool is_lead_vertex  = (v_it -> position() - lead_vertex -> position()).r() < 0.02;
+			      if( ! is_lead_vertex && ! track_from_other_vertex ) {
+ 				track_from_other_vertex = find( v_it -> tracks_begin(), 
+								v_it -> tracks_end  (), 
+								reco::TrackBaseRef(constituent -> trackRef())) != v_it -> tracks_end(); 
+			      }
+			      dZ = std::min(dZ,fabs(constituent->trackRef()->dz( v_it -> position())));
+			    }
+
+			    if      (  track_from_lead_vertex && !track_from_other_vertex ) jetBetaClassic     += track_pt;
+			    else if ( !track_from_lead_vertex &&  track_from_other_vertex ) jetBetaStarClassic += track_pt;
+
+			    if      ( dZ0 < 0.2 ) jetBeta     += track_pt;
+			    else if ( dZ  < 0.2 ) jetBetaStar += track_pt;
+
+			  }
+			  
+			  catch (cms::Exception & e) { std::cout << e << std::endl; } 
+			  
+			}
+
+			if ( sum_track_pt != 0. ) { 
+			  jetBetaStar        /= sum_track_pt ;
+			  jetBetaStarClassic /= sum_track_pt ;
+			  jetBeta            /= sum_track_pt ;
+			  jetBetaClassic     /= sum_track_pt ;
+			} 
+			else { 
+			  assert ( jetBetaStar        == 0.0 );
+			  assert ( jetBetaStarClassic == 0.0 );
+			  assert ( jetBeta            == 0.0 );
+			  assert ( jetBetaClassic     == 0.0 );
+			}
 			
-			//std::cout<<bestVtxIndex3Ddist<<"  "<<bestVtxIndexSharedTracks<<"  "<<minVtxDist3D<<"  "<<minVtxDistXY<<"  "<<minVtxDistZ<<"  "<<maxTrackAssocRatio<<std::endl;
-			//std::cout<<"------------------------------------------"<<std::endl;
-
-
+			betaStar        -> push_back ( jetBetaStar        ) ;
+			betaStarClassic -> push_back ( jetBetaStarClassic ) ;
+			beta            -> push_back ( jetBeta            ) ;
+			betaClassic     -> push_back ( jetBetaClassic     ) ;
+			
 			bestVertexTrackAssociationFactor ->push_back( maxTrackAssocRatio );
 			bestVertexTrackAssociationIndex ->push_back( bestVtxIndexSharedTracks );
 			closestVertexWeighted3DSeparation ->push_back( minVtxDist3D);
@@ -547,4 +633,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( combinedMVABTag                     ,prefix + "CombinedMVABTag" + suffix ) ;
 	iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);
 	iEvent.put( passTightID, prefix + "PassTightID" + suffix);
+       
+	iEvent.put(betaStar       , prefix + "BetaStar"        + suffix ) ;
+	iEvent.put(betaStarClassic, prefix + "BetaStarClassic" + suffix ) ;
+	iEvent.put(beta           , prefix + "Beta"            + suffix ) ;
+	iEvent.put(betaClassic    , prefix + "BetaClassic"     + suffix ) ;
+
+
+
+
 }

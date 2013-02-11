@@ -298,17 +298,19 @@ process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")
 process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
 process.LJFilter.jetLabel  = cms.InputTag("cleanPatJetsAK5PF")
-process.LJFilter.muonsMin = 1
-process.LJFilter.muPT     = 25.0
-process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT       = 25.0
-process.LJFilter.tausMin = 1
-process.LJFilter.tauPT   = 25.0
+process.LJFilter.muonsMin = 0
+process.LJFilter.muPT     = 10.0
+process.LJFilter.electronsMin = 0
+process.LJFilter.elecPT       = 15.0
+process.LJFilter.tausMin = 0
+process.LJFilter.tauPT   = 15.0
+process.LJFilter.jetsMin = 0
+process.LJFilter.jetPT   = 15.0
 process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = True
 # -- WARNING :
-# "customfilterEMuTauJet2012" configuration is hard-coded. If enabled, other configuration parameters will NOT have any effect.
-# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc?revision=1.12&view=markup )
+# "customfilterEMuTauJet2012" configuration is hard-coded.
+# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc?revision=1.14&view=markup )
 # "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
 
 #----------------------------------------------------------------------------------------------------

@@ -290,7 +290,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if(eta->size() >= maxSize)
 	    break;
 
-	  if( it->isPFMuon() && fabs(it->eta)>2.2 ) *hasVeryForwardPFMuon.get() = true;
+	  if( it->isPFMuon() && fabs(it->eta())>2.2 ) *hasVeryForwardPFMuon.get() = true;
 	  
 	  //if muon is neither global nor tracker muon, continue.
 	  if( !it->isGlobalMuon() && !it->isTrackerMuon() ) continue;

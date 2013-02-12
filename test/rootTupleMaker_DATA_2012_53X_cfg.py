@@ -83,7 +83,7 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'GR_P_V41_AN3::All'
 
 # Events to process
-process.maxEvents.input = -1
+process.maxEvents.input = 100
 
 # Input files
 process.source.fileNames = [
@@ -162,6 +162,12 @@ addTcMET(process, 'TC')
 #----------------------------------------------------------------------------------------------------
 
 process.load("Leptoquarks.RootTupleMakerV2.metFilters_cfi")
+
+#----------------------------------------------------------------------------------------------------
+# Rerun full HPS sequence to fully profit from the fix of high pT taus
+#----------------------------------------------------------------------------------------------------
+
+process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
 
 #----------------------------------------------------------------------------------------------------
 # Modify cleanPatTaus (HPS Taus) - loosen up a bit
@@ -310,7 +316,7 @@ process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = True
 # -- WARNING :
 # "customfilterEMuTauJet2012" configuration is hard-coded.
-# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc?revision=1.14&view=markup )
+# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc )
 # "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
 
 #----------------------------------------------------------------------------------------------------
@@ -404,6 +410,8 @@ process.p = cms.Path(
     process.patMETsRawPF*         # PFMET  : Raw
     process.patMETsAK5PF*         # PFMET  : Type 0+1 corrections
     process.patMETsAK5PFXYShift*  # PFMET  : Type 0+1 corrections, X/Y shift
+    # Re-run full HPS sequence to fully profit from the fix of high pT taus
+    process.recoTauClassicHPSSequence*
     # RootTupleMakerV2
     (
     process.rootTupleEvent+

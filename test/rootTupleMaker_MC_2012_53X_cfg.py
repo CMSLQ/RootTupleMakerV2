@@ -79,7 +79,7 @@ process.TFileService = cms.Service("TFileService",
 process.GlobalTag.globaltag = 'START53_V7G::All'
 
 # Events to process
-process.maxEvents.input = -1
+process.maxEvents.input = 100
 
 # Input files
 process.source.fileNames = [
@@ -312,7 +312,7 @@ process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = True
 # -- WARNING :
 # "customfilterEMuTauJet2012" configuration is hard-coded.
-# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc?revision=1.14&view=markup )
+# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc )
 # "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
 
 #----------------------------------------------------------------------------------------------------

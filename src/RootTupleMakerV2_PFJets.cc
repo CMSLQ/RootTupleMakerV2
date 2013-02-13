@@ -275,12 +275,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			// Loop on primary Vertices and jets and perform associations 
 			
 			reco::VertexCollection::const_iterator lead_vertex = primaryVertices->end();
+			bool found_lead_vertex = false;
 
 			if(primaryVertices.isValid())
 			{
 				edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
-
-				bool found_lead_vertex = false;
 				
 				// Main Vertex Loop
 				for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
@@ -384,48 +383,50 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			double jetBetaStarClassic = 0.0 ;
 			double jetBeta            = 0.0 ;
 			double jetBetaClassic     = 0.0 ;
-	
-			for (; i_constituent != end_constituent; ++i_constituent ) { 
-			  reco::PFCandidatePtr & constituent = *i_constituent;
-			  if ( ! constituent -> trackRef().isNonnull()   ) continue;
-			  if ( ! constituent -> trackRef().isAvailable() ) continue;
-			  
-			  try { 
-			    double track_pt = constituent -> trackRef() -> pt();
-			    sum_track_pt += track_pt;
 
-			    bool track_from_lead_vertex = find( lead_vertex->tracks_begin(), 
-								lead_vertex->tracks_end()  , 
-								reco::TrackBaseRef( constituent -> trackRef())) != lead_vertex -> tracks_end();
+			if ( found_lead_vertex ) { 
+			  for (; i_constituent != end_constituent; ++i_constituent ) { 
+			    reco::PFCandidatePtr & constituent = *i_constituent;
+			    if ( ! constituent -> trackRef().isNonnull()   ) continue;
+			    if ( ! constituent -> trackRef().isAvailable() ) continue;
 			    
-			    bool track_from_other_vertex = false;
-			    
-			    double dZ0 = fabs(constituent ->trackRef()->dz(lead_vertex->position()));
-			    double dZ = dZ0; 
-			    
-			    for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ){
-			      if( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
-			      bool is_lead_vertex  = (v_it -> position() - lead_vertex -> position()).r() < 0.02;
-			      if( ! is_lead_vertex && ! track_from_other_vertex ) {
- 				track_from_other_vertex = find( v_it -> tracks_begin(), 
-								v_it -> tracks_end  (), 
-								reco::TrackBaseRef(constituent -> trackRef())) != v_it -> tracks_end(); 
+			    try { 
+			      double track_pt = constituent -> trackRef() -> pt();
+			      sum_track_pt += track_pt;
+			      
+			      bool track_from_lead_vertex = find( lead_vertex->tracks_begin(), 
+								  lead_vertex->tracks_end()  , 
+								  reco::TrackBaseRef( constituent -> trackRef())) != lead_vertex -> tracks_end();
+			      
+			      bool track_from_other_vertex = false;
+			      
+			      double dZ0 = fabs(constituent ->trackRef()->dz(lead_vertex->position()));
+			      double dZ = dZ0; 
+			      
+			      for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ){
+				if( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
+				bool is_lead_vertex  = (v_it -> position() - lead_vertex -> position()).r() < 0.02;
+				if( ! is_lead_vertex && ! track_from_other_vertex ) {
+				  track_from_other_vertex = find( v_it -> tracks_begin(), 
+								  v_it -> tracks_end  (), 
+								  reco::TrackBaseRef(constituent -> trackRef())) != v_it -> tracks_end(); 
+				}
+				dZ = std::min(dZ,fabs(constituent->trackRef()->dz( v_it -> position())));
 			      }
-			      dZ = std::min(dZ,fabs(constituent->trackRef()->dz( v_it -> position())));
+			      
+			      if      (  track_from_lead_vertex && !track_from_other_vertex ) jetBetaClassic     += track_pt;
+			      else if ( !track_from_lead_vertex &&  track_from_other_vertex ) jetBetaStarClassic += track_pt;
+			      
+			      if      ( dZ0 < 0.2 ) jetBeta     += track_pt;
+			      else if ( dZ  < 0.2 ) jetBetaStar += track_pt;
+			      
 			    }
-
-			    if      (  track_from_lead_vertex && !track_from_other_vertex ) jetBetaClassic     += track_pt;
-			    else if ( !track_from_lead_vertex &&  track_from_other_vertex ) jetBetaStarClassic += track_pt;
-
-			    if      ( dZ0 < 0.2 ) jetBeta     += track_pt;
-			    else if ( dZ  < 0.2 ) jetBetaStar += track_pt;
-
+			    
+			    catch (cms::Exception & e) { std::cout << e << std::endl; } 
+			    
 			  }
-			  
-			  catch (cms::Exception & e) { std::cout << e << std::endl; } 
-			  
 			}
-
+			
 			if ( sum_track_pt != 0. ) { 
 			  jetBetaStar        /= sum_track_pt ;
 			  jetBetaStarClassic /= sum_track_pt ;

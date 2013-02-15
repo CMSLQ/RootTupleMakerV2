@@ -50,6 +50,7 @@ from CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi import *
 # ------------------------------------------------------------------------------------
 
 from EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi import * 
+EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi.eventFileName = cms.FileInPath('EventFilter/HcalRawToDigi/data/HCALLaser2012AllDatasets.txt.gz')
 
 # ------------------------------------------------------------------------------------
 # ECAL dead cell filter:

@@ -45,12 +45,12 @@ from CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi import *
 
 
 # ------------------------------------------------------------------------------------
-# HCAL laser filter:
+# HCAL laser filter: 
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFilters#HCAL_laser_events_updated
 # ------------------------------------------------------------------------------------
 
-from EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi import * 
-EventFilter.HcalRawToDigi.hcallasereventfilter2012_cfi.eventFileName = cms.FileInPath('EventFilter/HcalRawToDigi/data/HCALLaser2012AllDatasets.txt.gz')
+from Leptoquarks.MetTools.hcallasereventfilter2012_lq_cfi import * 
+hcallasereventfilter2012_lq.eventFileName = cms.FileInPath('EventFilter/HcalRawToDigi/data/HCALLaser2012AllDatasets.txt.gz')
 
 # ------------------------------------------------------------------------------------
 # ECAL dead cell filter:

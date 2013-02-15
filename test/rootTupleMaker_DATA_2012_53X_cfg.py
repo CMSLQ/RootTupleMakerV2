@@ -394,7 +394,7 @@ process.p = cms.Path(
     process.EcalDeadCellTriggerPrimitiveFilter*
     process.EcalDeadCellBoundaryEnergyFilter*
     process.HBHENoiseFilterResultProducer*
-    process.hcallasereventfilter2012*
+    process.hcallasereventfilter2012_lq*
     process.trackingFailureFilter*
     process.eeBadScFilter*
     process.ecalLaserCorrFilter*

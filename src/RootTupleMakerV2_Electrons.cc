@@ -125,6 +125,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "SigmaEtaEta"              + suffix );
   produces <std::vector<double> > ( prefix + "SigmaIEtaIEta"            + suffix );
   produces <std::vector<int> >    ( prefix + "Classif"                  + suffix );
+  produces <std::vector<double> > ( prefix + "R9"                       + suffix );
   produces <std::vector<double> > ( prefix + "E1x5OverE5x5"             + suffix );
   produces <std::vector<double> > ( prefix + "E2x5OverE5x5"             + suffix );
   								        
@@ -281,6 +282,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<std::vector<double> >  sigmaEtaEta               ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sigmaIEtaIEta             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  r9                        ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e1x5overe5x5              ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e2x5overe5x5              ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     classif                   ( new std::vector<int>   ()  );
@@ -737,6 +739,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       sigmaEtaEta              -> push_back ( it->sigmaEtaEta() );
       sigmaIEtaIEta            -> push_back ( it->sigmaIetaIeta() );
       classif                  -> push_back ( it->classification() );
+      r9                       -> push_back ( it->r9() );
       e1x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e1x5()/it->e5x5()) : 0 );
       e2x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
 
@@ -872,6 +875,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   iEvent.put( sigmaEtaEta             , prefix + "SigmaEtaEta"              + suffix );
   iEvent.put( sigmaIEtaIEta           , prefix + "SigmaIEtaIEta"            + suffix );
+  iEvent.put( r9                      , prefix + "R9"                       + suffix );
   iEvent.put( e1x5overe5x5            , prefix + "E1x5OverE5x5"             + suffix );
   iEvent.put( e2x5overe5x5            , prefix + "E2x5OverE5x5"             + suffix );
   iEvent.put( classif                 , prefix + "Classif"                  + suffix );

@@ -108,6 +108,9 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "AgainstMuonLoose2Discr"  + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstMuonMedium2Discr" + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstMuonTight2Discr"  + suffix );
+    produces <std::vector<double> >    ( prefix + "AgainstMuonLoose3Discr"  + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstMuonMedium3Discr" + suffix ); //does not exist
+    produces <std::vector<double> >    ( prefix + "AgainstMuonTight3Discr"  + suffix );
     //
     produces <std::vector<double> >    ( prefix + "VLooseIsolationDiscr"                           + suffix );
     produces <std::vector<double> >    ( prefix + "LooseIsolationDiscr"                            + suffix );
@@ -247,12 +250,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  againstelectronvtightmva3discr   ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  againstelectrondeadecaldiscr     ( new std::vector<double>()   );
   //
-  std::auto_ptr<std::vector<double> >  againstmuonloosediscr   ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstmuonmediumdiscr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstmuontightdiscr   ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstmuonloose2discr  ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstmuonmedium2discr ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstmuontight2discr  ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuonloosediscr     ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuonmediumdiscr    ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuontightdiscr     ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuonloose2discr    ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuonmedium2discr   ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuontight2discr    ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuonloose3discr    ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstmuonmedium3discr   ( new std::vector<double>()   );
+  std::auto_ptr<std::vector<double> >  againstmuontight3discr    ( new std::vector<double>()   );
   //
   std::auto_ptr<std::vector<double> >  vlooseisolationdiscr                           ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  looseisolationdiscr                            ( new std::vector<double>()   );
@@ -397,12 +403,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	againstelectronvtightmva3discr   -> push_back( it->tauID("againstElectronVTightMVA3")   );
 	againstelectrondeadecaldiscr     -> push_back( it->tauID("againstElectronDeadECAL")     );
 	//
-	againstmuonloosediscr   -> push_back( it->tauID("againstMuonLoose")   );
-	againstmuonmediumdiscr  -> push_back( it->tauID("againstMuonMedium")  );//applied in cleanPatTaus, REMOVED in cmssw_cfg.py
-	againstmuontightdiscr   -> push_back( it->tauID("againstMuonTight")   );
-	againstmuonloose2discr  -> push_back( it->tauID("againstMuonLoose2")  );
-	againstmuonmedium2discr -> push_back( it->tauID("againstMuonMedium2") );
-	againstmuontight2discr  -> push_back( it->tauID("againstMuonTight2")  );
+	againstmuonloosediscr     -> push_back( it->tauID("againstMuonLoose")     );
+	againstmuonmediumdiscr    -> push_back( it->tauID("againstMuonMedium")    );//applied in cleanPatTaus, REMOVED in cmssw_cfg.py
+	againstmuontightdiscr     -> push_back( it->tauID("againstMuonTight")     );
+	againstmuonloose2discr    -> push_back( it->tauID("againstMuonLoose2")    );
+	againstmuonmedium2discr   -> push_back( it->tauID("againstMuonMedium2")   );
+	againstmuontight2discr    -> push_back( it->tauID("againstMuonTight2")    );
+	againstmuonloose3discr    -> push_back( it->tauID("againstMuonLoose3")    );
+	//againstmuonmedium3discr   -> push_back( it->tauID("againstMuonMedium3")   );
+	againstmuontight3discr    -> push_back( it->tauID("againstMuonTight3")    );
 	//
 	vlooseisolationdiscr              -> push_back( it->tauID("byVLooseIsolation") );
 	looseisolationdiscr               -> push_back( it->tauID("byLooseIsolation")  );
@@ -714,7 +723,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.put( againstmuonloose2discr,                    prefix + "AgainstMuonLoose2Discr"                      + suffix );
     iEvent.put( againstmuonmedium2discr,                   prefix + "AgainstMuonMedium2Discr"                     + suffix );
     iEvent.put( againstmuontight2discr,                    prefix + "AgainstMuonTight2Discr"                      + suffix );
-
+    iEvent.put( againstmuonloose3discr,                    prefix + "AgainstMuonLoose3Discr"                      + suffix );
+    //iEvent.put( againstmuonmedium3discr,                   prefix + "AgainstMuonMedium3Discr"                     + suffix );
+    iEvent.put( againstmuontight3discr,                    prefix + "AgainstMuonTight3Discr"                      + suffix );
+    //
     iEvent.put( vlooseisolationdiscr,                           prefix + "VLooseIsolationDiscr"                           + suffix );
     iEvent.put( looseisolationdiscr,                            prefix + "LooseIsolationDiscr"                            + suffix );
     iEvent.put( mediumisolationdiscr,                           prefix + "MediumIsolationDiscr"                           + suffix );

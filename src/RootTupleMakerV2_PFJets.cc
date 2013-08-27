@@ -217,6 +217,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 		for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it )
 		{
+		        // Only look at jets with pt>=20 GeV
+   		        if( it->pt()<20 ) 
+			        continue;
+		  
 			// exit from loop when you reach the required number of jets
 			if(eta->size() >= maxSize)
 				break;

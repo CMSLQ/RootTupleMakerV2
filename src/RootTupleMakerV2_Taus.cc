@@ -334,6 +334,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     std::vector<pat::Tau>::const_iterator it_end = taus -> end();
     //
     for (; it != it_end; ++it ) { 
+      //
+      if ( it->pt() < 20         ) continue;
+      //
       if ( eta->size() > maxSize ) break;
       //
       // SCTau Discriminators are at: (cvs up -r 1.53 PhysicsTools/PatAlgos/python/tools/tauTools.py)

@@ -13,8 +13,12 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
-inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
-inputTagL1Offset(iConfig.getParameter<edm::InputTag>("InputTagL1Offset")),
+inputTag           (iConfig.getParameter<edm::InputTag>("InputTag"           )),
+inputTagL1Offset   (iConfig.getParameter<edm::InputTag>("InputTagL1Offset"   )),
+inputTagSmearedUp  (iConfig.getParameter<edm::InputTag>("InputTagSmearedUp"  )),
+inputTagSmearedDown(iConfig.getParameter<edm::InputTag>("InputTagSmearedDown")),
+inputTagScaledUp   (iConfig.getParameter<edm::InputTag>("InputTagScaledUp"   )),
+inputTagScaledDown (iConfig.getParameter<edm::InputTag>("InputTagScaledDown" )),
 prefix  (iConfig.getParameter<std::string>  ("Prefix")),
 suffix  (iConfig.getParameter<std::string>  ("Suffix")),
 maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
@@ -30,8 +34,16 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "Eta" + suffix );
 	produces <std::vector<double> > ( prefix + "Phi" + suffix );
 	produces <std::vector<double> > ( prefix + "Pt" + suffix );
+	produces <std::vector<double> > ( prefix + "SmearedUpPt" + suffix );
+	produces <std::vector<double> > ( prefix + "SmearedDownPt" + suffix );
+	produces <std::vector<double> > ( prefix + "ScaledUpPt" + suffix );
+	produces <std::vector<double> > ( prefix + "ScaledDownPt" + suffix );
 	produces <std::vector<double> > ( prefix + "PtRaw" + suffix );
 	produces <std::vector<double> > ( prefix + "Energy" + suffix );
+	produces <std::vector<double> > ( prefix + "SmearedUpEnergy" + suffix );
+	produces <std::vector<double> > ( prefix + "SmearedDownEnergy" + suffix );
+	produces <std::vector<double> > ( prefix + "ScaledUpEnergy" + suffix );
+	produces <std::vector<double> > ( prefix + "ScaledDownEnergy" + suffix );
 	produces <std::vector<double> > ( prefix + "EnergyRaw" + suffix );
 	produces <std::vector<double> > ( prefix + "JECUnc" + suffix );
 	produces <std::vector<double> > ( prefix + "L2L3ResJEC" + suffix );
@@ -105,6 +117,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  ptSmearedUp  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  ptSmearedDown  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  ptScaledUp  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  ptScaledDown  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  energySmearedUp  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  energySmearedDown  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  energyScaledUp  ( new std::vector<double>()  );
+	std::auto_ptr<std::vector<double> >  energyScaledDown  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  pt_raw  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  energy_raw ( new std::vector<double>()  );
@@ -207,6 +227,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	edm::Handle<std::vector<pat::Jet> > jetsL1Offset;
 	iEvent.getByLabel(inputTagL1Offset, jetsL1Offset);
+
+	edm::Handle<std::vector<pat::Jet> > jetsSmearedUp;
+	iEvent.getByLabel(inputTagSmearedUp, jetsSmearedUp);
+	std::vector<pat::Jet>::const_iterator it_smearedUp;
+
+	edm::Handle<std::vector<pat::Jet> > jetsSmearedDown;
+	iEvent.getByLabel(inputTagSmearedDown, jetsSmearedDown);
+	std::vector<pat::Jet>::const_iterator it_smearedDown;
+
+	edm::Handle<std::vector<pat::Jet> > jetsScaledUp;
+	iEvent.getByLabel(inputTagScaledUp, jetsScaledUp);
+	std::vector<pat::Jet>::const_iterator it_scaledUp;
+
+	edm::Handle<std::vector<pat::Jet> > jetsScaledDown;
+	iEvent.getByLabel(inputTagScaledDown, jetsScaledDown);
+	std::vector<pat::Jet>::const_iterator it_scaledDown;
 	
 	edm::Handle<reco::VertexCollection> primaryVertices;  // DB
 	iEvent.getByLabel(vtxInputTag,primaryVertices);       // DB
@@ -215,8 +251,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	{
 		edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Total # PFJets: " << jets->size();
 
+		int ijet = -1;
 		for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it )
-		{
+		  {
+		    ijet++;
 		        // Only look at jets with pt>=20 GeV
    		        if( it->pt()<20 ) 
 			        continue;
@@ -461,6 +499,31 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			eta->push_back( it->eta() );
 			phi->push_back( it->phi() );
 			pt->push_back( it->pt() );
+
+			if ( jetsSmearedUp.isValid() ){
+			  it_smearedUp = jetsSmearedUp -> begin() + ijet;
+			  ptSmearedUp -> push_back ( it_smearedUp -> pt() );
+			  energySmearedUp -> push_back ( it_smearedUp -> energy() );
+			}
+
+			if ( jetsSmearedDown.isValid() ){
+			  it_smearedDown = jetsSmearedDown -> begin() + ijet;
+			  ptSmearedDown -> push_back ( it_smearedDown -> pt() );
+			  energySmearedDown -> push_back ( it_smearedDown -> energy() );
+			}
+
+			if ( jetsScaledUp.isValid() ){
+			  it_scaledUp = jetsScaledUp -> begin() + ijet;
+			  ptScaledUp -> push_back ( it_scaledUp -> pt() );
+			  energyScaledUp -> push_back ( it_scaledUp -> energy() );
+			}
+
+			if ( jetsScaledDown.isValid() ){
+			  it_scaledDown = jetsScaledDown -> begin() + ijet;
+			  ptScaledDown -> push_back ( it_scaledDown -> pt() );
+			  energyScaledDown -> push_back ( it_scaledDown -> energy() );
+			}
+
 			pt_raw->push_back( it->correctedJet("Uncorrected").pt() );
 			energy->push_back( it->energy() );
 			energy_raw->push_back( it->correctedJet("Uncorrected").energy() );
@@ -591,8 +654,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( eta, prefix + "Eta" + suffix );
 	iEvent.put( phi, prefix + "Phi" + suffix );
 	iEvent.put( pt, prefix + "Pt" + suffix );
+	iEvent.put( ptSmearedUp, prefix + "SmearedUpPt" + suffix );
+	iEvent.put( ptSmearedDown, prefix + "SmearedDownPt" + suffix );
+	iEvent.put( ptScaledUp, prefix + "ScaledUpPt" + suffix );
+	iEvent.put( ptScaledDown, prefix + "ScaledDownPt" + suffix );
 	iEvent.put( pt_raw, prefix + "PtRaw" + suffix );
 	iEvent.put( energy, prefix + "Energy" + suffix );
+	iEvent.put( energySmearedUp, prefix + "SmearedUpEnergy" + suffix );
+	iEvent.put( energySmearedDown, prefix + "SmearedDownEnergy" + suffix );
+	iEvent.put( energyScaledUp, prefix + "ScaledUpEnergy" + suffix );
+	iEvent.put( energyScaledDown, prefix + "ScaledDownEnergy" + suffix );
 	iEvent.put( energy_raw, prefix + "EnergyRaw" + suffix );
 	iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
 	iEvent.put( l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix );

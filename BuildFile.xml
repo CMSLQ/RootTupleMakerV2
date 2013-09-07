@@ -15,7 +15,7 @@
 <use name="MagneticField/Records"/>
 <use name="PhysicsTools/PatUtils"/>
 <use name="JetMETCorrections/Objects"/>
-<use name="EGamma/EGammaAnalysisTools"/>
+<use name="EgammaAnalysis/ElectronTools"/>
 <use name="lhapdf"/>
 <use name="rootrflx"/>
 <use name="rootmath"/>

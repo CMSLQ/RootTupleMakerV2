@@ -10,7 +10,7 @@ from PhysicsTools.PatAlgos.tools.pfTools import *
 usePFIso ( process )
 
 # Options and Output Report
-process.options.wantSummary = True
+process.options.wantSummary = False
 
 import os
 
@@ -20,23 +20,6 @@ import os
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.MessageLogger.cerr.default.limit = 10
 #################################################################
-
-#----------------------------------------------------------------------------------------------------
-# The ECAL laser correction filter (ecalLaserCorrFilter) occasionally (~1/20 events) 
-# interpolates laser correction values of < 1 and issues a LogError message
-# 
-# This does not affect the laser correction that is applied: only the interpolated estimate 
-# that the filter uses.  The filter runs in "Tagging Mode", so no events can be removed.
-# 
-# Error message comes from line 173 of:
-# CalibCalorimetry/EcalLaserCorrection/src/EcalLaserDbService.cc
-# function = EcalLaserDbService::getLaserCorrection
-# Message = "The interpolated laser correction is <= zero!"
-#
-# We suppress these messages.  Suppression can be removed by commenting the following line.
-#----------------------------------------------------------------------------------------------------
-
-process.MessageLogger.suppressError = cms.untracked.vstring ('ecalLaserCorrFilter') 
 
 #----------------------------------------------------------------------------------------------------
 # Load our RootTupleMakerV2 modules
@@ -52,61 +35,17 @@ process.TFileService = cms.Service("TFileService",
 #----------------------------------------------------------------------------------------------------
 # Set global settings (number of events, global tag, input files, etc)
 #----------------------------------------------------------------------------------------------------
-# Make sure a correct global tag is used.
-#
-# Correct global tags for Summer12_DR53X MC are here: 
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#2012_MC_production
-#
-# Correct global tags for 2012 PromptReco data are here:
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Global_tags_for_prompt_reco_data
-# 
-# Correct global tags for 2012 ReReco data are here:
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Summary_of_Global_Tags_used_in_o
-#
-# Recommendations as of Feb 8, 2013:
-# Summer12_DR53X  MC               (*/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM) : START53_V7G
-# 2012 A          Data ReReco      (*/Run2012A-recover-06Aug2012-v1/AOD)           : FT_53_V6C_AN3
-# 2012 A          Data ReReco      (*/Run2012A-13Jul2012-v1/AOD)                   : FT_53_V6_AN3
-# 2012 B          Data ReReco      (*/Run2012B-13Jul2012-v1/AOD)                   : FT_53_V6_AN3
-# 2012 C          Data ReReco      (*/Run2012C-24Aug2012-v1/AOD)                   : FT_53_V10_AN3
-# 2012 C          Data ReReco      (*/Run2012C-EcalRecover_11Dec2012-v1/AOD)       : FT_P_V42C_AN3
-# 2012 C          Prompt Reco      (*/Run2012C-PromptReco-v2/AOD)                  : GR_P_V41_AN3
-# 2012 D          Prompt Reco      (*/Run2012D-PromptReco-v1/AOD)                  : GR_P_V42_AN3
-# 
-# Make sure a correct global tag is used:
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 
+# GlobalTag
 process.GlobalTag.globaltag = 'START53_V7G::All'
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = 10
 
 # Input files
 process.source.fileNames = [
-    #Specified by the InputList.txt
-    #'root://eoscms//eos/cms/store/user/hsaka/2012prep/TTJets_FullLeptMGDecays_8TeV-madgraph_PU_S10_START53_V7A-v1.root'
-    #'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_LQToTTau_M-950_TuneZ2star_8TeV_pythia6_AODSIM_PU_S10_START53_V7A-v1_TEST.root'
-    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12__DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball__AODSIM__PU_S7_START52_V9-v1__TEST.root'
-    ]
-
-#----------------------------------------------------------------------------------------------------
-# For 53x Data and MC, the default Jet Probability Calibration from the GlobalTag is not optimal 
-# and needs to be replaced in the following way, when using CRAB:
-# 
-# Hypernews: https://hypernews.cern.ch/HyperNews/CMS/get/exotica/1524.html
-# Twiki: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBTagJetProbabilityCalibration#Calibration_in_53x_Data_and_MC
-#----------------------------------------------------------------------------------------------------
-
-process.GlobalTag.toGet = cms.VPSet(
-    cms.PSet(record  = cms.string          ("BTagTrackProbability2DRcd"                ),
-             tag     = cms.string          ("TrackProbabilityCalibration_2D_MC53X_v2"  ),
-             connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"    )
-    ),                                                                                 
-    cms.PSet(record  = cms.string          ("BTagTrackProbability3DRcd"                ),
-             tag     = cms.string          ("TrackProbabilityCalibration_3D_MC53X_v2"  ),
-             connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_BTAU"    )
-    )
-)
+    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Summer12_DR53X_DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_PU_S10_START53_V7A-v1_TEST.root'
+]
 
 #----------------------------------------------------------------------------------------------------
 # HEEP 4.0 (electron ID) still uses the 2011 definitions of rho for isolation corrections.
@@ -145,11 +84,12 @@ switchOnTriggerMatching( process, triggerMatchers = [
 
 #----------------------------------------------------------------------------------------------------
 # Add PFMET and TCMET
+# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Tools
 #----------------------------------------------------------------------------------------------------
 
 from PhysicsTools.PatAlgos.tools.metTools import *
-addPfMET(process, 'PF')
-addTcMET(process, 'TC')
+addPfMET(process, 'PF') # This adds Type1-corrected PFMET
+addTcMET(process, 'TC') # This adds raw TC MET
 
 #----------------------------------------------------------------------------------------------------
 # Add MET filters
@@ -184,59 +124,142 @@ process.load("Leptoquarks.RootTupleMakerV2.tauIDsources_cfi")
 # https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentification#MVA_based_Id_in_PAT
 #
 # Taken from the example:
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/EGamma/EGammaAnalysisTools/test/patTuple_electronId_cfg.py?revision=1.2&view=markup&pathrev=V00-00-21
+# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/EgammaAnalysis/ElectronTools/test/patTuple_electronId_cfg.py?revision=1.2&view=markup&pathrev=V00-00-09
 #----------------------------------------------------------------------------------------------------
 
-process.load('EGamma.EGammaAnalysisTools.electronIdMVAProducer_cfi')
-process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaNonTrigV0 )
-process.patElectrons.electronIDSources.mvaTrigV0    = cms.InputTag("mvaTrigV0"   )
-process.patElectrons.electronIDSources.mvaNonTrigV0 = cms.InputTag("mvaNonTrigV0")
+process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi')
+process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaTrigNoIPV0 + process.mvaNonTrigV0 )
+process.patElectrons.electronIDSources.mvaTrigV0     = cms.InputTag("mvaTrigV0")  
+process.patElectrons.electronIDSources.mvaNonTrigV0  = cms.InputTag("mvaNonTrigV0") 
+process.patElectrons.electronIDSources.mvaTrigNoIPV0 = cms.InputTag("mvaTrigNoIPV0")
+
+process.patConversions = cms.EDProducer("PATConversionProducer",
+    electronSource = cms.InputTag("cleanPatElectrons")  
+)
+
 
 #----------------------------------------------------------------------------------------------------
-# Add PF jets --> See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
+# Add the PFJets
+# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
 #----------------------------------------------------------------------------------------------------
-
-# With FastJet corrections, do Type 1 MET corrections
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
+process.load("PhysicsTools.PatAlgos.patSequences_cff")
+
+# With L1FastJet corrections (default)
+
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PF',
-    doJTA        = True,
-    doBTagging   = True,
-    jetCorrLabel = ('AK5PF', cms.vstring(['L1FastJet','L2Relative', 'L3Absolute'])),
-    doType1MET   = True,
-    genJetCollection = cms.InputTag("ak5GenJets"),
-    doJetID      = True,
+    doJetID      = True, # Perform jet ID algorithm and store ID info in the jet
+    doJTA        = True, # Perform jet track association and determine jet charge
+    doBTagging   = True, # Perform b-tagging and store b-tagging info in the jet
+    doType1MET   = True, # Store Type1 PFMET information.  Label of resulting PFMET collection is: patMETsAK5PF
+    jetIdLabel   = "ak5",# Which jet ID label should be used?
+    jetCorrLabel = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute']), # Which jet corrections should be used?
+    genJetCollection = cms.InputTag("ak5GenJets") # Which GEN jets should be used?
 )
 
-# With Offset corrections
+# With L1Offset corrections (cross-check)
 
 addJetCollection(process,cms.InputTag('ak5PFJets'),
     'AK5', 'PFL1Offset',
-    doJTA        = True,
-    doBTagging   = True,
+    doJetID      = True, # Perform jet ID algorithm and store ID info in the jet
+    doJTA        = True, # Perform jet track association and determine jet charge
+    doBTagging   = True, # Perform b-tagging and store b-tagging info in the jet
+    doType1MET   = False,# DON'T store Type1 PFMET information for these jets.  They're for cross-checking only.
+    jetIdLabel   = "ak5",# Which jet ID label should be used?
     jetCorrLabel = ('AK5PF', cms.vstring(['L1Offset','L2Relative', 'L3Absolute'])),
-    doType1MET   = False,
     genJetCollection = cms.InputTag("ak5GenJets"),
-    doJetID      = True,
 )
 
 #----------------------------------------------------------------------------------------------------
-# Available pat::MET collections
-# - process.patMETsTC          : raw TCMET                    (already included, no extra code needed)
-# - process.patMETsRawCalo     : raw CaloMET
-# - process.patMETs            : Type1-corrected CaloMET      (already included, no extra code needed)
-# - process.patMETsRawPF       : raw PFMET
-# - process.patMETsPF          : Type1-corrected PFMET        (already included, no extra code needed)
-# - process.patMETsAK5PF       : Type0+1-corrected PFMET
-# - process.patMETsAK5PFXYShift: Type0+1-corrected + XY shift-corrected PFMET
+# Define the systematic shift correction
+# Private email from Christian Veelken.  Original values are here:
+# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py?revision=1.7&view=markup
+#----------------------------------------------------------------------------------------------------
+
+process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
+process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+
+process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc = cms.VPSet(cms.PSet( # CV: Summer'12 MC + Summer'13 JEC
+    numJetsMin = cms.int32(-1),
+    numJetsMax = cms.int32(-1),
+    px = cms.string("+1.62861e-01 - 2.38517e-02*Nvtx"),
+    py = cms.string("+3.60860e-01 - 1.30335e-01*Nvtx")
+))
+
+process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc[0]
+
+#----------------------------------------------------------------------------------------------------
+# Use the runMetUncertainties tool here
+# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Systematics_Tools
+#----------------------------------------------------------------------------------------------------
+
+from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
+
+runMEtUncertainties(
+    process,
+    jetCollection           = cms.InputTag('cleanPatJetsAK5PF'), 
+    doApplySysShiftCorr     = True,  # Apply correction for systematic x/y shift in MET
+    doApplyType0corr        = True,  # Apply correction for pileup
+    makeType1corrPFMEt      = True,  # Apply correction for jet energy scale
+    makeType1p2corrPFMEt    = False, # DO NOT apply correction for unclustered energy (degrades MET resolution)
+    makePFMEtByMVA          = False, # We don't use MVA PFMET
+    doSmearJets             = True,  # Very important to smear the pfjets (MC ONLY)
+    addToPatDefaultSequence = True,  # Add this to the PAT sequence
+    sysShiftCorrParameter   = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc[0]
+)
+
+#----------------------------------------------------------------------------------------------------
+# Available pat::MET collections for analysis
+# - process.patMETsTC                               : raw        TCMET   (NO  jet smearing)
+# - process.patMETsRawCalo                          : raw        CaloMET (NO  jet smearing)
+# - process.patMETsRawPF                            : raw        PFMET   (NO  jet smearing)
+# - process.patMETs                                 : Type1      CaloMET (NO  jet smearing)
+# - process.patMETsPF                               : Type1      PFMET   (NO  jet smearing)
+# - process.patMETsAK5PF                            : Type0+1    PFMET   (NO  jet smearing)
+# - process.patMETsAK5PFXYShift                     : Type0+1+XY PFMET   (NO  jet smearing)
+# - process.patType1CorrectedPFMet                  : Type0+1+XY PFMET   (YES jet smearing) <-- Recommended for analysis
+# 
+# Available pat::MET collections for systematic studies
+# - process.patType1CorrectedPFMetElectronEnUp      : Type0+1+XY PFMET   (YES jet smearing), Electron energy shifted up 
+# - process.patType1CorrectedPFMetElectronEnDown    : Type0+1+XY PFMET   (YES jet smearing), Electron energy shifted down
+# - process.patType1CorrectedPFMetMuonEnUp          : Type0+1+XY PFMET   (YES jet smearing), Muon energy shifted up
+# - process.patType1CorrectedPFMetMuonEnDown        : Type0+1+XY PFMET   (YES jet smearing), Muon energy shifted down 
+# - process.patType1CorrectedPFMetTauEnUp           : Type0+1+XY PFMET   (YES jet smearing), Tau energy shifted up   
+# - process.patType1CorrectedPFMetTauEnDown         : Type0+1+XY PFMET   (YES jet smearing), Tau energy shifted down 
+# - process.patType1CorrectedPFMetJetResUp          : Type0+1+XY PFMET   (YES jet smearing), Jet resolution smeared up
+# - process.patType1CorrectedPFMetJetResDown        : Type0+1+XY PFMET   (YES jet smearing), Jet resolution smeared down
+# - process.patType1CorrectedPFMetJetEnUp           : Type0+1+XY PFMET   (YES jet smearing), Jet energy shifted up   
+# - process.patType1CorrectedPFMetJetEnDown         : Type0+1+XY PFMET   (YES jet smearing), Jet energy shifted down  
+# - process.patType1CorrectedPFMetUnclusteredEnUp   : Type0+1+XY PFMET   (YES jet smearing), Unclustered energy shifted up  
+# - process.patType1CorrectedPFMetUnclusteredEnDown : Type0+1+XY PFMET   (YES jet smearing), Unclustered energy shifted down
+# 
+# Available shifted object collections:
+# - process.shiftedPatElectronsEnUp                 : pat electrons, energy scale shifted up
+# - process.shiftedPatElectronsEnDown               : pat electrons, energy scale shifted down
+# - process.shiftedPatMuonsEnUp                     : pat muons    , energy scale shifted up
+# - process.shiftedPatMuonsEnDown                   : pat muons    , energy scale shifted down
+# - process.shiftedPatTausEnUp                      : pat taus     , energy scale shifted up
+# - process.shiftedPatTausEnDown                    : pat taus     , energy scale shifted down
+# - process.smearedPatJetsAK5PF                     : pat jets     , energy resolution smeared to match data  <-- Recommended for analysis
+# - process.smearedPatJetsAK5PFresUp                : pat jets     , energy resolution smeared worse data
+# - process.smearedPatJetsAK5PFresDown              : pat jets     , energy resolution sharpened better than data
+# - process.shiftedPatJetsAK5PFenUpForCorrMEt       : pat jets     , energy scale shifted up  
+# - process.shiftedPatJetsAK5PFenDownForCorrMEt     : pat jets     , energy scale shifted down 
+# 
+# Notes:
+# - No Type0 corrections are available for CaloMET
+# - No Type0 or Type1 corrections are available for TCMET
+# - No Type2 corrections recommended for any MET, since they degrade the MET resolution
 #
-# No Type0 corrections are available for CaloMET
-# No Type0 or Type1 corrections are available for TCMET
-# Type2 corrections are not recommended, since they degrade the MET resolution
-#
-# Thanks to Jared Sturdy
+# Thanks to Jared Sturdy, Christian Veelken, and Guler Karapinar
+#----------------------------------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------------------------------
+# Add the raw CaloMET and raw PFMET
+# Raw TCMET is already included: patMETsRawTC
 #----------------------------------------------------------------------------------------------------
 
 # CaloMET: raw
@@ -249,9 +272,9 @@ process.patMETsRawCalo.metSource = cms.InputTag("met")
 process.patMETsRawPF = process.patMETsTC.clone()
 process.patMETsRawPF.metSource = cms.InputTag("pfMet")
 
-# PFMET: Type 0+1 corrections
-
-process.load("JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi")
+# PFMET: Type0+1 PFMET (no jet smearing)
+# process.AK5PFType1CorMet is a CorrectedPFMETProducer.
+# Result will be put inside a pat::MET collection called "patMETsAK5PF" automatically.
 
 process.AK5PFType1CorMet.applyType0Corrections = cms.bool(False)
 process.AK5PFType1CorMet.srcType1Corrections   = cms.VInputTag(
@@ -259,11 +282,10 @@ process.AK5PFType1CorMet.srcType1Corrections   = cms.VInputTag(
     cms.InputTag('pfJetMETcorr', 'type1')
 )
 
-# PFMET: Type 0+1 corrections + XY systematic shift correction
+# PFMET: Type0+1+XY PFMET (no jet smearing)
+# process.AK5PFType1CorMetXYShift is a CorrectedPFMETProducer.  
+# Result will need to be put inside a pat::MET collection by hand.
 
-process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-
-process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runAvsNvtx_mc
 process.AK5PFType1CorMetXYShift = process.AK5PFType1CorMet.clone()
 process.AK5PFType1CorMetXYShift.srcType1Corrections = cms.VInputTag(
     cms.InputTag('pfMETcorrType0'),      
@@ -273,6 +295,11 @@ process.AK5PFType1CorMetXYShift.srcType1Corrections = cms.VInputTag(
 process.patMETsAK5PFXYShift = process.patMETsAK5PF.clone()
 process.patMETsAK5PFXYShift.metSource = cms.InputTag ("AK5PFType1CorMetXYShift")
 
+#----------------------------------------------------------------------------------------------------
+# Analyze the smeared jets
+#----------------------------------------------------------------------------------------------------
+
+process.rootTuplePFJets.InputTag = cms.InputTag("smearedPatJetsAK5PF")
 
 #----------------------------------------------------------------------------------------------------
 # Set Lepton-Gen Matching Parameters
@@ -287,7 +314,6 @@ process.patDefaultSequence.replace( process.tauMatch, process.tauLepMatch )
 process.patTaus.genParticleMatch = cms.VInputTag( cms.InputTag("tauLepMatch") )
 process.patDefaultSequence.replace( process.tauGenJetMatch, process.tauJetMatch )
 process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
-
 
 #----------------------------------------------------------------------------------------------------
 # Lepton + Jets filter
@@ -323,11 +349,11 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 	# Fix POWHEG if buggy (this PDF set will also appear on output,
 	# so only two more PDF sets can be added in PdfSetNames if not "")
 	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
-	GenTag = cms.untracked.InputTag("genParticles"),
+        # GenTag = cms.untracked.InputTag("genParticles"),
 	PdfInfoTag = cms.untracked.InputTag("generator"),
 	PdfSetNames = cms.untracked.vstring(
-			"CT10.LHgrid" , 
-			"MSTW2008nlo68cl.LHgrid",
+            "CT10.LHgrid" , 
+            "MSTW2008nlo68cl.LHgrid",
             "NNPDF20_100.LHgrid"
 	)
 )
@@ -353,6 +379,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTuplePFMETType01Cor_*_*',
         'keep *_rootTuplePFMETType01XYCor_*_*',
+        'keep *_rootTuplePFMETType01XYCorJetSmeared_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
@@ -396,12 +423,15 @@ process.p = cms.Path(
     process.pdfWeights*
     # MVA electron ID
     process.mvaID*
+    # HEEP rho for isolation correction
+    process.kt6PFJetsForHEEPIsolation*
     # Good vertices
     process.goodVertices*
     # PFMET corrections
     process.type0PFMEtCorrection*
-    process.pfMEtSysShiftCorrSequence*
+    process.patPFMETtype0Corr*
     process.producePFMETCorrections*
+    process.pfMEtSysShiftCorrSequence*
     # PFMET producers
     process.AK5PFType1CorMet*
     process.AK5PFType1CorMetXYShift*
@@ -412,17 +442,17 @@ process.p = cms.Path(
     process.trackingFailureFilter*
     process.eeBadScFilter*
     process.ecalLaserCorrFilter*
-    # HEEP rho for isolation correction
-    process.kt6PFJetsForHEEPIsolation*
-    # PAT sequence
+    # Now the regular PAT default sequence
     process.patDefaultSequence*
-    # L+J filter
-    process.LJFilter*    
-    # PAT MET producers
-    process.patMETsRawCalo*       # CaloMET: RAW
-    process.patMETsRawPF*         # PFMET  : Raw
-    process.patMETsAK5PF*         # PFMET  : Type 0+1 corrections
-    process.patMETsAK5PFXYShift*  # PFMET  : Type 0+1 corrections, X/Y shift
+    # L+J Filter
+    process.LJFilter*  
+    # Run PAT conversions for electrons
+    process.patConversions*
+    # Now produce the raw CaloMET and raw PFMET 
+    process.patMETsRawCalo*       # Raw CaloMET
+    process.patMETsRawPF*         # Raw PFMET 
+    process.patMETsAK5PF*         # PFMET  : Type 0+1 corrections (no jet smearing)
+    process.patMETsAK5PFXYShift*  # PFMET  : Type 0+1 corrections, X/Y shift (no jet smearing)
     # Re-run full HPS sequence to fully profit from the fix of high pT taus
     process.recoTauClassicHPSSequence*
     # RootTupleMakerV2
@@ -439,6 +469,9 @@ process.p = cms.Path(
     process.rootTuplePFMETType1Cor+
     process.rootTuplePFMETType01Cor+
     process.rootTuplePFMETType01XYCor+
+    process.rootTuplePFMETType01XYCorJetSmeared+
+    process.rootTuplePFMETType01XYCorJetSmearedUnclusteredUp+
+    process.rootTuplePFMETType01XYCorJetSmearedUnclusteredDown+
     process.rootTupleMuons+
     process.rootTupleTrigger+
     process.rootTupleTriggerObjects+
@@ -458,25 +491,23 @@ process.p = cms.Path(
     process.rootTupleGenMETCalo+    
     process.rootTuplePhotons+
     process.rootTuplePFCandidates
-    )
-    *process.rootTupleTree
+    )*
+    process.rootTupleTree
 )
 
 #----------------------------------------------------------------------------------------------------
-# Dump if necessary
+# Dump the root file
 #----------------------------------------------------------------------------------------------------
 
-#process.dump = cms.OutputModule("PoolOutputModule",
-#                                outputCommands = cms.untracked.vstring(
-#                                'keep *',
-#                                ),
-#                                fileName = cms.untracked.string('dump.root')
-#                                )
-#process.DUMP    = cms.EndPath (process.dump)
+# process.dump_module = cms.OutputModule("PoolOutputModule",
+#     outputCommands = cms.untracked.vstring('keep *'),
+#     fileName       = cms.untracked.string ('dump.root')
+# )
+# process.dump = cms.EndPath (process.dump_module )
 
-# Delete predefined Endpath (needed for running with CRAB)
-del process.out
-del process.outpath
 
-# Schedule definition
+#----------------------------------------------------------------------------------------------------
+# Run the path
+#----------------------------------------------------------------------------------------------------
+
 process.schedule = cms.Schedule(process.p)

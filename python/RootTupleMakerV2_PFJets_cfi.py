@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 rootTuplePFJets = cms.EDProducer("RootTupleMakerV2_PFJets",
     InputTag = cms.InputTag('selectedPatJetsAK5PF'),
-    InputTagL1Offset    = cms.InputTag('selectedPatJetsAK5PFL1Offset'),
+    # InputTagL1Offset    = cms.InputTag('selectedPatJetsAK5PFL1Offset'),
     InputTagSmearedUp   = cms.InputTag('smearedPatJetsAK5PFresUp'),                                 
     InputTagSmearedDown = cms.InputTag('smearedPatJetsAK5PFresDown'),                                 
     InputTagScaledUp    = cms.InputTag('shiftedPatJetsAK5PFenUpForCorrMEt'),                                 

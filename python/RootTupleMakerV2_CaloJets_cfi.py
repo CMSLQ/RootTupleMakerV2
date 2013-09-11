@@ -2,7 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 rootTupleCaloJets = cms.EDProducer("RootTupleMakerV2_CaloJets",
     InputTag = cms.InputTag('cleanPatJets'),
-    InputTagL1Offset = cms.InputTag('selectedPatJetsAK5CaloL1Offset'),
     Prefix = cms.string('CaloJet'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(15),

@@ -620,6 +620,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// 
 	//   for( std::vector<pat::Jet>::const_iterator it = jetsL1Offset->begin(); it != jetsL1Offset->end(); ++it )
 	//     {
+	//	// Only look at jets with pt>=20 GeV
+	//	if( it->pt()<20 )
+	//	  continue;
 	//       // exit from loop when you reach the required number of jets
 	//       if(l1offsetJEC_vec->size() >= maxSize)
 	// 	break;

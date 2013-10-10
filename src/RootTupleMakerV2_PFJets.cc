@@ -258,7 +258,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		        // Only look at jets with pt>=20 GeV
    		        if( it->pt()<20 ) 
 			        continue;
-		  
+			
 			// exit from loop when you reach the required number of jets
 			if(eta->size() >= maxSize)
 				break;
@@ -312,7 +312,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			double minVtxDistXY = -99999.;
 			double minVtxDistZ  = -99999.;
 			double maxTrackAssocRatio = -9999.;
-			
 			
 			// Loop on primary Vertices and jets and perform associations 
 			
@@ -468,7 +467,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			    
 			  }
 			}
-			
+
 			if ( sum_track_pt != 0. ) { 
 			  jetBetaStar        /= sum_track_pt ;
 			  jetBetaStarClassic /= sum_track_pt ;
@@ -500,28 +499,42 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			phi->push_back( it->phi() );
 			pt->push_back( it->pt() );
 
-			if ( jetsSmearedUp.isValid() ){
-			  it_smearedUp = jetsSmearedUp -> begin() + ijet;
-			  ptSmearedUp -> push_back ( it_smearedUp -> pt() );
-			  energySmearedUp -> push_back ( it_smearedUp -> energy() );
-			}
+			if ( !iEvent.isRealData() ) { 
 
-			if ( jetsSmearedDown.isValid() ){
-			  it_smearedDown = jetsSmearedDown -> begin() + ijet;
-			  ptSmearedDown -> push_back ( it_smearedDown -> pt() );
-			  energySmearedDown -> push_back ( it_smearedDown -> energy() );
+			  if ( jetsSmearedUp.isValid() ){
+			    it_smearedUp = jetsSmearedUp -> begin() + ijet;
+			    ptSmearedUp -> push_back ( it_smearedUp -> pt() );
+			    energySmearedUp -> push_back ( it_smearedUp -> energy() );
+			  }
+			  
+			  if ( jetsSmearedDown.isValid() ){
+			    it_smearedDown = jetsSmearedDown -> begin() + ijet;
+			    ptSmearedDown -> push_back ( it_smearedDown -> pt() );
+			    energySmearedDown -> push_back ( it_smearedDown -> energy() );
+			  }
+			  
+			  if ( jetsScaledUp.isValid() ){
+			    it_scaledUp = jetsScaledUp -> begin() + ijet;
+			    ptScaledUp -> push_back ( it_scaledUp -> pt() );
+			    energyScaledUp -> push_back ( it_scaledUp -> energy() );
+			  }
+			  
+			  if ( jetsScaledDown.isValid() ){
+			    it_scaledDown = jetsScaledDown -> begin() + ijet;
+			    ptScaledDown -> push_back ( it_scaledDown -> pt() );
+			    energyScaledDown -> push_back ( it_scaledDown -> energy() );
+			  }
 			}
-
-			if ( jetsScaledUp.isValid() ){
-			  it_scaledUp = jetsScaledUp -> begin() + ijet;
-			  ptScaledUp -> push_back ( it_scaledUp -> pt() );
-			  energyScaledUp -> push_back ( it_scaledUp -> energy() );
-			}
-
-			if ( jetsScaledDown.isValid() ){
-			  it_scaledDown = jetsScaledDown -> begin() + ijet;
-			  ptScaledDown -> push_back ( it_scaledDown -> pt() );
-			  energyScaledDown -> push_back ( it_scaledDown -> energy() );
+			
+			else { 
+			  ptSmearedUp       -> push_back ( it -> pt()     );
+			  energySmearedUp   -> push_back ( it -> energy() );
+			  ptSmearedDown     -> push_back ( it -> pt()     );
+			  energySmearedDown -> push_back ( it -> energy() );
+			  ptScaledUp        -> push_back ( it -> pt()     );
+			  energyScaledUp    -> push_back ( it -> energy() );
+			  ptScaledDown      -> push_back ( it -> pt()     );
+			  energyScaledDown  -> push_back ( it -> energy() );
 			}
 
 			pt_raw->push_back( it->correctedJet("Uncorrected").pt() );

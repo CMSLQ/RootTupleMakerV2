@@ -29,7 +29,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string( 'rootTupleMaker_CRAB_MC_2012_Top_53X_LOCALTEST.root' )
+    fileName = cms.string( "file.root" )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -116,6 +116,56 @@ process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5     
 #----------------------------------------------------------------------------------------------------
 
 process.load("Leptoquarks.RootTupleMakerV2.tauIDsources_cfi")
+
+#----------------------------------------------------------------------------------------------------
+# Add the HEEP ID bit to the electrons
+#----------------------------------------------------------------------------------------------------
+
+from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *
+process.HEEPId = cms.EDProducer("HEEPIdValueMapProducer",
+                                eleLabel = cms.InputTag("gsfElectrons"),
+                                barrelCuts = cms.PSet(heepBarrelCuts),
+                                endcapCuts = cms.PSet(heepEndcapCuts),
+                                eleIsolEffectiveAreas = cms.PSet(heepEffectiveAreas),
+                                eleRhoCorrLabel = cms.InputTag("kt6PFJetsForIsolation","rho"),
+                                applyRhoCorrToEleIsol = cms.bool(True),
+                                verticesLabel = cms.InputTag("offlinePrimaryVerticesWithBS"),
+                                writeIdAsInt =cms.bool(True)
+                                )
+process.patElectrons.userData.userInts.src = cms.VInputTag('HEEPId')
+
+#----------------------------------------------------------------------------------------------------
+# Make analysisPatTaus and add them to the cleanPatCandidates sequence
+#----------------------------------------------------------------------------------------------------
+
+process.analysisPatTaus = process.cleanPatTaus.clone()
+process.analysisPatTaus.preselection = cms.string(
+    'tauID("decayModeFinding") > 0.5 &'
+    ' tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits") > 0.5 &'
+    ' tauID("againstMuonLoose3") > 0.5 &'
+    ' tauID("againstElectronLooseMVA3") > 0.5'
+)
+process.analysisPatTaus.finalCut = cms.string('pt > 20. & abs(eta) < 2.3')
+
+process.cleanPatCandidates.replace ( process.cleanPatTaus, process.cleanPatTaus + process.analysisPatTaus )
+
+#----------------------------------------------------------------------------------------------------
+# Make analysisPatMuons and add them to the cleanPatCandidates sequence
+#----------------------------------------------------------------------------------------------------
+
+process.analysisPatMuons = process.cleanPatMuons.clone()
+process.analysisPatMuons.finalCut = cms.string("isGlobalMuon & muonID('GlobalMuonPromptTight') & pt > 20")
+
+process.cleanPatCandidates.replace ( process.cleanPatMuons, process.cleanPatMuons + process.analysisPatMuons )
+
+#----------------------------------------------------------------------------------------------------
+# Make analysisPatElectrons and add them to the cleanPatCandidates sequence
+#----------------------------------------------------------------------------------------------------
+
+process.analysisPatElectrons = process.cleanPatElectrons.clone()
+process.analysisPatElectrons.finalCut = cms.string('userInt("HEEPId") < 0.5')
+
+process.cleanPatCandidates.replace ( process.cleanPatElectrons, process.cleanPatElectrons + process.analysisPatElectrons )
 
 #----------------------------------------------------------------------------------------------------
 # Add MVA electron ID
@@ -226,6 +276,9 @@ runMEtUncertainties(
     makePFMEtByMVA          = False, # We don't use MVA PFMET
     doSmearJets             = True,  # Very important to smear the pfjets (MC ONLY)
     addToPatDefaultSequence = True,  # Add this to the PAT sequence
+    electronCollection      = cms.InputTag('analysisPatElectrons'),
+    tauCollection           = cms.InputTag('analysisPatTaus'),
+    muonCollection          = cms.InputTag('analysisPatMuons'),
     sysShiftCorrParameter   = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc[0]
 )
 
@@ -454,6 +507,8 @@ process.p = cms.Path(
     process.genElectronsFromZs*
     # pdf weights
     process.pdfWeights*
+    # HEEP electron ID
+    process.HEEPId*
     # MVA electron ID
     process.mvaID*
     # HEEP rho for isolation correction
@@ -540,19 +595,26 @@ process.p = cms.Path(
     process.rootTupleTree
 )
 
+
 #----------------------------------------------------------------------------------------------------
-# Dump the root file
+# Dump if necessary
 #----------------------------------------------------------------------------------------------------
 
-process.dump_module = cms.OutputModule("PoolOutputModule",
-    outputCommands = cms.untracked.vstring('keep *'),
-    fileName       = cms.untracked.string ('dump.root')
-)
-process.dump = cms.EndPath (process.dump_module )
+#process.dump = cms.OutputModule("PoolOutputModule",
+#                                outputCommands = cms.untracked.vstring(
+#                                'keep *',
+#                                ),
+#                                fileName = cms.untracked.string('dump.root')
+#                                )
+#process.DUMP    = cms.EndPath (process.dump)
+
+# Delete predefined Endpath (needed for running with CRAB)
+del process.out
+del process.outpath
 
 
 #----------------------------------------------------------------------------------------------------
 # Run the path
 #----------------------------------------------------------------------------------------------------
 
-process.schedule = cms.Schedule(process.p,process.dump)
+process.schedule = cms.Schedule(process.p)

@@ -11,6 +11,7 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
 inputTag           (iConfig.getParameter<edm::InputTag>("InputTag"           )),
@@ -89,6 +90,11 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "CombinedMVABTag" + suffix );
 	produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);
 	produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);
+	produces <std::vector<bool> >    ( prefix + "PileupjetIDpassLooseWP" + suffix);
+	produces <std::vector<bool> >    ( prefix + "PileupjetIDpassMediumWP" + suffix);
+	produces <std::vector<bool> >    ( prefix + "PileupjetIDpassTightWP" + suffix);
+	produces <std::vector<int> >    ( prefix + "JetPileupIdflag" + suffix);
+	produces <std::vector<double> >    ( prefix + "JetPileupMVA" + suffix);
 	produces <std::vector<double> > ( prefix + "BestVertexTrackAssociationFactor" + suffix );
 	produces <std::vector<int> >    ( prefix + "BestVertexTrackAssociationIndex" + suffix);
 	produces <std::vector<double> > ( prefix + "ClosestVertexWeighted3DSeparation" + suffix );
@@ -174,6 +180,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	std::auto_ptr<std::vector<int> >  passLooseID  ( new std::vector<int>()  );
 	std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );
+
+
+	std::auto_ptr<std::vector<bool> >  pileup_jetID_passLooseWP  ( new std::vector<bool>()  );
+	std::auto_ptr<std::vector<bool> >  pileup_jetID_passMediumWP  ( new std::vector<bool>()  );
+	std::auto_ptr<std::vector<bool> >  pileup_jetID_passTightWP  ( new std::vector<bool>()  );
+	std::auto_ptr<std::vector<int> >  jetpileup_idflag  ( new std::vector<int>()  );
+	std::auto_ptr<std::vector<double> >  jetpileup_mva  ( new std::vector<double>()  );
+
 	std::auto_ptr <std::vector<double> >  bestVertexTrackAssociationFactor  ( new std::vector<double>()  );
 	std::auto_ptr <std::vector<int> >     bestVertexTrackAssociationIndex   ( new std::vector<int>()  );
 	std::auto_ptr <std::vector<double> >  closestVertexWeighted3DSeparation  ( new std::vector<double>()  );
@@ -247,6 +261,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	edm::Handle<reco::VertexCollection> primaryVertices;  // DB
 	iEvent.getByLabel(vtxInputTag,primaryVertices);       // DB
 
+	edm::Handle<edm::View<pat::Jet> > sjets;
+	iEvent.getByLabel("selectedPatJetsAK5PF",sjets);
+		
+	edm::Handle<edm::ValueMap<float> > puJetIdMVA;
+	iEvent.getByLabel("puJetMva","full53xDiscriminant", puJetIdMVA);
+	
+	edm::Handle<edm::ValueMap<int> > puJetIdFlag;
+	iEvent.getByLabel("puJetMva","full53xId",puJetIdFlag);
+
+
 	if(jets.isValid())
 	{
 		edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Total # PFJets: " << jets->size();
@@ -270,6 +294,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			retpf.set(false);
 			int passjetTight = 0;
 			if (pfjetIDTight( *it, retpf)) passjetTight =1;
+
+
+			double mva   = (double) (*puJetIdMVA)[sjets->refAt(ijet)];
+			int    idflag = (*puJetIdFlag)[sjets->refAt(ijet)];
+			bool pileup_jetID_passLoose= PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose);
+			bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
+			bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
+			
 
 			if(readJECuncertainty)
 			{
@@ -599,7 +631,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			combinedMVABTag                     ->push_back( it->bDiscriminator("combinedMVABJetTags"                     ));
 			passLooseID->push_back( passjetLoose );
 			passTightID->push_back( passjetTight );
-			
+			pileup_jetID_passLooseWP->push_back(pileup_jetID_passLoose);
+			pileup_jetID_passMediumWP->push_back(pileup_jetID_passMedium);
+			pileup_jetID_passTightWP->push_back(pileup_jetID_passTight);
+			jetpileup_idflag->push_back(idflag);
+			jetpileup_mva->push_back(mva);
 
 // 			//////////////////////////////////////////////////////////////////// 
 // 			if( fabs(it->eta()) > 3) 
@@ -725,7 +761,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( combinedMVABTag                     ,prefix + "CombinedMVABTag" + suffix ) ;
 	iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);
 	iEvent.put( passTightID, prefix + "PassTightID" + suffix);
-       
+	
+	iEvent.put( pileup_jetID_passLooseWP, prefix + "PileupjetIDpassLooseWP" + suffix);
+	iEvent.put( pileup_jetID_passMediumWP, prefix + "PileupjetIDpassMediumWP" + suffix);
+	iEvent.put( pileup_jetID_passTightWP, prefix + "PileupjetIDpassTightWP" + suffix);
+	iEvent.put( jetpileup_idflag, prefix + "JetPileupIdflag" + suffix);
+	iEvent.put( jetpileup_mva, prefix + "JetPileupMVA" + suffix);
+
 	iEvent.put(betaStar       , prefix + "BetaStar"        + suffix ) ;
 	iEvent.put(betaStarClassic, prefix + "BetaStarClassic" + suffix ) ;
 	iEvent.put(beta           , prefix + "Beta"            + suffix ) ;

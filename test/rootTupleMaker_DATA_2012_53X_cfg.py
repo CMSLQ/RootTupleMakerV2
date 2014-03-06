@@ -167,6 +167,12 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
 )
 
 #----------------------------------------------------------------------------------------------------
+# Add the pileup MVA to the PFJets
+#----------------------------------------------------------------------------------------------------
+
+process.load("Leptoquarks.RootTupleMakerV2.pujetidsequence_cff")
+
+#----------------------------------------------------------------------------------------------------
 # Switch to CaloJets
 # See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
 #
@@ -442,6 +448,8 @@ process.p = cms.Path(
     process.ecalLaserCorrFilter*
     # Now the regular PAT default sequence
     process.patDefaultSequence*
+    # Add the pileup MVA to the jets
+    process.puJetIdSqeuence*
     # MET producers
     process.patMETsRawCalo*
     process.patMETsRawPF*

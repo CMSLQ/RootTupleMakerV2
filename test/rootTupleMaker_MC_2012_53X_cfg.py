@@ -115,7 +115,8 @@ process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5     
 # Add Tau ID sources (HPS Taus)
 #----------------------------------------------------------------------------------------------------
 
-process.load("Leptoquarks.RootTupleMakerV2.tauIDsources_cfi")
+from PhysicsTools.PatAlgos.tools.tauTools import *
+switchToPFTauHPS(process)
 
 #----------------------------------------------------------------------------------------------------
 # Add the HEEP ID bit to the electrons

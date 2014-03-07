@@ -87,15 +87,15 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "AgainstElectronLooseDiscr"        + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronMediumDiscr"       + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronTightDiscr"        + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronMVADiscr"          + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronMVA2rawDiscr"      + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronMVA2categoryDiscr" + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronVLooseMVA2Discr"   + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronLooseMVA2Discr"    + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronMediumMVA2Discr"   + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronTightMVA2Discr"    + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronMVA3rawDiscr"      + suffix );
-    produces <std::vector<double> >    ( prefix + "AgainstElectronMVA3categoryDiscr" + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronMVADiscr"          + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronMVA2rawDiscr"      + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronMVA2categoryDiscr" + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronVLooseMVA2Discr"   + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronLooseMVA2Discr"    + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronMediumMVA2Discr"   + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronTightMVA2Discr"    + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronMVA3rawDiscr"      + suffix );
+    //produces <std::vector<double> >    ( prefix + "AgainstElectronMVA3categoryDiscr" + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronLooseMVA3Discr"    + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronMediumMVA3Discr"   + suffix );
     produces <std::vector<double> >    ( prefix + "AgainstElectronTightMVA3Discr"    + suffix );
@@ -137,18 +137,18 @@ RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
     produces <std::vector<double> >    ( prefix + "TightIsolationMVA2Discr"                        + suffix );
     //
     // HPSTau Signal PFCandidates Info
-    produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsPt"    + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsEta"   + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsPhi"   + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsCount" + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsPt"      + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsEta"     + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsPhi"     + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsCount"   + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsPt"          + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsEta"         + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsPhi"         + suffix );
-    produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsCount"       + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsPt"    + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsEta"   + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsPhi"   + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFChargedHadrCandsCount" + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsPt"      + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsEta"     + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsPhi"     + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFNeutrHadrCandsCount"   + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsPt"          + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsEta"         + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsPhi"         + suffix );
+    //produces <std::vector<double> >    ( prefix + "SignalPFGammaCandsCount"       + suffix );
     //
     // HPSTau Vertex Info
     produces <std::vector<int> >    ( prefix + "VtxIndex"      + suffix );
@@ -235,15 +235,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  againstelectronloosediscr        ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  againstelectronmediumdiscr       ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  againstelectrontightdiscr        ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronmvadiscr          ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronmva2rawdiscr      ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronmva2categorydiscr ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronvloosemva2discr   ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronloosemva2discr    ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronmediummva2discr   ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectrontightmva2discr    ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronmva3rawdiscr      ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  againstelectronmva3categorydiscr ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronmvadiscr          ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronmva2rawdiscr      ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronmva2categorydiscr ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronvloosemva2discr   ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronloosemva2discr    ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronmediummva2discr   ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectrontightmva2discr    ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronmva3rawdiscr      ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  againstelectronmva3categorydiscr ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  againstelectronloosemva3discr    ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  againstelectronmediummva3discr   ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  againstelectrontightmva3discr    ( new std::vector<double>()   );
@@ -285,18 +285,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  tightisolationmva2discr                        ( new std::vector<double>()   );
   //
   //Signal Particles (HPSTau)  
-  std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandspt    ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandseta   ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandsphi   ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandscount ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandspt      ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandseta     ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandsphi     ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandscount   ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfgammacandspt          ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfgammacandseta         ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfgammacandsphi         ( new std::vector<double>()   );
-  std::auto_ptr<std::vector<double> >  signalpfgammacandscount       ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandspt    ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandseta   ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandsphi   ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfchargedhadrcandscount ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandspt      ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandseta     ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandsphi     ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfneutrhadrcandscount   ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfgammacandspt          ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfgammacandseta         ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfgammacandsphi         ( new std::vector<double>()   );
+  //std::auto_ptr<std::vector<double> >  signalpfgammacandscount       ( new std::vector<double>()   );
   //                                                                                                                                                                          
   // HPSTau Vertex Info 
   std::auto_ptr<std::vector<int> >     vtxIndex   ( new std::vector<int>   ()  );
@@ -391,15 +391,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	againstelectronloosediscr        -> push_back( it->tauID("againstElectronLoose")        );
 	againstelectronmediumdiscr       -> push_back( it->tauID("againstElectronMedium")       );//applied in cleanPatTaus, REMOVED in cmssw_cfg.py
 	againstelectrontightdiscr        -> push_back( it->tauID("againstElectronTight")        );
-	againstelectronmvadiscr          -> push_back( it->tauID("againstElectronMVA")          );
-	againstelectronmva2rawdiscr      -> push_back( it->tauID("againstElectronMVA2raw")      );
-	againstelectronmva2categorydiscr -> push_back( it->tauID("againstElectronMVA2category") );
-	againstelectronvloosemva2discr   -> push_back( it->tauID("againstElectronVLooseMVA2")   );
-	againstelectronloosemva2discr    -> push_back( it->tauID("againstElectronLooseMVA2")    );
-	againstelectronmediummva2discr   -> push_back( it->tauID("againstElectronMediumMVA2")   );
-	againstelectrontightmva2discr    -> push_back( it->tauID("againstElectronTightMVA2")    );
-	againstelectronmva3rawdiscr      -> push_back( it->tauID("againstElectronMVA3raw")      );
-	againstelectronmva3categorydiscr -> push_back( it->tauID("againstElectronMVA3category") );
+	//againstelectronmvadiscr          -> push_back( it->tauID("againstElectronMVA")          );//obsolete
+	//againstelectronmva2rawdiscr      -> push_back( it->tauID("againstElectronMVA2raw")      );//obsolete
+	//againstelectronmva2categorydiscr -> push_back( it->tauID("againstElectronMVA2category") );//obsolete
+	//againstelectronvloosemva2discr   -> push_back( it->tauID("againstElectronVLooseMVA2")   );//obsolete
+	//againstelectronloosemva2discr    -> push_back( it->tauID("againstElectronLooseMVA2")    );//obsolete
+	//againstelectronmediummva2discr   -> push_back( it->tauID("againstElectronMediumMVA2")   );//obsolete
+	//againstelectrontightmva2discr    -> push_back( it->tauID("againstElectronTightMVA2")    );//obsolete
+	//againstelectronmva3rawdiscr      -> push_back( it->tauID("againstElectronMVA3raw")      );//obsolete
+	//againstelectronmva3categorydiscr -> push_back( it->tauID("againstElectronMVA3category") );//obsolete
 	againstelectronloosemva3discr    -> push_back( it->tauID("againstElectronLooseMVA3")    );
 	againstelectronmediummva3discr   -> push_back( it->tauID("againstElectronMediumMVA3")   );
 	againstelectrontightmva3discr    -> push_back( it->tauID("againstElectronTightMVA3")    );
@@ -563,48 +563,48 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/PhysicsTools/IsolationAlgos/plugins/PFTauExtractor.cc?revision=1.1&view=markup
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //
-      if(isHPSTau){
-	reco::PFCandidateRefVector signalPFChargedHadrCands_RefVector = it->signalPFChargedHadrCands();
-	double signalPFChargedHadrCands_RefVector_size=0;
-	if(signalPFChargedHadrCands_RefVector.isNonnull()){
-	  signalPFChargedHadrCands_RefVector_size=(double)(signalPFChargedHadrCands_RefVector.size());
-	  reco::PFCandidateRefVector::iterator itSignalChargedHad     = signalPFChargedHadrCands_RefVector.begin();
-	  reco::PFCandidateRefVector::iterator itSignalChargedHad_end = signalPFChargedHadrCands_RefVector.end();
-	  for (; itSignalChargedHad != itSignalChargedHad_end; ++itSignalChargedHad ) {
-	    signalpfchargedhadrcandspt  -> push_back((double)(*itSignalChargedHad)->pt());
-	    signalpfchargedhadrcandseta -> push_back((double)(*itSignalChargedHad)->eta());
-	    signalpfchargedhadrcandsphi -> push_back((double)(*itSignalChargedHad)->phi());
-	  }
-	}
-	signalpfchargedhadrcandscount -> push_back(signalPFChargedHadrCands_RefVector_size);
+      //if(isHPSTau){
+	//reco::PFCandidateRefVector signalPFChargedHadrCands_RefVector = it->signalPFChargedHadrCands();
+	//double signalPFChargedHadrCands_RefVector_size=0;
+	//if(signalPFChargedHadrCands_RefVector.isNonnull()){
+	//  signalPFChargedHadrCands_RefVector_size=(double)(signalPFChargedHadrCands_RefVector.size());
+	//  reco::PFCandidateRefVector::iterator itSignalChargedHad     = signalPFChargedHadrCands_RefVector.begin();
+	//  reco::PFCandidateRefVector::iterator itSignalChargedHad_end = signalPFChargedHadrCands_RefVector.end();
+	//  for (; itSignalChargedHad != itSignalChargedHad_end; ++itSignalChargedHad ) {
+	//    signalpfchargedhadrcandspt  -> push_back((double)(*itSignalChargedHad)->pt());
+	//    signalpfchargedhadrcandseta -> push_back((double)(*itSignalChargedHad)->eta());
+	//    signalpfchargedhadrcandsphi -> push_back((double)(*itSignalChargedHad)->phi());
+	//  }
+	//}
+	//signalpfchargedhadrcandscount -> push_back(signalPFChargedHadrCands_RefVector_size);
 	//
-	reco::PFCandidateRefVector signalPFNeutrHadrCands_RefVector = it->signalPFNeutrHadrCands();
-	double signalPFNeutrHadrCands_RefVector_size=0;
-	if(signalPFNeutrHadrCands_RefVector.isNonnull()){
-  	  signalPFNeutrHadrCands_RefVector_size=(double)(signalPFNeutrHadrCands_RefVector.size());
-	  reco::PFCandidateRefVector::iterator itSignalNeutrHadr     = signalPFNeutrHadrCands_RefVector.begin();
-	  reco::PFCandidateRefVector::iterator itSignalNeutrHadr_end = signalPFNeutrHadrCands_RefVector.end();
-	  for (; itSignalNeutrHadr != itSignalNeutrHadr_end; ++itSignalNeutrHadr ) {
-	    signalpfneutrhadrcandspt  -> push_back((double)(*itSignalNeutrHadr)->pt());	
-	    signalpfneutrhadrcandseta -> push_back((double)(*itSignalNeutrHadr)->eta());	
-	    signalpfneutrhadrcandsphi -> push_back((double)(*itSignalNeutrHadr)->phi());	
-	  }
-	}
-	signalpfneutrhadrcandscount -> push_back(signalPFNeutrHadrCands_RefVector_size);
+	//reco::PFCandidateRefVector signalPFNeutrHadrCands_RefVector = it->signalPFNeutrHadrCands();
+	//double signalPFNeutrHadrCands_RefVector_size=0;
+	//if(signalPFNeutrHadrCands_RefVector.isNonnull()){
+  	//  signalPFNeutrHadrCands_RefVector_size=(double)(signalPFNeutrHadrCands_RefVector.size());
+	//  reco::PFCandidateRefVector::iterator itSignalNeutrHadr     = signalPFNeutrHadrCands_RefVector.begin();
+	//  reco::PFCandidateRefVector::iterator itSignalNeutrHadr_end = signalPFNeutrHadrCands_RefVector.end();
+	//  for (; itSignalNeutrHadr != itSignalNeutrHadr_end; ++itSignalNeutrHadr ) {
+	//    signalpfneutrhadrcandspt  -> push_back((double)(*itSignalNeutrHadr)->pt());	
+	//    signalpfneutrhadrcandseta -> push_back((double)(*itSignalNeutrHadr)->eta());	
+	//    signalpfneutrhadrcandsphi -> push_back((double)(*itSignalNeutrHadr)->phi());	
+	//  }
+	//}
+	//signalpfneutrhadrcandscount -> push_back(signalPFNeutrHadrCands_RefVector_size);
 	//
-	reco::PFCandidateRefVector signalPFGammaCands_RefVector = it->signalPFGammaCands();
-	double signalPFGammaCands_RefVector_size=0;
-	if(signalPFGammaCands_RefVector.isNonnull()){
-	  signalPFGammaCands_RefVector_size=(double)(signalPFGammaCands_RefVector.size());
-	  reco::PFCandidateRefVector::iterator itSignalGamma     = signalPFGammaCands_RefVector.begin();
-	  reco::PFCandidateRefVector::iterator itSignalGamma_end = signalPFGammaCands_RefVector.end();
-	  for (; itSignalGamma != itSignalGamma_end; ++itSignalGamma ) {
-	    signalpfgammacandspt  -> push_back((double)(*itSignalGamma)->pt());
-	    signalpfgammacandseta -> push_back((double)(*itSignalGamma)->eta());
-	    signalpfgammacandsphi -> push_back((double)(*itSignalGamma)->phi());
-	  }
-	}
-	signalpfgammacandscount -> push_back(signalPFGammaCands_RefVector_size);
+	//reco::PFCandidateRefVector signalPFGammaCands_RefVector = it->signalPFGammaCands();
+	//double signalPFGammaCands_RefVector_size=0;
+	//if(signalPFGammaCands_RefVector.isNonnull()){
+	//  signalPFGammaCands_RefVector_size=(double)(signalPFGammaCands_RefVector.size());
+	//  reco::PFCandidateRefVector::iterator itSignalGamma     = signalPFGammaCands_RefVector.begin();
+	//  reco::PFCandidateRefVector::iterator itSignalGamma_end = signalPFGammaCands_RefVector.end();
+	//  for (; itSignalGamma != itSignalGamma_end; ++itSignalGamma ) {
+	//    signalpfgammacandspt  -> push_back((double)(*itSignalGamma)->pt());
+	//    signalpfgammacandseta -> push_back((double)(*itSignalGamma)->eta());
+	//    signalpfgammacandsphi -> push_back((double)(*itSignalGamma)->phi());
+	//  }
+	//}
+	//signalpfgammacandscount -> push_back(signalPFGammaCands_RefVector_size);
 	//	
 	// --------------------------------------------------------------------------------------- //
 	// HPS Tau Optional Isolation information 
@@ -643,7 +643,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	//}
 	// --------------------------------------------------------------------------------------- //
 	//
-      }
+      //}
       //
     }
   } else {
@@ -705,15 +705,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.put( againstelectronloosediscr,                 prefix + "AgainstElectronLooseDiscr"                   + suffix );
     iEvent.put( againstelectronmediumdiscr,                prefix + "AgainstElectronMediumDiscr"                  + suffix );
     iEvent.put( againstelectrontightdiscr,                 prefix + "AgainstElectronTightDiscr"                   + suffix );
-    iEvent.put( againstelectronmvadiscr,                   prefix + "AgainstElectronMVADiscr"                     + suffix );
-    iEvent.put( againstelectronmva2rawdiscr,               prefix + "AgainstElectronMVA2rawDiscr"                 + suffix );
-    iEvent.put( againstelectronmva2categorydiscr,          prefix + "AgainstElectronMVA2categoryDiscr"            + suffix );
-    iEvent.put( againstelectronvloosemva2discr,            prefix + "AgainstElectronVLooseMVA2Discr"              + suffix );
-    iEvent.put( againstelectronloosemva2discr,             prefix + "AgainstElectronLooseMVA2Discr"               + suffix );
-    iEvent.put( againstelectronmediummva2discr,            prefix + "AgainstElectronMediumMVA2Discr"              + suffix );
-    iEvent.put( againstelectrontightmva2discr,             prefix + "AgainstElectronTightMVA2Discr"               + suffix );
-    iEvent.put( againstelectronmva3rawdiscr,               prefix + "AgainstElectronMVA3rawDiscr"                 + suffix );
-    iEvent.put( againstelectronmva3categorydiscr,          prefix + "AgainstElectronMVA3categoryDiscr"            + suffix );
+    //iEvent.put( againstelectronmvadiscr,                   prefix + "AgainstElectronMVADiscr"                     + suffix );
+    //iEvent.put( againstelectronmva2rawdiscr,               prefix + "AgainstElectronMVA2rawDiscr"                 + suffix );
+    //iEvent.put( againstelectronmva2categorydiscr,          prefix + "AgainstElectronMVA2categoryDiscr"            + suffix );
+    //iEvent.put( againstelectronvloosemva2discr,            prefix + "AgainstElectronVLooseMVA2Discr"              + suffix );
+    //iEvent.put( againstelectronloosemva2discr,             prefix + "AgainstElectronLooseMVA2Discr"               + suffix );
+    //iEvent.put( againstelectronmediummva2discr,            prefix + "AgainstElectronMediumMVA2Discr"              + suffix );
+    //iEvent.put( againstelectrontightmva2discr,             prefix + "AgainstElectronTightMVA2Discr"               + suffix );
+    //iEvent.put( againstelectronmva3rawdiscr,               prefix + "AgainstElectronMVA3rawDiscr"                 + suffix );
+    //iEvent.put( againstelectronmva3categorydiscr,          prefix + "AgainstElectronMVA3categoryDiscr"            + suffix );
     iEvent.put( againstelectronloosemva3discr,             prefix + "AgainstElectronLooseMVA3Discr"               + suffix );
     iEvent.put( againstelectronmediummva3discr,            prefix + "AgainstElectronMediumMVA3Discr"              + suffix );
     iEvent.put( againstelectrontightmva3discr,             prefix + "AgainstElectronTightMVA3Discr"               + suffix );
@@ -760,18 +760,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     iEvent.put( vtx0DistXY,  prefix + "LeadVtxDistXY"  + suffix );
     iEvent.put( vtx0DistZ,   prefix + "LeadVtxDistZ"   + suffix );
     //
-    iEvent.put( signalpfchargedhadrcandspt,   prefix +  "SignalPFChargedHadrCandsPt"   + suffix );
-    iEvent.put( signalpfchargedhadrcandseta,  prefix +  "SignalPFChargedHadrCandsEta"  + suffix );
-    iEvent.put( signalpfchargedhadrcandsphi,  prefix +  "SignalPFChargedHadrCandsPhi"  + suffix );
-    iEvent.put( signalpfchargedhadrcandscount,prefix +  "SignalPFChargedHadrCandsCount"+ suffix );
-    iEvent.put( signalpfneutrhadrcandspt,     prefix +  "SignalPFNeutrHadrCandsPt"     + suffix );
-    iEvent.put( signalpfneutrhadrcandseta,    prefix +  "SignalPFNeutrHadrCandsEta"    + suffix );
-    iEvent.put( signalpfneutrhadrcandsphi,    prefix +  "SignalPFNeutrHadrCandsPhi"    + suffix );
-    iEvent.put( signalpfneutrhadrcandscount,  prefix +  "SignalPFNeutrHadrCandsCount"  + suffix );
-    iEvent.put( signalpfgammacandspt,         prefix +  "SignalPFGammaCandsPt"         + suffix );
-    iEvent.put( signalpfgammacandseta,        prefix +  "SignalPFGammaCandsEta"        + suffix );
-    iEvent.put( signalpfgammacandsphi,        prefix +  "SignalPFGammaCandsPhi"        + suffix );
-    iEvent.put( signalpfgammacandscount,      prefix +  "SignalPFGammaCandsCount"      + suffix );
+    // HPS Tau Optional Signal PFCandidates information 
+    //iEvent.put( signalpfchargedhadrcandspt,   prefix +  "SignalPFChargedHadrCandsPt"   + suffix );
+    //iEvent.put( signalpfchargedhadrcandseta,  prefix +  "SignalPFChargedHadrCandsEta"  + suffix );
+    //iEvent.put( signalpfchargedhadrcandsphi,  prefix +  "SignalPFChargedHadrCandsPhi"  + suffix );
+    //iEvent.put( signalpfchargedhadrcandscount,prefix +  "SignalPFChargedHadrCandsCount"+ suffix );
+    //iEvent.put( signalpfneutrhadrcandspt,     prefix +  "SignalPFNeutrHadrCandsPt"     + suffix );
+    //iEvent.put( signalpfneutrhadrcandseta,    prefix +  "SignalPFNeutrHadrCandsEta"    + suffix );
+    //iEvent.put( signalpfneutrhadrcandsphi,    prefix +  "SignalPFNeutrHadrCandsPhi"    + suffix );
+    //iEvent.put( signalpfneutrhadrcandscount,  prefix +  "SignalPFNeutrHadrCandsCount"  + suffix );
+    //iEvent.put( signalpfgammacandspt,         prefix +  "SignalPFGammaCandsPt"         + suffix );
+    //iEvent.put( signalpfgammacandseta,        prefix +  "SignalPFGammaCandsEta"        + suffix );
+    //iEvent.put( signalpfgammacandsphi,        prefix +  "SignalPFGammaCandsPhi"        + suffix );
+    //iEvent.put( signalpfgammacandscount,      prefix +  "SignalPFGammaCandsCount"      + suffix );
     //
     // --------------------------------------------------------------------------------------- //
     // HPS Tau Optional Isolation information 

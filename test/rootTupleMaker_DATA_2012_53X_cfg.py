@@ -162,7 +162,7 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     doBTagging   = True , # Perform b-tagging and store b-tagging info in the jet
     doType1MET   = False, # Don't store Type1 PFMET information. This will be done by the runMEtUncertainties tool.
     jetIdLabel   = "ak5",# Which jet ID label should be used?
-    jetCorrLabel = ('AK5Calo', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), # Which jet corrections should be used?
+    jetCorrLabel = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), # Which jet corrections should be used?
     genJetCollection = cms.InputTag("ak5GenJets") # Which GEN jets should be used?
 )
 

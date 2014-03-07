@@ -25,7 +25,7 @@ puJetMva = pileupJetIdProducer.clone(
     )
 
 # 
-puJetIdSqeuence = cms.Sequence(puJetId*puJetMva)
+puJetIdSequence = cms.Sequence(puJetId*puJetMva)
 
 #
 # Charged Hadron Subtraction

@@ -450,7 +450,7 @@ process.p = cms.Path(
     # Now the regular PAT default sequence
     process.patDefaultSequence*
     # Add the pileup MVA to the jets
-    process.puJetIdSqeuence*
+    process.puJetIdSequence*
     # MET producers
     process.patMETsRawCalo*
     process.patMETsRawPF*

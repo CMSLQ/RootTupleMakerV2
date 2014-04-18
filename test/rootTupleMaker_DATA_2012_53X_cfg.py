@@ -219,14 +219,7 @@ switchJetCollection(process,cms.InputTag('ak5CaloJets'),
 process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
 
-process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data = cms.VPSet(cms.PSet( # CV: ReReco data + Summer'13 JEC
-    numJetsMin = cms.int32(-1),
-    numJetsMax = cms.int32(-1),
-    px = cms.string("+4.83642e-02 + 2.48870e-01*Nvtx"),
-    py = cms.string("-1.50135e-01 - 8.27917e-02*Nvtx")
-))
-
-process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data[0]
+process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data
 
 #----------------------------------------------------------------------------------------------------
 # Use the runMetUncertainties tool here
@@ -245,7 +238,7 @@ runMEtUncertainties(
     makePFMEtByMVA          = False, # We don't use MVA PFMET 
     doSmearJets             = False, # Very important to NOT smear the pfjets (DATA ONLY)
     addToPatDefaultSequence = True,  # Add this to the PAT sequence
-    sysShiftCorrParameter   = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data[0]
+    sysShiftCorrParameter   = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data
 )
 
 #----------------------------------------------------------------------------------------------------

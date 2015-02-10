@@ -14,23 +14,23 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 
 RootTupleMakerV2_PhysicsDSTStream2011::RootTupleMakerV2_PhysicsDSTStream2011(const edm::ParameterSet& iConfig) :
-suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-storeEventInfo   (iConfig.getParameter<bool> ("StoreEventInfo")), 
 hltInputTag      (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
 inputTagHLTPFJets(iConfig.getParameter<edm::InputTag>("InputTagHLTPFJets")),
+inputTagHLTCaloJetsRaw(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsRaw")),
+inputTagHLTCaloJetsCorr(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsCorr")),
+inputTagHLTPixelVertices (iConfig.getParameter<edm::InputTag>("InputTagHLTPixelVertices")),
+suffix  (iConfig.getParameter<std::string>  ("Suffix")),
 prefixHLTPFJets  (iConfig.getParameter<std::string>  ("PrefixHLTPFJets")),
+prefixHLTCaloJetsRaw  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsRaw")),
+prefixHLTCaloJetsCorr  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsCorr")),
+prefixHLTPixelVertices   (iConfig.getParameter<std::string>  ("PrefixHLTPixelVertices")),
 minPtHLTPFJets   (iConfig.getParameter<double> ("MinPtHLTPFJets")),
 maxEtaHLTPFJets  (iConfig.getParameter<double> ("MaxEtaHLTPFJets")),
-inputTagHLTCaloJetsRaw(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsRaw")),
-prefixHLTCaloJetsRaw  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsRaw")),
 minPtHLTCaloJetsRaw   (iConfig.getParameter<double> ("MinPtHLTCaloJetsRaw")),
 maxEtaHLTCaloJetsRaw  (iConfig.getParameter<double> ("MaxEtaHLTCaloJetsRaw")),
-inputTagHLTCaloJetsCorr(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsCorr")),
-prefixHLTCaloJetsCorr  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsCorr")),
 minPtHLTCaloJetsCorr   (iConfig.getParameter<double> ("MinPtHLTCaloJetsCorr")),
 maxEtaHLTCaloJetsCorr  (iConfig.getParameter<double> ("MaxEtaHLTCaloJetsCorr")),
-inputTagHLTPixelVertices (iConfig.getParameter<edm::InputTag>("InputTagHLTPixelVertices")),
-prefixHLTPixelVertices   (iConfig.getParameter<std::string>  ("PrefixHLTPixelVertices"))
+storeEventInfo   (iConfig.getParameter<bool> ("StoreEventInfo"))
 {
   produces <unsigned int> ( "run"   );
   produces <unsigned int> ( "event" );

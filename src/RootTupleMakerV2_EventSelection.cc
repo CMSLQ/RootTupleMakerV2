@@ -3,56 +3,26 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GtFdlWord.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
-#include "DataFormats/METReco/interface/BeamHaloSummary.h"
-//#include "RecoMET/METFilters/interface/EcalBoundaryInfoCalculator.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
   l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
-  vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag")),
-  vtxMinNDOF(iConfig.getParameter<unsigned int>("VertexMinimumNDOF")),
-  vtxMaxAbsZ(iConfig.getParameter<double>("VertexMaxAbsZ")),
-  vtxMaxd0(iConfig.getParameter<double>("VertexMaxd0")),
-  trkInputTag(iConfig.getParameter<edm::InputTag>("TracksInputTag")),
-  numTracks(iConfig.getParameter<unsigned int>("NumTracks")),
-  hpTrackThreshold(iConfig.getParameter<double>("HPTrackThreshold")),
   hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag")),
-  beamHaloInputTag(iConfig.getParameter<edm::InputTag>("BeamHaloInputTag")),
-  trackingFilterJetInputTag   (iConfig.getParameter<edm::InputTag>("TrackingFailureJets")),	      
-  trackingFilterDzTrVtxMax    (iConfig.getParameter<double>       ("TrackingFailureDzTrVtzMax")),   
-  trackingFilterDxyTrVtxMax   (iConfig.getParameter<double>       ("TrackingFailureDxyTrVtxMax")) ,
-  trackingFilterMinSumPtOverHT(iConfig.getParameter<double>       ("TrackingFailureMinSumPtOverHT")),
-  ecalMaskedCellDRFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalMaskedCellDRFilterInputTag")),
-  caloBoundaryDRFilterInputTag(iConfig.getParameter<edm::InputTag>("CaloBoundaryDRFilterInputTag")),
-//
-  ecalDeadCellTriggerPrimitiveFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellTriggerPrimitiveFilterInputTag")),
-  ecalDeadCellBoundaryEnergyFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalDeadCellBoundaryEnergyFilterInputTag")),
-  trackingFailureFilterInputTag(iConfig.getParameter<edm::InputTag>("TrackingFailureFilterInputTag")),
-  badEESupercrystalFilterInputTag(iConfig.getParameter<edm::InputTag>("BadEESupercrystalFilterInputTag")),
-  ecalLaserCorrFilterInputTag(iConfig.getParameter<edm::InputTag>("EcalLaserCorrFilterInputTag")),
-  logErrorTooManyClustersInputTag(iConfig.getParameter<edm::InputTag>("LogErrorTooManyClustersInputTag")),      
-  manyStripClus53XInputTag       (iConfig.getParameter<edm::InputTag>("ManyStripClus53XInputTag"       )),      
-  tooManyStripClus53XInputTag    (iConfig.getParameter<edm::InputTag>("TooManyStripClus53XInputTag"    ))
+  filterResultsInputTag(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag"))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
   produces <bool> ("isBSCMinBias");
   produces <bool> ("isBSCBeamHalo");
   produces <bool> ("isPrimaryVertex");
-  produces <bool> ("isBeamScraping");
   produces <bool> ("passHBHENoiseFilter");
-  produces <bool> ("passBeamHaloFilterLoose");
+  produces <bool> ("passHcalLaserEventFilter");
   produces <bool> ("passBeamHaloFilterTight");
   produces <bool> ("isTrackingFailure");
-  produces <bool> ("passEcalMaskedCellDRFilter");
-  produces <bool> ("passCaloBoundaryDRFilter");
   //
   produces <bool> ("passEcalDeadCellTriggerPrimitiveFilter");
-  produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
   produces <bool> ("passTrackingFailureFilter");
   produces <bool> ("passBadEESupercrystalFilter");
   produces <bool> ("passEcalLaserCorrFilter");
@@ -70,16 +40,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> isbscminbias( new bool() );
   std::auto_ptr<bool> isbscbeamhalo( new bool() );
   std::auto_ptr<bool> isprimaryvertex( new bool() );
-  std::auto_ptr<bool> isbeamscraping( new bool() );
   std::auto_ptr<bool> passhbhenoisefilter( new bool() );
-  std::auto_ptr<bool> passbeamhalofilterloose( new bool() );
+  std::auto_ptr<bool> passHcalLaserEventFilter( new bool() );
   std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
   std::auto_ptr<bool> istrackingfailure ( new bool() ) ;
-  std::auto_ptr<bool> passEcalMaskedCellDRFilter ( new bool() ) ;
-  std::auto_ptr<bool> passCaloBoundaryDRFilter ( new bool() ) ;
   //
   std::auto_ptr<bool> passEcalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
-  std::auto_ptr<bool> passEcalDeadCellBoundaryEnergyFilter ( new bool() ) ;
   std::auto_ptr<bool> passTrackingFailureFilter ( new bool() ) ;
   std::auto_ptr<bool> passBadEESupercrystalFilter ( new bool() ) ;
   std::auto_ptr<bool> passEcalLaserCorrFilter (new bool() );
@@ -92,16 +58,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *isbptx0.get() = false;
   *isbscminbias.get() = false;
   *isbscbeamhalo.get() = false;
-  *isprimaryvertex.get() = false;
-  *isbeamscraping.get() = false;
+  *isprimaryvertex.get() = true;
   *passhbhenoisefilter.get() = true;
-  *passbeamhalofilterloose.get() = true;
+  *passHcalLaserEventFilter.get() = true;
   *passbeamhalofiltertight.get() = true;
-  *passEcalMaskedCellDRFilter.get() = true;
-  *passCaloBoundaryDRFilter.get() = true;
   //
   *passEcalDeadCellTriggerPrimitiveFilter.get() = true;
-  *passEcalDeadCellBoundaryEnergyFilter.get()   = true;
   *passTrackingFailureFilter.get()              = true;
   *passBadEESupercrystalFilter.get()            = true;
   *passEcalLaserCorrFilter.get()                = true;
@@ -141,164 +103,127 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << l1InputTag;
   }
 
-  // Good Primary Vertex Part
-  edm::Handle<reco::VertexCollection> primaryVertices;
-  iEvent.getByLabel(vtxInputTag,primaryVertices);
 
-  if(primaryVertices.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Total # Primary Vertices: " << primaryVertices->size();
-
-    for( reco::VertexCollection::const_iterator it=primaryVertices->begin() ; it!=primaryVertices->end() ; ++it ) {
-      if( !(it->isFake()) && it->ndof() > vtxMinNDOF &&
-          fabs(it->z()) <= vtxMaxAbsZ && fabs(it->position().rho()) <= vtxMaxd0
-        ) *isprimaryvertex.get() = true;
-    }
-  } else {
-    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << vtxInputTag;
-  }
-
-  // Scraping Events Part
-  edm::Handle<reco::TrackCollection> tracks;
-  iEvent.getByLabel(trkInputTag,tracks);
-
-  if(tracks.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Total # Tracks: " << tracks->size();
-
-    int numhighpurity = 0;
-    double fraction = 1.;
-    reco::TrackBase::TrackQuality trackQuality = reco::TrackBase::qualityByName("highPurity");
-
-    if( tracks->size() > numTracks ){
-      for( reco::TrackCollection::const_iterator it=tracks->begin(); it!=tracks->end(); ++it ) {
-        if( it->quality(trackQuality) ) numhighpurity++;
-      }
-      fraction = (double)numhighpurity/(double)tracks->size();
-      if( fraction < hpTrackThreshold ) *isbeamscraping.get() = true;
-    }
-  } else {
-    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << trkInputTag;
-  }
-
-  // Hcal Noise Part
-  edm::Handle<bool> hbheFilterResult;
-  iEvent.getByLabel(hcalNoiseInputTag, hbheFilterResult);
-
-  if(hbheFilterResult.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained " << hcalNoiseInputTag;
-
-      *passhbhenoisefilter.get()=*hbheFilterResult;
-  } else {
-    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << hcalNoiseInputTag;
-  }
-
-  // Beam Halo part
-  edm::Handle<reco::BeamHaloSummary> TheBeamHaloSummary;
-  iEvent.getByLabel(beamHaloInputTag,TheBeamHaloSummary); 
-
-  if(TheBeamHaloSummary.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained " << beamHaloInputTag;
-    const reco::BeamHaloSummary TheSummary = (*TheBeamHaloSummary.product() );
-    *passbeamhalofilterloose.get() = !TheSummary.CSCLooseHaloId();
-    *passbeamhalofiltertight.get() = !TheSummary.CSCTightHaloId();    
-  } else {
-    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << beamHaloInputTag;
-  }
-
-  //Tracking failure filter:
-  edm::Handle<edm::View<reco::Jet> > jets;
-  iEvent.getByLabel(trackingFilterJetInputTag, jets);
-  
-  double ht = 0;
-  for (edm::View<reco::Jet>::const_iterator j = jets->begin(); j != jets->end(); ++j) {
-    ht += j->pt();
-  }
-
-  double sumpt = 0;
-  if (primaryVertices->size() > 0) {
-    const reco::Vertex * vtx = &((*primaryVertices)[0]);
-    for (std::vector<reco::Track>::const_iterator tr = tracks->begin(); tr != tracks->end(); ++tr) {
-      if (fabs(tr->dz(vtx->position()))  > trackingFilterDzTrVtxMax    ) continue;
-      if (fabs(tr->dxy(vtx->position())) > trackingFilterDxyTrVtxMax   ) continue;
-      sumpt += tr->pt();
-    }
-  }
-  
-  *istrackingfailure.get() = ((sumpt/ht) < trackingFilterMinSumPtOverHT );
-
-  
-  //Ecal maksed cell and calo boundary filter ( https://twiki.cern.ch/twiki/bin/view/CMS/SusyEcalMaskedCellSummary ):
-  edm::Handle<int> EcalMaskedCellDRFilterResult;
-  iEvent.getByLabel(ecalMaskedCellDRFilterInputTag, EcalMaskedCellDRFilterResult);
-  
-  edm::Handle<int> CaloBoundaryDRFilterResult;
-  iEvent.getByLabel(caloBoundaryDRFilterInputTag, CaloBoundaryDRFilterResult);
-  
-  if(EcalMaskedCellDRFilterResult.isValid()) {
-    *passEcalMaskedCellDRFilter.get()=!(*EcalMaskedCellDRFilterResult);
-  }
-  //    } else {
-  //      edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << ecalMaskedCellDRFilterInputTag;
+  //XXX FIXME There are no tracks in MiniAOD
+  //// Scraping Events Part
+  //edm::Handle<reco::TrackCollection> tracks;
+  //iEvent.getByLabel(trkInputTag,tracks);
+  //if(tracks.isValid()) {
+  //  edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Total # Tracks: " << tracks->size();
+  //
+  //  int numhighpurity = 0;
+  //  double fraction = 1.;
+  //  reco::TrackBase::TrackQuality trackQuality = reco::TrackBase::qualityByName("highPurity");
+  //
+  //  if( tracks->size() > numTracks ){
+  //    for( reco::TrackCollection::const_iterator it=tracks->begin(); it!=tracks->end(); ++it ) {
+  //      if( it->quality(trackQuality) ) numhighpurity++;
   //    }
-  
-  if(CaloBoundaryDRFilterResult.isValid()) {
-    *passCaloBoundaryDRFilter.get()=!(*CaloBoundaryDRFilterResult);
-  }
-  //    } else {
-  //      edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << caloBoundaryDRFilterInputTag;
-  //    }
-  
-  // ECAL dead cell filter:
-  edm::Handle<bool> EcalDeadCellTriggerPrimitiveFilterResult;
-  iEvent.getByLabel(ecalDeadCellTriggerPrimitiveFilterInputTag, EcalDeadCellTriggerPrimitiveFilterResult);
-  if(EcalDeadCellTriggerPrimitiveFilterResult.isValid()) {
-    *passEcalDeadCellTriggerPrimitiveFilter.get()=!(*EcalDeadCellTriggerPrimitiveFilterResult);
-  }
-  edm::Handle<bool> EcalDeadCellBoundaryEnergyFilterResult;
-  iEvent.getByLabel(ecalDeadCellBoundaryEnergyFilterInputTag, EcalDeadCellBoundaryEnergyFilterResult);
-  if(EcalDeadCellBoundaryEnergyFilterResult.isValid()) {
-    *passEcalDeadCellBoundaryEnergyFilter.get()=!(*EcalDeadCellBoundaryEnergyFilterResult);
+  //    fraction = (double)numhighpurity/(double)tracks->size();
+  //    if( fraction < hpTrackThreshold ) *isbeamscraping.get() = true;
+  //  }
+  //} else {
+  //  edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << trkInputTag;
+  //}
+
+  // These filters are now run in MiniAOD and saved as an edm::TriggerResults of the PAT process
+  // See: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD
+  // List of filters: https://github.com/cms-sw/cmssw/blob/CMSSW_7_0_X/PhysicsTools/PatAlgos/python/slimming/metFilterPaths_cff.py
+  // combination of all filters:
+  //  Flag_METFilters
+  // individual filters:
+  //  Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilter)
+  //  Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
+  //  Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
+  //  Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
+  //  Flag_goodVertices = cms.Path(goodVertices)
+  //  Flag_trackingFailureFilter = cms.Path(goodVertices + trackingFailureFilter)
+  //  Flag_eeBadScFilter = cms.Path(eeBadScFilter)
+  //  Flag_ecalLaserCorrFilter = cms.Path(ecalLaserCorrFilter)
+  //  Flag_trkPOGFilters = cms.Path(trkPOGFilters) --> This is made up of the three trkPOG filters below
+  // and the individual trkPOG filters
+  //  Flag_trkPOG_manystripclus53X = cms.Path(~manystripclus53X)
+  //  Flag_trkPOG_toomanystripclus53X = cms.Path(~toomanystripclus53X)
+  //  Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)
+
+  edm::Handle<edm::TriggerResults> filterResults;
+  iEvent.getByLabel(filterResultsInputTag, filterResults);
+  if(filterResults.isValid())
+  {
+    //edm::LogInfo("RootTupleMakerV2_EventSelection") << "Successfully obtained " << filterResultsInputTag;
+    const edm::TriggerNames &filterNames = iEvent.triggerNames(*filterResults);
+    // print filter names
+    //std::cout << "\n === FILTER NAMES === " << std::endl;
+    //for (unsigned int i = 0, n = filterResults->size(); i < n; ++i)
+    //{
+    //  std::cout << "Filter " << filterNames.triggerName(i) << 
+    //    ": " << (filterResults->accept(i) ? "PASS" : "fail (or not run)") 
+    //    << std::endl;
+    //}
+
+    // CSC Beam Halo Tight
+    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHaloFilter");
+    if(index < filterNames.size())
+      *passbeamhalofiltertight.get() = filterResults->accept(index);
+
+    // Tracking failure filter
+    index = filterNames.triggerIndex("Flag_trackingFailureFilter");
+    if(index < filterNames.size())
+      *passTrackingFailureFilter.get() = filterResults->accept(index);
+
+    // ECAL dead cell filter
+    index = filterNames.triggerIndex("Flag_EcalDeadCellTriggerPrimitiveFilter");
+    if(index < filterNames.size())
+      *passEcalDeadCellTriggerPrimitiveFilter.get() = filterResults->accept(index);
+
+
+    //Ecal masked cell and calo boundary filter ( https://twiki.cern.ch/twiki/bin/view/CMS/SusyEcalMaskedCellSummary )
+    //XXX: FIXME? Not run in MiniAOD
+
+    // Tracking POG filters: ManyStripClus53X
+    index = filterNames.triggerIndex("Flag_trkPOG_manystripclus53X");
+    if(index < filterNames.size())
+      *passManyStripClus53X.get() = filterResults->accept(index);
+
+    // Tracking POG filters: TooManyStripClus53X
+    index = filterNames.triggerIndex("Flag_trkPOG_toomanystripclus53X");
+    if(index < filterNames.size())
+      *passTooManyStripClus53X.get() = filterResults->accept(index);
+    
+    // Tracking POG filters: LogErrorTooManyClusters
+    index = filterNames.triggerIndex("Flag_trkPOG_logErrorTooManyClusters");
+    if(index < filterNames.size())
+      *passLogErrorTooManyClusters.get() = filterResults->accept(index);
+
+    // Bad EE Supercrystal Filter  
+    index = filterNames.triggerIndex("Flag_eeBadScFilter");
+    if(index < filterNames.size())
+      *passBadEESupercrystalFilter.get() = filterResults->accept(index);
+
+    // large ECAL laser correction filter
+    index = filterNames.triggerIndex("Flag_ecalLaserCorrFilter");
+    if(index < filterNames.size())
+      *passEcalLaserCorrFilter.get() = filterResults->accept(index);
+
+    // Good Primary Vertex Part
+    index = filterNames.triggerIndex("Flag_goodVertices");
+    if(index < filterNames.size())
+      *isprimaryvertex.get() = filterResults->accept(index);
+
+    // Hcal Noise Part (HBHE)
+    index = filterNames.triggerIndex("Flag_HBHENoiseFilter");
+    if(index < filterNames.size())
+      *passhbhenoisefilter.get() = filterResults->accept(index);
+
+    // Hcal Laser Event Filter
+    index = filterNames.triggerIndex("Flag_hcalLaserEventFilter");
+    if(index < filterNames.size())
+      *passHcalLaserEventFilter.get() = filterResults->accept(index);
+
+  } else {
+    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << filterResultsInputTag;
   }
 
-  // Tracking POG filters
-  
-  edm::Handle<bool> LogErrorTooManyClusters;
-  iEvent.getByLabel( logErrorTooManyClustersInputTag, LogErrorTooManyClusters );
-  if (LogErrorTooManyClusters.isValid()){
-    *passLogErrorTooManyClusters.get() = !(*LogErrorTooManyClusters);
-  }
-
-  edm::Handle<bool> ManyStripClus53X;
-  iEvent.getByLabel( manyStripClus53XInputTag, ManyStripClus53X );
-  if (ManyStripClus53X.isValid()){
-    *passManyStripClus53X.get() = !(*ManyStripClus53X);
-  }
-
-  edm::Handle<bool> TooManyStripClus53X;
-  iEvent.getByLabel( tooManyStripClus53XInputTag, TooManyStripClus53X );
-  if (TooManyStripClus53X.isValid()){
-    *passTooManyStripClus53X.get() = !(*TooManyStripClus53X);
-  }
-
-  //Tracking failure filter:
-  edm::Handle<bool> TrackingFailureFilterResult;
-  iEvent.getByLabel(trackingFailureFilterInputTag, TrackingFailureFilterResult);
-  if(TrackingFailureFilterResult.isValid()) {
-    *passTrackingFailureFilter.get()=!(*TrackingFailureFilterResult);
-  }
-
-  //Bad EE Supercrystal Filter  
-  edm::Handle<bool> BadEESupercrystalFilterResult;
-  iEvent.getByLabel(badEESupercrystalFilterInputTag, BadEESupercrystalFilterResult);
-  if(BadEESupercrystalFilterResult.isValid()) {
-    *passBadEESupercrystalFilter.get()=!(*BadEESupercrystalFilterResult);
-  }
-  
-  // large ECAL laser correction filter
-  edm::Handle<bool> EcalLaserCorrFilterResult;
-  iEvent.getByLabel(ecalLaserCorrFilterInputTag, EcalLaserCorrFilterResult );
-  if ( EcalLaserCorrFilterResult.isValid() ){
-    *passEcalLaserCorrFilter.get()=!(*EcalLaserCorrFilterResult);
-  }
 
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
@@ -306,16 +231,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(isbscminbias,"isBSCMinBias");
   iEvent.put(isbscbeamhalo,"isBSCBeamHalo");
   iEvent.put(isprimaryvertex,"isPrimaryVertex");
-  iEvent.put(isbeamscraping,"isBeamScraping");
   iEvent.put(passhbhenoisefilter,"passHBHENoiseFilter");
-  iEvent.put(passbeamhalofilterloose,"passBeamHaloFilterLoose");
+  iEvent.put(passHcalLaserEventFilter,"passHcalLaserEventFilter");
   iEvent.put(passbeamhalofiltertight,"passBeamHaloFilterTight");
   iEvent.put(istrackingfailure, "isTrackingFailure");
-  iEvent.put(passEcalMaskedCellDRFilter, "passEcalMaskedCellDRFilter");
-  iEvent.put(passCaloBoundaryDRFilter, "passCaloBoundaryDRFilter");
   //
   iEvent.put(passEcalDeadCellTriggerPrimitiveFilter,"passEcalDeadCellTriggerPrimitiveFilter");
-  iEvent.put(passEcalDeadCellBoundaryEnergyFilter,"passEcalDeadCellBoundaryEnergyFilter");
   iEvent.put(passTrackingFailureFilter,"passTrackingFailureFilter");
   iEvent.put(passBadEESupercrystalFilter, "passBadEESupercrystalFilter");
   iEvent.put(passEcalLaserCorrFilter, "passEcalLaserCorrFilter");

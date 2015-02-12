@@ -12,25 +12,8 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag   l1InputTag,vtxInputTag;
-  const unsigned int    vtxMinNDOF;
-  const double          vtxMaxAbsZ, vtxMaxd0;
-  const edm::InputTag   trkInputTag;
-  const unsigned int    numTracks;
-  const double          hpTrackThreshold;
   const edm::InputTag   hcalNoiseInputTag;
-  const edm::InputTag   beamHaloInputTag;
-
-  const edm::InputTag trackingFilterJetInputTag   ;
-  const double trackingFilterDzTrVtxMax    ;
-  const double trackingFilterDxyTrVtxMax   ;
-  const double trackingFilterMinSumPtOverHT;
-
-  const edm::InputTag   ecalMaskedCellDRFilterInputTag , caloBoundaryDRFilterInputTag;
-  //
-  const edm::InputTag   hcalLaserEventFilterInputTag , ecalDeadCellTriggerPrimitiveFilterInputTag , ecalDeadCellBoundaryEnergyFilterInputTag;
-  const edm::InputTag   trackingFailureFilterInputTag , badEESupercrystalFilterInputTag, ecalLaserCorrFilterInputTag;
-  const edm::InputTag   logErrorTooManyClustersInputTag, manyStripClus53XInputTag, tooManyStripClus53XInputTag;
-
+  const edm::InputTag   filterResultsInputTag;
 
 };
 

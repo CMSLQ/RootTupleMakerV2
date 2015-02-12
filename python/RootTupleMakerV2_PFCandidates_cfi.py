@@ -1,9 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTuplePFCandidates = cms.EDProducer("RootTupleMakerV2_PFCandidates",
-                                       ReducedPFCandidateInputTag = cms.InputTag('pfCandsNotInJet'),
-                                       ElectronInputTag = cms.InputTag('cleanPatElectrons'),
-                                       MuonInputTag = cms.InputTag('cleanPatMuons'),                                    
+                                       JetInputTag = cms.InputTag('slimmedJets'),
+                                       ElectronInputTag = cms.InputTag('slimmedElectrons'),
+                                       MuonInputTag = cms.InputTag('slimmedMuons'),                                    
                                        Prefix = cms.string('PFCand'),
                                        Suffix = cms.string(''),
                                        MaxSize = cms.uint32(10),

@@ -5,11 +5,14 @@
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "Math/GenVector/VectorUtil.h"
 
+#include <set>
+
 RootTupleMakerV2_PFCandidates::RootTupleMakerV2_PFCandidates(const edm::ParameterSet& iConfig) :
-    reducedPFCandidateInputTag(iConfig.getParameter<edm::InputTag>("ReducedPFCandidateInputTag")),
+    jetInputTag(iConfig.getParameter<edm::InputTag>("JetInputTag")),
     electronInputTag(iConfig.getParameter<edm::InputTag>("ElectronInputTag")),
     muonInputTag(iConfig.getParameter<edm::InputTag>("MuonInputTag")),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
@@ -34,58 +37,103 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
 
-  // get the PFCandidate Collection
-  edm::Handle<edm::View<reco::Candidate> >   reducedpfcands;
-  iEvent.getByLabel( reducedPFCandidateInputTag, reducedpfcands );
+  // get the Jet Collection
+  edm::Handle<pat::JetCollection> jets;
+  iEvent.getByLabel(jetInputTag, jets);
 
-  // get the GsfElectron Collection
-  edm::Handle<std::vector<pat::Electron> > electrons;
+  // get the Electron Collection
+  edm::Handle<pat::ElectronCollection> electrons;
   iEvent.getByLabel(electronInputTag, electrons);
   
   // get the Muon Collection
-  edm::Handle<std::vector<pat::Muon> > muons;
+  edm::Handle<pat::MuonCollection> muons;
   iEvent.getByLabel(muonInputTag, muons);
 
   //-------------------------------------------
 
   if( electrons.isValid() && muons.isValid() )
   { 
-             
-    for( edm::View<reco::Candidate>::const_iterator icand = reducedpfcands->begin(); icand != reducedpfcands->end(); ++icand )
+    // NB: SIC
+    // originally the PFCandidates came from the 'pfCandsNotInJet' collection
+    // we don't have such a collection in MiniAOD
+    // so let's remove the jet constituents by hand
+    // loop over the leptons and save their constituents
+    //std::set<const reco::CandidatePtr> elecAndMuSourceCands;
+
+    std::vector<const reco::Candidate*> electronCands;
+    std::vector<const reco::Candidate*> muonCands;
+    std::vector<const reco::Candidate*> jetCands;
+    for(const pat::Electron &el : *electrons) electronCands.push_back(&el);
+    for(const pat::Muon &mu : *muons) muonCands.push_back(&mu);
+    for(const pat::Jet &jet : *jets) jetCands.push_back(&jet);
+
+    for(const reco::Candidate *elec : electronCands)
+    {
+      std::vector<reco::CandidatePtr> sourceCands;
+      for(unsigned int i = 0, n = elec->numberOfSourceCandidatePtrs(); i < n; ++i)
+        sourceCands.push_back(elec->sourceCandidatePtr(i));
+
+      // now look for sourceCands inside jets
+      for(const reco::Candidate *jet : jetCands)
       {
-	
-	bool isCloseToRecoEle  = false;
-	bool isCloseToRecoMuon = false;
-	       
-	// look if it close to an electron in a cone
-	for( std::vector<pat::Electron>::const_iterator itele = electrons->begin(); itele != electrons->end(); ++itele )
-	  {
-	    if ( fabs( ROOT::Math::VectorUtil::DeltaR( itele->p4() ,icand->p4() ) ) <= DRmatch ) 
-	    {
-	      isCloseToRecoEle = true;
-	    }
-	}//
+        std::vector<reco::CandidatePtr> sourceJetCands;
+        for(unsigned int i = 0, n = jet->numberOfSourceCandidatePtrs(); i < n; ++i)
+        {
+          // if jet cand particle is close to electron, see if it is part of the electron
+          if(deltaR(*(jet->sourceCandidatePtr(i)),*elec) < DRmatch)
+          {
+            // if jet constituent is in the electron, remove it from electron constituents set
+            std::vector<reco::CandidatePtr>::iterator srcCand = std::find(sourceCands.begin(), sourceCands.end(), jet->sourceCandidatePtr(i));
+            if(srcCand != sourceCands.end())
+              sourceCands.erase(srcCand);
+          }
+        }
+      }
+    }
 
-	// look if it close to a muon in a cone
-	for( std::vector<pat::Muon>::const_iterator itmu = muons->begin(); itmu != muons->end(); ++itmu )
-	  {
-	    if ( fabs( ROOT::Math::VectorUtil::DeltaR( itmu->p4() ,icand->p4() ) ) <= DRmatch ) 
-	    {
-	      isCloseToRecoMuon = true;
-	    }
-	}//
-	
-	if( isCloseToRecoEle || isCloseToRecoMuon )
-	  {
-	    eta->push_back( icand->eta() );
-	    phi->push_back( icand->phi() );
-	    pt->push_back( icand->pt() );
-	    energy->push_back( icand->energy() );
-	    charge->push_back( icand->charge() );	   
-	  }
+    //TODO FIXME
+    //for(const reco::Candidate *mu : muonCands)
+    //{
+    //  for(unsigned int i = 0, n = mu->numberOfSourceCandidatePtrs(); i < n; ++i)
+    //    elecAndMuSourceCands.push_back(mu->sourceCandidatePtr(i));
+    //}
 
-      }//loop over reduced pf candidates
-    
+
+
+    //for(const pat::PackedCandidate &pfcand : *packedpfcands )
+    //{
+    //  bool isCloseToRecoEle  = false;
+    //  bool isCloseToRecoMuon = false;
+
+    //  // look if it close to an electron in a cone
+    //  for(const pat::Electron &elec : *electrons )
+    //  {
+    //    if ( fabs( ROOT::Math::VectorUtil::DeltaR( elec.p4() , pfcand.p4() ) ) <= DRmatch ) 
+    //    {
+    //      isCloseToRecoEle = true;
+    //    }
+    //  }//
+
+    //  // look if it close to a muon in a cone
+    //  for(const pat::Muon &mu : *muons )
+    //  {
+    //    if ( fabs( ROOT::Math::VectorUtil::DeltaR( mu.p4() , pfcand.p4() ) ) <= DRmatch ) 
+    //    {
+    //      isCloseToRecoMuon = true;
+    //    }
+    //  }//
+
+    //  if( isCloseToRecoEle || isCloseToRecoMuon )
+    //  {
+    //    eta->push_back( pfcand.eta() );
+    //    phi->push_back( pfcand.phi() );
+    //    pt->push_back( pfcand.pt() );
+    //    energy->push_back( pfcand.energy() );
+    //    charge->push_back( pfcand.charge() );	   
+    //  }
+
+    //}//loop over packed pf candidates
+
   }
   else {
     if( !electrons.isValid() )

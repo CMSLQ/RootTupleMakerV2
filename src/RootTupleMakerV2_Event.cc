@@ -2,12 +2,11 @@
 #include "FWCore/Framework/interface/Event.h"
 
 RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig) :
-  //fastJetForIsolationInputTag(iConfig.getParameter<edm::InputTag>("FastJetForIsolationInputTag")),//not used in 2012
-  fastJetForJECInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECInputTag")),
-  fastJetForHEEPInputTag(iConfig.getParameter<edm::InputTag>("FastJetForHEEPInputTag")),
-  fastJetForJECCCPUInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECCCPUInputTag")),
-  fastJetForJECCNInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECCNInputTag")),
-  fastJetForJECCNTInputTag(iConfig.getParameter<edm::InputTag>("FastJetForJECCNTInputTag"))
+  fixedGridRhoAllInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoAllInputTag")),
+  fixedGridRhoFastjetAllCaloInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetAllCaloInputTag")),
+  fixedGridRhoFastjetCentralCaloInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralCaloInputTag")),
+  fixedGridRhoFastjetCentralChargedPileUpInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralChargedPileUpInputTag")),
+  fixedGridRhoFastjetCentralNeutralInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralNeutralInputTag"))
 {
   produces <unsigned int> ( "run"    );
   produces <unsigned int> ( "event"  );
@@ -16,12 +15,11 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
   produces <unsigned int> ( "orbit"  );
   produces <double>       ( "time"   );
   produces <bool>         ( "isData" );
-  //produces <double>     ( "rhoIso" );//not used in 2012 
-  produces <double>       ( "rhoJets"     );
-  produces <double>       ( "rhoForHEEP"  );
-  produces <double>       ( "rhoJetsCCPU" );
-  produces <double>       ( "rhoJetsCN"   );
-  produces <double>       ( "rhoJetsCNT"  );
+  produces <double>       ( "fixedGridRhoAll"                         );
+  produces <double>       ( "fixedGridRhoFastjetAllCalo"              );
+  produces <double>       ( "fixedGridRhoFastjetCentralCalo"          );
+  produces <double>       ( "fixedGridRhoFastjetCentralChargedPileUp" );
+  produces <double>       ( "fixedGridRhoFastjetCentralNeutral"       );
 }
 
 void RootTupleMakerV2_Event::
@@ -41,29 +39,26 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<bool >          isdata  ( new bool(iEvent.isRealData()));
 
-  // edm::Handle<double> rhoH;
-  // iEvent.getByLabel(fastJetForIsolationInputTag,rhoH);
-  // std::auto_ptr<double >        rhoIso  ( new double( *rhoH.product() ) );
+  edm::Handle<double> fixedGridRhoAllH;
+  iEvent.getByLabel(fixedGridRhoAllInputTag,fixedGridRhoAllH);
+  std::auto_ptr<double> fixedGridRhoAll (new double(*fixedGridRhoAllH.product() ) );
 
-  edm::Handle<double> rhoHJets;
-  iEvent.getByLabel(fastJetForJECInputTag,rhoHJets);
-  std::auto_ptr<double >        rhoJets     ( new double( *rhoHJets.product() )     );
+  edm::Handle<double> fixedGridRhoFastjetAllCaloH;
+  iEvent.getByLabel(fixedGridRhoFastjetAllCaloInputTag,fixedGridRhoFastjetAllCaloH);
+  std::auto_ptr<double> fixedGridRhoFastjetAllCalo (new double(*fixedGridRhoFastjetAllCaloH.product() ) );
 
-  edm::Handle<double> rhoHForHEEP;
-  iEvent.getByLabel(fastJetForHEEPInputTag, rhoHForHEEP);
-  std::auto_ptr<double >        rhoForHEEP  ( new double( *rhoHForHEEP.product() )     );
+  edm::Handle<double> fixedGridRhoFastjetCentralCaloH;
+  iEvent.getByLabel(fixedGridRhoFastjetCentralCaloInputTag,fixedGridRhoFastjetCentralCaloH);
+  std::auto_ptr<double> fixedGridRhoFastjetCentralCalo (new double(*fixedGridRhoFastjetCentralCaloH.product() ) );
 
-  edm::Handle<double> rhoHJetsCCPU;
-  iEvent.getByLabel(fastJetForJECCCPUInputTag,rhoHJetsCCPU);
-  std::auto_ptr<double >        rhoJetsCCPU ( new double( *rhoHJetsCCPU.product() ) );
+  edm::Handle<double> fixedGridRhoFastjetCentralChargedPileUpH;
+  iEvent.getByLabel(fixedGridRhoFastjetCentralChargedPileUpInputTag,fixedGridRhoFastjetCentralChargedPileUpH);
+  std::auto_ptr<double> fixedGridRhoFastjetCentralChargedPileUp (new double(*fixedGridRhoFastjetCentralChargedPileUpH.product() ) );
 
-  edm::Handle<double> rhoHJetsCN;
-  iEvent.getByLabel(fastJetForJECCNInputTag,rhoHJetsCN);
-  std::auto_ptr<double >        rhoJetsCN   ( new double( *rhoHJetsCN.product() )   );
+  edm::Handle<double> fixedGridRhoFastjetCentralNeutralH;
+  iEvent.getByLabel(fixedGridRhoFastjetCentralNeutralInputTag,fixedGridRhoFastjetCentralNeutralH);
+  std::auto_ptr<double> fixedGridRhoFastjetCentralNeutral (new double(*fixedGridRhoFastjetCentralNeutralH.product() ) );
 
-  edm::Handle<double> rhoHJetsCNT;
-  iEvent.getByLabel(fastJetForJECCNTInputTag,rhoHJetsCNT);
-  std::auto_ptr<double >        rhoJetsCNT  ( new double( *rhoHJetsCNT.product() )  );
 
 
 
@@ -75,10 +70,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( orbit, "orbit" );
   iEvent.put( time,  "time"  );
   iEvent.put( isdata,"isData");
-  //iEvent.put( rhoIso,   "rhoIso"   );
-  iEvent.put( rhoJets,     "rhoJets"     );
-  iEvent.put( rhoForHEEP,  "rhoForHEEP"  );
-  iEvent.put( rhoJetsCCPU, "rhoJetsCCPU" );
-  iEvent.put( rhoJetsCN,   "rhoJetsCN"   );
-  iEvent.put( rhoJetsCNT,  "rhoJetsCNT"  );
+  iEvent.put( fixedGridRhoAll,                         "fixedGridRhoAll"                         );
+  iEvent.put( fixedGridRhoFastjetAllCalo,              "fixedGridRhoFastjetAllCalo"              );
+  iEvent.put( fixedGridRhoFastjetCentralCalo,          "fixedGridRhoFastjetCentralCalo"          );
+  iEvent.put( fixedGridRhoFastjetCentralChargedPileUp, "fixedGridRhoFastjetCentralChargedPileUp" );
+  iEvent.put( fixedGridRhoFastjetCentralNeutral,       "fixedGridRhoFastjetCentralNeutral"       );
 }

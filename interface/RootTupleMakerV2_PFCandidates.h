@@ -11,7 +11,7 @@ class RootTupleMakerV2_PFCandidates : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   reducedPFCandidateInputTag, electronInputTag, muonInputTag;
+  const edm::InputTag   jetInputTag, electronInputTag, muonInputTag;
   const std::string     prefix, suffix;
   const unsigned int    maxSize;
   const double          DRmatch; 

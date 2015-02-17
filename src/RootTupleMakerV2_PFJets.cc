@@ -15,20 +15,22 @@
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
 inputTag           (iConfig.getParameter<edm::InputTag>("InputTag"           )),
-// inputTagL1Offset   (iConfig.getParameter<edm::InputTag>("InputTagL1Offset"   )),
-inputTagSmearedUp  (iConfig.getParameter<edm::InputTag>("InputTagSmearedUp"  )),
-inputTagSmearedDown(iConfig.getParameter<edm::InputTag>("InputTagSmearedDown")),
-inputTagScaledUp   (iConfig.getParameter<edm::InputTag>("InputTagScaledUp"   )),
-inputTagScaledDown (iConfig.getParameter<edm::InputTag>("InputTagScaledDown" )),
+//FIXME TODO later
+//inputTagSmearedUp  (iConfig.getParameter<edm::InputTag>("InputTagSmearedUp"  )),
+//inputTagSmearedDown(iConfig.getParameter<edm::InputTag>("InputTagSmearedDown")),
+//inputTagScaledUp   (iConfig.getParameter<edm::InputTag>("InputTagScaledUp"   )),
+//inputTagScaledDown (iConfig.getParameter<edm::InputTag>("InputTagScaledDown" )),
 prefix  (iConfig.getParameter<std::string>  ("Prefix")),
 suffix  (iConfig.getParameter<std::string>  ("Suffix")),
 maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
+//FIXME TODO possibly later
 jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
 readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
+//
 vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 
 {
-        produces <bool>                 ( "hasJetWithBadUnc" );
+  produces <bool>                 ( "hasJetWithBadUnc" );
 	produces <std::vector<double> > ( prefix + "Eta" + suffix );
 	produces <std::vector<double> > ( prefix + "Phi" + suffix );
 	produces <std::vector<double> > ( prefix + "Pt" + suffix );
@@ -48,7 +50,6 @@ vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 	produces <std::vector<double> > ( prefix + "L3AbsJEC" + suffix );
 	produces <std::vector<double> > ( prefix + "L2RelJEC" + suffix );
 	produces <std::vector<double> > ( prefix + "L1FastJetJEC" + suffix );
-	// produces <std::vector<double> > ( prefix + "L1OffsetJEC" + suffix );
 	produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
 	produces <std::vector<double> > ( prefix + "ChargedEmEnergyFraction"  + suffix );
 	produces <std::vector<double> > ( prefix + "ChargedHadronEnergyFraction"  + suffix );
@@ -226,21 +227,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// edm::Handle<std::vector<pat::Jet> > jetsL1Offset;
 	// iEvent.getByLabel(inputTagL1Offset, jetsL1Offset);
 
-	edm::Handle<std::vector<pat::Jet> > jetsSmearedUp;
-	iEvent.getByLabel(inputTagSmearedUp, jetsSmearedUp);
-	std::vector<pat::Jet>::const_iterator it_smearedUp;
-
-	edm::Handle<std::vector<pat::Jet> > jetsSmearedDown;
-	iEvent.getByLabel(inputTagSmearedDown, jetsSmearedDown);
-	std::vector<pat::Jet>::const_iterator it_smearedDown;
-
-	edm::Handle<std::vector<pat::Jet> > jetsScaledUp;
-	iEvent.getByLabel(inputTagScaledUp, jetsScaledUp);
-	std::vector<pat::Jet>::const_iterator it_scaledUp;
-
-	edm::Handle<std::vector<pat::Jet> > jetsScaledDown;
-	iEvent.getByLabel(inputTagScaledDown, jetsScaledDown);
-	std::vector<pat::Jet>::const_iterator it_scaledDown;
+  // FIXME TODO later
+	//edm::Handle<std::vector<pat::Jet> > jetsSmearedUp;
+	//iEvent.getByLabel(inputTagSmearedUp, jetsSmearedUp);
+	//std::vector<pat::Jet>::const_iterator it_smearedUp;
+	//edm::Handle<std::vector<pat::Jet> > jetsSmearedDown;
+	//iEvent.getByLabel(inputTagSmearedDown, jetsSmearedDown);
+	//std::vector<pat::Jet>::const_iterator it_smearedDown;
+	//edm::Handle<std::vector<pat::Jet> > jetsScaledUp;
+	//iEvent.getByLabel(inputTagScaledUp, jetsScaledUp);
+	//std::vector<pat::Jet>::const_iterator it_scaledUp;
+	//edm::Handle<std::vector<pat::Jet> > jetsScaledDown;
+	//iEvent.getByLabel(inputTagScaledDown, jetsScaledDown);
+	//std::vector<pat::Jet>::const_iterator it_scaledDown;
 	
 	edm::Handle<reco::VertexCollection> primaryVertices;  // DB
 	iEvent.getByLabel(vtxInputTag,primaryVertices);       // DB
@@ -500,43 +499,43 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			phi->push_back( it->phi() );
 			pt->push_back( it->pt() );
 
-			if ( !iEvent.isRealData() ) { 
-
-			  if ( jetsSmearedUp.isValid() ){
-			    it_smearedUp = jetsSmearedUp -> begin() + ijet;
-			    ptSmearedUp -> push_back ( it_smearedUp -> pt() );
-			    energySmearedUp -> push_back ( it_smearedUp -> energy() );
-			  }
-			  
-			  if ( jetsSmearedDown.isValid() ){
-			    it_smearedDown = jetsSmearedDown -> begin() + ijet;
-			    ptSmearedDown -> push_back ( it_smearedDown -> pt() );
-			    energySmearedDown -> push_back ( it_smearedDown -> energy() );
-			  }
-			  
-			  if ( jetsScaledUp.isValid() ){
-			    it_scaledUp = jetsScaledUp -> begin() + ijet;
-			    ptScaledUp -> push_back ( it_scaledUp -> pt() );
-			    energyScaledUp -> push_back ( it_scaledUp -> energy() );
-			  }
-			  
-			  if ( jetsScaledDown.isValid() ){
-			    it_scaledDown = jetsScaledDown -> begin() + ijet;
-			    ptScaledDown -> push_back ( it_scaledDown -> pt() );
-			    energyScaledDown -> push_back ( it_scaledDown -> energy() );
-			  }
-			}
-			
-			else { 
-			  ptSmearedUp       -> push_back ( it -> pt()     );
-			  energySmearedUp   -> push_back ( it -> energy() );
-			  ptSmearedDown     -> push_back ( it -> pt()     );
-			  energySmearedDown -> push_back ( it -> energy() );
-			  ptScaledUp        -> push_back ( it -> pt()     );
-			  energyScaledUp    -> push_back ( it -> energy() );
-			  ptScaledDown      -> push_back ( it -> pt()     );
-			  energyScaledDown  -> push_back ( it -> energy() );
-			}
+      //FIXME TODO later
+			//if ( !iEvent.isRealData() ) { 
+			//  if ( jetsSmearedUp.isValid() ){
+			//    it_smearedUp = jetsSmearedUp -> begin() + ijet;
+			//    ptSmearedUp -> push_back ( it_smearedUp -> pt() );
+			//    energySmearedUp -> push_back ( it_smearedUp -> energy() );
+			//  }
+			//  
+			//  if ( jetsSmearedDown.isValid() ){
+			//    it_smearedDown = jetsSmearedDown -> begin() + ijet;
+			//    ptSmearedDown -> push_back ( it_smearedDown -> pt() );
+			//    energySmearedDown -> push_back ( it_smearedDown -> energy() );
+			//  }
+			//  
+			//  if ( jetsScaledUp.isValid() ){
+			//    it_scaledUp = jetsScaledUp -> begin() + ijet;
+			//    ptScaledUp -> push_back ( it_scaledUp -> pt() );
+			//    energyScaledUp -> push_back ( it_scaledUp -> energy() );
+			//  }
+			//  
+			//  if ( jetsScaledDown.isValid() ){
+			//    it_scaledDown = jetsScaledDown -> begin() + ijet;
+			//    ptScaledDown -> push_back ( it_scaledDown -> pt() );
+			//    energyScaledDown -> push_back ( it_scaledDown -> energy() );
+			//  }
+			//}
+			//
+			//else { 
+			//  ptSmearedUp       -> push_back ( it -> pt()     );
+			//  energySmearedUp   -> push_back ( it -> energy() );
+			//  ptSmearedDown     -> push_back ( it -> pt()     );
+			//  energySmearedDown -> push_back ( it -> energy() );
+			//  ptScaledUp        -> push_back ( it -> pt()     );
+			//  energyScaledUp    -> push_back ( it -> energy() );
+			//  ptScaledDown      -> push_back ( it -> pt()     );
+			//  energyScaledDown  -> push_back ( it -> energy() );
+			//}
 
 			pt_raw->push_back( it->correctedJet("Uncorrected").pt() );
 			energy->push_back( it->energy() );
@@ -688,7 +687,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.put( l3absJEC_vec, prefix + "L3AbsJEC" + suffix );
 	iEvent.put( l2relJEC_vec, prefix + "L2RelJEC" + suffix );
 	iEvent.put( l1fastjetJEC_vec, prefix + "L1FastJetJEC" + suffix );
-	// iEvent.put( l1offsetJEC_vec, prefix + "L1OffsetJEC" + suffix );
 	iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );
 	iEvent.put( chargedEmEnergyFraction,  prefix + "ChargedEmEnergyFraction"  + suffix );
 	iEvent.put( chargedHadronEnergyFraction,  prefix + "ChargedHadronEnergyFraction"  + suffix );

@@ -27,9 +27,6 @@ jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
 readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
 vtxInputTag(iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 
-//OLD
-//    applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
-//    resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
         produces <bool>                 ( "hasJetWithBadUnc" );
 	produces <std::vector<double> > ( prefix + "Eta" + suffix );
@@ -204,19 +201,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	//-----------------------------------------------------------------
 
-	// OLD
-	//   edm::FileInPath fipUnc(jecUncPath);;
-	//   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(fipUnc.fullPath());
-	//
-	//   JetCorrectorParameters *ResJetCorPar = 0;
-	//   FactorizedJetCorrector *JEC = 0;
-	//   if(applyResJEC) {
-	//     edm::FileInPath fipRes(resJEC);
-	//     ResJetCorPar = new JetCorrectorParameters(fipRes.fullPath());
-	//     std::vector<JetCorrectorParameters> vParam;
-	//     vParam.push_back(*ResJetCorPar);
-	//     JEC = new FactorizedJetCorrector(vParam);
-	//   }
 
 	//JEC Uncertainties
 
@@ -310,26 +294,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 				jecUnc->setJetPt( it->pt() );
 			}
 
-			// OLD
-			//       double corr = 1.;
-			//       if( applyResJEC && iEvent.isRealData() ) {
-			//         JEC->setJetEta( it->eta() );
-			//         JEC->setJetPt( it->pt() ); // here you put the L2L3 Corrected jet pt
-			//         corr = JEC->getCorrection();
-			//       }
 
 			// Status of JEC
 			//std::cout << "PF: currentJECLevel(): " << it->currentJECLevel() << std::endl;
 			//std::cout << "PF: currentJECSet(): " << it->currentJECSet() << std::endl;
 			//-------------------
-
-			// fill in all the vectors
-
-			// OLD
-			// pt->push_back( it->pt()*corr );
-			// energy->push_back( it->energy()*corr );
-			// resJEC_vec->push_back( corr );
-
 
 
 			// Vertex association
@@ -684,10 +653,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// 	edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTagL1Offset;
 	// }
 
-	//OLD
 	delete jecUnc;
-	//   delete ResJetCorPar;
-	//   delete JEC;
 
 	//-----------------------------------------------------------------
 	// put vectors in the event

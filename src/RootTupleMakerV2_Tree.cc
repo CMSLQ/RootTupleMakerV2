@@ -1,9 +1,9 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Tree.h"
 
 #include "FWCore/Framework/interface/ConstProductRegistry.h"
-#include "FWCore/Framework/interface/GroupSelector.h"
-#include "FWCore/Framework/interface/GroupSelectorRules.h"
-#include "DataFormats/Provenance/interface/Selections.h"
+#include "FWCore/Framework/interface/ProductSelector.h"
+#include "FWCore/Framework/interface/ProductSelectorRules.h"
+#include "DataFormats/Provenance/interface/SelectedProducts.h"
 #include "Math/LorentzVector.h"
 #include "Math/Vector3D.h"
 
@@ -74,15 +74,15 @@ beginJob() {
   leafmap["String"]     = STRING;     leafmap["Strings"]    = STRING_V;
 
   edm::Service<edm::ConstProductRegistry> reg;
-  edm::Selections allBranches = reg->allBranchDescriptions();
-  edm::GroupSelectorRules groupSelectorRules_(pset, "outputCommands", "RootTupleMakerV2_Tree");
-  edm::GroupSelector groupSelector_;
-  groupSelector_.initialize(groupSelectorRules_, allBranches);
+  edm::SelectedProducts allBranches = reg->allBranchDescriptions();
+  edm::ProductSelectorRules productSelectorRules_(pset, "outputCommands", "RootTupleMakerV2_Tree");
+  edm::ProductSelector productSelector_;
+  productSelector_.initialize(productSelectorRules_, allBranches);
 
   std::set<std::string> branchnames;
 
-  BOOST_FOREACH( const edm::Selections::value_type& selection, allBranches) {
-    if(groupSelector_.selected(*selection)) {
+  BOOST_FOREACH( const edm::SelectedProducts::value_type& selection, allBranches) {
+    if(productSelector_.selected(*selection)) {
 
       //Check for duplicate branch names
       if (branchnames.find( selection->productInstanceName()) != branchnames.end() ) {

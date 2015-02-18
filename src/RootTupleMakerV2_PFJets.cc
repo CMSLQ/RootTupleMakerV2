@@ -3,6 +3,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -244,8 +245,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	edm::Handle<reco::VertexCollection> primaryVertices;  // DB
 	iEvent.getByLabel(vtxInputTag,primaryVertices);       // DB
 
-	edm::Handle<edm::View<pat::Jet> > sjets;
-	iEvent.getByLabel("selectedPatJetsAK5PF",sjets);
+  // XXX SIC FIXME JET MVA
+	//edm::Handle<edm::View<pat::Jet> > sjets;
+	//iEvent.getByLabel("selectedPatJetsAK5PF",sjets);
 		
 	edm::Handle<edm::ValueMap<float> > puJetIdMVA;
 	iEvent.getByLabel("puJetMva","full53xDiscriminant", puJetIdMVA);
@@ -279,11 +281,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if (pfjetIDTight( *it, retpf)) passjetTight =1;
 
 
-			double mva   = (double) (*puJetIdMVA)[sjets->refAt(ijet)];
-			int    idflag = (*puJetIdFlag)[sjets->refAt(ijet)];
-			bool pileup_jetID_passLoose= PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose);
-			bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
-			bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
+      // XXX SIC FIXME JET MVA
+			//double mva   = (double) (*puJetIdMVA)[sjets->refAt(ijet)];
+      // XXX SIC FIXME PU JET ID
+			//int    idflag = (*puJetIdFlag)[sjets->refAt(ijet)];
+			//bool pileup_jetID_passLoose= PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose);
+			//bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
+			//bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
 			
 
 			if(readJECuncertainty)
@@ -414,10 +418,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			}
 
 			// Get the constituents of the PFJet
+      // On MiniAOD, we must use daughters instead
 
-			std::vector <reco::PFCandidatePtr> constituents  = it -> getPFConstituents();
-			std::vector <reco::PFCandidatePtr>::iterator i_constituent   = constituents.begin();
-			std::vector <reco::PFCandidatePtr>::iterator end_constituent = constituents.end();
+			//std::vector <reco::PFCandidatePtr> constituents  = it -> getPFConstituents();
+			//std::vector <reco::PFCandidatePtr>::iterator i_constituent   = constituents.begin();
+			//std::vector <reco::PFCandidatePtr>::iterator end_constituent = constituents.end();
+      int numberOfDaughters = it->numberOfDaughters();
 			double sum_track_pt = 0.;
 	
 			double jetBetaStar        = 0.0 ;
@@ -426,42 +432,45 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			double jetBetaClassic     = 0.0 ;
 
 			if ( found_lead_vertex ) { 
-			  for (; i_constituent != end_constituent; ++i_constituent ) { 
-			    reco::PFCandidatePtr & constituent = *i_constituent;
-			    if ( ! constituent -> trackRef().isNonnull()   ) continue;
-			    if ( ! constituent -> trackRef().isAvailable() ) continue;
+        for(int dau = 0; dau < numberOfDaughters; ++dau) {
+          edm::Ptr<pat::PackedCandidate> constituent(it->daughterPtr(dau));
+          //FIXME: check like the below needed?
+			    //if ( ! constituent -> trackRef().isNonnull()   ) continue;
+			    //if ( ! constituent -> trackRef().isAvailable() ) continue;
 			    
-			    try { 
-			      double track_pt = constituent -> trackRef() -> pt();
-			      sum_track_pt += track_pt;
-			      
-			      bool track_from_lead_vertex = find( lead_vertex->tracks_begin(), 
-								  lead_vertex->tracks_end()  , 
-								  reco::TrackBaseRef( constituent -> trackRef())) != lead_vertex -> tracks_end();
-			      
-			      bool track_from_other_vertex = false;
-			      
-			      double dZ0 = fabs(constituent ->trackRef()->dz(lead_vertex->position()));
-			      double dZ = dZ0; 
-			      
-			      for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ){
-				if( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
-				bool is_lead_vertex  = (v_it -> position() - lead_vertex -> position()).r() < 0.02;
-				if( ! is_lead_vertex && ! track_from_other_vertex ) {
-				  track_from_other_vertex = find( v_it -> tracks_begin(), 
-								  v_it -> tracks_end  (), 
-								  reco::TrackBaseRef(constituent -> trackRef())) != v_it -> tracks_end(); 
-				}
-				dZ = std::min(dZ,fabs(constituent->trackRef()->dz( v_it -> position())));
-			      }
-			      
-			      if      (  track_from_lead_vertex && !track_from_other_vertex ) jetBetaClassic     += track_pt;
-			      else if ( !track_from_lead_vertex &&  track_from_other_vertex ) jetBetaStarClassic += track_pt;
-			      
-			      if      ( dZ0 < 0.2 ) jetBeta     += track_pt;
-			      else if ( dZ  < 0.2 ) jetBetaStar += track_pt;
-			      
-			    }
+          try { 
+            // constituent->pseudoTrack().pt() in MiniAOD (best we can have) is the same as constituent pt
+            //   so no need to make the pseudoTrack here
+            double track_pt = constituent->pt();
+            sum_track_pt += track_pt;
+
+            // If it's used in the fit of the primary vertex or associated to it, take it
+            // See: https://hypernews.cern.ch/HyperNews/CMS/get/csa14/85/1/1/1.html
+            bool track_from_lead_vertex = (constituent->fromPV() == pat::PackedCandidate::PVUsedInFit) ||
+                                          (constituent->fromPV() == pat::PackedCandidate::PVTight);
+
+            bool track_from_other_vertex = false;
+
+            float dZ0 = fabs(constituent->dz()); // constituent dz is only kept at float precision (MiniAOD trick)
+            float dZ = dZ0; 
+
+            // look at other vertices in PV collection, not primary ( pv[0] )
+            for(reco::VertexCollection::const_iterator v_it=primaryVertices->begin()+1; v_it!=primaryVertices->end(); ++v_it )
+            {
+              if( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
+              // is track from a non-PV non-pileup vertex in the PV collection?
+              if(!track_from_other_vertex)
+                track_from_other_vertex = constituent->fromPV() == pat::PackedCandidate::PVLoose;
+              dZ = std::min(dZ, constituent->dz(v_it -> position()));
+            }
+
+            if      (  track_from_lead_vertex && !track_from_other_vertex ) jetBetaClassic     += track_pt;
+            else if ( !track_from_lead_vertex &&  track_from_other_vertex ) jetBetaStarClassic += track_pt;
+
+            if      ( dZ0 < 0.2 ) jetBeta     += track_pt;
+            else if ( dZ  < 0.2 ) jetBetaStar += track_pt;
+
+          }
 			    
 			    catch (cms::Exception & e) { std::cout << e << std::endl; } 
 			    
@@ -599,11 +608,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			combinedMVABTag                     ->push_back( it->bDiscriminator("combinedMVABJetTags"                     ));
 			passLooseID->push_back( passjetLoose );
 			passTightID->push_back( passjetTight );
-			pileup_jetID_passLooseWP->push_back(pileup_jetID_passLoose);
-			pileup_jetID_passMediumWP->push_back(pileup_jetID_passMedium);
-			pileup_jetID_passTightWP->push_back(pileup_jetID_passTight);
-			jetpileup_idflag->push_back(idflag);
-			jetpileup_mva->push_back(mva);
+      // XXX SIC FIXME PU JET ID
+			//pileup_jetID_passLooseWP->push_back(pileup_jetID_passLoose);
+			//pileup_jetID_passMediumWP->push_back(pileup_jetID_passMedium);
+			//pileup_jetID_passTightWP->push_back(pileup_jetID_passTight);
+			//jetpileup_idflag->push_back(idflag);
+      // XXX SIC FIXME JET MVA
+			//jetpileup_mva->push_back(mva);
 
 // 			//////////////////////////////////////////////////////////////////// 
 // 			if( fabs(it->eta()) > 3) 

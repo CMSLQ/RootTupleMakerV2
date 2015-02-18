@@ -434,9 +434,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if ( found_lead_vertex ) { 
         for(int dau = 0; dau < numberOfDaughters; ++dau) {
           edm::Ptr<pat::PackedCandidate> constituent(it->daughterPtr(dau));
-          //FIXME: check like the below needed?
-			    //if ( ! constituent -> trackRef().isNonnull()   ) continue;
-			    //if ( ! constituent -> trackRef().isAvailable() ) continue;
 			    
           try { 
             // constituent->pseudoTrack().pt() in MiniAOD (best we can have) is the same as constituent pt

@@ -443,6 +443,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
             // If it's used in the fit of the primary vertex or associated to it, take it
             // See: https://hypernews.cern.ch/HyperNews/CMS/get/csa14/85/1/1/1.html
+            // Note that for CHS jets, all daughters will be at least PV Loose (i.e., not from a "pileup" vertex)
             bool track_from_lead_vertex = (constituent->fromPV() == pat::PackedCandidate::PVUsedInFit) ||
                                           (constituent->fromPV() == pat::PackedCandidate::PVTight);
 

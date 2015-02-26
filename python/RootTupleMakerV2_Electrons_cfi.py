@@ -16,26 +16,6 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     TriggerEventInputTag = cms.InputTag('patTriggerEvent'),                                    
     LikelihoodInputTag = cms.InputTag('egammaIDLikelihood') ,
     RhoInputTag = cms.InputTag('kt6PFJets','rho'),
-    PFIsolationValues03 = cms.VInputTag ( cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueNeutral03PFIdPFIso')),
-                                    # In principle, these should be added too, but I get errors from PAT when I try to load them
-                                    # They are not needed for EGamma PF isolation
-                                    # An exception of category 'Configuration' occurred while
-                                    # [0] Constructing the EventProcessor
-                                    # [1] Constructing module: class=RootTupleMakerV2_Electrons label='rootTupleElectrons'
-                                    # Exception Message:
-                                    #     Duplicate Process The process name PAT was previously used on these products.
-                                    # Please modify the configuration file to use a distinct process name.
-                                    # cms.InputTag("elPFIsoValueChargedAll03PFIdPFIso"),  
-                                    # cms.InputTag("elPFIsoValuePU03PFIdPFIso")),
-    PFIsolationValues04 = cms.VInputTag ( cms.InputTag('elPFIsoValueCharged04PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueGamma04PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueNeutral04PFIdPFIso')),
-                                    # In principle, these should be added too, but I get errors from PAT when I try to load them
-                                    # They are not needed for EGamma PF isolation ( see above ) 
-                                    # cms.InputTag("elPFIsoValueChargedAll04PFIdPFIso"), 
-                                    # cms.InputTag("elPFIsoValuePU04PFIdPFIso")),
     # SIC add
     ElectronVetoIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-veto"),
     ElectronTightIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-tight"),

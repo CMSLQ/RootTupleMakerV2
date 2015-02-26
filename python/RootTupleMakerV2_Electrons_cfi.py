@@ -1,9 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
-    TracksInputTag = cms.InputTag('generalTracks'),
     DCSInputTag = cms.InputTag('scalersRawToDigi'),
-    InputTag = cms.InputTag('cleanPatElectrons'),
+    InputTag = cms.InputTag('slimmedElectrons'),
     Prefix = cms.string('Electron'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(10),
@@ -11,7 +10,7 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     MuonPt = cms.double(10.),
     MuonIso = cms.double(0.05),
     MuonID = cms.string('GlobalMuonPromptTight'),
-    VertexInputTag = cms.InputTag('offlinePrimaryVertices'),
+    VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
     BeamSpotInputTag = cms.InputTag('offlineBeamSpot'),
     ConversionsInputTag = cms.InputTag('allConversions'),
     TriggerEventInputTag = cms.InputTag('patTriggerEvent'),                                    
@@ -37,14 +36,16 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
                                     # They are not needed for EGamma PF isolation ( see above ) 
                                     # cms.InputTag("elPFIsoValueChargedAll04PFIdPFIso"), 
                                     # cms.InputTag("elPFIsoValuePU04PFIdPFIso")),
-    SingleEleTriggerMatch     = cms.string ("cleanElectronTriggerMatchHLTSingleElectron"),
-    SingleEleTriggerMatchWP80 = cms.string ("cleanElectronTriggerMatchHLTSingleElectronWP80"),
-    DoubleEleTriggerMatch     = cms.string ("cleanElectronTriggerMatchHLTDoubleElectron")
+    # SIC add
+    ElectronVetoIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-veto"),
+    ElectronTightIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-tight"),
+    ElectronMediumIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-tight"),
+    ElectronLooseIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-tight"),
 )
 
 cleanElectronTriggerMatchHLTSingleElectron = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
-, src     = cms.InputTag( 'cleanPatElectrons' )
+, src     = cms.InputTag( 'slimmedElectrons' )
 , matched = cms.InputTag( 'patTrigger' )          
 , matchedCuts = cms.string( 'type( "TriggerElectron" ) && path ( "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
@@ -54,7 +55,7 @@ cleanElectronTriggerMatchHLTSingleElectron = cms.EDProducer(
 
 cleanElectronTriggerMatchHLTSingleElectronWP80 = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
-, src     = cms.InputTag( 'cleanPatElectrons' )
+, src     = cms.InputTag( 'slimmedElectrons' )
 , matched = cms.InputTag( 'patTrigger' )          
 , matchedCuts = cms.string( 'type( "TriggerElectron" ) && path( "HLT_Ele27_WP80_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
@@ -64,12 +65,55 @@ cleanElectronTriggerMatchHLTSingleElectronWP80 = cms.EDProducer(
 
 cleanElectronTriggerMatchHLTDoubleElectron = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
-, src     = cms.InputTag( 'cleanPatElectrons' )
-, matched = cms.InputTag( 'patTrigger' )          
+, src     = cms.InputTag( 'slimmedElectrons' )
+, matched = cms.InputTag( 'patTrigger' ) 
 , matchedCuts = cms.string( 'type( "TriggerCluster" ) && path( "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
 , resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
+)
+
+# embed the trigger objects into the electrons
+electronsTriggerMatchHLTSingleElectron = cms.EDProducer(
+  "PATTriggerMatchElectronEmbedder"
+, src = cms.InputTag( 'slimmedElectrons' )
+, matches = cms.VInputTag(
+  cms.InputTag( 'cleanElectronTriggerMatchHLTSingleElectron' )
+  )
+)
+
+electronsTriggerMatchHLTSingleElectronWP80 = cms.EDProducer(
+  "PATTriggerMatchElectronEmbedder"
+, src = cms.InputTag( 'slimmedElectrons' )
+, matches = cms.VInputTag(
+  cms.InputTag( 'cleanElectronTriggerMatchHLTSingleElectronWP80' )
+  )
+)
+
+electronsTriggerMatchHLTDoubleElectron = cms.EDProducer(
+  "PATTriggerMatchElectronEmbedder"
+, src = cms.InputTag( 'slimmedElectrons' )
+, matches = cms.VInputTag(
+  cms.InputTag( 'cleanElectronTriggerMatchHLTDoubleElectron' )
+  )
+
+)
+
+# these will skim out (from the collections above with embedded matches) only the objects which have a trigger object match
+from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
+electronsTriggeredHLTSingleElectron = selectedPatElectrons.clone(
+   src = cms.InputTag( 'electronsTriggerMatchHLTSingleElectron' )
+, cut = 'triggerObjectMatches.size > 0'
+)
+
+electronsTriggeredHLTSingleElectronWP80 = selectedPatElectrons.clone(
+   src = cms.InputTag( 'electronsTriggerMatchHLTSingleElectronWP80' )
+, cut = 'triggerObjectMatches.size > 0'
+)
+
+electronsTriggeredHLTDoubleElectron = selectedPatElectrons.clone(
+   src = cms.InputTag( 'electronsTriggerMatchHLTDoubleElectron' )
+, cut = 'triggerObjectMatches.size > 0'
 )
 
 # Extra trigger matching (for QCD estimate).  Leave commented for now.

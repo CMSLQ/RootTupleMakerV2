@@ -22,42 +22,39 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
-#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+//#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 #include "DataFormats/RecoCandidate/interface/IsoDepositDirection.h"
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
 #include "DataFormats/RecoCandidate/interface/IsoDepositVetos.h"
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 
-#include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"
-#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 
 //------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
-  trkInputTag              (iConfig.getParameter<edm::InputTag>("TracksInputTag"           )),
-  dcsInputTag              (iConfig.getParameter<edm::InputTag>("DCSInputTag"              )),
-  inputTag                 (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
-  vtxInputTag              (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
-  beamSpotInputTag         (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
-  conversionsInputTag      (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"      )),
-  triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
-  rhoInputTag              (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
-  pfIsolation03InputTags   (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues03")),
-  pfIsolation04InputTags   (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues04")),
-  electronIso              (iConfig.getParameter<double>       ("ElectronIso"              )),
-  muonPt                   (iConfig.getParameter<double>       ("MuonPt"                   )),
-  muonIso                  (iConfig.getParameter<double>       ("MuonIso"                  )),
-  muonID                   (iConfig.getParameter<std::string>  ("MuonID"                   )),
-  singleEleTriggerMatch    (iConfig.getParameter<std::string>  ("SingleEleTriggerMatch"    )),
-  singleEleTriggerMatchWP80(iConfig.getParameter<std::string>  ("SingleEleTriggerMatchWP80")),
-  doubleEleTriggerMatch    (iConfig.getParameter<std::string>  ("DoubleEleTriggerMatch"    )),
-  prefix                   (iConfig.getParameter<std::string>  ("Prefix"                   )),
-  suffix                   (iConfig.getParameter<std::string>  ("Suffix"                   )),
-  maxSize                  (iConfig.getParameter<unsigned int> ("MaxSize"                  ))
+  dcsInputTag                 (iConfig.getParameter<edm::InputTag>("DCSInputTag"              )),
+  inputTag                    (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
+  vtxInputTag                 (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
+  beamSpotInputTag            (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
+  conversionsInputTag         (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"      )),
+  rhoInputTag                 (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
+  electronVetoIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"))),
+  electronLooseIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"))),
+  electronMediumIdMapToken_   (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"))),
+  electronTightIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"))),
+  pfIsolation03InputTags      (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues03")),
+  pfIsolation04InputTags      (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues04")),
+  electronIso                 (iConfig.getParameter<double>       ("ElectronIso"              )),
+  muonPt                      (iConfig.getParameter<double>       ("MuonPt"                   )),
+  muonIso                     (iConfig.getParameter<double>       ("MuonIso"                  )),
+  muonID                      (iConfig.getParameter<std::string>  ("MuonID"                   )),
+  prefix                      (iConfig.getParameter<std::string>  ("Prefix"                   )),
+  suffix                      (iConfig.getParameter<std::string>  ("Suffix"                   )),
+  maxSize                     (iConfig.getParameter<unsigned int> ("MaxSize"                  ))
  {
   
   //------------------------------------------------------------------------
@@ -375,10 +372,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Get handles for the event
   //------------------------------------------------------------------------
   
-  // Tracks
-
-  edm::Handle<reco::TrackCollection> tracks;
-  iEvent.getByLabel(trkInputTag, tracks);
+  // Tracks -- SIC note: no tracks in MiniAOD
 
   // DCS information
 
@@ -400,71 +394,54 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<reco::ConversionCollection> hConversions;
   iEvent.getByLabel(conversionsInputTag, hConversions); 
 
-  // ParticleFlow-based isolation
+  //// ParticleFlow-based isolation
 
-  size_t nPfIsolationTypes = 3;
+  //size_t nPfIsolationTypes = 3;
 
-  IsoDepositVals pfIsolation03Values(nPfIsolationTypes); 
-  IsoDepositVals pfIsolation04Values(nPfIsolationTypes); 
-  
-  for (size_t j = 0; j<nPfIsolationTypes; ++j) {
-    iEvent.getByLabel( pfIsolation03InputTags[j], pfIsolation03Values[j]);
-    iEvent.getByLabel( pfIsolation04InputTags[j], pfIsolation04Values[j]);
-  }
+  //IsoDepositVals pfIsolation03Values(nPfIsolationTypes); 
+  //IsoDepositVals pfIsolation04Values(nPfIsolationTypes); 
+  //
+  //for (size_t j = 0; j<nPfIsolationTypes; ++j) {
+  //  iEvent.getByLabel( pfIsolation03InputTags[j], pfIsolation03Values[j]);
+  //  iEvent.getByLabel( pfIsolation04InputTags[j], pfIsolation04Values[j]);
+  //}
   
   // PAT electrons
 
   edm::Handle<std::vector<pat::Electron> > electrons;
   iEvent.getByLabel(inputTag, electrons);
 
-  // PAT trigger event
+  // PAT trigger matches by HLT path
+  edm::Handle<std::vector<pat::Electron> > electronsSingleElectronHLTMatched;
+  iEvent.getByLabel(inputTag, electronsSingleElectronHLTMatched);
+  edm::Handle<std::vector<pat::Electron> > electronsSingleElectronWP80HLTMatched;
+  iEvent.getByLabel(inputTag, electronsSingleElectronWP80HLTMatched);
+  edm::Handle<std::vector<pat::Electron> > electronsDoubleElectronHLTMatched;
+  iEvent.getByLabel(inputTag, electronsDoubleElectronHLTMatched);
 
-  edm::Handle< pat::TriggerEvent > triggerEvent;
-  iEvent.getByLabel( triggerEventInputTag, triggerEvent );
-
-  // PAT trigger helper for trigger matching information
-
-  const pat::helper::TriggerMatchHelper matchHelper;
 
   // rho for EGamma isolation calculation
-
-  edm::Handle<double> rho;
-  iEvent.getByLabel(rhoInputTag, rho);
-  double rhoIso = *(rho.product());
+  // SIC note: no longer needed for VID framework
+  //edm::Handle<double> rho;
+  //iEvent.getByLabel(rhoInputTag, rho);
+  //double rhoIso = *(rho.product());
   
+  // SIC add for new egamma VID framework
+  // example: https://github.com/ikrav/ElectronWork/blob/master/ElectronNtupler/plugins/ElectronNtuplerIdDemoPrePHYS14miniAOD.cc
+  // get electron ID maps
+  edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
+  iEvent.getByToken(electronVetoIdMapToken_,veto_id_decisions);
+  iEvent.getByToken(electronTightIdMapToken_,loose_id_decisions);
+  iEvent.getByToken(electronTightIdMapToken_,medium_id_decisions);
+  iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);
+
   //------------------------------------------------------------------------
-  // Get magnetic field (need this for photon conversion information):
-  //   - if isRealData then derive bfield using the magnet current from DcsStatus
-  //     scale factor = 3.801 Tesla /18166.0 Amps, which are
-  //     average values taken over a stable two-week period
-  //   - otherwise take it from the IdealMagneticFieldRecord
+  // Get magnetic field (need this for photon conversion information)
+  //  - Instead, use conversion information built into PAT/MiniAOD, so no need for this
   //------------------------------------------------------------------------
-
-  double evt_bField = 3.8;
-  double currentToBFieldScaleFactor = 2.09237036221512717e-04;
-
-  if(iEvent.isRealData()) {
-    if(dcsHandle.isValid()) {
-      edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Successfully obtained " << dcsInputTag;
-      if( (*dcsHandle).size()>0 ) {
-        double current = (*dcsHandle)[0].magnetCurrent();
-        evt_bField = current*currentToBFieldScaleFactor;
-      }
-    } 
-    else edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << dcsInputTag;
-  } 
-
-  else {
-    edm::ESHandle<MagneticField> magneticField;
-    iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
-
-    if(magneticField.isValid()) {
-      edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Successfully obtained IdealMagneticFieldRecord";
-      evt_bField = magneticField->inTesla(GlobalPoint(0.,0.,0.)).z();
-    } 
-
-    else edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get IdealMagneticFieldRecord";
-  }
 
   //------------------------------------------------------------------------
   // Loop over electrons (finally!)
@@ -509,7 +486,25 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //  - bit 4: eidRobustHighEnergy
       //  - bit 5: MVA "trig" 
       //  - bit 6: MVA "non-trig"
+      // SIC XXX FIXME: probably need to update this using the below, taken from
+      //    https://github.com/cms-sw/cmssw/blob/CMSSW_7_4_X/DataFormats/PatCandidates/interface/Electron.h
+       /// Returns a specific electron ID associated to the pat::Electron given its name
+      // For cut-based IDs, the value map has the following meaning:
+      // 0: fails,
+      // 1: passes electron ID only,
+      // 2: passes electron Isolation only,
+      // 3: passes electron ID and Isolation only,
+      // 4: passes conversion rejection,
+      // 5: passes conversion rejection and ID,
+      // 6: passes conversion rejection and Isolation,
+      // 7: passes the whole selection.
+      // For more details have a look at:
+      // https://twiki.cern.ch/twiki/bin/view/CMS/SimpleCutBasedEleID
+      // https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideCategoryBasedElectronID
+      // Note: an exception is thrown if the specified ID is not available
       //------------------------------------------------------------------------
+      // In Phys14 samples, these are CSA14-tuned ID's such as: heepElectronID-HEEPV50-CSA14-25ns
+      //  and the below
       
       int passId = 0;
       if (it->electronID("eidRobustLoose"     )>0) passId = passId | 1<<0;
@@ -517,8 +512,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if (it->electronID("eidLoose"           )>0) passId = passId | 1<<2;
       if (it->electronID("eidTight"           )>0) passId = passId | 1<<3;
       if (it->electronID("eidRobustHighEnergy")>0) passId = passId | 1<<4;
-      if (it->electronID("mvaTrigV0"          )>0) passId = passId | 1<<5;
-      if (it->electronID("mvaNonTrigV0"       )>0) passId = passId | 1<<6;
+      //if (it->electronID("mvaTrigV0"          )>0) passId = passId | 1<<5;
+      //if (it->electronID("mvaNonTrigV0"       )>0) passId = passId | 1<<6;
       
       //------------------------------------------------------------------------
       // Trigger matching
@@ -526,54 +521,75 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // Example taken from PatTriggerAnalyzer:
       // http://cmslxr.fnal.gov/lxr/source/PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.cc
       //------------------------------------------------------------------------
+      // SIC FIXME: update for Run II triggers needed
+      // SIC: we've embedded matches to selected HLT paths in the python with the PATTriggerMatchEmbedder.
+      //      now just ask if we have a match to whichever HLT path in the object
 
       // Double electron
-
-      const pat::TriggerObjectRef doubleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron, doubleEleTriggerMatch, iEvent, *triggerEvent ) );
-      if ( doubleElectronTrigRef.isAvailable() && doubleElectronTrigRef.isNonnull() ) { 
-	HLTDoubleEleMatched  -> push_back ( true ) ;
-	HLTDoubleEleMatchPt  -> push_back ( doubleElectronTrigRef -> pt() );
-	HLTDoubleEleMatchEta -> push_back ( doubleElectronTrigRef -> eta());
-	HLTDoubleEleMatchPhi -> push_back ( doubleElectronTrigRef -> phi());
-      } else { 
-	HLTDoubleEleMatched  -> push_back ( false ) ;
-	HLTDoubleEleMatchPt  -> push_back ( -999. );
-	HLTDoubleEleMatchEta -> push_back ( -999. );
-	HLTDoubleEleMatchPhi -> push_back ( -999. );
+      // SIC FIXME? In principle, could have more than one match here
+      const pat::TriggerObjectStandAloneCollection matchesDoubleEle = it->triggerObjectMatchesByPath("HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v*");
+      if(matchesDoubleEle.size() > 0)
+      {
+        HLTDoubleEleMatched  -> push_back ( true ) ;
+        HLTDoubleEleMatchPt  -> push_back ( matchesDoubleEle[0].pt() );
+        HLTDoubleEleMatchEta -> push_back ( matchesDoubleEle[0].eta());
+        HLTDoubleEleMatchPhi -> push_back ( matchesDoubleEle[0].phi());
       }
+      else
+      {
+        HLTDoubleEleMatched  -> push_back ( false ) ;
+        HLTDoubleEleMatchPt  -> push_back ( -999. );
+        HLTDoubleEleMatchEta -> push_back ( -999. );
+        HLTDoubleEleMatchPhi -> push_back ( -999. );
+      }
+
+
+  //    const pat::TriggerObjectRef doubleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron, doubleEleTriggerMatch, iEvent, *triggerEvent ) );
+  //    if ( doubleElectronTrigRef.isAvailable() && doubleElectronTrigRef.isNonnull() ) { 
+	//HLTDoubleEleMatched  -> push_back ( true ) ;
+	//HLTDoubleEleMatchPt  -> push_back ( doubleElectronTrigRef -> pt() );
+	//HLTDoubleEleMatchEta -> push_back ( doubleElectronTrigRef -> eta());
+	//HLTDoubleEleMatchPhi -> push_back ( doubleElectronTrigRef -> phi());
+  //    } else { 
+	//HLTDoubleEleMatched  -> push_back ( false ) ;
+	//HLTDoubleEleMatchPt  -> push_back ( -999. );
+	//HLTDoubleEleMatchEta -> push_back ( -999. );
+	//HLTDoubleEleMatchPhi -> push_back ( -999. );
+  //    }
 
       // Single electron
       
-      const pat::TriggerObjectRef singleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatch, iEvent, *triggerEvent ) );
-      if ( singleElectronTrigRef.isAvailable() && singleElectronTrigRef.isNonnull() ) { 
-	HLTSingleEleMatched  -> push_back ( true ) ;
-	HLTSingleEleMatchPt  -> push_back ( singleElectronTrigRef -> pt() );
-	HLTSingleEleMatchEta -> push_back ( singleElectronTrigRef -> eta());
-	HLTSingleEleMatchPhi -> push_back ( singleElectronTrigRef -> phi());
-      } else { 
-	HLTSingleEleMatched  -> push_back ( false ) ;
-	HLTSingleEleMatchPt  -> push_back ( -999. );
-	HLTSingleEleMatchEta -> push_back ( -999. );
-	HLTSingleEleMatchPhi -> push_back ( -999. );
-      }
+  //    const pat::TriggerObjectRef singleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatch, iEvent, *triggerEvent ) );
+  //    if ( singleElectronTrigRef.isAvailable() && singleElectronTrigRef.isNonnull() ) { 
+	//HLTSingleEleMatched  -> push_back ( true ) ;
+	//HLTSingleEleMatchPt  -> push_back ( singleElectronTrigRef -> pt() );
+	//HLTSingleEleMatchEta -> push_back ( singleElectronTrigRef -> eta());
+	//HLTSingleEleMatchPhi -> push_back ( singleElectronTrigRef -> phi());
+  //    } else { 
+	//HLTSingleEleMatched  -> push_back ( false ) ;
+	//HLTSingleEleMatchPt  -> push_back ( -999. );
+	//HLTSingleEleMatchEta -> push_back ( -999. );
+	//HLTSingleEleMatchPhi -> push_back ( -999. );
+  //    }
 
-      // Single electron (WP80)
-      
-      const pat::TriggerObjectRef singleElectronWP80TrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatchWP80, iEvent, *triggerEvent ) );
-      if ( singleElectronWP80TrigRef.isAvailable() && singleElectronWP80TrigRef.isNonnull() ) { 
-	HLTSingleEleWP80Matched  -> push_back ( true ) ;
-	HLTSingleEleWP80MatchPt  -> push_back ( singleElectronWP80TrigRef -> pt() );
-	HLTSingleEleWP80MatchEta -> push_back ( singleElectronWP80TrigRef -> eta());
-	HLTSingleEleWP80MatchPhi -> push_back ( singleElectronWP80TrigRef -> phi());
-      } else { 
-	HLTSingleEleWP80Matched  -> push_back ( false ) ;
-	HLTSingleEleWP80MatchPt  -> push_back ( -999. );
-	HLTSingleEleWP80MatchEta -> push_back ( -999. );
-	HLTSingleEleWP80MatchPhi -> push_back ( -999. );
-      }
+  //    // Single electron (WP80)
+  //    
+  //    const pat::TriggerObjectRef singleElectronWP80TrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatchWP80, iEvent, *triggerEvent ) );
+  //    if ( singleElectronWP80TrigRef.isAvailable() && singleElectronWP80TrigRef.isNonnull() ) { 
+	//HLTSingleEleWP80Matched  -> push_back ( true ) ;
+	//HLTSingleEleWP80MatchPt  -> push_back ( singleElectronWP80TrigRef -> pt() );
+	//HLTSingleEleWP80MatchEta -> push_back ( singleElectronWP80TrigRef -> eta());
+	//HLTSingleEleWP80MatchPhi -> push_back ( singleElectronWP80TrigRef -> phi());
+  //    } else { 
+	//HLTSingleEleWP80Matched  -> push_back ( false ) ;
+	//HLTSingleEleWP80MatchPt  -> push_back ( -999. );
+	//HLTSingleEleWP80MatchEta -> push_back ( -999. );
+	//HLTSingleEleWP80MatchPhi -> push_back ( -999. );
+  //    }
 
       //------------------------------------------------------------------------
       // Gen matching: Status 3 only
+      //FIXME SIC: Update for pythia8. should use status 23 I think for outgoing electrons.
       //------------------------------------------------------------------------
 
       double genPartPt = -999.;
@@ -603,40 +619,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //------------------------------------------------------------------------
       // Conversion information
       //------------------------------------------------------------------------
+      // Now take what's embedded in the pat candidate
 
-      // Conversion (variables)
-      ConversionFinder convFinder;
-      double dist = -9999.;
-      double dcot = -9999.;
-      if(tracks.isValid()) {
-        edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Successfully obtained " << trkInputTag;
-
-        ConversionInfo convInfo = convFinder.getConversionInfo(*it, tracks, evt_bField);
-        dist = convInfo.dist();
-        dcot = convInfo.dcot();
-      } else {
-        edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << trkInputTag;
-      }
-
-      // Conversion (fit) 
-      bool matchesConv = false;
-      double convFitProb = 0.0;
-      
-      if( hConversions.isValid() && bsHandle.isValid() ) {
-	// See: https://twiki.cern.ch/twiki/bin/view/CMS/ConversionTools#Conversion_veto_for_electron_ID
-	matchesConv = ConversionTools::hasMatchedConversion(*it,hConversions,bsHandle->position());
-	if ( matchesConv ) { 
-	  reco::ConversionRef matchedConv = ConversionTools::matchedConversion   (*it,hConversions,bsHandle->position());
-	  reco::Vertex vertex = matchedConv->conversionVertex();
-	  convFitProb = TMath::Prob( vertex.chi2(), vertex.ndof() );
-	}
-      } else {
-	if( !bsHandle.isValid() )
-	  edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << beamSpotInputTag;
-	if( !hConversions.isValid() )
-	  edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << conversionsInputTag;
-      }
-      
       //------------------------------------------------------------------------
       // Vertex association
       //------------------------------------------------------------------------
@@ -702,13 +686,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       // ID information
       passIds                  -> push_back( passId );
-      passEGammaIDVeto         -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::VETO  , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
-      passEGammaIDLoose        -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::LOOSE , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
-      passEGammaIDMedium       -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::MEDIUM, *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
-      passEGammaIDTight        -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::TIGHT , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
-      passEGammaIDTrigTight    -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, *it));
-      passEGammaIDTrigWP70     -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70 , *it));
-      passEGammaIDEoP          -> push_back (EgammaCutBasedEleId::PassEoverPCuts(*it));
+      // SIC: update to Run2 cut-based and HEEP ID's
+      const edm::Ptr<pat::Electron> elPtr(electrons, it - electrons->begin() );
+      passEGammaIDVeto         -> push_back ((*veto_id_decisions)[ elPtr ]);
+      passEGammaIDLoose        -> push_back ((*loose_id_decisions)[ elPtr ]);
+      passEGammaIDMedium       -> push_back ((*medium_id_decisions)[ elPtr ]);
+      passEGammaIDTight        -> push_back ((*tight_id_decisions)[ elPtr ]);
+      // XXX FIXME SIC: update with trigger updates?
+      //passEGammaIDTrigTight    -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, *it));
+      //passEGammaIDTrigWP70     -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70 , *it));
+      //passEGammaIDEoP          -> push_back (EgammaCutBasedEleId::PassEoverPCuts(*it));
 
       // Does this electron overlap with a muon?
       overlaps                 -> push_back( ovrlps );
@@ -753,15 +740,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       // Isolation variables: particle flow
 
-      edm::Ptr<reco::Candidate> originalGsfElectronRef = it -> originalObjectRef();
-      
-      pfChargedHadronIso03     -> push_back ( (*pfIsolation03Values[0])[originalGsfElectronRef] );
-      pfPhotonIso03            -> push_back ( (*pfIsolation03Values[1])[originalGsfElectronRef] );
-      pfNeutralHadronIso03     -> push_back ( (*pfIsolation03Values[2])[originalGsfElectronRef] );
-      
-      pfChargedHadronIso04     -> push_back ( (*pfIsolation04Values[0])[originalGsfElectronRef] );
-      pfPhotonIso04            -> push_back ( (*pfIsolation04Values[1])[originalGsfElectronRef] );
-      pfNeutralHadronIso04     -> push_back ( (*pfIsolation04Values[2])[originalGsfElectronRef] );
+      //edm::Ptr<reco::Candidate> originalGsfElectronRef = it -> originalObjectRef();
+      //
+      //pfChargedHadronIso03     -> push_back ( (*pfIsolation03Values[0])[originalGsfElectronRef] );
+      //pfPhotonIso03            -> push_back ( (*pfIsolation03Values[1])[originalGsfElectronRef] );
+      //pfNeutralHadronIso03     -> push_back ( (*pfIsolation03Values[2])[originalGsfElectronRef] );
+      //
+      //pfChargedHadronIso04     -> push_back ( (*pfIsolation04Values[0])[originalGsfElectronRef] );
+      //pfPhotonIso04            -> push_back ( (*pfIsolation04Values[1])[originalGsfElectronRef] );
+      //pfNeutralHadronIso04     -> push_back ( (*pfIsolation04Values[2])[originalGsfElectronRef] );
 
       // Isolation variables: DR 0.3				        
       
@@ -776,16 +763,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       trkIsoDR03               -> push_back( it->dr03TkSumPt() );
       
       // Conversion variables
+      constexpr reco::HitPattern::HitCategory missingHitType = reco::HitPattern::MISSING_INNER_HITS;
+      //missingHits              -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
+      missingHits              -> push_back ( it->gsfTrack()->numberOfLostHits() );
+      //missingHitsEG            -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits()     );
+      missingHitsEG            -> push_back ( it->gsfTrack()->hitPattern().numberOfHits(missingHitType) );
       
-      missingHits              -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
-      missingHitsEG            -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits()     );
-      
-      dist_vec                 -> push_back ( dist );
-      dCotTheta                -> push_back ( dcot );
-      hasMatchedConvPhot       -> push_back ( matchesConv );
+      dist_vec                 -> push_back ( it->convDist() ); // from reco::GsfElectron
+      dCotTheta                -> push_back ( it->convDcot() ); // from reco::GsfElectron
+      hasMatchedConvPhot       -> push_back ( !(it->passConversionVeto()) );
       fbrem                    -> push_back ( it->fbrem() );
-      convFitProb_vec          -> push_back ( convFitProb );
-      
+      // SIC possible FIXME: I'm not sure if we can easily replace this      
+      //convFitProb_vec          -> push_back ( convFitProb );
+
       // Vertex association variables
       
       vtxIndex                 -> push_back( vtxIndex_  );

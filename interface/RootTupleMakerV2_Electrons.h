@@ -14,10 +14,14 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag   trkInputTag, dcsInputTag, inputTag;
   const edm::InputTag   vtxInputTag, beamSpotInputTag, conversionsInputTag, triggerEventInputTag, rhoInputTag;
+  edm::EDGetTokenT<edm::ValueMap<bool> > electronVetoIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > electronLooseIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > electronMediumIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > electronTightIdMapToken_;
   const std::vector <edm::InputTag> pfIsolation03InputTags, pfIsolation04InputTags;
   const double          electronIso, muonPt, muonIso;
   const std::string     muonID;
-  const std::string     singleEleTriggerMatch, singleEleTriggerMatchWP80, doubleEleTriggerMatch;
+  const edm::InputTag   singleEleTriggerMatchTag, singleEleTriggerMatchWP80Tag, doubleEleTriggerMatchTag;
   const std::string     prefix, suffix;
   const unsigned int    maxSize;
 

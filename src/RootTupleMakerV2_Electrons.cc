@@ -36,18 +36,14 @@
 //------------------------------------------------------------------------
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
-  dcsInputTag                 (iConfig.getParameter<edm::InputTag>("DCSInputTag"              )),
   inputTag                    (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
   vtxInputTag                 (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
   beamSpotInputTag            (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
-  conversionsInputTag         (iConfig.getParameter<edm::InputTag>("ConversionsInputTag"      )),
   rhoInputTag                 (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
   electronVetoIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"))),
   electronLooseIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"))),
   electronMediumIdMapToken_   (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"))),
   electronTightIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"))),
-  pfIsolation03InputTags      (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues03")),
-  pfIsolation04InputTags      (iConfig.getParameter<std::vector<edm::InputTag> >("PFIsolationValues04")),
   electronIso                 (iConfig.getParameter<double>       ("ElectronIso"              )),
   muonPt                      (iConfig.getParameter<double>       ("MuonPt"                   )),
   muonIso                     (iConfig.getParameter<double>       ("MuonIso"                  )),
@@ -374,11 +370,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   // Tracks -- SIC note: no tracks in MiniAOD
 
-  // DCS information
+  // DCS information -- no longer needed
 
-  edm::Handle<DcsStatusCollection> dcsHandle;
-  iEvent.getByLabel(dcsInputTag, dcsHandle);
-  
   // Primary vertices
   
   edm::Handle<reco::VertexCollection> primaryVertices;
@@ -389,29 +382,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<reco::BeamSpot> bsHandle; 
   iEvent.getByLabel(beamSpotInputTag, bsHandle); 
 
-  // Photon conversion information
+  // Photon conversion information -- no longer needed; take what's embedded in pat::Electron
 
-  edm::Handle<reco::ConversionCollection> hConversions;
-  iEvent.getByLabel(conversionsInputTag, hConversions); 
-
-  //// ParticleFlow-based isolation
-
-  //size_t nPfIsolationTypes = 3;
-
-  //IsoDepositVals pfIsolation03Values(nPfIsolationTypes); 
-  //IsoDepositVals pfIsolation04Values(nPfIsolationTypes); 
-  //
-  //for (size_t j = 0; j<nPfIsolationTypes; ++j) {
-  //  iEvent.getByLabel( pfIsolation03InputTags[j], pfIsolation03Values[j]);
-  //  iEvent.getByLabel( pfIsolation04InputTags[j], pfIsolation04Values[j]);
-  //}
-  
   // PAT electrons
 
   edm::Handle<std::vector<pat::Electron> > electrons;
   iEvent.getByLabel(inputTag, electrons);
 
   // PAT trigger matches by HLT path
+  // we embed these in the regular pat::Electron collection
+  // but we could make separate collections containing only the matches if we wanted
   edm::Handle<std::vector<pat::Electron> > electronsSingleElectronHLTMatched;
   iEvent.getByLabel(inputTag, electronsSingleElectronHLTMatched);
   edm::Handle<std::vector<pat::Electron> > electronsSingleElectronWP80HLTMatched;
@@ -731,27 +711,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       e2x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
 
       // Isolation variables: PAT
-      
-      trkIsoPAT                -> push_back( it->trackIso() );
+      // dR 0.4, detector isolation
+      trkIsoPAT                -> push_back( it->trackIso() ); // note: same as userIsolation(pat::TrackIso)
       ecalIsoPAT               -> push_back( it->ecalIso() );
       hcalIsoPAT               -> push_back( it->hcalIso() );
       relIsoPAT                -> push_back( reliso );
       passIsoPAT               -> push_back( (reliso<electronIso) ? 1 : 0 ); 
 
-      // Isolation variables: particle flow
-
-      //edm::Ptr<reco::Candidate> originalGsfElectronRef = it -> originalObjectRef();
-      //
-      //pfChargedHadronIso03     -> push_back ( (*pfIsolation03Values[0])[originalGsfElectronRef] );
-      //pfPhotonIso03            -> push_back ( (*pfIsolation03Values[1])[originalGsfElectronRef] );
-      //pfNeutralHadronIso03     -> push_back ( (*pfIsolation03Values[2])[originalGsfElectronRef] );
-      //
-      //pfChargedHadronIso04     -> push_back ( (*pfIsolation04Values[0])[originalGsfElectronRef] );
-      //pfPhotonIso04            -> push_back ( (*pfIsolation04Values[1])[originalGsfElectronRef] );
-      //pfNeutralHadronIso04     -> push_back ( (*pfIsolation04Values[2])[originalGsfElectronRef] );
-
-      // Isolation variables: DR 0.3				        
-      
+      // Isolation variables: dR 0.3, detector isolation
+      // from reco::GsfElectron methods
       ecalIsoDR03              -> push_back ( it->dr03EcalRecHitSumEt() );
       hcalIsoDR03              -> push_back ( it->dr03HcalTowerSumEt() );
       hcalIsoDR03FullCone      -> push_back ( it->dr03HcalTowerSumEt() +
@@ -761,6 +729,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hcalIsoD1DR03            -> push_back( it->dr03HcalDepth1TowerSumEt() );
       hcalIsoD2DR03            -> push_back( it->dr03HcalDepth2TowerSumEt() );
       trkIsoDR03               -> push_back( it->dr03TkSumPt() );
+
+      // Isolation variables: particle flow
+      // methods from reco::GsfElectron; should be filled with dR 0.3 values from isolation value maps, e.g., gedElPFIsoValueCharged03
+      // See http://cmslxr.fnal.gov/source/RecoEgamma/EgammaElectronProducers/python/gedGsfElectronFinalizer_cfi.py?v=CMSSW_7_2_3
+      pfChargedHadronIso03     -> push_back ( it->pfIsolationVariables().sumChargedHadronPt );
+      pfPhotonIso03            -> push_back ( it->pfIsolationVariables().sumPhotonEt );
+      pfNeutralHadronIso03     -> push_back ( it->pfIsolationVariables().sumNeutralHadronEt );
+      // chargedHadronIso() is same as userIsolation(pat::PfChargedHadronIso); // dR = 0.4, filled in PAT electron producer
+      // see: http://cmslxr.fnal.gov/source/PhysicsTools/PatAlgos/python/producersLayer1/electronProducer_cff.py?v=CMSSW_7_2_3
+      pfChargedHadronIso04     -> push_back ( it->chargedHadronIso() );
+      pfPhotonIso04            -> push_back ( it->photonIso() );
+      pfNeutralHadronIso04     -> push_back ( it->neutralHadronIso() );
+      // Above dR 0.3/0.4 storage is confirmed by http://cmslxr.fnal.gov/source/PhysicsTools/Heppy/python/physicsobjects/Electron.py?v=CMSSW_7_3_1
+      // See line 129 for chargedHadronIso
+
       
       // Conversion variables
       constexpr reco::HitPattern::HitCategory missingHitType = reco::HitPattern::MISSING_INNER_HITS;

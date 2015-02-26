@@ -6,6 +6,9 @@ import os
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 process.load('PhysicsTools.PatAlgos.patSequences_cff')
+#process.load('Configuration.StandardSequences.Services_cff')
+process.load('JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff')
+process.load('JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff')
 
 # Change process name
 #process = cms.Process("ROOTTUPLEMAKERV2")
@@ -39,27 +42,26 @@ process.TFileService = cms.Service("TFileService",
 #----------------------------------------------------------------------------------------------------
 # Make sure a correct global tag is used:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
-#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 # XXX SIC: below possibly needed depending on CMSSW version
-###process.GlobalTag = GlobalTag(process.GlobalTag, 'POSTLS162_V1::All', '')
-#from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_72_V3A', '')
-## override the GlobalTag, connection string and pfnPrefix
-#if 'GlobalTag' in process.__dict__:
-#    from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
-#    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V1A::All')
-#    #process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
-#    process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
-#    process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
-#    for pset in process.GlobalTag.toGet.value():
-#        pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
-#    # fix for multi-run processing
-#    process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
-#    process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'PHYS14_25_V1', '')
+# override the GlobalTag, connection string and pfnPrefix
+if 'GlobalTag' in process.__dict__:
+    from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
+    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V1A::All')
+    #process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
+    process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
+    process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
+    for pset in process.GlobalTag.toGet.value():
+        pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
+    # fix for multi-run processing
+    process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
+    process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
-# GlobalTag
+# Otherwise, just plain GlobalTag
 #process.GlobalTag.globaltag = 'MCRUN2_72_V3'
-process.GlobalTag.globaltag = 'PHYS14_25_V1'
+#process.GlobalTag.globaltag = 'PHYS14_25_V1'
 
 # Events to process
 process.maxEvents.input = 1
@@ -79,7 +81,7 @@ process.source.fileNames = [
 # Recipe taken from here:
 # https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection#Rho_for_2011_Effective_Areas
 #----------------------------------------------------------------------------------------------------
-# XXX SIC Replace with HEEP5.0 (CSA14 stopgap ID)
+# SIC Replace with HEEP 5.1
 # Also load Egamma cut-based ID in new VID framework while we're at it
 # See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
 #   and for HEEP: https://hypernews.cern.ch/HyperNews/CMS/get/egamma/1519/2/1/1/1.html
@@ -88,17 +90,15 @@ process.source.fileNames = [
 #
 # Load tools and function definitions
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-# # Turn on VID producer
-switchOnVIDElectronIdProducer(process)
-#process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
-process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cff")
+process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
+process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
 from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
 process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 # Define which IDs we want to produce
 # Each of these two example IDs contains all four standard
-# cut-based ID working points (only two WP of the PU20bx25 are actually used here).
-#my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_CSA14_PU20bx25_V0_cff']
-my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V0_cff']
+# cut-based ID working points
+my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V0_miniAOD_cff']
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V1_miniAOD_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 #Add them to the VID producer
 for idmod in my_id_modules:
@@ -108,20 +108,38 @@ for idmod in my_id_modules:
 #----------------------------------------------------------------------------------------------------
 # Turn on trigger matching
 #----------------------------------------------------------------------------------------------------
-#XXX SIC I believe this is all stored in pat::TriggerObjectStandAlone with default MiniAOD config
+# stored in pat::TriggerObjectStandAlone with default MiniAOD config
 # See: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD
+# To access, see: https://hypernews.cern.ch/HyperNews/CMS/get/physTools/3286/1/2.html
+# This is based off of the hypernews post
 # FIXME check that we match to the paths we want while we're updating the cpp code
+from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTrigger
 
+process.cleanElectronTriggerMatchHLTSingleElectron.matched = 'unpackedPatTrigger'
+process.cleanElectronTriggerMatchHLTSingleElectronWP80.matched = 'unpackedPatTrigger'
+process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
+
+process.out.outputCommands += ['keep *_electronsTriggerMatchHLTSingleElectron_*_*',
+                               'keep *_electronsTriggerMatchHLTSingleElectronWP80 _*_*',
+                               'keep *_electronsTriggerMatchHLTDoubleElectron_*_*'      ]
+# select the matching electrons and keep them
+process.out.outputCommands += ['keep *_ electronsTriggeredHLTSingleElectron_*_*',
+                               'keep *_ electronsTriggeredHLTSingleElectronWP80_*_*',
+                               'keep *_ electronsTriggeredHLTDoubleElectron_*_*' ]
 #----------------------------------------------------------------------------------------------------
 # Add PFMET and TCMET
 # See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Tools
 #----------------------------------------------------------------------------------------------------
-# XXX SIC: I think we can get away with using the default MiniAOD MET
+# SIC: I think we can get away with using the default MiniAOD MET
+# Reproduce "raw" MET from packedPFCandidates
+from RecoMET.METProducers.PFMET_cfi import pfMet
+process.pfMet = pfMet.clone(src = "packedPFCandidates")
+process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment (as of Feb 17 2015)
 
 #----------------------------------------------------------------------------------------------------
 # MET filters
 #----------------------------------------------------------------------------------------------------
-#XXX SIC: A number of filters are run by default:
+# SIC: A number of filters are run by default:
 #Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilter)
 #Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
 #Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
@@ -182,13 +200,17 @@ process.cleanPatCandidates.replace ( process.cleanPatElectrons, process.cleanPat
 # Taken from the example:
 # http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/EgammaAnalysis/ElectronTools/test/patTuple_electronId_cfg.py?revision=1.2&view=markup&pathrev=V00-00-09
 #----------------------------------------------------------------------------------------------------
-#process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi')
 #process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaTrigNoIPV0 + process.mvaNonTrigV0 )
 #process.patElectrons.electronIDSources.mvaTrigV0     = cms.InputTag("mvaTrigV0")  
 #process.patElectrons.electronIDSources.mvaNonTrigV0  = cms.InputTag("mvaNonTrigV0") 
 #process.patElectrons.electronIDSources.mvaTrigNoIPV0 = cms.InputTag("mvaTrigNoIPV0")
-# XXX SIC FIXME: update for 7_2_X
+# Updated for 72X Run II
+# must checkout private code from Hugues for the moment
 ## See: https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
+#process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_CSA14_cfi')
+#process.mvaID = cms.Sequence(  process.mvaTrigV025nsCSA14 + process.mvaNonTrigV025nsPHYS14 )
+#FIXME: Add the stuff to calculate this in the analyzer as per Hugues' example
+# See https://github.com/HuguesBrun/ExampleElectronMVAid/blob/master/plugins/ExampleElectronMVAid.cc
 
 #process.patConversions = cms.EDProducer("PATConversionProducer",
 #    electronSource = cms.InputTag("cleanPatElectrons")  
@@ -215,14 +237,14 @@ process.cleanPatCandidates.replace ( process.cleanPatElectrons, process.cleanPat
 #----------------------------------------------------------------------------------------------------
 # Make analysisPatJets and add them to the patDefaultSequence
 #----------------------------------------------------------------------------------------------------
-process.cleanPatJetsAK5PF = process.cleanPatJets.clone()
-process.cleanPatJetsAK5PF.src = cms.InputTag('patJetsAK5PF')
-process.patDefaultSequence.replace (process.cleanPatJets, process.cleanPatJets + process.cleanPatJetsAK5PF)
-# FIXME
-process.analysisPatJetsAK5PF = process.cleanPatJetsAK5PF.clone()
-process.analysisPatJetsAK5PF.finalCut = cms.string("abs(eta)<2.5 & pt > 20")
-process.patDefaultSequence.replace ( process.cleanPatJetsAK5PF, process.cleanPatJetsAK5PF + process.analysisPatJetsAK5PF )
-# FIXME
+#process.cleanPatJetsAK5PF = process.cleanPatJets.clone()
+#process.cleanPatJetsAK5PF.src = cms.InputTag('patJetsAK5PF')
+#process.patDefaultSequence.replace (process.cleanPatJets, process.cleanPatJets + process.cleanPatJetsAK5PF)
+## FIXME
+#process.analysisPatJetsAK5PF = process.cleanPatJetsAK5PF.clone()
+#process.analysisPatJetsAK5PF.finalCut = cms.string("abs(eta)<2.5 & pt > 20")
+#process.patDefaultSequence.replace ( process.cleanPatJetsAK5PF, process.cleanPatJetsAK5PF + process.analysisPatJetsAK5PF )
+## FIXME
 
 #----------------------------------------------------------------------------------------------------
 # Add the pileup MVA to the PFJets
@@ -232,24 +254,7 @@ process.patDefaultSequence.replace ( process.cleanPatJetsAK5PF, process.cleanPat
 # This needs an update for 72X. Not sure what the official recipe is now.
 
 #----------------------------------------------------------------------------------------------------
-# Switch to CaloJets
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
-# 
-# Recommended JEC for CaloJets:
-# - L1FastJet : https://twiki.cern.ch/twiki/bin/view/CMS/JECAnalysesRecommendations#Corrections
-# - L2Relative: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-# - L3Absolute: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-#----------------------------------------------------------------------------------------------------
-#switchJetCollection(process,cms.InputTag('ak5CaloJets'),
-#    doJetID      = True , # Perform jet ID algorithm and store ID info in the jet
-#    doJTA        = True , # Perform jet track association and determine jet charge
-#    doBTagging   = True , # Perform b-tagging and store b-tagging info in the jet
-#    doType1MET   = True , # Store Type1 PFMET information.  Label of resulting PFMET collection is: patMETsAK5Calo
-#    jetIdLabel   = "ak5",# Which jet ID label should be used?
-#    jetCorrLabel = ('AK5Calo', ['L1FastJet', 'L2Relative', 'L3Absolute']), # Which jet corrections should be used?
-#    genJetCollection = cms.InputTag("ak5GenJets") # Which GEN jets should be used?
-#)
-# SIC: FIXME do we even care about the CaloJets anymore?
+# No CaloJets in MiniAOD
 
 #----------------------------------------------------------------------------------------------------
 # Define the systematic shift correction
@@ -337,13 +342,16 @@ process.pfMetT1Txy = cms.EDProducer(
 
 #----------------------------------------------------------------------------------------------------
 # This is MC, so analyze the smeared PFJets by default
+# But smearing should be done by default in MiniAOD ?
 #----------------------------------------------------------------------------------------------------
-
-process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJetsAK5PF')
-process.rootTuplePFJets.InputTagSmearedUp   = cms.InputTag('smearedAnalysisPatJetsAK5PFresUp')                                 
-process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('smearedAnalysisPatJetsAK5PFresDown')                                 
-process.rootTuplePFJets.InputTagScaledUp    = cms.InputTag('shiftedAnalysisPatJetsAK5PFenUpForCorrMEt')                                 
-process.rootTuplePFJets.InputTagScaledDown  = cms.InputTag('shiftedAnalysisPatJetsAK5PFenDownForCorrMEt')     
+# SIC FIXME TODO
+# for now just analyze the default jet collection in MiniAOD (AK4PFJetsCHS)
+#process.rootTuplePFJets.InputTag = cms.InputTag('slimmedJets')
+#process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJetsAK5PF')
+#process.rootTuplePFJets.InputTagSmearedUp   = cms.InputTag('smearedAnalysisPatJetsAK5PFresUp')                                 
+#process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('smearedAnalysisPatJetsAK5PFresDown')                                 
+#process.rootTuplePFJets.InputTagScaledUp    = cms.InputTag('shiftedAnalysisPatJetsAK5PFenUpForCorrMEt')                                 
+#process.rootTuplePFJets.InputTagScaledDown  = cms.InputTag('shiftedAnalysisPatJetsAK5PFenDownForCorrMEt')     
 
 #----------------------------------------------------------------------------------------------------
 # Set Lepton-Gen Matching Parameters
@@ -416,7 +424,6 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         # Single objects
         'keep *_rootTuplePFCandidates_*_*',
         'keep *_rootTuplePFJets_*_*',
-        'keep *_rootTupleCaloJets_*_*',
         'keep *_rootTupleElectrons_*_*',
         'keep *_rootTupleMuons_*_*',
         'keep *_rootTupleHPSTaus_*_*',
@@ -472,8 +479,15 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 #----------------------------------------------------------------------------------------------------
 # Define the path 
 #----------------------------------------------------------------------------------------------------
+# to see EventSetup content
+#process.esContent = cms.EDAnalyzer("PrintEventSetupContent")
 
 process.p = cms.Path(
+    # extra Phys14 VIDs (inc. HEEP)
+    process.egmGsfElectronIDSequence*
+    # MVA electron ID (can't be run on MiniAOD?)
+    #process.mvaID*
+    #process.esContent*
     # gen particle skimmer modules
     process.genTausFromWs*
     process.genMuonsFromWs*
@@ -481,32 +495,9 @@ process.p = cms.Path(
     process.genTausFromZs*
     process.genMuonsFromZs*
     process.genElectronsFromZs*
+    # FIXME ADD PDF WEIGHTS BACK LATER?
     # pdf weights
-    process.pdfWeights*
-    # HEEP electron ID
-    #process.HEEPId*
-    # MVA electron ID
-    #process.mvaID*
-    # HEEP rho for isolation correction
-    #process.kt6PFJetsForHEEPIsolation*
-    # Good vertices (run by default)
-    #process.goodVertices*
-    # PFMET corrections (included by default)
-    #process.type0PFMEtCorrection*
-    #process.patPFMETtype0Corr*
-    #process.producePFMETCorrections*
-    #process.correctionTermsPfMetType1Type2*
-    #process.correctionTermsPfMetShiftXY*
-    #process.correctionTermsCaloMet*
-    #process.type0PFMEtCorrection*
-    #process.pfMEtSysShiftCorrSequence*
-    ## MET filters (run by default)):
-    #process.EcalDeadCellTriggerPrimitiveFilter*
-    #process.EcalDeadCellBoundaryEnergyFilter*
-    #process.HBHENoiseFilterResultProducer*
-    #process.trackingFailureFilter*
-    #process.eeBadScFilter*
-    #process.ecalLaserCorrFilter*
+    #process.pdfWeights*
     # Now the regular PAT default sequence
     #process.patDefaultSequence*
     # Add the pileup MVA to the jets
@@ -530,7 +521,6 @@ process.p = cms.Path(
     # Single objects
     process.rootTuplePFCandidates+
     process.rootTuplePFJets+
-    process.rootTupleCaloJets+
     process.rootTupleElectrons+
     process.rootTupleMuons+
     process.rootTupleHPSTaus+
@@ -593,7 +583,6 @@ process.p = cms.Path(
 # Delete predefined Endpath (needed for running with CRAB)
 del process.out
 del process.outpath
-
 
 #----------------------------------------------------------------------------------------------------
 # Run the path

@@ -460,7 +460,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       isolationpfchargedhadrcandsptsum -> push_back( (double)(it->isolationPFChargedHadrCandsPtSum()) );
       isolationpfgammacandsetsum       -> push_back( (double)(it->isolationPFGammaCandsEtSum())       );
       leadpfchargedhadrcandsignedsipt  -> push_back( (double)(it->leadPFChargedHadrCandsignedSipt())  );
-      reco::PFCandidateRef leadPFChargedHadrCand_Ref = it->leadPFChargedHadrCand();
+      reco::PFCandidatePtr leadPFChargedHadrCand_Ref = it->leadPFChargedHadrCand();
       if(leadPFChargedHadrCand_Ref.isNonnull()){// this check is needed in case hpsTau fails decayModeFinding.
 	etaleadcharged                   -> push_back( (double)(leadPFChargedHadrCand_Ref->eta()) );
 	phileadcharged                   -> push_back( (double)(leadPFChargedHadrCand_Ref->phi()) );

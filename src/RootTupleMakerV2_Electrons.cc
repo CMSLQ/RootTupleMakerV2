@@ -193,12 +193,12 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HLTSingleEleMatchEta"     + suffix );
   produces <std::vector<double> > ( prefix + "HLTSingleEleMatchPhi"     + suffix );
 
-  // Trigger matching: Single electron (WP80)
+  // Trigger matching: Single electron (WP85)
 
-  produces <std::vector<bool  > > ( prefix + "HLTSingleEleWP80Matched"  + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchPt"  + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchEta" + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchPhi" + suffix );
+  produces <std::vector<bool  > > ( prefix + "HLTSingleEleWP85Matched"  + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleWP85MatchPt"  + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleWP85MatchEta" + suffix );
+  produces <std::vector<double> > ( prefix + "HLTSingleEleWP85MatchPhi" + suffix );
 
   // Gen matching: status 3 only 
 
@@ -351,12 +351,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  HLTSingleEleMatchEta	 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  HLTSingleEleMatchPhi      ( new std::vector<double>()  );
 
-  // Trigger matching: Single electron (WP80)
+  // Trigger matching: Single electron (WP85)
 
-  std::auto_ptr<std::vector<bool  > >  HLTSingleEleWP80Matched   ( new std::vector<bool  >()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchPt 	 ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchEta	 ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchPhi  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<bool  > >  HLTSingleEleWP85Matched   ( new std::vector<bool  >()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleWP85MatchPt 	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleWP85MatchEta	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTSingleEleWP85MatchPhi  ( new std::vector<double>()  );
 
   // Gen matching: Status 3 only
   
@@ -394,8 +394,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // but we could make separate collections containing only the matches if we wanted
   edm::Handle<std::vector<pat::Electron> > electronsSingleElectronHLTMatched;
   iEvent.getByLabel(inputTag, electronsSingleElectronHLTMatched);
-  edm::Handle<std::vector<pat::Electron> > electronsSingleElectronWP80HLTMatched;
-  iEvent.getByLabel(inputTag, electronsSingleElectronWP80HLTMatched);
+  edm::Handle<std::vector<pat::Electron> > electronsSingleElectronWP85HLTMatched;
+  iEvent.getByLabel(inputTag, electronsSingleElectronWP85HLTMatched);
   edm::Handle<std::vector<pat::Electron> > electronsDoubleElectronHLTMatched;
   iEvent.getByLabel(inputTag, electronsDoubleElectronHLTMatched);
 
@@ -497,17 +497,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       //------------------------------------------------------------------------
       // Trigger matching
-      // 
-      // Example taken from PatTriggerAnalyzer:
-      // http://cmslxr.fnal.gov/lxr/source/PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.cc
       //------------------------------------------------------------------------
-      // SIC FIXME: update for Run II triggers needed
       // SIC: we've embedded matches to selected HLT paths in the python with the PATTriggerMatchEmbedder.
       //      now just ask if we have a match to whichever HLT path in the object
 
       // Double electron
       // SIC FIXME? In principle, could have more than one match here
-      const pat::TriggerObjectStandAloneCollection matchesDoubleEle = it->triggerObjectMatchesByPath("HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v*");
+      const pat::TriggerObjectStandAloneCollection matchesDoubleEle = it->triggerObjectMatchesByPath("HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v*");
       if(matchesDoubleEle.size() > 0)
       {
         HLTDoubleEleMatched  -> push_back ( true ) ;
@@ -523,53 +519,40 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         HLTDoubleEleMatchPhi -> push_back ( -999. );
       }
 
-
-  //    const pat::TriggerObjectRef doubleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron, doubleEleTriggerMatch, iEvent, *triggerEvent ) );
-  //    if ( doubleElectronTrigRef.isAvailable() && doubleElectronTrigRef.isNonnull() ) { 
-	//HLTDoubleEleMatched  -> push_back ( true ) ;
-	//HLTDoubleEleMatchPt  -> push_back ( doubleElectronTrigRef -> pt() );
-	//HLTDoubleEleMatchEta -> push_back ( doubleElectronTrigRef -> eta());
-	//HLTDoubleEleMatchPhi -> push_back ( doubleElectronTrigRef -> phi());
-  //    } else { 
-	//HLTDoubleEleMatched  -> push_back ( false ) ;
-	//HLTDoubleEleMatchPt  -> push_back ( -999. );
-	//HLTDoubleEleMatchEta -> push_back ( -999. );
-	//HLTDoubleEleMatchPhi -> push_back ( -999. );
-  //    }
-
       // Single electron
-      
-  //    const pat::TriggerObjectRef singleElectronTrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatch, iEvent, *triggerEvent ) );
-  //    if ( singleElectronTrigRef.isAvailable() && singleElectronTrigRef.isNonnull() ) { 
-	//HLTSingleEleMatched  -> push_back ( true ) ;
-	//HLTSingleEleMatchPt  -> push_back ( singleElectronTrigRef -> pt() );
-	//HLTSingleEleMatchEta -> push_back ( singleElectronTrigRef -> eta());
-	//HLTSingleEleMatchPhi -> push_back ( singleElectronTrigRef -> phi());
-  //    } else { 
-	//HLTSingleEleMatched  -> push_back ( false ) ;
-	//HLTSingleEleMatchPt  -> push_back ( -999. );
-	//HLTSingleEleMatchEta -> push_back ( -999. );
-	//HLTSingleEleMatchPhi -> push_back ( -999. );
-  //    }
+      //    if ( singleElectronTrigRef.isAvailable() && singleElectronTrigRef.isNonnull() ) { 
+      //HLTSingleEleMatched  -> push_back ( true ) ;
+      //HLTSingleEleMatchPt  -> push_back ( singleElectronTrigRef -> pt() );
+      //HLTSingleEleMatchEta -> push_back ( singleElectronTrigRef -> eta());
+      //HLTSingleEleMatchPhi -> push_back ( singleElectronTrigRef -> phi());
+      //    } else { 
+      //HLTSingleEleMatched  -> push_back ( false ) ;
+      //HLTSingleEleMatchPt  -> push_back ( -999. );
+      //HLTSingleEleMatchEta -> push_back ( -999. );
+      //HLTSingleEleMatchPhi -> push_back ( -999. );
+      //    }
 
-  //    // Single electron (WP80)
-  //    
-  //    const pat::TriggerObjectRef singleElectronWP80TrigRef( matchHelper.triggerMatchObject( electrons, iElectron,  singleEleTriggerMatchWP80, iEvent, *triggerEvent ) );
-  //    if ( singleElectronWP80TrigRef.isAvailable() && singleElectronWP80TrigRef.isNonnull() ) { 
-	//HLTSingleEleWP80Matched  -> push_back ( true ) ;
-	//HLTSingleEleWP80MatchPt  -> push_back ( singleElectronWP80TrigRef -> pt() );
-	//HLTSingleEleWP80MatchEta -> push_back ( singleElectronWP80TrigRef -> eta());
-	//HLTSingleEleWP80MatchPhi -> push_back ( singleElectronWP80TrigRef -> phi());
-  //    } else { 
-	//HLTSingleEleWP80Matched  -> push_back ( false ) ;
-	//HLTSingleEleWP80MatchPt  -> push_back ( -999. );
-	//HLTSingleEleWP80MatchEta -> push_back ( -999. );
-	//HLTSingleEleWP80MatchPhi -> push_back ( -999. );
-  //    }
+      // Single electron (WP85)
+      const pat::TriggerObjectStandAloneCollection matchesSingleEleWP85 = it->triggerObjectMatchesByPath("HLT_Ele32_eta2p1_WP85_Gsf_v*");
+      if(matchesSingleEleWP85.size() > 0)
+      {
+        HLTSingleEleWP85Matched  -> push_back ( true ) ;
+        HLTSingleEleWP85MatchPt  -> push_back ( matchesSingleEleWP85[0].pt() );
+        HLTSingleEleWP85MatchEta -> push_back ( matchesSingleEleWP85[0].eta());
+        HLTSingleEleWP85MatchPhi -> push_back ( matchesSingleEleWP85[0].phi());
+      }
+      else 
+      { 
+        HLTSingleEleWP85Matched  -> push_back ( false ) ;
+        HLTSingleEleWP85MatchPt  -> push_back ( -999. );
+        HLTSingleEleWP85MatchEta -> push_back ( -999. );
+        HLTSingleEleWP85MatchPhi -> push_back ( -999. );
+      }
 
       //------------------------------------------------------------------------
-      // Gen matching: Status 3 only
-      //FIXME SIC: Update for pythia8. should use status 23 I think for outgoing electrons.
+      // Gen matching
+      // This should work for pythia8 in MiniAOD. should use status 23 I think for outgoing electrons.
+      // See: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD#MC_Truth
       //------------------------------------------------------------------------
 
       double genPartPt = -999.;
@@ -577,13 +560,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       double genPartPhi= -999.;
       
       if ( !iEvent.isRealData() ) {
-	for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){ //it->genParticleRefs().size() should be 0, 1 or 2                
-	  if( it->genParticle(igen)->status()==3){
-	    genPartPt =it->genParticle(igen)->pt();
-	    genPartEta=it->genParticle(igen)->eta();
-	    genPartPhi=it->genParticle(igen)->phi();
-	  }
-	}
+        for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){ //it->genParticleRefs().size() should be 0, 1 or 2                
+          if(it->genParticleRef(igen).isNonnull()) {
+            if( it->genParticle(igen)->status()==3 || it->genParticle(igen)->status()==23){
+              genPartPt =it->genParticle(igen)->pt();
+              genPartEta=it->genParticle(igen)->eta();
+              genPartPhi=it->genParticle(igen)->phi();
+            }
+          }
+          else
+            edm::LogError("RootTupleMakerV2_ElectronsError") << "genParticleRef " << igen+1 << "/" << it->genParticleRefs().size() << " is null!";
+        }
+        //XXX FIXME TODO: can't we just use this?
+        //genPartPt =it->genParticle()->pt();
+        //genPartEta=it->genParticle()->eta();
+        //genPartPhi=it->genParticle()->phi();
       }
       
       matchedGenParticlePt  -> push_back ( (double)(genPartPt ) );
@@ -924,12 +915,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( HLTSingleEleMatchEta    , prefix + "HLTSingleEleMatchEta"     + suffix );
   iEvent.put( HLTSingleEleMatchPhi    , prefix + "HLTSingleEleMatchPhi"     + suffix );
 
-  // Trigger matching: Single electron (WP80)
+  // Trigger matching: Single electron (WP85)
 
-  iEvent.put( HLTSingleEleWP80Matched , prefix + "HLTSingleEleWP80Matched"  + suffix );
-  iEvent.put( HLTSingleEleWP80MatchPt , prefix + "HLTSingleEleWP80MatchPt"  + suffix );
-  iEvent.put( HLTSingleEleWP80MatchEta, prefix + "HLTSingleEleWP80MatchEta" + suffix );
-  iEvent.put( HLTSingleEleWP80MatchPhi, prefix + "HLTSingleEleWP80MatchPhi" + suffix );
+  iEvent.put( HLTSingleEleWP85Matched , prefix + "HLTSingleEleWP85Matched"  + suffix );
+  iEvent.put( HLTSingleEleWP85MatchPt , prefix + "HLTSingleEleWP85MatchPt"  + suffix );
+  iEvent.put( HLTSingleEleWP85MatchEta, prefix + "HLTSingleEleWP85MatchEta" + suffix );
+  iEvent.put( HLTSingleEleWP85MatchPhi, prefix + "HLTSingleEleWP85MatchPhi" + suffix );
 
   // Gen matching: Status 3 only
 

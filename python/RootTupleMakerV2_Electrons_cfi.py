@@ -33,11 +33,11 @@ cleanElectronTriggerMatchHLTSingleElectron = cms.EDProducer(
 , resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
 )
 
-cleanElectronTriggerMatchHLTSingleElectronWP80 = cms.EDProducer(
+cleanElectronTriggerMatchHLTSingleElectronWP85 = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( 'slimmedElectrons' )
 , matched = cms.InputTag( 'patTrigger' )          
-, matchedCuts = cms.string( 'type( "TriggerElectron" ) && path( "HLT_Ele27_WP80_v*" )' )
+, matchedCuts = cms.string( 'type( "TriggerElectron" ) && path( "HLT_Ele32_eta2p1_WP85_Gsf_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
 , resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
@@ -47,7 +47,17 @@ cleanElectronTriggerMatchHLTDoubleElectron = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( 'slimmedElectrons' )
 , matched = cms.InputTag( 'patTrigger' ) 
-, matchedCuts = cms.string( 'type( "TriggerCluster" ) && path( "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v*" )' )
+, matchedCuts = cms.string( 'type( "TriggerCluster" ) && path( "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v*" )' )
+, maxDeltaR = cms.double( 0.5 )
+, resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
+, resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
+)
+
+cleanElectronTriggerMatchHLTElectronJetJet = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
+, src     = cms.InputTag( 'slimmedElectrons' )
+, matched = cms.InputTag( 'patTrigger' ) 
+, matchedCuts = cms.string( 'type( "TriggerCluster" ) && path( "HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
 , resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
@@ -62,11 +72,11 @@ electronsTriggerMatchHLTSingleElectron = cms.EDProducer(
   )
 )
 
-electronsTriggerMatchHLTSingleElectronWP80 = cms.EDProducer(
+electronsTriggerMatchHLTSingleElectronWP85 = cms.EDProducer(
   "PATTriggerMatchElectronEmbedder"
 , src = cms.InputTag( 'slimmedElectrons' )
 , matches = cms.VInputTag(
-  cms.InputTag( 'cleanElectronTriggerMatchHLTSingleElectronWP80' )
+  cms.InputTag( 'cleanElectronTriggerMatchHLTSingleElectronWP85' )
   )
 )
 
@@ -76,7 +86,14 @@ electronsTriggerMatchHLTDoubleElectron = cms.EDProducer(
 , matches = cms.VInputTag(
   cms.InputTag( 'cleanElectronTriggerMatchHLTDoubleElectron' )
   )
+)
 
+electronsTriggerMatchHLTElectronJetJet = cms.EDProducer(
+  "PATTriggerMatchElectronEmbedder"
+, src = cms.InputTag( 'slimmedElectrons' )
+, matches = cms.VInputTag(
+  cms.InputTag( 'cleanElectronTriggerMatchHLTElectronJetJet' )
+  )
 )
 
 # these will skim out (from the collections above with embedded matches) only the objects which have a trigger object match

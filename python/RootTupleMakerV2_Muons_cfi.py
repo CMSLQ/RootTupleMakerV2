@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Muons",
-    InputTag = cms.InputTag('cleanPatMuons'),
+    InputTag = cms.InputTag('slimmedMuons'),
     TriggerEventInputTag = cms.InputTag ('patTriggerEvent'),                                
     Prefix = cms.string('Muon'),
     Suffix = cms.string(''),
@@ -10,7 +10,7 @@ rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Muons",
     MuonID = cms.string('GlobalMuonPromptTight'),
     BeamSpotCorr = cms.bool(True),
     UseCocktailRefits = cms.bool(True),
-    VertexInputTag = cms.InputTag('offlinePrimaryVertices'),
+    VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
     SingleMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleMuon"),
     SingleIsoMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleIsoMuon")
 )

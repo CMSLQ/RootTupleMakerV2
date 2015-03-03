@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleVertex = cms.EDProducer("RootTupleMakerV2_Vertex",
-    InputTag = cms.InputTag('offlinePrimaryVertices'),
+    InputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
     Prefix = cms.string('Vertex'),
     Suffix = cms.string('')
 )

@@ -10,12 +10,11 @@
 #include <iostream>
 #include <DataFormats/TrackReco/interface/Track.h>
 #include "TLorentzVector.h"
-#include "PhysicsTools/PatUtils/interface/TriggerHelper.h"
-#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig) :
 inputTag (iConfig.getParameter<edm::InputTag>("InputTag")),
-triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
+//triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
 prefix   (iConfig.getParameter<std::string>  ("Prefix")),
 suffix   (iConfig.getParameter<std::string>  ("Suffix")),
 maxSize  (iConfig.getParameter<unsigned int> ("MaxSize")),
@@ -23,10 +22,6 @@ maxSize  (iConfig.getParameter<unsigned int> ("MaxSize")),
 muonIso  (iConfig.getParameter<double>       ("MuonIso")),
 								 // threshold for "passID"
 muonID   (iConfig.getParameter<std::string>  ("MuonID")),
-								 // trigger matching string
-singleMuonTriggerMatch(iConfig.getParameter<std::string>("SingleMuonTriggerMatch")),
-								 // trigger matching string
-singleIsoMuonTriggerMatch(iConfig.getParameter<std::string>("SingleIsoMuonTriggerMatch")),
 beamSpotCorr      (iConfig.getParameter<bool>("BeamSpotCorr")),
 useCocktailRefits (iConfig.getParameter<bool>("UseCocktailRefits")),
 								 // collection of primary vertices to be used.
@@ -286,11 +281,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	edm::Handle<reco::BeamSpot> beamSpot;
 	iEvent.getByLabel("offlineBeamSpot", beamSpot );
 
-	edm::Handle< pat::TriggerEvent > triggerEvent;
-	iEvent.getByLabel( triggerEventInputTag, triggerEvent );
+	//edm::Handle< pat::TriggerEvent > triggerEvent;
+	//iEvent.getByLabel( triggerEventInputTag, triggerEvent );
 
-	// PAT trigger helper for trigger matching information
-	const pat::helper::TriggerMatchHelper matchHelper;
+	// PAT trigger matches by HLT path
+	// we embed these in the regular pat::Muon collection 
+	// but we could make separate collections containing only the matches if we wanted
+	edm::Handle<std::vector<pat::Muon> > muonsSingleMuonHLTMatched;
+	iEvent.getByLabel(inputTag, muonsSingleMuonHLTMatched);
+	edm::Handle<std::vector<pat::Muon> > muonsSingleIsoMuonHLTMatched;
+	iEvent.getByLabel(inputTag, muonsSingleIsoMuonHLTMatched);
 
 	*hasVeryForwardPFMuon.get() = false;
 
@@ -314,6 +314,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if( it->pt()<5 ) continue;
 
 			/// Gen Matching
+			//FIXME DMM: Update for pythia8. should use status 23 I think for outgoing electrons.
 			double genparPt = -999.;
 			double genparEta= -999.;
 			double genparPhi= -999.;
@@ -406,9 +407,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			// http://cmslxr.fnal.gov/lxr/source/PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.cc
 			//------------------------------------------------------------------------
 
+			// DMM FIXME: update for Run II triggers needed
+			// SIC: we've embedded matches to selected HLT paths in the python with the PATTriggerMatchEmbedder.
+			//      now just ask if we have a match to whichever HLT path in the object
+			
 			// HLT Single Muon trigger matching
-			const pat::TriggerObjectRef singleMuonTrigRef( matchHelper.triggerMatchObject( muons, iMuon,  singleMuonTriggerMatch, iEvent, *triggerEvent ) );
-			if ( singleMuonTrigRef.isAvailable() && singleMuonTrigRef.isNonnull() )
+			// DMM FIXME? In principle, could have more than one match here
+			const pat::TriggerObjectStandAloneCollection matchesSingleMu = it->triggerObjectMatchesByPath("HLT");
+			if (matchesSingleMu.size() > 0)
 			{
 				HLTSingleMuonMatched  -> push_back ( true ) ;
 				HLTSingleMuonMatchPt  -> push_back ( singleMuonTrigRef -> pt() );
@@ -424,8 +430,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			}
 
 			// HLT Single Iso Muon trigger matching
-			const pat::TriggerObjectRef singleIsoMuonTrigRef( matchHelper.triggerMatchObject( muons, iMuon,  singleIsoMuonTriggerMatch, iEvent, *triggerEvent ) );
-			if ( singleIsoMuonTrigRef.isAvailable() && singleIsoMuonTrigRef.isNonnull() )
+						const pat::TriggerObjectStandAloneCollection matchesSingleIsoMu = it->triggerObjectMatchesByPath("HLT_IsoMu24_IterTrk02_v*");
+			if (matchesSingleIsoMu.size() > 0)
 			{
 				HLTSingleIsoMuonMatched  -> push_back ( true ) ;
 				HLTSingleIsoMuonMatchPt  -> push_back ( singleIsoMuonTrigRef -> pt() );
@@ -513,7 +519,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			{
 				if ( it->isGlobalMuon() )	
 				{
-					int refit_id = -999;
+				  //DMM FIXME - refits don't work in 7_2, will be added later
+				  //int refit_id = -999;
 
 					// -----------------------------------------------------------------------------------------------------------------------------------------//
 					// HighPT Muon - New Version (recommended)
@@ -530,7 +537,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					//The cut of dpT/pT<0.3 for the track used for momentum determination is applied, i.e. cktTrack->ptError()/cktTrack->pt()<0.3
 					//The cuts applied on recoMu.muonBestTrack (impact parameter cuts) need to be applied to cktTrack since this is the new best track now.
 					// -----------------------------------------------------------------------------------------------------------------------------------------//
-
+				  /*
 					reco::TrackRef cocktail_track = (muon::tevOptimized(*it, 200, 17., 40., 0.25)).first;
 
 					double cttrkd0  = cocktail_track -> d0() ;
@@ -592,7 +599,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					ctTrkvtxIndex            ->push_back( bct_vtxIndex_ );
 
 					// std::cout<<" Cocktail flag --> "<< bct_vtxDistXY_ <<"  "<<bct_vtxDistZ_ << std::endl;
-
+					*/
 
 
 				} //cocktail fits

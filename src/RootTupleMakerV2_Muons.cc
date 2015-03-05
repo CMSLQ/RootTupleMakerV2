@@ -417,9 +417,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if (matchesSingleMu.size() > 0)
 			{
 				HLTSingleMuonMatched  -> push_back ( true ) ;
-				HLTSingleMuonMatchPt  -> push_back ( singleMuonTrigRef -> pt() );
-				HLTSingleMuonMatchEta -> push_back ( singleMuonTrigRef -> eta());
-				HLTSingleMuonMatchPhi -> push_back ( singleMuonTrigRef -> phi());
+				HLTSingleMuonMatchPt  -> push_back ( matchesSingleMu[0].pt() );
+				HLTSingleMuonMatchEta -> push_back ( matchesSingleMu[0].eta());
+				HLTSingleMuonMatchPhi -> push_back ( matchesSingleMu[0].phi());
 			}
 			else
 			{
@@ -434,9 +434,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if (matchesSingleIsoMu.size() > 0)
 			{
 				HLTSingleIsoMuonMatched  -> push_back ( true ) ;
-				HLTSingleIsoMuonMatchPt  -> push_back ( singleIsoMuonTrigRef -> pt() );
-				HLTSingleIsoMuonMatchEta -> push_back ( singleIsoMuonTrigRef -> eta());
-				HLTSingleIsoMuonMatchPhi -> push_back ( singleIsoMuonTrigRef -> phi());
+				HLTSingleIsoMuonMatchPt  -> push_back ( matchesSingleIsoMu[0].pt() );
+				HLTSingleIsoMuonMatchEta -> push_back ( matchesSingleIsoMu[0].eta());
+				HLTSingleIsoMuonMatchPhi -> push_back ( matchesSingleIsoMu[0].phi());
 			}
 			else
 			{

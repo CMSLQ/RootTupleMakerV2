@@ -22,7 +22,6 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
-//#include "DataFormats/PatCandidates/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 #include "DataFormats/RecoCandidate/interface/IsoDepositDirection.h"
@@ -36,21 +35,27 @@
 //------------------------------------------------------------------------
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
-  inputTag                    (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
-  vtxInputTag                 (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
-  beamSpotInputTag            (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
-  rhoInputTag                 (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
-  electronVetoIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"))),
-  electronLooseIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"))),
-  electronMediumIdMapToken_   (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"))),
-  electronTightIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"))),
-  electronIso                 (iConfig.getParameter<double>       ("ElectronIso"              )),
-  muonPt                      (iConfig.getParameter<double>       ("MuonPt"                   )),
-  muonIso                     (iConfig.getParameter<double>       ("MuonIso"                  )),
-  muonID                      (iConfig.getParameter<std::string>  ("MuonID"                   )),
-  prefix                      (iConfig.getParameter<std::string>  ("Prefix"                   )),
-  suffix                      (iConfig.getParameter<std::string>  ("Suffix"                   )),
-  maxSize                     (iConfig.getParameter<unsigned int> ("MaxSize"                  ))
+  inputTag                     (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
+  vtxInputTag                  (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
+  beamSpotInputTag             (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
+  rhoInputTag                  (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
+  electronVetoIdMapInputTag_   (iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"              )),
+  electronTightIdMapInputTag_  (iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"              )),
+  electronMediumIdMapInputTag_ (iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"              )),
+  electronLooseIdMapInputTag_  (iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"              )),
+  electronHEEPIdMapInputTag_   (iConfig.getParameter<edm::InputTag>("ElectronHEEPIdMap"              )),
+  electronVetoIdMapToken_      (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"))),
+  electronLooseIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"))),
+  electronMediumIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"))),
+  electronTightIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"))),
+  electronHEEPIdMapToken_      (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronHEEPIdMap"))),
+  electronIso                  (iConfig.getParameter<double>       ("ElectronIso"              )),
+  muonPt                       (iConfig.getParameter<double>       ("MuonPt"                   )),
+  muonIso                      (iConfig.getParameter<double>       ("MuonIso"                  )),
+  muonID                       (iConfig.getParameter<std::string>  ("MuonID"                   )),
+  prefix                       (iConfig.getParameter<std::string>  ("Prefix"                   )),
+  suffix                       (iConfig.getParameter<std::string>  ("Suffix"                   )),
+  maxSize                      (iConfig.getParameter<unsigned int> ("MaxSize"                  ))
  {
   
   //------------------------------------------------------------------------
@@ -78,14 +83,16 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 
   // ID information
   
-  produces <std::vector<int> >    ( prefix + "PassId"                   + suffix );
-  produces <std::vector<int> >    ( prefix + "PassEGammaIDVeto"         + suffix );
-  produces <std::vector<int> >    ( prefix + "PassEGammaIDLoose"        + suffix );
-  produces <std::vector<int> >    ( prefix + "PassEGammaIDMedium"       + suffix );
-  produces <std::vector<int> >    ( prefix + "PassEGammaIDTight"        + suffix );
-  produces <std::vector<int> >    ( prefix + "PassEGammaIDTrigTight"    + suffix );
-  produces <std::vector<int> >    ( prefix + "PassEGammaIDTrigWP70"     + suffix );
-  produces <std::vector<int> >    ( prefix + "PassEGammaIDEoP"          + suffix );
+  produces <std::vector<int> >     ( prefix + "PassId"                   + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDVeto"         + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDLoose"        + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDMedium"       + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTight"        + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigTight"    + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigWP70"     + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDEoP"          + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassHEEPID"               + suffix );
+  produces <std::vector<float> >   ( prefix + "RhoIsoHEEP"               + suffix );
 
   // Does this electron overlap with a muon?			        
   produces <std::vector<int> >    ( prefix + "Overlaps"                 + suffix );
@@ -112,15 +119,19 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 								        
   produces <std::vector<double> > ( prefix + "DeltaPhiTrkSC"            + suffix );
   produces <std::vector<double> > ( prefix + "DeltaEtaTrkSC"            + suffix );
+  produces <std::vector<double> > ( prefix + "DeltaEtaTrkSeedSC"        + suffix );
 								        
   // Shower shape						        
 								        
   produces <std::vector<double> > ( prefix + "SigmaEtaEta"              + suffix );
   produces <std::vector<double> > ( prefix + "SigmaIEtaIEta"            + suffix );
+  produces <std::vector<double> > ( prefix + "Full5x5SigmaIEtaIEta"     + suffix );
   produces <std::vector<int> >    ( prefix + "Classif"                  + suffix );
   produces <std::vector<double> > ( prefix + "R9"                       + suffix );
   produces <std::vector<double> > ( prefix + "E1x5OverE5x5"             + suffix );
   produces <std::vector<double> > ( prefix + "E2x5OverE5x5"             + suffix );
+  produces <std::vector<double> > ( prefix + "Full5x5E1x5OverE5x5"      + suffix );
+  produces <std::vector<double> > ( prefix + "Full5x5E2x5OverE5x5"      + suffix );
   								        
   // Isolation variables: PAT					        
 								        
@@ -238,14 +249,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  scRawEnergy               ( new std::vector<double>()  );
 
   // ID information
-  std::auto_ptr<std::vector<int > >    passIds                   ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int > >    passEGammaIDVeto          ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int > >    passEGammaIDLoose         ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int > >    passEGammaIDMedium        ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int > >    passEGammaIDTight         ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int > >    passEGammaIDTrigTight     ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int > >    passEGammaIDTrigWP70      ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int > >    passEGammaIDEoP           ( new std::vector<int>   ()  ); 
+  std::auto_ptr<std::vector<int> >    passIds                   ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaIDVeto          ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaIDLoose         ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaIDMedium        ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaIDTight         ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaIDTrigTight     ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaIDTrigWP70      ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaIDEoP           ( new std::vector<bool>   ()  ); 
+  std::auto_ptr<std::vector<bool> >    passHEEPID           ( new std::vector<bool>   ()  ); 
+  std::auto_ptr<std::vector<float> >   rhoIsoHEEP           ( new std::vector<float>   ()  ); 
   
   // Does this electron overlap with a muon?
   std::auto_ptr<std::vector<int> >     overlaps                  ( new std::vector<int>   ()  );
@@ -270,14 +283,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<std::vector<double> >  deltaPhiTrkSC             ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  deltaEtaTrkSC             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  deltaEtaTrkSeedSC         ( new std::vector<double>()  );
 
   // Shower shape
 
   std::auto_ptr<std::vector<double> >  sigmaEtaEta               ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  sigmaIEtaIEta             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  full5x5SigmaIEtaIEta      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  r9                        ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e1x5overe5x5              ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  e2x5overe5x5              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  full5x5e1x5overe5x5       ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  full5x5e2x5overe5x5       ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     classif                   ( new std::vector<int>   ()  );
 
   // Isolation variables: PAT
@@ -401,10 +418,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 
   // rho for EGamma isolation calculation
-  // SIC note: no longer needed for VID framework
-  //edm::Handle<double> rho;
-  //iEvent.getByLabel(rhoInputTag, rho);
-  //double rhoIso = *(rho.product());
+  edm::Handle<double> rho;
+  iEvent.getByLabel(rhoInputTag, rho);
+  double rhoIso = *(rho.product());
   
   // SIC add for new egamma VID framework
   // example: https://github.com/ikrav/ElectronWork/blob/master/ElectronNtupler/plugins/ElectronNtuplerIdDemoPrePHYS14miniAOD.cc
@@ -413,10 +429,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
   edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
   edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
   iEvent.getByToken(electronVetoIdMapToken_,veto_id_decisions);
-  iEvent.getByToken(electronTightIdMapToken_,loose_id_decisions);
-  iEvent.getByToken(electronTightIdMapToken_,medium_id_decisions);
+  iEvent.getByToken(electronLooseIdMapToken_,loose_id_decisions);
+  iEvent.getByToken(electronMediumIdMapToken_,medium_id_decisions);
   iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);
+  iEvent.getByToken(electronHEEPIdMapToken_,heep_id_decisions);
+  // in case we want to store the instance name later
+  //std::cout << "Veto ID: " << electronVetoIdMapInputTag_.instance() << std::endl;
+  //std::cout << "Tight ID: " << electronTightIdMapInputTag_.instance() << std::endl;
+  //std::cout << "Medium ID: " << electronMediumIdMapInputTag_.instance() << std::endl;
+  //std::cout << "Loose ID: " << electronLooseIdMapInputTag_.instance() << std::endl;
+  //std::cout << "HEEP ID: " << electronHEEPIdMapInputTag_.instance() << std::endl;
 
   //------------------------------------------------------------------------
   // Get magnetic field (need this for photon conversion information)
@@ -663,6 +687,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       passEGammaIDLoose        -> push_back ((*loose_id_decisions)[ elPtr ]);
       passEGammaIDMedium       -> push_back ((*medium_id_decisions)[ elPtr ]);
       passEGammaIDTight        -> push_back ((*tight_id_decisions)[ elPtr ]);
+      passHEEPID               -> push_back ((*heep_id_decisions)[ elPtr ]);
+      rhoIsoHEEP               -> push_back (rhoIso);
       // XXX FIXME SIC: update with trigger updates?
       //passEGammaIDTrigTight    -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, *it));
       //passEGammaIDTrigWP70     -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70 , *it));
@@ -691,15 +717,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       deltaPhiTrkSC            -> push_back ( it->deltaPhiSuperClusterTrackAtVtx() );
       deltaEtaTrkSC            -> push_back ( it->deltaEtaSuperClusterTrackAtVtx() );
+      //FIXME: works in 73X
+      //deltaEtaTrkSeedSC        -> push_back ( it->deltaEtaSeedClusterTrackAtVtx() );
+      float dEtaInSeed = it->superCluster().isNonnull() && it->superCluster()->seed().isNonnull() ? 
+        it->deltaEtaSuperClusterTrackAtVtx() - it->superCluster()->eta() + it->superCluster()->seed()->eta() : std::numeric_limits<float>::max();
+      deltaEtaTrkSeedSC        -> push_back ( dEtaInSeed );
 
       // Shower shape
 
       sigmaEtaEta              -> push_back ( it->sigmaEtaEta() );
       sigmaIEtaIEta            -> push_back ( it->sigmaIetaIeta() );
+      full5x5SigmaIEtaIEta     -> push_back ( it->full5x5_sigmaIetaIeta() );
       classif                  -> push_back ( it->classification() );
       r9                       -> push_back ( it->r9() );
       e1x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e1x5()/it->e5x5()) : 0 );
       e2x5overe5x5             -> push_back ( (it->e5x5()>0) ? (it->e2x5Max()/it->e5x5()) : 0 );
+      full5x5e1x5overe5x5      -> push_back ( (it->full5x5_e5x5()>0) ? (it->full5x5_e1x5()/it->full5x5_e5x5()) : 0 );
+      full5x5e2x5overe5x5      -> push_back ( (it->full5x5_e5x5()>0) ? (it->full5x5_e2x5Max()/it->full5x5_e5x5()) : 0 );
 
       // Isolation variables: PAT
       // dR 0.4, detector isolation
@@ -739,9 +773,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // Conversion variables
       constexpr reco::HitPattern::HitCategory missingHitType = reco::HitPattern::MISSING_INNER_HITS;
       //missingHits              -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
-      missingHits              -> push_back ( it->gsfTrack()->numberOfLostHits() );
+      //missingHits              -> push_back ( it->gsfTrack()->numberOfLostHits() );
       //missingHitsEG            -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits()     );
-      missingHitsEG            -> push_back ( it->gsfTrack()->hitPattern().numberOfHits(missingHitType) );
+      missingHits            -> push_back ( it->gsfTrack()->hitPattern().numberOfHits(missingHitType) );
       
       dist_vec                 -> push_back ( it->convDist() ); // from reco::GsfElectron
       dCotTheta                -> push_back ( it->convDcot() ); // from reco::GsfElectron
@@ -809,6 +843,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( passEGammaIDTrigTight   , prefix + "PassEGammaIDTrigTight"    + suffix );
   iEvent.put( passEGammaIDTrigWP70    , prefix + "PassEGammaIDTrigWP70"     + suffix );
   iEvent.put( passEGammaIDEoP         , prefix + "PassEGammaIDEoP"          + suffix );
+  iEvent.put( passHEEPID              , prefix + "PassHEEPID"               + suffix );
+  iEvent.put( rhoIsoHEEP              , prefix + "RhoIsoHEEP"               + suffix );
   
   // Does this electron overlap with a muon?			        
   iEvent.put( overlaps                , prefix + "Overlaps"                 + suffix );
@@ -834,14 +870,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   iEvent.put( deltaPhiTrkSC           , prefix + "DeltaPhiTrkSC"            + suffix );
   iEvent.put( deltaEtaTrkSC           , prefix + "DeltaEtaTrkSC"            + suffix );
+  iEvent.put( deltaEtaTrkSeedSC       , prefix + "DeltaEtaTrkSeedSC"        + suffix );
 
   // Shower shape						        
 
   iEvent.put( sigmaEtaEta             , prefix + "SigmaEtaEta"              + suffix );
   iEvent.put( sigmaIEtaIEta           , prefix + "SigmaIEtaIEta"            + suffix );
+  iEvent.put( full5x5SigmaIEtaIEta    , prefix + "Full5x5SigmaIEtaIEta"     + suffix );
   iEvent.put( r9                      , prefix + "R9"                       + suffix );
   iEvent.put( e1x5overe5x5            , prefix + "E1x5OverE5x5"             + suffix );
   iEvent.put( e2x5overe5x5            , prefix + "E2x5OverE5x5"             + suffix );
+  iEvent.put( full5x5e1x5overe5x5        , prefix + "Full5x5E1x5OverE5x5"         + suffix );
+  iEvent.put( full5x5e2x5overe5x5        , prefix + "Full5x5E2x5OverE5x5"         + suffix );
   iEvent.put( classif                 , prefix + "Classif"                  + suffix );
   
   // Isolation variables: PAT					        

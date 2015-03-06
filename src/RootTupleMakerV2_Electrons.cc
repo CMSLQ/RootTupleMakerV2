@@ -586,7 +586,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if ( !iEvent.isRealData() ) {
         for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){ //it->genParticleRefs().size() should be 0, 1 or 2                
           if(it->genParticleRef(igen).isNonnull()) {
-            if( it->genParticle(igen)->status()==3 || it->genParticle(igen)->status()==23){
+            if(  it->genParticle(igen)->status()==1 || it->genParticle(igen)->status()==3 || it->genParticle(igen)->status()==23){
               genPartPt =it->genParticle(igen)->pt();
               genPartEta=it->genParticle(igen)->eta();
               genPartPhi=it->genParticle(igen)->phi();

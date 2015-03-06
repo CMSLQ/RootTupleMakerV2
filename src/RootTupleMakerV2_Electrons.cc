@@ -70,6 +70,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "PtHeep"                   + suffix );
   produces <std::vector<double> > ( prefix + "Energy"                   + suffix );
   produces <std::vector<double> > ( prefix + "CaloEnergy"               + suffix );
+  produces <std::vector<double> > ( prefix + "EcalEnergy"               + suffix );
   produces <std::vector<int> >    ( prefix + "Charge"                   + suffix );
   produces <std::vector<double> > ( prefix + "HoE"                      + suffix );
 								        
@@ -146,6 +147,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "PFChargedHadronIso03"     + suffix );
   produces <std::vector<double> > ( prefix + "PFNeutralHadronIso03"     + suffix );
   produces <std::vector<double> > ( prefix + "PFPhotonIso03"            + suffix );
+  produces <std::vector<double> > ( prefix + "PFPUIso03"                + suffix );
 
   produces <std::vector<double> > ( prefix + "PFChargedHadronIso04"     + suffix );
   produces <std::vector<double> > ( prefix + "PFNeutralHadronIso04"     + suffix );
@@ -237,6 +239,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  ptHeep                    ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy                    ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  caloEnergy                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  ecalEnergy                ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     charge                    ( new std::vector<int>   ()  );
   std::auto_ptr<std::vector<double> >  hoe                       ( new std::vector<double>()  );
 
@@ -310,6 +313,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pfChargedHadronIso03      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfNeutralHadronIso03      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfPhotonIso03             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pfPUIso03                 ( new std::vector<double>()  );
 
   std::auto_ptr<std::vector<double> >  pfChargedHadronIso04      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfNeutralHadronIso04      ( new std::vector<double>()  );
@@ -668,6 +672,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       ptHeep                   -> push_back ( it->caloEnergy()*sin(it->p4().theta()) );
       energy                   -> push_back ( it->energy() );
       caloEnergy               -> push_back ( it->caloEnergy() );
+      ecalEnergy               -> push_back ( it->ecalEnergy() );
       charge                   -> push_back ( it->charge() );
       hoe                      -> push_back ( it->hadronicOverEm() );
       
@@ -717,7 +722,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       deltaPhiTrkSC            -> push_back ( it->deltaPhiSuperClusterTrackAtVtx() );
       deltaEtaTrkSC            -> push_back ( it->deltaEtaSuperClusterTrackAtVtx() );
-      //FIXME: works in 73X
+      //FIXME: this works in 73X
       //deltaEtaTrkSeedSC        -> push_back ( it->deltaEtaSeedClusterTrackAtVtx() );
       float dEtaInSeed = it->superCluster().isNonnull() && it->superCluster()->seed().isNonnull() ? 
         it->deltaEtaSuperClusterTrackAtVtx() - it->superCluster()->eta() + it->superCluster()->seed()->eta() : std::numeric_limits<float>::max();
@@ -761,6 +766,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pfChargedHadronIso03     -> push_back ( it->pfIsolationVariables().sumChargedHadronPt );
       pfPhotonIso03            -> push_back ( it->pfIsolationVariables().sumPhotonEt );
       pfNeutralHadronIso03     -> push_back ( it->pfIsolationVariables().sumNeutralHadronEt );
+      pfPUIso03                -> push_back ( it->pfIsolationVariables().sumPUPt );
       // chargedHadronIso() is same as userIsolation(pat::PfChargedHadronIso); // dR = 0.4, filled in PAT electron producer
       // see: http://cmslxr.fnal.gov/source/PhysicsTools/PatAlgos/python/producersLayer1/electronProducer_cff.py?v=CMSSW_7_2_3
       pfChargedHadronIso04     -> push_back ( it->chargedHadronIso() );
@@ -823,6 +829,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( ptHeep                  , prefix + "PtHeep"                   + suffix );
   iEvent.put( energy                  , prefix + "Energy"                   + suffix );
   iEvent.put( caloEnergy              , prefix + "CaloEnergy"               + suffix );
+  iEvent.put( ecalEnergy              , prefix + "EcalEnergy"               + suffix );
   iEvent.put( charge                  , prefix + "Charge"                   + suffix );
   iEvent.put( hoe                     , prefix + "HoE"                      + suffix );
 
@@ -906,6 +913,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pfChargedHadronIso03    , prefix + "PFChargedHadronIso03"     + suffix );
   iEvent.put( pfNeutralHadronIso03    , prefix + "PFNeutralHadronIso03"     + suffix );
   iEvent.put( pfPhotonIso03           , prefix + "PFPhotonIso03"            + suffix );
+  iEvent.put( pfPUIso03               , prefix + "PFPUIso03"                + suffix );
 
   iEvent.put( pfChargedHadronIso04    , prefix + "PFChargedHadronIso04"     + suffix );
   iEvent.put( pfNeutralHadronIso04    , prefix + "PFNeutralHadronIso04"     + suffix );

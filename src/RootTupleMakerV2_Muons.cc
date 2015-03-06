@@ -314,23 +314,31 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if( it->pt()<5 ) continue;
 
 			/// Gen Matching
-			//FIXME DMM: Update for pythia8. should use status 23 I think for outgoing electrons.
+			//FIXME DMM: Update for pythia8. should use status 23 I think for outgoing muons.  Currently miniAOD stores only status 1
+			
 			double genparPt = -999.;
 			double genparEta= -999.;
 			double genparPhi= -999.;
-			if ( !iEvent.isRealData() )
-			{
-								 //it->genParticleRefs().size() should be 0 or 1
-				for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen )
-				{
-					genparPt =it->genParticle(igen)->pt();
-					genparEta=it->genParticle(igen)->eta();
-					genparPhi=it->genParticle(igen)->phi();
+			
+			if ( !iEvent.isRealData() ){
+			  //it->genParticleRefs().size() should be 0 or 1
+			  for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen )
+			    {
+			      if(it->genParticleRef(igen).isNonnull()) {
+				//std::cout<<"muon igen: "<<igen<<" pdgId: "<<it->genParticle(igen)->pdgId()<<" status: "<<it->genParticle(igen)->status()<<" pt: "<<it->genParticle(igen)->pt()<<std::endl;
+				if( it->genParticle(igen)->status()==1 || it->genParticle(igen)->status()==3 || it->genParticle(igen)->status()==23){
+				  genparPt =it->genParticle(igen)->pt();
+				  genparEta=it->genParticle(igen)->eta();
+				  genparPhi=it->genParticle(igen)->phi();
 				}
+			      }
+			      else edm::LogError("RootTupleMakerV2_MuonsError") << "genParticleRef " << igen+1 << "/" << it->genParticleRefs().size() << " is null!";
+			    }
 			}
 			matchedgenparticlept     -> push_back ( (double)(genparPt) );
 			matchedgenparticleeta    -> push_back ( (double)(genparEta) );
 			matchedgenparticlephi    -> push_back ( (double)(genparPhi) );
+			
 			/// Gen Matching
 
 			double trkd0   = it->track()->d0();
@@ -479,7 +487,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			trkPhiError -> push_back ( it->track()->phiError() );
 
 			charge            ->push_back( it->charge() );
-			trkHits           ->push_back( it->track()->numberOfValidHits() );
+			//	trkHits           ->push_back( it->track()->numberOfValidHits() );
+			trkHits           ->push_back( it->track()->hitPattern().numberOfValidHits() );
 			trkHitsTrackerOnly->push_back( it->track()->hitPattern().numberOfValidTrackerHits() );
 
 			if( it->isGlobalMuon() )

@@ -15,12 +15,14 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     ConversionsInputTag = cms.InputTag('allConversions'),
     TriggerEventInputTag = cms.InputTag('patTriggerEvent'),                                    
     LikelihoodInputTag = cms.InputTag('egammaIDLikelihood') ,
-    RhoInputTag = cms.InputTag('kt6PFJets','rho'),
+    # rho for HEEP. See e.g. https://github.com/cms-sw/cmssw/blob/CMSSW_7_5_X/RecoEgamma/ElectronIdentification/python/Identification/heepElectronID_HEEPV50_CSA14_startup_cff.py
+    RhoInputTag = cms.InputTag('fixedGridRhoFastjetAll'),
     # SIC add
     ElectronVetoIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-veto"),
     ElectronTightIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-tight"),
-    ElectronMediumIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-tight"),
-    ElectronLooseIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-tight"),
+    ElectronMediumIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-medium"),
+    ElectronLooseIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V1-miniAOD-standalone-loose"),
+    ElectronHEEPIdMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV51-miniAOD"),
 )
 
 cleanElectronTriggerMatchHLTSingleElectron = cms.EDProducer(

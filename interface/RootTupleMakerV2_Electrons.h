@@ -12,12 +12,16 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   trkInputTag, inputTag;
-  const edm::InputTag   vtxInputTag, beamSpotInputTag, triggerEventInputTag, rhoInputTag;
+  const edm::InputTag trkInputTag, inputTag;
+  const edm::InputTag vtxInputTag, beamSpotInputTag, triggerEventInputTag, rhoInputTag;
+  const edm::InputTag electronVetoIdMapInputTag_, electronTightIdMapInputTag_;
+  const edm::InputTag electronMediumIdMapInputTag_, electronLooseIdMapInputTag_;
+  const edm::InputTag electronHEEPIdMapInputTag_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronVetoIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronLooseIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronMediumIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronTightIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > electronHEEPIdMapToken_;
   const double          electronIso, muonPt, muonIso;
   const std::string     muonID;
   const edm::InputTag   singleEleTriggerMatchTag, singleEleTriggerMatchWP80Tag, doubleEleTriggerMatchTag;

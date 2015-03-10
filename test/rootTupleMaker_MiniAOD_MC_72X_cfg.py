@@ -518,7 +518,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTuplePFJets_*_*',
         'keep *_rootTupleElectrons_*_*',
         # FIXME ignore for now
-        #'keep *_rootTupleMuons_*_*',
+        'keep *_rootTupleMuons_*_*',
         #'keep *_rootTupleHPSTaus_*_*',
         # FIXME ignore for now
         #'keep *_rootTuplePhotons_*_*',
@@ -629,8 +629,8 @@ process.p = cms.Path(
     process.rootTuplePFCandidates+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
-    # FIXME ignore for now
-    #process.rootTupleMuons+
+    # FIXME ignore for now`
+    process.rootTupleMuons+
     #process.rootTupleHPSTaus+
     #process.rootTuplePhotons+
     process.rootTupleVertex+

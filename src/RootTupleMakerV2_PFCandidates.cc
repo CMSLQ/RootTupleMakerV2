@@ -155,13 +155,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
 
 
-
-
-
-
-
-
-
     //for(const pat::PackedCandidate &pfcand : *packedpfcands )
     //{
     //  bool isCloseToRecoEle  = false;

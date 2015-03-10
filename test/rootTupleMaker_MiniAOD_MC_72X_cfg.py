@@ -629,8 +629,8 @@ process.p = cms.Path(
     process.rootTuplePFCandidates+
     process.rootTuplePFJets+
     process.rootTupleElectrons+
-    # FIXME ignore for now`
     process.rootTupleMuons+
+    # FIXME ignore for now
     #process.rootTupleHPSTaus+
     #process.rootTuplePhotons+
     process.rootTupleVertex+

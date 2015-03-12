@@ -64,7 +64,7 @@ if 'GlobalTag' in process.__dict__:
 #process.GlobalTag.globaltag = 'PHYS14_25_V1'
 
 # Events to process
-process.maxEvents.input = 10
+process.maxEvents.input = 1
 
 # Input files
 process.source.fileNames = [
@@ -72,19 +72,19 @@ process.source.fileNames = [
     # Here is a test MiniAOD RelVal in CMSSW_7_2_2_patch1
     #'/store/relval/CMSSW_7_2_2_patch1/RelValZEE_13/MINIAODSIM/PU25ns_MCRUN2_72_V3_71XGENSIM-v2/00000/4E19A622-3474-E411-A100-0026189438E1.root'
     # Here is a file from dataset=/DYJetsToLL_M-50_13TeV-madgraph-pythia8/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM
-    '/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root'
+    #'/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root'
     # setup: https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/TSG-Phys14DR-00003
     ## Here is a file from my Phys14-like MiniAOD LQ1 production
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_10_1_su7.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_11_1_xCf.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_12_1_D39.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_13_1_wyC.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_14_1_ZeD.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_15_1_k6e.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_16_1_EGW.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_17_1_hdA.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_18_1_JrI.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_19_1_1N4.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_10_1_su7.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_11_1_xCf.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_12_1_D39.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_13_1_wyC.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_14_1_ZeD.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_15_1_k6e.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_16_1_EGW.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_17_1_hdA.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_18_1_JrI.root',
+    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_19_1_1N4.root',
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_1_1_Snm.root',
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_20_1_Myo.root',
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_21_1_n4c.root',
@@ -143,7 +143,9 @@ process.source.fileNames = [
 # Load tools and function definitions
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
-process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
+#process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
+# Note, must be the same as input collection used for electron ntuplizer
+process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
 from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
 process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 # Define which IDs we want to produce
@@ -166,11 +168,13 @@ for idmod in my_id_modules:
 # This is based off of the hypernews post
 # FIXME check that we match to the paths we want while we're updating the cpp code
 from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTrigger
+# need to load it into the process, or else it won't run
+process.unpackedPatTrigger = unpackedPatTrigger.clone()
 
-process.cleanElectronTriggerMatchHLTSingleElectron.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTSingleElectronWP85.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTElectronJetJet.matched = 'unpackedPatTrigger'
+process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 
 #process.out.outputCommands += ['keep *_electronsTriggerMatchHLTSingleElectron_*_*',
 #                               'keep *_electronsTriggerMatchHLTSingleElectronWP80 _*_*',
@@ -438,7 +442,12 @@ process.pfMetT1Txy = cms.EDProducer(
 # analyze the default jet collection in MiniAOD (AK4PFJetsCHS)
 #process.rootTuplePFJets.InputTag = cms.InputTag('slimmedJets')
 # analyze the remade AK5 PFJets (we also have the AK5PFJetsCHS available)
-process.rootTuplePFJets.InputTag = cms.InputTag('patJetsAK5')
+#process.rootTuplePFJets.InputTag = 'patJetsAK5'
+#process.rootTuplePFJets.InputTag = 'pfjetTriggerMatchEmbedderHLTEleJetJet'
+#process.pfjetTriggerMatchHLTEleJetJet.src = 'patJetsAK5' # use for trigger matching
+#process.pfjetTriggerMatchEmbedderHLTEleJetJet.src = 'patJetsAK5' # also use for trigger match embedding
+
+#process.rootTuplePFJets.InputTag = 'pfjetTriggerMatchEmbedderHLTEleJetJet'
 #process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJetsAK5PF')
 #process.rootTuplePFJets.InputTagSmearedUp   = cms.InputTag('smearedAnalysisPatJetsAK5PFresUp')                                 
 #process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('smearedAnalysisPatJetsAK5PFresDown')                                 
@@ -619,7 +628,6 @@ process.p = cms.Path(
     # Re-run full HPS sequence to fully profit from the fix of high pT taus (no longer needed, I assume)
     #process.recoTauClassicHPSSequence*
     #process.esContent*
-    #process.printContent*
     # RootTupleMakerV2
     (
     # Event information
@@ -627,6 +635,7 @@ process.p = cms.Path(
     process.rootTupleEventSelection+
     # Single objects
     process.rootTuplePFCandidates+
+    #process.printContent*
     process.rootTuplePFJets+
     process.rootTupleElectrons+
     # FIXME ignore for now
@@ -700,6 +709,9 @@ del process.outpath
 # Run the path
 #----------------------------------------------------------------------------------------------------
 
-process.schedule = cms.Schedule(process.p)
+process.schedule = cms.Schedule(process.p)#,process.DUMP)
 
 #print process.dumpPython()
+# try to convert it to unscheduled explicitly?
+#from FWCore.ParameterSet.Utilities import convertToUnscheduled
+#convertToUnscheduled(process)

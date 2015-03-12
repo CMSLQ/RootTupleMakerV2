@@ -37,7 +37,6 @@
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
   inputTag                     (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
   vtxInputTag                  (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
-  beamSpotInputTag             (iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"         )),
   rhoInputTag                  (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
   electronVetoIdMapInputTag_   (iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"              )),
   electronTightIdMapInputTag_  (iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"              )),
@@ -213,6 +212,13 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HLTSingleEleWP85MatchEta" + suffix );
   produces <std::vector<double> > ( prefix + "HLTSingleEleWP85MatchPhi" + suffix );
 
+  // Trigger matching: Ele+Jet+Jet
+
+  produces <std::vector<bool  > > ( prefix + "HLTEleJetJetMatched"  + suffix );
+  produces <std::vector<double> > ( prefix + "HLTEleJetJetMatchPt"  + suffix );
+  produces <std::vector<double> > ( prefix + "HLTEleJetJetMatchEta" + suffix );
+  produces <std::vector<double> > ( prefix + "HLTEleJetJetMatchPhi" + suffix );
+
   // Gen matching: status 3 only 
 
   produces <std::vector<double> > ( prefix + "MatchedGenParticlePt"   + suffix );
@@ -379,6 +385,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  HLTSingleEleWP85MatchEta	 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  HLTSingleEleWP85MatchPhi  ( new std::vector<double>()  );
 
+  // Trigger matching: Ele+Jet+Jet
+
+  std::auto_ptr<std::vector<bool  > >  HLTEleJetJetMatched   ( new std::vector<bool  >()  );
+  std::auto_ptr<std::vector<double> >  HLTEleJetJetMatchPt 	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTEleJetJetMatchEta	 ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  HLTEleJetJetMatchPhi  ( new std::vector<double>()  );
+
   // Gen matching: Status 3 only
   
   std::auto_ptr<std::vector<double> >  matchedGenParticlePt  ( new std::vector<double>()   );
@@ -399,9 +412,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByLabel(vtxInputTag,primaryVertices);
 
   // Beamspot information
-  
-  edm::Handle<reco::BeamSpot> bsHandle; 
-  iEvent.getByLabel(beamSpotInputTag, bsHandle); 
 
   // Photon conversion information -- no longer needed; take what's embedded in pat::Electron
 
@@ -413,12 +423,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // PAT trigger matches by HLT path
   // we embed these in the regular pat::Electron collection
   // but we could make separate collections containing only the matches if we wanted
-  edm::Handle<std::vector<pat::Electron> > electronsSingleElectronHLTMatched;
-  iEvent.getByLabel(inputTag, electronsSingleElectronHLTMatched);
-  edm::Handle<std::vector<pat::Electron> > electronsSingleElectronWP85HLTMatched;
-  iEvent.getByLabel(inputTag, electronsSingleElectronWP85HLTMatched);
-  edm::Handle<std::vector<pat::Electron> > electronsDoubleElectronHLTMatched;
-  iEvent.getByLabel(inputTag, electronsDoubleElectronHLTMatched);
+  //edm::Handle<std::vector<pat::Electron> > electronsSingleElectronHLTMatched;
+  //iEvent.getByLabel(inputTag, electronsSingleElectronHLTMatched);
+  //edm::Handle<std::vector<pat::Electron> > electronsSingleElectronWP85HLTMatched;
+  //iEvent.getByLabel(inputTag, electronsSingleElectronWP85HLTMatched);
+  //edm::Handle<std::vector<pat::Electron> > electronsDoubleElectronHLTMatched;
+  //iEvent.getByLabel(inputTag, electronsDoubleElectronHLTMatched);
 
 
   // rho for EGamma isolation calculation
@@ -529,8 +539,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // SIC: we've embedded matches to selected HLT paths in the python with the PATTriggerMatchEmbedder.
       //      now just ask if we have a match to whichever HLT path in the object
 
+      //TEST
+      //std::cout << "size of trigger matches: " << it->triggerObjectMatches().size() << std::endl;
+      //TEST
+
       // Double electron
-      // SIC FIXME? In principle, could have more than one match here
       const pat::TriggerObjectStandAloneCollection matchesDoubleEle = it->triggerObjectMatchesByPath("HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v*");
       if(matchesDoubleEle.size() > 0)
       {
@@ -548,17 +561,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
 
       // Single electron
-      //    if ( singleElectronTrigRef.isAvailable() && singleElectronTrigRef.isNonnull() ) { 
-      //HLTSingleEleMatched  -> push_back ( true ) ;
-      //HLTSingleEleMatchPt  -> push_back ( singleElectronTrigRef -> pt() );
-      //HLTSingleEleMatchEta -> push_back ( singleElectronTrigRef -> eta());
-      //HLTSingleEleMatchPhi -> push_back ( singleElectronTrigRef -> phi());
-      //    } else { 
-      //HLTSingleEleMatched  -> push_back ( false ) ;
-      //HLTSingleEleMatchPt  -> push_back ( -999. );
-      //HLTSingleEleMatchEta -> push_back ( -999. );
-      //HLTSingleEleMatchPhi -> push_back ( -999. );
-      //    }
+      //FIXME: TRY WP75 path in recent menu
+      //const pat::TriggerObjectStandAloneCollection matchesDoubleEle = it->triggerObjectMatchesByPath("*");
+      //if(matchesSingleEle.size() > 0)
+      //{
+      //  HLTSingleEleMatched  -> push_back ( true ) ;
+      //  HLTSingleEleMatchPt  -> push_back ( matchesSingleEle[0] -> pt() );
+      //  HLTSingleEleMatchEta -> push_back ( matchesSingleEle[0] -> eta());
+      //  HLTSingleEleMatchPhi -> push_back ( matchesSingleEle[0] -> phi());
+      //}
+      //else
+      //{ 
+      //  HLTSingleEleMatched  -> push_back ( false ) ;
+      //  HLTSingleEleMatchPt  -> push_back ( -999. );
+      //  HLTSingleEleMatchEta -> push_back ( -999. );
+      //  HLTSingleEleMatchPhi -> push_back ( -999. );
+      //}
 
       // Single electron (WP85)
       const pat::TriggerObjectStandAloneCollection matchesSingleEleWP85 = it->triggerObjectMatchesByPath("HLT_Ele32_eta2p1_WP85_Gsf_v*");
@@ -575,6 +593,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         HLTSingleEleWP85MatchPt  -> push_back ( -999. );
         HLTSingleEleWP85MatchEta -> push_back ( -999. );
         HLTSingleEleWP85MatchPhi -> push_back ( -999. );
+      }
+
+      // E+J+J cross trigger
+      const pat::TriggerObjectStandAloneCollection matchesEleJetJet = it->triggerObjectMatchesByPath("HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*");
+      if(matchesEleJetJet.size() > 0)
+      {
+        HLTEleJetJetMatched  -> push_back ( true ) ;
+        HLTEleJetJetMatchPt  -> push_back ( matchesEleJetJet[0].pt() );
+        HLTEleJetJetMatchEta -> push_back ( matchesEleJetJet[0].eta());
+        HLTEleJetJetMatchPhi -> push_back ( matchesEleJetJet[0].phi());
+      }
+      else 
+      { 
+        HLTEleJetJetMatched  -> push_back ( false ) ;
+        HLTEleJetJetMatchPt  -> push_back ( -999. );
+        HLTEleJetJetMatchEta -> push_back ( -999. );
+        HLTEleJetJetMatchPhi -> push_back ( -999. );
       }
 
       //------------------------------------------------------------------------
@@ -969,6 +1004,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( HLTSingleEleWP85MatchPt , prefix + "HLTSingleEleWP85MatchPt"  + suffix );
   iEvent.put( HLTSingleEleWP85MatchEta, prefix + "HLTSingleEleWP85MatchEta" + suffix );
   iEvent.put( HLTSingleEleWP85MatchPhi, prefix + "HLTSingleEleWP85MatchPhi" + suffix );
+
+  // Trigger matching: Ele+Jet+Jet
+
+  iEvent.put( HLTEleJetJetMatched , prefix + "HLTEleJetJetMatched"  + suffix );
+  iEvent.put( HLTEleJetJetMatchPt , prefix + "HLTEleJetJetMatchPt"  + suffix );
+  iEvent.put( HLTEleJetJetMatchEta, prefix + "HLTEleJetJetMatchEta" + suffix );
+  iEvent.put( HLTEleJetJetMatchPhi, prefix + "HLTEleJetJetMatchPhi" + suffix );
 
   // Gen matching: Status 3 only
 

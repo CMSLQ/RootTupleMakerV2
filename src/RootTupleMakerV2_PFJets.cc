@@ -13,6 +13,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
 inputTag           (iConfig.getParameter<edm::InputTag>("InputTag"           )),
@@ -260,181 +261,181 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	{
 		edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Total # PFJets: " << jets->size();
 
-		int ijet = -1;
-		for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it )
-		  {
-		    ijet++;
-		        // Only look at jets with pt>=20 GeV
-   		        if( it->pt()<20 ) 
-			        continue;
-			
-			// exit from loop when you reach the required number of jets
-			if(eta->size() >= maxSize)
-				break;
+    int ijet = -1;
+    for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it )
+    {
+      ijet++;
+      // Only look at jets with pt>=20 GeV
+      if( it->pt()<20 ) 
+        continue;
 
-			retpf.set(false);
-			int passjetLoose =0;
-			if(pfjetIDLoose( *it, retpf )) passjetLoose =1;
+      // exit from loop when you reach the required number of jets
+      if(eta->size() >= maxSize)
+        break;
 
-			retpf.set(false);
-			int passjetTight = 0;
-			if (pfjetIDTight( *it, retpf)) passjetTight =1;
+      retpf.set(false);
+      int passjetLoose =0;
+      if(pfjetIDLoose( *it, retpf )) passjetLoose =1;
+
+      retpf.set(false);
+      int passjetTight = 0;
+      if (pfjetIDTight( *it, retpf)) passjetTight =1;
 
 
       // XXX SIC FIXME JET MVA
-			//double mva   = (double) (*puJetIdMVA)[sjets->refAt(ijet)];
+      //double mva   = (double) (*puJetIdMVA)[sjets->refAt(ijet)];
       // XXX SIC FIXME PU JET ID
-			//int    idflag = (*puJetIdFlag)[sjets->refAt(ijet)];
-			//bool pileup_jetID_passLoose= PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose);
-			//bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
-			//bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
-			
-
-			if(readJECuncertainty)
-			{
-				jecUnc->setJetEta( it->eta() );
-				// the uncertainty is a function of the corrected pt
-				jecUnc->setJetPt( it->pt() );
-			}
+      //int    idflag = (*puJetIdFlag)[sjets->refAt(ijet)];
+      //bool pileup_jetID_passLoose= PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose);
+      //bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
+      //bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
 
 
-			// Status of JEC
-			//std::cout << "PF: currentJECLevel(): " << it->currentJECLevel() << std::endl;
-			//std::cout << "PF: currentJECSet(): " << it->currentJECSet() << std::endl;
-			//-------------------
+      if(readJECuncertainty)
+      {
+        jecUnc->setJetEta( it->eta() );
+        // the uncertainty is a function of the corrected pt
+        jecUnc->setJetPt( it->pt() );
+      }
 
 
-			// Vertex association
+      // Status of JEC
+      //std::cout << "PF: currentJECLevel(): " << it->currentJECLevel() << std::endl;
+      //std::cout << "PF: currentJECSet(): " << it->currentJECSet() << std::endl;
+      //-------------------
 
-			int bestVtxIndex3Ddist = -1;
-			int bestVtxIndexXYdist = -1;
-			int bestVtxIndexZdist = -1;
 
-			int bestVtxIndexSharedTracks = -1;
-			
-			double minVtxDist3D = 999999.;
-			double minVtxDistXY = -99999.;
-			double minVtxDistZ  = -99999.;
-			double maxTrackAssocRatio = -9999.;
-			
-			// Loop on primary Vertices and jets and perform associations 
-			
-			reco::VertexCollection::const_iterator lead_vertex = primaryVertices->end();
-			bool found_lead_vertex = false;
+      // Vertex association
 
-			if(primaryVertices.isValid())
-			{
-				edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
-				
-				// Main Vertex Loop
-				for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
-				{
+      int bestVtxIndex3Ddist = -1;
+      int bestVtxIndexXYdist = -1;
+      int bestVtxIndexZdist = -1;
 
-					double sumweights = 0.0;
-					double dist3Dweighted = 0.0;
-					double distXYweighted = 0.0;
-					double distZweighted = 0.0;
-					double assocsumpttracks = 0.0;
-					double trackassociationratio = 0.000001;
-	
-					if ( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
-					if ( !found_lead_vertex ) { 
-					  lead_vertex = v_it;
-					  found_lead_vertex = true;
-					}
+      int bestVtxIndexSharedTracks = -1;
 
-					// Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
-					const reco::TrackRefVector &jtracks=it->associatedTracks();
-					for(reco::TrackRefVector::const_iterator jtIt=jtracks.begin(); jtIt!=jtracks.end(); ++jtIt)
-					{
-						if( jtIt->isNull() ) continue;
-						const reco::Track *jtrack=jtIt->get();
-						double trackptweight = jtrack->pt();
-						sumweights += trackptweight;
+      double minVtxDist3D = 999999.;
+      double minVtxDistXY = -99999.;
+      double minVtxDistZ  = -99999.;
+      double maxTrackAssocRatio = -9999.;
 
-						// Weighted Distance Calculation
-						double distXY= jtrack->dxy(v_it->position());
-						double distZ = jtrack->dz(v_it->position());
-						dist3Dweighted = trackptweight*(sqrt(pow(distXY,2) + pow(distZ,2)));
-						distXYweighted = trackptweight*distXY;
-						distZweighted = trackptweight*distZ;
-						
-						
-						// Loop on vertex tracks, find PT weighted shared tracks. 
-						for(reco::Vertex::trackRef_iterator vtIt=v_it->tracks_begin(); vtIt!=v_it->tracks_end(); ++vtIt)
-						{
-							if( vtIt->isNull() ) continue;
-							const reco::Track *vtrack=vtIt->get();
-							if(vtrack!=jtrack) continue;
-							assocsumpttracks+=jtrack->pt();
-							break;
-						}
-						
-						trackassociationratio = assocsumpttracks/sumweights;
-					
-					}
-					
-					// Divide distances by sum of weights. 
-					dist3Dweighted = dist3Dweighted / sumweights;
-					distXYweighted = distXYweighted / sumweights;
-					distZweighted  = distZweighted  / sumweights;	
-	
-					// Find vertex with minimum weighted distance. 
-					if( dist3Dweighted < minVtxDist3D )
-					{
-						minVtxDist3D = dist3Dweighted;
-						bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(),v_it));
+      // Loop on primary Vertices and jets and perform associations 
 
-					}
+      reco::VertexCollection::const_iterator lead_vertex = primaryVertices->end();
+      bool found_lead_vertex = false;
 
-					if( distXYweighted < minVtxDistXY )
-					{
-						minVtxDistXY = distXYweighted;
-						bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(),v_it));
-					}
+      if(primaryVertices.isValid())
+      {
+        edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
-					if( distZweighted < minVtxDistZ )
-					{
-						minVtxDistZ = distZweighted;
-						bestVtxIndexZdist = int(std::distance(primaryVertices->begin(),v_it));
-					}
+        // Main Vertex Loop
+        for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
+        {
 
-					// Find vertex with minimum weighted distance. 
-					if( trackassociationratio > maxTrackAssocRatio )
-					{
-						maxTrackAssocRatio = trackassociationratio ;
-						bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(),v_it));
-					}						
-					
-					//std::cout<<dist3Dweighted<<"  "<<distXYweighted<<"  "<<distZweighted<<"  "<<trackassociationratio<<"  "<<int(std::distance(primaryVertices->begin(),v_it))<<std::endl;
+          double sumweights = 0.0;
+          double dist3Dweighted = 0.0;
+          double distXYweighted = 0.0;
+          double distZweighted = 0.0;
+          double assocsumpttracks = 0.0;
+          double trackassociationratio = 0.000001;
 
-					
-				}
-				//std::cout<<"---------------------"<<std::endl;
-			}	
-			else
-			{
-				edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
-			}
+          if ( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
+          if ( !found_lead_vertex ) { 
+            lead_vertex = v_it;
+            found_lead_vertex = true;
+          }
 
-			// Get the constituents of the PFJet
+          // Loop on tracks in jet, calculate PT weighted 3D distance to vertex and PT weighted shared track ratio
+          const reco::TrackRefVector &jtracks=it->associatedTracks();
+          for(reco::TrackRefVector::const_iterator jtIt=jtracks.begin(); jtIt!=jtracks.end(); ++jtIt)
+          {
+            if( jtIt->isNull() ) continue;
+            const reco::Track *jtrack=jtIt->get();
+            double trackptweight = jtrack->pt();
+            sumweights += trackptweight;
+
+            // Weighted Distance Calculation
+            double distXY= jtrack->dxy(v_it->position());
+            double distZ = jtrack->dz(v_it->position());
+            dist3Dweighted = trackptweight*(sqrt(pow(distXY,2) + pow(distZ,2)));
+            distXYweighted = trackptweight*distXY;
+            distZweighted = trackptweight*distZ;
+
+
+            // Loop on vertex tracks, find PT weighted shared tracks. 
+            for(reco::Vertex::trackRef_iterator vtIt=v_it->tracks_begin(); vtIt!=v_it->tracks_end(); ++vtIt)
+            {
+              if( vtIt->isNull() ) continue;
+              const reco::Track *vtrack=vtIt->get();
+              if(vtrack!=jtrack) continue;
+              assocsumpttracks+=jtrack->pt();
+              break;
+            }
+
+            trackassociationratio = assocsumpttracks/sumweights;
+
+          }
+
+          // Divide distances by sum of weights. 
+          dist3Dweighted = dist3Dweighted / sumweights;
+          distXYweighted = distXYweighted / sumweights;
+          distZweighted  = distZweighted  / sumweights;	
+
+          // Find vertex with minimum weighted distance. 
+          if( dist3Dweighted < minVtxDist3D )
+          {
+            minVtxDist3D = dist3Dweighted;
+            bestVtxIndex3Ddist = int(std::distance(primaryVertices->begin(),v_it));
+
+          }
+
+          if( distXYweighted < minVtxDistXY )
+          {
+            minVtxDistXY = distXYweighted;
+            bestVtxIndexXYdist = int(std::distance(primaryVertices->begin(),v_it));
+          }
+
+          if( distZweighted < minVtxDistZ )
+          {
+            minVtxDistZ = distZweighted;
+            bestVtxIndexZdist = int(std::distance(primaryVertices->begin(),v_it));
+          }
+
+          // Find vertex with minimum weighted distance. 
+          if( trackassociationratio > maxTrackAssocRatio )
+          {
+            maxTrackAssocRatio = trackassociationratio ;
+            bestVtxIndexSharedTracks = int(std::distance(primaryVertices->begin(),v_it));
+          }						
+
+          //std::cout<<dist3Dweighted<<"  "<<distXYweighted<<"  "<<distZweighted<<"  "<<trackassociationratio<<"  "<<int(std::distance(primaryVertices->begin(),v_it))<<std::endl;
+
+
+        }
+        //std::cout<<"---------------------"<<std::endl;
+      }	
+      else
+      {
+        edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << vtxInputTag;
+      }
+
+      // Get the constituents of the PFJet
       // On MiniAOD, we must use daughters instead
 
-			//std::vector <reco::PFCandidatePtr> constituents  = it -> getPFConstituents();
-			//std::vector <reco::PFCandidatePtr>::iterator i_constituent   = constituents.begin();
-			//std::vector <reco::PFCandidatePtr>::iterator end_constituent = constituents.end();
+      //std::vector <reco::PFCandidatePtr> constituents  = it -> getPFConstituents();
+      //std::vector <reco::PFCandidatePtr>::iterator i_constituent   = constituents.begin();
+      //std::vector <reco::PFCandidatePtr>::iterator end_constituent = constituents.end();
       int numberOfDaughters = it->numberOfDaughters();
-			double sum_track_pt = 0.;
-	
-			double jetBetaStar        = 0.0 ;
-			double jetBetaStarClassic = 0.0 ;
-			double jetBeta            = 0.0 ;
-			double jetBetaClassic     = 0.0 ;
+      double sum_track_pt = 0.;
 
-			if ( found_lead_vertex ) { 
+      double jetBetaStar        = 0.0 ;
+      double jetBetaStarClassic = 0.0 ;
+      double jetBeta            = 0.0 ;
+      double jetBetaClassic     = 0.0 ;
+
+      if ( found_lead_vertex ) { 
         for(int dau = 0; dau < numberOfDaughters; ++dau) {
           edm::Ptr<pat::PackedCandidate> constituent(it->daughterPtr(dau));
-			    
+
           try { 
             // constituent->pseudoTrack().pt() in MiniAOD (best we can have) is the same as constituent pt
             //   so no need to make the pseudoTrack here
@@ -445,7 +446,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             // See: https://hypernews.cern.ch/HyperNews/CMS/get/csa14/85/1/1/1.html
             // Note that for CHS jets, all daughters will be at least PV Loose (i.e., not from a "pileup" vertex)
             bool track_from_lead_vertex = (constituent->fromPV() == pat::PackedCandidate::PVUsedInFit) ||
-                                          (constituent->fromPV() == pat::PackedCandidate::PVTight);
+              (constituent->fromPV() == pat::PackedCandidate::PVTight);
 
             bool track_from_other_vertex = false;
 
@@ -469,171 +470,185 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             else if ( dZ  < 0.2 ) jetBetaStar += track_pt;
 
           }
-			    
-			    catch (cms::Exception & e) { std::cout << e << std::endl; } 
-			    
-			  }
-			}
 
-			if ( sum_track_pt != 0. ) { 
-			  jetBetaStar        /= sum_track_pt ;
-			  jetBetaStarClassic /= sum_track_pt ;
-			  jetBeta            /= sum_track_pt ;
-			  jetBetaClassic     /= sum_track_pt ;
-			} 
-			else { 
-			  assert ( jetBetaStar        == 0.0 );
-			  assert ( jetBetaStarClassic == 0.0 );
-			  assert ( jetBeta            == 0.0 );
-			  assert ( jetBetaClassic     == 0.0 );
-			}
-			
-			betaStar        -> push_back ( jetBetaStar        ) ;
-			betaStarClassic -> push_back ( jetBetaStarClassic ) ;
-			beta            -> push_back ( jetBeta            ) ;
-			betaClassic     -> push_back ( jetBetaClassic     ) ;
-			
-			bestVertexTrackAssociationFactor ->push_back( maxTrackAssocRatio );
-			bestVertexTrackAssociationIndex ->push_back( bestVtxIndexSharedTracks );
-			closestVertexWeighted3DSeparation ->push_back( minVtxDist3D);
-			closestVertexWeightedXYSeparation ->push_back( minVtxDistXY );
-			closestVertexWeightedZSeparation ->push_back( minVtxDistZ);
-			closestVertex3DIndex ->push_back( bestVtxIndex3Ddist);
-			closestVertexXYIndex ->push_back( bestVtxIndexXYdist);
-			closestVertexZIndex ->push_back( bestVtxIndexZdist);
-			
-			eta->push_back( it->eta() );
-			phi->push_back( it->phi() );
-			pt->push_back( it->pt() );
+          catch (cms::Exception & e) { std::cout << e << std::endl; } 
+
+        }
+      }
+
+      if ( sum_track_pt != 0. ) { 
+        jetBetaStar        /= sum_track_pt ;
+        jetBetaStarClassic /= sum_track_pt ;
+        jetBeta            /= sum_track_pt ;
+        jetBetaClassic     /= sum_track_pt ;
+      } 
+      else { 
+        assert ( jetBetaStar        == 0.0 );
+        assert ( jetBetaStarClassic == 0.0 );
+        assert ( jetBeta            == 0.0 );
+        assert ( jetBetaClassic     == 0.0 );
+      }
+
+      betaStar        -> push_back ( jetBetaStar        ) ;
+      betaStarClassic -> push_back ( jetBetaStarClassic ) ;
+      beta            -> push_back ( jetBeta            ) ;
+      betaClassic     -> push_back ( jetBetaClassic     ) ;
+
+      bestVertexTrackAssociationFactor ->push_back( maxTrackAssocRatio );
+      bestVertexTrackAssociationIndex ->push_back( bestVtxIndexSharedTracks );
+      closestVertexWeighted3DSeparation ->push_back( minVtxDist3D);
+      closestVertexWeightedXYSeparation ->push_back( minVtxDistXY );
+      closestVertexWeightedZSeparation ->push_back( minVtxDistZ);
+      closestVertex3DIndex ->push_back( bestVtxIndex3Ddist);
+      closestVertexXYIndex ->push_back( bestVtxIndexXYdist);
+      closestVertexZIndex ->push_back( bestVtxIndexZdist);
+
+      eta->push_back( it->eta() );
+      phi->push_back( it->phi() );
+      pt->push_back( it->pt() );
 
       //FIXME TODO later
-			//if ( !iEvent.isRealData() ) { 
-			//  if ( jetsSmearedUp.isValid() ){
-			//    it_smearedUp = jetsSmearedUp -> begin() + ijet;
-			//    ptSmearedUp -> push_back ( it_smearedUp -> pt() );
-			//    energySmearedUp -> push_back ( it_smearedUp -> energy() );
-			//  }
-			//  
-			//  if ( jetsSmearedDown.isValid() ){
-			//    it_smearedDown = jetsSmearedDown -> begin() + ijet;
-			//    ptSmearedDown -> push_back ( it_smearedDown -> pt() );
-			//    energySmearedDown -> push_back ( it_smearedDown -> energy() );
-			//  }
-			//  
-			//  if ( jetsScaledUp.isValid() ){
-			//    it_scaledUp = jetsScaledUp -> begin() + ijet;
-			//    ptScaledUp -> push_back ( it_scaledUp -> pt() );
-			//    energyScaledUp -> push_back ( it_scaledUp -> energy() );
-			//  }
-			//  
-			//  if ( jetsScaledDown.isValid() ){
-			//    it_scaledDown = jetsScaledDown -> begin() + ijet;
-			//    ptScaledDown -> push_back ( it_scaledDown -> pt() );
-			//    energyScaledDown -> push_back ( it_scaledDown -> energy() );
-			//  }
-			//}
-			//
-			//else { 
-			//  ptSmearedUp       -> push_back ( it -> pt()     );
-			//  energySmearedUp   -> push_back ( it -> energy() );
-			//  ptSmearedDown     -> push_back ( it -> pt()     );
-			//  energySmearedDown -> push_back ( it -> energy() );
-			//  ptScaledUp        -> push_back ( it -> pt()     );
-			//  energyScaledUp    -> push_back ( it -> energy() );
-			//  ptScaledDown      -> push_back ( it -> pt()     );
-			//  energyScaledDown  -> push_back ( it -> energy() );
-			//}
+      //if ( !iEvent.isRealData() ) { 
+      //  if ( jetsSmearedUp.isValid() ){
+      //    it_smearedUp = jetsSmearedUp -> begin() + ijet;
+      //    ptSmearedUp -> push_back ( it_smearedUp -> pt() );
+      //    energySmearedUp -> push_back ( it_smearedUp -> energy() );
+      //  }
+      //  
+      //  if ( jetsSmearedDown.isValid() ){
+      //    it_smearedDown = jetsSmearedDown -> begin() + ijet;
+      //    ptSmearedDown -> push_back ( it_smearedDown -> pt() );
+      //    energySmearedDown -> push_back ( it_smearedDown -> energy() );
+      //  }
+      //  
+      //  if ( jetsScaledUp.isValid() ){
+      //    it_scaledUp = jetsScaledUp -> begin() + ijet;
+      //    ptScaledUp -> push_back ( it_scaledUp -> pt() );
+      //    energyScaledUp -> push_back ( it_scaledUp -> energy() );
+      //  }
+      //  
+      //  if ( jetsScaledDown.isValid() ){
+      //    it_scaledDown = jetsScaledDown -> begin() + ijet;
+      //    ptScaledDown -> push_back ( it_scaledDown -> pt() );
+      //    energyScaledDown -> push_back ( it_scaledDown -> energy() );
+      //  }
+      //}
+      //
+      //else { 
+      //  ptSmearedUp       -> push_back ( it -> pt()     );
+      //  energySmearedUp   -> push_back ( it -> energy() );
+      //  ptSmearedDown     -> push_back ( it -> pt()     );
+      //  energySmearedDown -> push_back ( it -> energy() );
+      //  ptScaledUp        -> push_back ( it -> pt()     );
+      //  energyScaledUp    -> push_back ( it -> energy() );
+      //  ptScaledDown      -> push_back ( it -> pt()     );
+      //  energyScaledDown  -> push_back ( it -> energy() );
+      //}
 
-			pt_raw->push_back( it->correctedJet("Uncorrected").pt() );
-			energy->push_back( it->energy() );
-			energy_raw->push_back( it->correctedJet("Uncorrected").energy() );
-			l2l3resJEC_vec->push_back( it->pt()/it->correctedJet("L3Absolute").pt() );
-			l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
-			l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1FastJet").pt() );
-			l1fastjetJEC_vec->push_back( it->correctedJet("L1FastJet").pt()/it->correctedJet("Uncorrected").pt() );
-			if(readJECuncertainty){ 
-			  double uncertainty = -999.;
-			  try { 
-			    uncertainty = jecUnc->getUncertainty(true);
-			  } 
-			  catch ( cms::Exception & e ) { 
-			    edm::LogWarning("RootTupleMakerV2_PFJetsError") << "Warning! For PFJet with eta = " << it -> eta() << " caught JEC unc exception: " << e;
-			    uncertainty = -999.;
-			    *hasJetWithBadUnc.get() = true;
-			  }
-			  jecUnc_vec->push_back( uncertainty );
-			}
-			else {
-			  jecUnc_vec->push_back( -999 );
-			}
-			partonFlavour->push_back( it->partonFlavour() );
-			chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
-			chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
-			// same as : it->chargedHadronEnergy() / it->correctedJet("Uncorrected").energy()
-			chargedMuEnergyFraction->push_back( it->chargedMuEnergyFraction() );
-			electronEnergyFraction->push_back( it->electronEnergy() / it->correctedJet("Uncorrected").energy() );
-			// 'const class pat::Jet' has no member named 'electronEnergyFraction'
-			muonEnergyFraction->push_back( it->muonEnergyFraction() );
-			neutralEmEnergyFraction->push_back( it->neutralEmEnergyFraction() );
-			neutralHadronEnergyFraction->push_back( it->neutralHadronEnergyFraction() );
-			photonEnergyFraction->push_back( it->photonEnergyFraction() );
-			hfHadronEnergyFraction->push_back( it->HFHadronEnergyFraction() );
-			hfEMEnergyFraction->push_back( it->HFEMEnergyFraction() );
-			chargedHadronMultiplicity->push_back( it->chargedHadronMultiplicity() );
-			chargedMultiplicity->push_back( it->chargedMultiplicity() );
-			electronMultiplicity->push_back( it->electronMultiplicity() );
-			muonMultiplicity->push_back( it->muonMultiplicity() );
-			neutralHadronMultiplicity->push_back( it->neutralHadronMultiplicity() );
-			neutralMultiplicity->push_back( it->neutralMultiplicity() );
-			photonMultiplicity->push_back( it->photonMultiplicity() );
-			hfHadronMultiplicity->push_back( it->HFHadronMultiplicity() );
-			hfEMMultiplicity->push_back( it->HFEMMultiplicity() );
-			nConstituents->push_back( it->numberOfDaughters() ); // same as it->getPFConstituents().size()
-			trackCountingHighEffBTag->push_back( it->bDiscriminator("trackCountingHighEffBJetTags") );
-			trackCountingHighPurBTag->push_back( it->bDiscriminator("trackCountingHighPurBJetTags") );
-			simpleSecondaryVertexHighEffBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags") );
-			simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags") );
-			jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
-			jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
-			combinedSecondaryVertexBTag         ->push_back( it->bDiscriminator("combinedSecondaryVertexBJetTags"         ));
-			combinedSecondaryVertexMVABTag      ->push_back( it->bDiscriminator("combinedSecondaryVertexMVABJetTags"      ));
-			softElectronByPtBTag                ->push_back( it->bDiscriminator("softElectronByPtBJetTags"                ));                
-			softElectronByIP3dBTag              ->push_back( it->bDiscriminator("softElectronByIP3dBJetTags"              ));
-			softMuonBTag                        ->push_back( it->bDiscriminator("softMuonBJetTags"                        ));
-			softMuonByPtBTag                    ->push_back( it->bDiscriminator("softMuonByPtBJetTags"                    ));                
-			softMuonByIP3dBTag                  ->push_back( it->bDiscriminator("softMuonByIP3dBJetTags"                  ));
-			combinedInclusiveSecondaryVertexBTag->push_back( it->bDiscriminator("combinedInclusiveSecondaryVertexBJetTags"));
-			combinedMVABTag                     ->push_back( it->bDiscriminator("combinedMVABJetTags"                     ));
-			passLooseID->push_back( passjetLoose );
-			passTightID->push_back( passjetTight );
+      pt_raw->push_back( it->correctedJet("Uncorrected").pt() );
+      energy->push_back( it->energy() );
+      energy_raw->push_back( it->correctedJet("Uncorrected").energy() );
+      l2l3resJEC_vec->push_back( it->pt()/it->correctedJet("L3Absolute").pt() );
+      l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
+      l2relJEC_vec->push_back( it->correctedJet("L2Relative").pt()/it->correctedJet("L1FastJet").pt() );
+      l1fastjetJEC_vec->push_back( it->correctedJet("L1FastJet").pt()/it->correctedJet("Uncorrected").pt() );
+      if(readJECuncertainty){ 
+        double uncertainty = -999.;
+        try { 
+          uncertainty = jecUnc->getUncertainty(true);
+        } 
+        catch ( cms::Exception & e ) { 
+          edm::LogWarning("RootTupleMakerV2_PFJetsError") << "Warning! For PFJet with eta = " << it -> eta() << " caught JEC unc exception: " << e;
+          uncertainty = -999.;
+          *hasJetWithBadUnc.get() = true;
+        }
+        jecUnc_vec->push_back( uncertainty );
+      }
+      else {
+        jecUnc_vec->push_back( -999 );
+      }
+      partonFlavour->push_back( it->partonFlavour() );
+      chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
+      chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
+      // same as : it->chargedHadronEnergy() / it->correctedJet("Uncorrected").energy()
+      chargedMuEnergyFraction->push_back( it->chargedMuEnergyFraction() );
+      electronEnergyFraction->push_back( it->electronEnergy() / it->correctedJet("Uncorrected").energy() );
+      // 'const class pat::Jet' has no member named 'electronEnergyFraction'
+      muonEnergyFraction->push_back( it->muonEnergyFraction() );
+      neutralEmEnergyFraction->push_back( it->neutralEmEnergyFraction() );
+      neutralHadronEnergyFraction->push_back( it->neutralHadronEnergyFraction() );
+      photonEnergyFraction->push_back( it->photonEnergyFraction() );
+      hfHadronEnergyFraction->push_back( it->HFHadronEnergyFraction() );
+      hfEMEnergyFraction->push_back( it->HFEMEnergyFraction() );
+      chargedHadronMultiplicity->push_back( it->chargedHadronMultiplicity() );
+      chargedMultiplicity->push_back( it->chargedMultiplicity() );
+      electronMultiplicity->push_back( it->electronMultiplicity() );
+      muonMultiplicity->push_back( it->muonMultiplicity() );
+      neutralHadronMultiplicity->push_back( it->neutralHadronMultiplicity() );
+      neutralMultiplicity->push_back( it->neutralMultiplicity() );
+      photonMultiplicity->push_back( it->photonMultiplicity() );
+      hfHadronMultiplicity->push_back( it->HFHadronMultiplicity() );
+      hfEMMultiplicity->push_back( it->HFEMMultiplicity() );
+      nConstituents->push_back( it->numberOfDaughters() ); // same as it->getPFConstituents().size()
+      trackCountingHighEffBTag->push_back( it->bDiscriminator("trackCountingHighEffBJetTags") );
+      trackCountingHighPurBTag->push_back( it->bDiscriminator("trackCountingHighPurBJetTags") );
+      simpleSecondaryVertexHighEffBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighEffBJetTags") );
+      simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("simpleSecondaryVertexHighPurBJetTags") );
+      jetProbabilityBTag->push_back( it->bDiscriminator("jetProbabilityBJetTags") );
+      jetBProbabilityBTag->push_back( it->bDiscriminator("jetBProbabilityBJetTags") );
+      combinedSecondaryVertexBTag         ->push_back( it->bDiscriminator("combinedSecondaryVertexBJetTags"         ));
+      combinedSecondaryVertexMVABTag      ->push_back( it->bDiscriminator("combinedSecondaryVertexMVABJetTags"      ));
+      softElectronByPtBTag                ->push_back( it->bDiscriminator("softElectronByPtBJetTags"                ));                
+      softElectronByIP3dBTag              ->push_back( it->bDiscriminator("softElectronByIP3dBJetTags"              ));
+      softMuonBTag                        ->push_back( it->bDiscriminator("softMuonBJetTags"                        ));
+      softMuonByPtBTag                    ->push_back( it->bDiscriminator("softMuonByPtBJetTags"                    ));                
+      softMuonByIP3dBTag                  ->push_back( it->bDiscriminator("softMuonByIP3dBJetTags"                  ));
+      combinedInclusiveSecondaryVertexBTag->push_back( it->bDiscriminator("combinedInclusiveSecondaryVertexBJetTags"));
+      combinedMVABTag                     ->push_back( it->bDiscriminator("combinedMVABJetTags"                     ));
+      passLooseID->push_back( passjetLoose );
+      passTightID->push_back( passjetTight );
       // XXX SIC FIXME PU JET ID
-			//pileup_jetID_passLooseWP->push_back(pileup_jetID_passLoose);
-			//pileup_jetID_passMediumWP->push_back(pileup_jetID_passMedium);
-			//pileup_jetID_passTightWP->push_back(pileup_jetID_passTight);
-			//jetpileup_idflag->push_back(idflag);
+      //pileup_jetID_passLooseWP->push_back(pileup_jetID_passLoose);
+      //pileup_jetID_passMediumWP->push_back(pileup_jetID_passMedium);
+      //pileup_jetID_passTightWP->push_back(pileup_jetID_passTight);
+      //jetpileup_idflag->push_back(idflag);
       // XXX SIC FIXME JET MVA
-			//jetpileup_mva->push_back(mva);
+      //jetpileup_mva->push_back(mva);
 
-// 			//////////////////////////////////////////////////////////////////// 
-// 			if( fabs(it->eta()) > 3) 
-// 			  {
-//  			    double SUM = it->chargedEmEnergyFraction() + it->chargedHadronEnergyFraction() + it->neutralEmEnergyFraction() + it->neutralHadronEnergyFraction() + it->chargedMuEnergyFraction() + it->HFHadronEnergyFraction() + it->HFEMEnergyFraction() ; 
-			    
-//  			    std::cout << "eta,chargedEmEnergy,chargedHadronEnergy,neutralEmEnergy,neutralHadronEnergy,chargedMuEnergy,HFHadronEnergy,HFEMEnergy,SUM: "  
-//  				      << it->eta() << " , "
-//  				      << it->chargedEmEnergyFraction() << " , " 
-//  				      << it->chargedHadronEnergyFraction() << " , " 
-//  				      << it->neutralEmEnergyFraction() << " , "  
-//  				      << it->neutralHadronEnergyFraction() << " , "
-//  				      << it->chargedMuEnergyFraction() << " , "
-//  				      << it->HFHadronEnergyFraction() << " , "
-//  				      << it->HFEMEnergyFraction() << " , "
-//  				      << SUM
-//  				      << std::endl; 
-// 			  }
-// 			////////////////////////////////////////////////////////////////////
+      // 			//////////////////////////////////////////////////////////////////// 
+      // 			if( fabs(it->eta()) > 3) 
+      // 			  {
+      //  			    double SUM = it->chargedEmEnergyFraction() + it->chargedHadronEnergyFraction() + it->neutralEmEnergyFraction() + it->neutralHadronEnergyFraction() + it->chargedMuEnergyFraction() + it->HFHadronEnergyFraction() + it->HFEMEnergyFraction() ; 
 
-		}
+      //  			    std::cout << "eta,chargedEmEnergy,chargedHadronEnergy,neutralEmEnergy,neutralHadronEnergy,chargedMuEnergy,HFHadronEnergy,HFEMEnergy,SUM: "  
+      //  				      << it->eta() << " , "
+      //  				      << it->chargedEmEnergyFraction() << " , " 
+      //  				      << it->chargedHadronEnergyFraction() << " , " 
+      //  				      << it->neutralEmEnergyFraction() << " , "  
+      //  				      << it->neutralHadronEnergyFraction() << " , "
+      //  				      << it->chargedMuEnergyFraction() << " , "
+      //  				      << it->HFHadronEnergyFraction() << " , "
+      //  				      << it->HFEMEnergyFraction() << " , "
+      //  				      << SUM
+      //  				      << std::endl; 
+      // 			  }
+      // 			////////////////////////////////////////////////////////////////////
+
+      // TODO: Gen matching?
+
+      // Trigger matching
+      // FIXME? matcher and embedder are not run during cmsRun for some reason
+      //TEST
+      //std::cout << "size of trigger matches: " << it->triggerObjectMatches().size() << std::endl;
+      //TEST
+      //// The Ele+Jet+Jet path
+      //const pat::TriggerObjectStandAloneCollection matchesEleJetJet = it->triggerObjectMatchesByPath("HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*");
+      //if(matchesEleJetJet.size() > 0)
+      //{
+      //  // do stuff, like fill ntuple vars
+      //}
+
+    } // end loop over jets
 	}
 	else
 	{

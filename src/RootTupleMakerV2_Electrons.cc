@@ -169,7 +169,6 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "DCotTheta"                + suffix );
   produces <std::vector<double> > ( prefix + "Fbrem"                    + suffix );
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot"       + suffix );
-  produces <std::vector<double> > ( prefix + "ConvFitProb"              + suffix );
 
   // Vertex and beamspot information
 
@@ -342,7 +341,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  dCotTheta                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  fbrem                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot        ( new std::vector<bool>  ()  );
-  std::auto_ptr<std::vector<double > > convFitProb_vec           ( new std::vector<double>()  );
   
   // Vertex and beamspot information
   
@@ -822,8 +820,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       dCotTheta                -> push_back ( it->convDcot() ); // from reco::GsfElectron
       hasMatchedConvPhot       -> push_back ( !(it->passConversionVeto()) );
       fbrem                    -> push_back ( it->fbrem() );
-      // SIC possible FIXME: I'm not sure if we can easily replace this      
-      //convFitProb_vec          -> push_back ( convFitProb );
+      //REMOVED convFitProb_vec          -> push_back ( convFitProb );
 
       // Vertex association variables
       
@@ -836,6 +833,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       primaryVertexDXYError    -> push_back( fabs( it->edB() ) );
       beamspotDXY              -> push_back( fabs( it->dB (pat::Electron::BS2D) ) );
       beamspotDXYError         -> push_back( fabs( it->edB(pat::Electron::BS2D) ) );
+      //FIXME: beamspot error always == 1
 			       
       // Track information     
       			       
@@ -962,7 +960,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( dCotTheta               , prefix + "DCotTheta"                + suffix );
   iEvent.put( fbrem                   , prefix + "Fbrem"                    + suffix );
   iEvent.put( hasMatchedConvPhot      , prefix + "HasMatchedConvPhot"       + suffix );
-  iEvent.put( convFitProb_vec         , prefix + "ConvFitProb"              + suffix );
 
   // Vertex and beamspot information
 

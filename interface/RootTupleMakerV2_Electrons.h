@@ -13,7 +13,7 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag trkInputTag, inputTag;
-  const edm::InputTag vtxInputTag, beamSpotInputTag, triggerEventInputTag, rhoInputTag;
+  const edm::InputTag vtxInputTag, rhoInputTag;
   const edm::InputTag electronVetoIdMapInputTag_, electronTightIdMapInputTag_;
   const edm::InputTag electronMediumIdMapInputTag_, electronLooseIdMapInputTag_;
   const edm::InputTag electronHEEPIdMapInputTag_;

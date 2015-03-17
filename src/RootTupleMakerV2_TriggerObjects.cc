@@ -1,7 +1,6 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_TriggerObjects.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-//#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
@@ -18,11 +17,15 @@ RootTupleMakerV2_TriggerObjects::RootTupleMakerV2_TriggerObjects(const edm::Para
   // What variables will this producer push into the event?
   //------------------------------------------------------------------------
   
-  produces <std::vector<std::string> >           ( prefix + "FilterName"   + suffix );
-  produces <std::vector<std::vector< int   > > > ( prefix + "FilterObjId"  + suffix );
-  produces <std::vector<std::vector< float > > > ( prefix + "FilterObjPt"  + suffix );
-  produces <std::vector<std::vector< float > > > ( prefix + "FilterObjEta" + suffix );
-  produces <std::vector<std::vector< float > > > ( prefix + "FilterObjPhi" + suffix );
+  produces <std::vector<std::vector< std::string > > > ( prefix + "TriggerObjFilterNames"   + suffix );
+  produces <std::vector<std::vector< std::string > > > ( prefix + "TriggerObjPathNames"   + suffix );
+  produces <std::vector<std::vector< bool        > > > ( prefix + "TriggerObjPassedPathL3Filter"  + suffix );
+  produces <std::vector<std::vector< bool        > > > ( prefix + "TriggerObjPassedPathLastFilter"  + suffix );
+  produces <std::vector<std::vector< int         > > > ( prefix + "TriggerObjTypeIds"  + suffix );
+  produces <std::vector< float                     > > ( prefix + "TriggerObjPt"  + suffix );
+  produces <std::vector< float                     > > ( prefix + "TriggerObjEta" + suffix );
+  produces <std::vector< float                     > > ( prefix + "TriggerObjPhi" + suffix );
+  produces <std::vector< std::string               > > ( prefix + "TriggerObjCollectionName" + suffix );
 
 }
 
@@ -33,11 +36,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Declare items to push into the event
   //------------------------------------------------------------------------
 
-  std::auto_ptr<std::vector < std::string          > > v_filter_names( new std::vector< std::string          > ());
-  std::auto_ptr<std::vector < std::vector< int   > > > v_filter_ids  ( new std::vector< std::vector< int   > > ());
-  std::auto_ptr<std::vector < std::vector< float > > > v_filter_pts  ( new std::vector< std::vector< float > > ());
-  std::auto_ptr<std::vector < std::vector< float > > > v_filter_etas ( new std::vector< std::vector< float > > ());
-  std::auto_ptr<std::vector < std::vector< float > > > v_filter_phis ( new std::vector< std::vector< float > > ());
+  std::auto_ptr<std::vector< std::vector< std::string > > > v_filter_names    ( new std::vector< std::vector< std::string > > ());
+  std::auto_ptr<std::vector< std::vector< std::string > > > v_path_names      ( new std::vector< std::vector< std::string > > ());
+  std::auto_ptr<std::vector< std::vector< bool        > > > v_passed_path_l3  ( new std::vector< std::vector< bool        > > ());
+  std::auto_ptr<std::vector< std::vector< bool        > > > v_passed_path_last( new std::vector< std::vector< bool        > > ());
+  std::auto_ptr<std::vector< std::vector< int         > > > v_type_ids        ( new std::vector< std::vector< int         > > ());
+  std::auto_ptr<std::vector< float                      > > v_pt              ( new std::vector< float                      > ());
+  std::auto_ptr<std::vector< float                      > > v_eta             ( new std::vector< float                      > ());
+  std::auto_ptr<std::vector< float                      > > v_phi             ( new std::vector< float                      > ());
+  std::auto_ptr<std::vector< std::string                > > v_collection      ( new std::vector< std::string                > ());
 
   //------------------------------------------------------------------------
   // Get the trigger bits and make sure they are valid
@@ -61,27 +68,69 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //------------------------------------------------------------------------
   // Get the trigger names
   //------------------------------------------------------------------------
-  //const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+  const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
 
-  
+  int nTrigObjects = 0;
   //------------------------------------------------------------------------
   // Loop over trigger objects
   //------------------------------------------------------------------------
-  //for (pat::TriggerObjectStandAlone triggerObject : *triggerObjects)
-  //{
-  //  triggerObject.unpackPathNames(names);
+  for (pat::TriggerObjectStandAlone obj : *triggerObjects)
+  {
+    v_type_ids   -> push_back ( std::vector<int>() );
+    v_filter_names -> push_back (std::vector<std::string>() );
+    obj.unpackPathNames(names);
+    //std::cout << "\tTrigger object:  pt " << obj.pt() << ", eta " << obj.eta() << ", phi " << obj.phi() << std::endl;
+    v_pt->push_back(obj.pt());
+    v_eta->push_back(obj.eta());
+    v_phi->push_back(obj.phi());
+    //// Print trigger object collection and type
+    //std::cout << "\t   Collection: " << obj.collection() << std::endl;
+    v_collection->push_back(obj.collection());
+    //std::cout << "\t   Type IDs:   ";
+    //for (unsigned h = 0; h < obj.filterIds().size(); ++h) std::cout << " " << obj.filterIds()[h] ;
+    for (unsigned h = 0; h < obj.triggerObjectTypes().size(); ++h)
+      (*v_type_ids )[nTrigObjects].push_back ( obj.triggerObjectTypes()[h] );
+    //std::cout << std::endl;
+    //// Print associated trigger filters
+    //std::cout << "\t   Filters:    ";
+    //for (unsigned h = 0; h < obj.filterLabels().size(); ++h) std::cout << " " << obj.filterLabels()[h];
+    for (unsigned h = 0; h < obj.filterLabels().size(); ++h)
+      (*v_filter_names )[nTrigObjects].push_back ( obj.filterLabels()[h] );
+    //std::cout << std::endl;
+    //std::vector<std::string> pathNamesAll  = obj.pathNames(false);
+    //std::vector<std::string> pathNamesLast = obj.pathNames(true);
+    //// Print all trigger paths, for each one record also if the object is associated to a 'l3' filter (always true for the
+    //// definition used in the PAT trigger producer) and if it's associated to the last filter of a successfull path (which
+    //// means that this object did cause this trigger to succeed; however, it doesn't work on some multi-object triggers)
+    //std::cout << "\t   Paths (" << pathNamesAll.size()<<"/"<<pathNamesLast.size()<<"):    ";
+    //for (unsigned h = 0, n = pathNamesAll.size(); h < n; ++h) {
+    //  bool isBoth = obj.hasPathName( pathNamesAll[h], true, true ); 
+    //  bool isL3   = obj.hasPathName( pathNamesAll[h], false, true ); 
+    //  bool isLF   = obj.hasPathName( pathNamesAll[h], true, false ); 
+    //  bool isNone = obj.hasPathName( pathNamesAll[h], false, false ); 
+    //  std::cout << "   " << pathNamesAll[h];
+    //  if (isBoth) std::cout << "(L,3)";
+    //  if (isL3 && !isBoth) std::cout << "(*,3)";
+    //  if (isLF && !isBoth) std::cout << "(L,*)";
+    //  if (isNone && !isBoth && !isL3 && !isLF) std::cout << "(*,*)";
+    //}
+    //std::cout << std::endl;
+    // Record if the object is associated to a 'l3' filter (always true for the definition used in the PAT trigger producer)
+    //   and if it's associated to the last filter of a successful path,
+    //   which means that this object did cause this trigger to succeed. But it doesn't work on some multi-object triggers.
+    std::vector<std::string> pathNamesAll  = obj.pathNames(false);
+    v_path_names -> push_back(std::vector<std::string>(pathNamesAll));
+    v_passed_path_l3 -> push_back(std::vector<bool>(pathNamesAll.size(),true));
+    v_passed_path_last -> push_back(std::vector<bool>());
+    for (unsigned h = 0, n = pathNamesAll.size(); h < n; ++h)
+    {
+      bool isLF   = obj.hasPathName( pathNamesAll[h], true, false ); 
+      (*v_passed_path_last )[nTrigObjects].push_back ( isLF );
+    }
 
-  //  // Store the trigger object as a TLorentzVector (borrowed from S. Harper)
-  //  TLorentzVector p4;
-  //  p4.SetPtEtaPhiM ( triggerObject.pt  (),
-  //      triggerObject.eta (),
-  //      triggerObject.phi (),
-  //      triggerObject.mass() );
-
-  //  triggerObjectP4s.push_back ( p4 ) ;
-  //  //FIXME?
-  //  //triggerObjectIds.push_back ( id ) ;
-  //}
+    nTrigObjects++;
+  }
+  std::cout << std::endl;
 
 
 
@@ -192,11 +241,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Push the information into the event
   //------------------------------------------------------------------------
 
-  iEvent.put ( v_filter_names, prefix + "FilterName"    + suffix ) ;
-  iEvent.put ( v_filter_ids  , prefix + "FilterObjId"   + suffix ) ;
-  iEvent.put ( v_filter_pts  , prefix + "FilterObjPt"   + suffix ) ;
-  iEvent.put ( v_filter_etas , prefix + "FilterObjEta"  + suffix ) ;
-  iEvent.put ( v_filter_phis , prefix + "FilterObjPhi"  + suffix ) ;
-	      
+  iEvent.put ( v_filter_names, prefix + "TriggerObjFilterNames"    + suffix ) ;
+  iEvent.put ( v_path_names, prefix + "TriggerObjPathNames" + suffix);
+  iEvent.put ( v_passed_path_l3, prefix + "TriggerObjPassedPathL3Filter" + suffix);
+  iEvent.put ( v_passed_path_last, prefix + "TriggerObjPassedPathLastFilter" + suffix);
+  iEvent.put ( v_type_ids , prefix + "TriggerObjTypeIds"   + suffix ) ;
+  iEvent.put ( v_pt , prefix + "TriggerObjPt"   + suffix ) ;
+  iEvent.put ( v_eta , prefix + "TriggerObjEta"  + suffix ) ;
+  iEvent.put ( v_phi , prefix + "TriggerObjPhi"  + suffix ) ;
+  iEvent.put ( v_collection, prefix + "TriggerObjCollectionName" + suffix) ;
 
 }

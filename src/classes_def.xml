@@ -3,4 +3,6 @@
   <class name="std::map<std::string,std::vector<float> >"/>
   <class name="std::vector<std::vector<float> >"/>
   <class name="std::vector<std::vector<int> >"/>
+  <class name="std::vector<std::vector<bool> >"/>
+  <class name="std::vector<std::vector<std::string> >"/>
 </lcgdict>

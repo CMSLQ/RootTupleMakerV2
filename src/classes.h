@@ -15,6 +15,12 @@ namespace {
     std::vector<std::vector<int > > dummy4;
     edm::Wrapper< std::vector<std::vector<int> > > dummy5;
 
+    std::vector<std::vector<bool > > dummy6;
+    edm::Wrapper< std::vector<std::vector<bool> > > dummy7;
+
+    std::vector<std::vector<std::string > > dummy8;
+    edm::Wrapper< std::vector<std::vector<std::string> > > dummy9;
+
   };
 
 }

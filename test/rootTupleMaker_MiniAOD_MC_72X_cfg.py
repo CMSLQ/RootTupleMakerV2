@@ -64,7 +64,7 @@ if 'GlobalTag' in process.__dict__:
 #process.GlobalTag.globaltag = 'PHYS14_25_V1'
 
 # Events to process
-process.maxEvents.input = 1
+process.maxEvents.input = 100
 
 # Input files
 process.source.fileNames = [
@@ -557,8 +557,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         #'keep *_rootTuplePFMETType01XYCorJetEnDown_*_*',
         # Trigger objects
         'keep *_rootTupleTrigger_*_*',
-        # FIXME ignore for now
-        #'keep *_rootTupleTriggerObjects_*_*',
+        'keep *_rootTupleTriggerObjects_*_*',
         # GEN objects
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
@@ -667,8 +666,7 @@ process.p = cms.Path(
     #process.rootTuplePFMETType01XYCorJetEnDown+
     # Trigger objects
     process.rootTupleTrigger+
-    #FIXME LATER?
-    #process.rootTupleTriggerObjects+
+    process.rootTupleTriggerObjects+
     # GEN objects
     process.rootTupleGenEventInfo+
     process.rootTupleGenParticles+

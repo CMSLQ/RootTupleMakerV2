@@ -80,6 +80,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "SCPhi"                    + suffix );
   produces <std::vector<double> > ( prefix + "SCPt"                     + suffix );
   produces <std::vector<double> > ( prefix + "SCRawEnergy"              + suffix );
+  produces <std::vector<double> > ( prefix + "SCEnergy"                 + suffix );
 
   // ID information
   
@@ -255,6 +256,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  scPhi                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPt                      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scRawEnergy               ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scEnergy                  ( new std::vector<double>()  );
 
   // ID information
   std::auto_ptr<std::vector<int> >    passIds                   ( new std::vector<int>   ()  );
@@ -715,6 +717,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       scPhi                    -> push_back( it->superCluster()->phi() );
       scPt                     -> push_back( it->superCluster()->energy()/cosh(it->superCluster()->eta()) );
       scRawEnergy              -> push_back( it->superCluster()->rawEnergy() );
+      scEnergy                 -> push_back( it->superCluster()->energy() );
       eSuperClusterOverP       -> push_back( it->eSuperClusterOverP() );
 
       // ID information
@@ -873,6 +876,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( scPhi                   , prefix + "SCPhi"                    + suffix );
   iEvent.put( scPt                    , prefix + "SCPt"                     + suffix );
   iEvent.put( scRawEnergy             , prefix + "SCRawEnergy"              + suffix );
+  iEvent.put( scEnergy                , prefix + "SCEnergy"                 + suffix );
 
   // ID information 
   iEvent.put( passIds                 , prefix + "PassId"                   + suffix );

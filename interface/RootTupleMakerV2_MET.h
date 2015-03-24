@@ -15,6 +15,7 @@ class RootTupleMakerV2_MET : public edm::EDProducer {
   const std::string     prefix,suffix;
   const bool            store_uncorrected_MET;
   const bool            store_MET_significance;
+  const std::string     uncertainty,level;
 };
 
 #endif

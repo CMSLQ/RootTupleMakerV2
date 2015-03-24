@@ -72,19 +72,19 @@ process.source.fileNames = [
     # Here is a test MiniAOD RelVal in CMSSW_7_2_2_patch1
     #'/store/relval/CMSSW_7_2_2_patch1/RelValZEE_13/MINIAODSIM/PU25ns_MCRUN2_72_V3_71XGENSIM-v2/00000/4E19A622-3474-E411-A100-0026189438E1.root'
     # Here is a file from dataset=/DYJetsToLL_M-50_13TeV-madgraph-pythia8/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM
-    #'/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root'
+    '/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root'
     # setup: https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/TSG-Phys14DR-00003
     ## Here is a file from my Phys14-like MiniAOD LQ1 production
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_10_1_su7.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_11_1_xCf.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_12_1_D39.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_13_1_wyC.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_14_1_ZeD.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_15_1_k6e.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_16_1_EGW.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_17_1_hdA.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_18_1_JrI.root',
-    '/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_19_1_1N4.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_10_1_su7.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_11_1_xCf.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_12_1_D39.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_13_1_wyC.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_14_1_ZeD.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_15_1_k6e.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_16_1_EGW.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_17_1_hdA.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_18_1_JrI.root',
+    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_19_1_1N4.root',
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_1_1_Snm.root',
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_20_1_Myo.root',
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_21_1_n4c.root',
@@ -368,6 +368,7 @@ process.patJetCorrFactorsAK5PFForMetUnc.primaryVertices = 'offlineSlimmedPrimary
 
 #----------------------------------------------------------------------------------------------------
 # Available pat::MET collections for analysis
+# https://indico.cern.ch/event/374824/contribution/5/material/slides/0.pdf
 # - process.patMETsTC                               : raw        TCMET   (NO  jet smearing)
 # 
 # - process.patMETsRawCalo                          : raw        CaloMET (NO  jet smearing)
@@ -537,24 +538,24 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         #'keep *_rootTupleTCMET_*_*',
         #'keep *_rootTupleCaloMET_*_*',
         #'keep *_rootTupleCaloMETType1Cor_*_*',
-        #'keep *_rootTuplePFMET_*_*',
-        #'keep *_rootTuplePFMETType1Cor_*_*',
-        #'keep *_rootTuplePFMETType01Cor_*_*',
-        #'keep *_rootTuplePFMETType01XYCor_*_*',
-        #'keep *_rootTuplePFMETType01XYCor_*_*',
+        'keep *_rootTuplePFMET_*_*',
+        'keep *_rootTuplePFMETType1Cor_*_*',
+        'keep *_rootTuplePFMETType01Cor_*_*',
+        'keep *_rootTuplePFMETType01XYCor_*_*',
+        'keep *_rootTuplePFMETType01XYCor_*_*',
         # pdf weights
-        #'keep *_rootTuplePFMETType01XYCorUnclusteredUp_*_*',
-        #'keep *_rootTuplePFMETType01XYCorUnclusteredDown_*_*',
-        #'keep *_rootTuplePFMETType01XYCorElectronEnUp_*_*',
-        #'keep *_rootTuplePFMETType01XYCorElectronEnDown_*_*',
-        #'keep *_rootTuplePFMETType01XYCorMuonEnUp_*_*',
-        #'keep *_rootTuplePFMETType01XYCorMuonEnDown_*_*',
-        #'keep *_rootTuplePFMETType01XYCorTauEnUp_*_*',
-        #'keep *_rootTuplePFMETType01XYCorTauEnDown_*_*',
-        #'keep *_rootTuplePFMETType01XYCorJetResUp_*_*',
-        #'keep *_rootTuplePFMETType01XYCorJetResDown_*_*',
-        #'keep *_rootTuplePFMETType01XYCorJetEnUp_*_*',
-        #'keep *_rootTuplePFMETType01XYCorJetEnDown_*_*',
+        'keep *_rootTuplePFMETType01XYCorUnclusteredUp_*_*',
+        'keep *_rootTuplePFMETType01XYCorUnclusteredDown_*_*',
+        'keep *_rootTuplePFMETType01XYCorElectronEnUp_*_*',
+        'keep *_rootTuplePFMETType01XYCorElectronEnDown_*_*',
+        'keep *_rootTuplePFMETType01XYCorMuonEnUp_*_*',
+        'keep *_rootTuplePFMETType01XYCorMuonEnDown_*_*',
+        'keep *_rootTuplePFMETType01XYCorTauEnUp_*_*',
+        'keep *_rootTuplePFMETType01XYCorTauEnDown_*_*',
+        'keep *_rootTuplePFMETType01XYCorJetResUp_*_*',
+        'keep *_rootTuplePFMETType01XYCorJetResDown_*_*',
+        'keep *_rootTuplePFMETType01XYCorJetEnUp_*_*',
+        'keep *_rootTuplePFMETType01XYCorJetEnDown_*_*',
         # Trigger objects
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
@@ -647,23 +648,23 @@ process.p = cms.Path(
     # FIXME ignore for now
     #process.rootTupleCaloMET+
     #process.rootTupleCaloMETType1Cor+
-    #process.rootTuplePFMET+
-    #process.rootTuplePFMETType1Cor+
-    #process.rootTuplePFMETType01Cor+
-    #process.rootTuplePFMETType01XYCor+
+    process.rootTuplePFMET+
+    process.rootTuplePFMETType1Cor+
+    process.rootTuplePFMETType01Cor+
+    process.rootTuplePFMETType01XYCor+
     ## MET objects for systematics
-    #process.rootTuplePFMETType01XYCorUnclusteredUp+
-    #process.rootTuplePFMETType01XYCorUnclusteredDown+
-    #process.rootTuplePFMETType01XYCorElectronEnUp+
-    #process.rootTuplePFMETType01XYCorElectronEnDown+
-    #process.rootTuplePFMETType01XYCorMuonEnUp+
-    #process.rootTuplePFMETType01XYCorMuonEnDown+
-    #process.rootTuplePFMETType01XYCorTauEnUp+
-    #process.rootTuplePFMETType01XYCorTauEnDown+
-    #process.rootTuplePFMETType01XYCorJetResUp+
-    #process.rootTuplePFMETType01XYCorJetResDown+
-    #process.rootTuplePFMETType01XYCorJetEnUp+
-    #process.rootTuplePFMETType01XYCorJetEnDown+
+    process.rootTuplePFMETType01XYCorUnclusteredUp+
+    process.rootTuplePFMETType01XYCorUnclusteredDown+
+    process.rootTuplePFMETType01XYCorElectronEnUp+
+    process.rootTuplePFMETType01XYCorElectronEnDown+
+    process.rootTuplePFMETType01XYCorMuonEnUp+
+    process.rootTuplePFMETType01XYCorMuonEnDown+
+    process.rootTuplePFMETType01XYCorTauEnUp+
+    process.rootTuplePFMETType01XYCorTauEnDown+
+    process.rootTuplePFMETType01XYCorJetResUp+
+    process.rootTuplePFMETType01XYCorJetResDown+
+    process.rootTuplePFMETType01XYCorJetEnUp+
+    process.rootTuplePFMETType01XYCorJetEnDown+
     # Trigger objects
     process.rootTupleTrigger+
     process.rootTupleTriggerObjects+

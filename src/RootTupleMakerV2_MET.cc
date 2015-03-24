@@ -8,7 +8,9 @@ RootTupleMakerV2_MET::RootTupleMakerV2_MET(const edm::ParameterSet& iConfig) :
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     store_uncorrected_MET (iConfig.getParameter<bool>  ("StoreUncorrectedMET")),
-    store_MET_significance (iConfig.getParameter<bool>  ("StoreMETSignificance"))
+    store_MET_significance (iConfig.getParameter<bool>  ("StoreMETSignificance")),
+    uncertainty (iConfig.getParameter<std::string>  ("Uncertainty")),
+    level       (iConfig.getParameter<std::string>  ("Level"))
 {
   produces <std::vector<double> > ( prefix + "MET" + suffix );
   produces <std::vector<double> > ( prefix + "METPhi" + suffix );
@@ -51,10 +53,31 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     for( std::vector<pat::MET>::const_iterator it = mets->begin(); it != mets->end(); ++it ) {
 
-      // fill in all the vectors
-      met->push_back( it->pt() );
-      metphi->push_back( it->phi() );
-      sumet->push_back( it->sumEt() );
+      pat::MET::METUncertainty shift = pat::MET::NoShift;
+      pat::MET::METUncertaintyLevel lev = pat::MET::Type1;
+
+      if(uncertainty=="JetEnUp")               shift=pat::MET::JetEnUp;
+      else if(uncertainty=="JetEnDown")        shift=pat::MET::JetEnDown;
+      else if(uncertainty=="JetResUp")         shift=pat::MET::JetResUp;
+      else if(uncertainty=="JetResDown")       shift=pat::MET::JetResDown;
+      else if(uncertainty=="MuonEnUp")         shift=pat::MET::MuonEnUp;
+      else if(uncertainty=="MuonEnDown")       shift=pat::MET::MuonEnDown;
+      else if(uncertainty=="ElectronEnUp")     shift=pat::MET::ElectronEnUp;
+      else if(uncertainty=="ElectronEnDown")   shift=pat::MET::ElectronEnDown;
+      else if(uncertainty=="TauEnUp")          shift=pat::MET::TauEnUp;
+      else if(uncertainty=="TauEnDown")        shift=pat::MET::TauEnDown;
+      else if(uncertainty=="UnclusteredEnUp")  shift=pat::MET::UnclusteredEnUp;
+      else if(uncertainty=="UnclusteredEnDown")shift=pat::MET::UnclusteredEnDown;
+      else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET uncertainty label: " << uncertainty;
+
+      if(level=="Raw")           lev = pat::MET::Raw;
+      else if(level=="Type1")    lev = pat::MET::Type1;
+      else if(level=="Type1p2")  lev = pat::MET::Type1p2;
+      else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET uncertainty level label: " << level;
+
+      met->push_back( it->shiftedPt(shift,lev) );
+      metphi->push_back( it->shiftedPhi(shift,lev) );
+      sumet->push_back( it->shiftedSumEt(shift,lev) );
       
       if ( store_uncorrected_MET ) {
 	metuncorr->push_back( it->uncorrectedPt(pat::MET::uncorrALL) );

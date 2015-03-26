@@ -702,10 +702,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       // ID information
       passIds                  -> push_back( passId );
-      passEGammaIDVeto         -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::VETO  , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
-      passEGammaIDLoose        -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::LOOSE , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
-      passEGammaIDMedium       -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::MEDIUM, *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
-      passEGammaIDTight        -> push_back (EgammaCutBasedEleId::TestWP(EgammaCutBasedEleId::TIGHT , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso));
+      passEGammaIDVeto         -> push_back (EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO  , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso,ElectronEffectiveArea::kEleEAData2012));
+      passEGammaIDLoose        -> push_back (EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso,ElectronEffectiveArea::kEleEAData2012));
+      passEGammaIDMedium       -> push_back (EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso,ElectronEffectiveArea::kEleEAData2012));
+      passEGammaIDTight        -> push_back (EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT , *it, hConversions, (*bsHandle), primaryVertices, it->chargedHadronIso(), it->photonIso(), it->neutralHadronIso(), rhoIso,ElectronEffectiveArea::kEleEAData2012));
       passEGammaIDTrigTight    -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, *it));
       passEGammaIDTrigWP70     -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70 , *it));
       passEGammaIDEoP          -> push_back (EgammaCutBasedEleId::PassEoverPCuts(*it));
@@ -777,8 +777,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       // Conversion variables
       
-      missingHits              -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
-      missingHitsEG            -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits()     );
+      missingHits              -> push_back ( it->gsfTrack()->numberOfLostHits() );
+      constexpr reco::HitPattern::HitCategory missingHitType = reco::HitPattern::MISSING_INNER_HITS;
+      missingHitsEG            -> push_back ( it->gsfTrack()->hitPattern().numberOfHits(missingHitType) );
       
       dist_vec                 -> push_back ( dist );
       dCotTheta                -> push_back ( dcot );

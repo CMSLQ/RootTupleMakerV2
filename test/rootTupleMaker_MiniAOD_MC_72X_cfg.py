@@ -1,4 +1,4 @@
-import os
+h import os
 #----------------------------------------------------------------------------------------------------
 # Load PAT template + customize
 #----------------------------------------------------------------------------------------------------
@@ -174,6 +174,8 @@ process.unpackedPatTrigger = unpackedPatTrigger.clone()
 process.cleanElectronTriggerMatchHLTSingleElectronWP85.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTElectronJetJet.matched = 'unpackedPatTrigger'
+process.cleanMuonTriggerMatchHLTSingleMuon.matched = 'unpackedPatTrigger'
+process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
 process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 
 #process.out.outputCommands += ['keep *_electronsTriggerMatchHLTSingleElectron_*_*',

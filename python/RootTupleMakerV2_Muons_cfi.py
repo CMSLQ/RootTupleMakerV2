@@ -1,8 +1,9 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Muons",
-    InputTag = cms.InputTag('slimmedMuons'),
-    TriggerEventInputTag = cms.InputTag ('patTriggerEvent'),                                
+    #InputTag = cms.InputTag('slimmedMuons'),
+    InputTag = cms.InputTag('muonsTriggerMatchAll'),
+    #TriggerEventInputTag = cms.InputTag ('patTriggerEvent'),                                
     Prefix = cms.string('Muon'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(10),
@@ -11,9 +12,21 @@ rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Muons",
     BeamSpotCorr = cms.bool(True),
     UseCocktailRefits = cms.bool(True),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
-    SingleMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleMuon"),
-    SingleIsoMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleIsoMuon")
+    #SingleMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleMuon"),
+    #SingleIsoMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleIsoMuon")
 )
+
+
+cleanMuonTriggerMatchHLTMuon = cms.EDProducer(
+  "PATTriggerMatcherDRLessByR"
+, src     = cms.InputTag( 'slimmedMuons' )
+, matched = cms.InputTag( 'unpackedPatTrigger' )          
+, matchedCuts = cms.string( 'type( "TriggerMuon" )' )
+, maxDeltaR = cms.double( 0.5 )
+, resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
+, resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
+)
+
 
 cleanMuonTriggerMatchHLTSingleMuon = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
@@ -53,14 +66,25 @@ muonsTriggerMatchHLTSingleIsoMuon = cms.EDProducer(
   )
 )
 
-# these will skim out (from the collections above with embedded matches) only the objects which have a trigger object match
-from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
-muonsTriggeredHLTSingleMuon = selectedPatMuons.clone(
-   src = cms.InputTag( 'muonsTriggerMatchHLTSingleMuon' )
-, cut = 'triggerObjectMatches.size > 0'
+
+muonsTriggerMatchAll = cms.EDProducer(
+  "PATTriggerMatchMuonEmbedder"
+, src = cms.InputTag( 'slimmedMuons' )
+, matches = cms.VInputTag(
+  cms.InputTag( 'cleanMuonTriggerMatchHLTMuon' )
+  )
 )
 
-muonsTriggeredHLTSingleIsoMuon = selectedPatMuons.clone(
-   src = cms.InputTag( 'muonsTriggerMatchHLTSingleIsoMuon' )
-, cut = 'triggerObjectMatches.size > 0'
-)
+
+
+# these will skim out (from the collections above with embedded matches) only the objects which have a trigger object match
+#from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import selectedPatMuons
+#muonsTriggeredHLTSingleMuon = selectedPatMuons.clone(
+#   src = cms.InputTag( 'muonsTriggerMatchHLTSingleMuon' )
+#, cut = 'triggerObjectMatches.size > 0'
+#)#
+#
+#muonsTriggeredHLTSingleIsoMuon = selectedPatMuons.clone(
+#   src = cms.InputTag( 'muonsTriggerMatchHLTSingleIsoMuon' )
+#, cut = 'triggerObjectMatches.size > 0'
+#)

@@ -287,10 +287,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// PAT trigger matches by HLT path
 	// we embed these in the regular pat::Muon collection 
 	// but we could make separate collections containing only the matches if we wanted
-	edm::Handle<std::vector<pat::Muon> > muonsSingleMuonHLTMatched;
-	iEvent.getByLabel(inputTag, muonsSingleMuonHLTMatched);
-	edm::Handle<std::vector<pat::Muon> > muonsSingleIsoMuonHLTMatched;
-	iEvent.getByLabel(inputTag, muonsSingleIsoMuonHLTMatched);
+	//edm::Handle<std::vector<pat::Muon> > muonsSingleMuonHLTMatched;
+	//iEvent.getByLabel(inputTag, muonsSingleMuonHLTMatched);
+	//edm::Handle<std::vector<pat::Muon> > muonsSingleIsoMuonHLTMatched;
+	//iEvent.getByLabel(inputTag, muonsSingleIsoMuonHLTMatched);
 
 	*hasVeryForwardPFMuon.get() = false;
 
@@ -420,8 +420,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			//      now just ask if we have a match to whichever HLT path in the object
 			
 			// HLT Single Muon trigger matching
-			// DMM FIXME? In principle, could have more than one match here
-			const pat::TriggerObjectStandAloneCollection matchesSingleMu = it->triggerObjectMatchesByPath("HLT");
+			const pat::TriggerObjectStandAloneCollection matchesSingleMu = it->triggerObjectMatchesByPath("HLT_Mu40_v*");
 			if (matchesSingleMu.size() > 0)
 			{
 				HLTSingleMuonMatched  -> push_back ( true ) ;

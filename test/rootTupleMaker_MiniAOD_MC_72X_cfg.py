@@ -1,4 +1,4 @@
-h import os
+import os
 #----------------------------------------------------------------------------------------------------
 # Load PAT template + customize
 #----------------------------------------------------------------------------------------------------
@@ -572,7 +572,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleGenTausFromWs_*_*',
         'keep *_rootTupleGenTausFromZs_*_*',
         # FIXME ignore for now
-        #'keep *_rootTupleGenMETTrue_*_*',
+        'keep *_rootTupleGenMETTrue_*_*',
         #'keep *_rootTupleGenMETCalo_*_*'       
     )
 )
@@ -679,10 +679,10 @@ process.p = cms.Path(
     process.rootTupleGenMuonsFromWs+
     process.rootTupleGenMuonsFromZs+
     process.rootTupleGenTausFromWs+
-    process.rootTupleGenTausFromZs
+    process.rootTupleGenTausFromZs+
     #+
     # FIXME ignore for now
-    #process.rootTupleGenMETTrue+
+    process.rootTupleGenMETTrue
     #process.rootTupleGenMETCalo
     )*
     # Put everything into the tree

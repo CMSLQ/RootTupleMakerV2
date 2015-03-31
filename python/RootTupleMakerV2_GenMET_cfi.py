@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleGenMETTrue = cms.EDProducer("RootTupleMakerV2_GenMET",
-    InputTag = cms.InputTag('genMetTrue'),
+    InputTag = cms.InputTag('slimmedMETs'),
     Prefix = cms.string('Gen'),
     Suffix = cms.string('True')
 )

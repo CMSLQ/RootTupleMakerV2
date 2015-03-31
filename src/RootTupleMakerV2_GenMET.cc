@@ -1,8 +1,7 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenMET.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/METReco/interface/GenMET.h"
-#include "DataFormats/METReco/interface/GenMETFwd.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 
 
 RootTupleMakerV2_GenMET::RootTupleMakerV2_GenMET(const edm::ParameterSet& iConfig) :
@@ -24,18 +23,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
-    edm::Handle<reco::GenMETCollection> mets;
+    edm::Handle<std::vector<pat::MET> > mets;
     iEvent.getByLabel(inputTag, mets);
 
     if(mets.isValid()) {
       edm::LogInfo("RootTupleMakerV2_GenMETInfo") << "Total # GenMETs: " << mets->size();
 
-      for( reco::GenMETCollection::const_iterator it = mets->begin(); it != mets->end(); ++it ) {
+    for( std::vector<pat::MET>::const_iterator it = mets->begin(); it != mets->end(); ++it ) {
 
         // fill in all the vectors
-        met->push_back( it->pt() );
-        metphi->push_back( it->phi() );
-        sumet->push_back( it->sumEt() );
+        met->push_back( it->genMET()->pt() );
+        metphi->push_back( it->genMET()->phi() );
+        sumet->push_back( it->genMET()->sumEt() );
       }
     } else {
       edm::LogError("RootTupleMakerV2_GenMETError") << "Error! Can't get the product " << inputTag;

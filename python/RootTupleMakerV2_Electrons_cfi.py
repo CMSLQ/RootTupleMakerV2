@@ -16,10 +16,10 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     ConversionsInputTag = cms.InputTag('allConversions'),
     TriggerEventInputTag = cms.InputTag('patTriggerEvent'),                                    
     LikelihoodInputTag = cms.InputTag('egammaIDLikelihood') ,
-    RhoInputTag = cms.InputTag('kt6PFJets','rho'),
-    PFIsolationValues03 = cms.VInputTag ( cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueNeutral03PFIdPFIso')),
+    RhoInputTag = cms.InputTag('kt6PFJetsForHEEPIsolation','rho'),
+    PFIsolationValues03 = cms.VInputTag ( cms.InputTag('elPFIsoValueCharged03PFId'),
+                                          cms.InputTag('elPFIsoValueGamma03PFId'),
+                                          cms.InputTag('elPFIsoValueNeutral03PFId')),
                                     # In principle, these should be added too, but I get errors from PAT when I try to load them
                                     # They are not needed for EGamma PF isolation
                                     # An exception of category 'Configuration' occurred while
@@ -30,9 +30,9 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
                                     # Please modify the configuration file to use a distinct process name.
                                     # cms.InputTag("elPFIsoValueChargedAll03PFIdPFIso"),  
                                     # cms.InputTag("elPFIsoValuePU03PFIdPFIso")),
-    PFIsolationValues04 = cms.VInputTag ( cms.InputTag('elPFIsoValueCharged04PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueGamma04PFIdPFIso'),
-                                          cms.InputTag('elPFIsoValueNeutral04PFIdPFIso')),
+    PFIsolationValues04 = cms.VInputTag ( cms.InputTag('elPFIsoValueCharged04PFId'),
+                                          cms.InputTag('elPFIsoValueGamma04PFId'),
+                                          cms.InputTag('elPFIsoValueNeutral04PFId')),
                                     # In principle, these should be added too, but I get errors from PAT when I try to load them
                                     # They are not needed for EGamma PF isolation ( see above ) 
                                     # cms.InputTag("elPFIsoValueChargedAll04PFIdPFIso"), 

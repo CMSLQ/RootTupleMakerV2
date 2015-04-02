@@ -2,10 +2,12 @@ import FWCore.ParameterSet.Config as cms
 
 rootTupleEvent = cms.EDProducer("RootTupleMakerV2_Event",
                                 #FastJetForIsolationInputTag = cms.InputTag('kt6PFJetsForIsolation','rho'),#not present in 2012
-                                FastJetForJECInputTag       = cms.InputTag('kt6PFJets','rho'),
+                                #FastJetForJECInputTag       = cms.InputTag('ak4PFJets','rho','RECO'),
+                                FastJetForJECInputTag       = cms.InputTag('fixedGridRhoFastjetAll'),
                                 FastJetForHEEPInputTag      = cms.InputTag('kt6PFJetsForHEEPIsolation','rho'),
-                                FastJetForJECCCPUInputTag   = cms.InputTag('kt6PFJetsCentralChargedPileUp','rho'),
-                                FastJetForJECCNInputTag     = cms.InputTag('kt6PFJetsCentralNeutral','rho'),
-                                FastJetForJECCNTInputTag    = cms.InputTag('kt6PFJetsCentralNeutralTight','rho')
+                                FastJetForJECCCPUInputTag   = cms.InputTag('fixedGridRhoFastjetCentralChargedPileUp'),
+                                FastJetForJECCNInputTag     = cms.InputTag('fixedGridRhoFastjetCentralNeutral'),
+                                FastJetForJECCNTInputTag    = cms.InputTag('fixedGridRhoFastjetCentralNeutral')
                                 )
+
 

@@ -45,7 +45,7 @@ rootTupleCaloMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
 # Raw PFMET, no jet smearing
 
 rootTuplePFMET = cms.EDProducer("RootTupleMakerV2_MET",
-    InputTag = cms.InputTag('patMETsRawPF'),
+    InputTag = cms.InputTag('patMETs'),
     Prefix = cms.string('PF'),
     Suffix = cms.string(''),
     StoreUncorrectedMET = cms.bool(False),
@@ -75,7 +75,8 @@ rootTuplePFMETType01Cor = cms.EDProducer("RootTupleMakerV2_MET",
 # Type0+1+XY PFMET, with jet smearing
 
 rootTuplePFMETType01XYCor = cms.EDProducer("RootTupleMakerV2_MET",
-    InputTag = cms.InputTag('patType1CorrectedPFMet'),
+    #InputTag = cms.InputTag('patType1CorrectedPFMet'),
+    InputTag = cms.InputTag('patPFMetT0pcT1Txy'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type01XYCor'),
     StoreUncorrectedMET = cms.bool(False),

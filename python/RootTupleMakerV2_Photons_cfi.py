@@ -7,7 +7,7 @@ rootTuplePhotons = cms.EDProducer("RootTupleMakerV2_Photons",
     MaxSize = cms.uint32(10),
     BeamSpotInputTag = cms.InputTag('offlineBeamSpot'),
     ConversionsInputTag = cms.InputTag('allConversions'),
-    ElectronsInputTag = cms.InputTag('gsfElectrons'),
+    ElectronsInputTag = cms.InputTag('gedGsfElectrons'),
     EcalRecHitsEBInputTag = cms.InputTag('reducedEcalRecHitsEB'),
     EcalRecHitsEEInputTag = cms.InputTag('reducedEcalRecHitsEE')
 )

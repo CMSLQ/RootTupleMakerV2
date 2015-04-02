@@ -517,8 +517,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if (it->electronID("eidLoose"           )>0) passId = passId | 1<<2;
       if (it->electronID("eidTight"           )>0) passId = passId | 1<<3;
       if (it->electronID("eidRobustHighEnergy")>0) passId = passId | 1<<4;
-      if (it->electronID("mvaTrigV0"          )>0) passId = passId | 1<<5;
-      if (it->electronID("mvaNonTrigV0"       )>0) passId = passId | 1<<6;
+      //XXX SIC HACK REMOVE
+      //if (it->electronID("mvaTrigV0"          )>0) passId = passId | 1<<5;
+      //if (it->electronID("mvaNonTrigV0"       )>0) passId = passId | 1<<6;
       
       //------------------------------------------------------------------------
       // Trigger matching

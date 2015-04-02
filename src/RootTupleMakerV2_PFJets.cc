@@ -11,7 +11,7 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "RecoJets/JetProducers/interface/PileupJetIdAlgo.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
 inputTag           (iConfig.getParameter<edm::InputTag>("InputTag"           )),
@@ -262,7 +262,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.getByLabel(vtxInputTag,primaryVertices);       // DB
 
 	edm::Handle<edm::View<pat::Jet> > sjets;
-	iEvent.getByLabel("selectedPatJetsAK5PF",sjets);
+	iEvent.getByLabel("selectedPatJets",sjets);
 		
 	edm::Handle<edm::ValueMap<float> > puJetIdMVA;
 	iEvent.getByLabel("puJetMva","full53xDiscriminant", puJetIdMVA);
@@ -296,11 +296,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			if (pfjetIDTight( *it, retpf)) passjetTight =1;
 
 
-			double mva   = (double) (*puJetIdMVA)[sjets->refAt(ijet)];
-			int    idflag = (*puJetIdFlag)[sjets->refAt(ijet)];
-			bool pileup_jetID_passLoose= PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose);
-			bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
-			bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
+			//double mva   = (double) (*puJetIdMVA)[sjets->refAt(ijet)];
+			//int    idflag = (*puJetIdFlag)[sjets->refAt(ijet)];
+			//bool pileup_jetID_passLoose= PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose);
+			//bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
+			//bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
+      //XXX SIC HACK: skip pu jet mva
+			double mva   = -9999.0;
+			int    idflag = -9999;
+			bool pileup_jetID_passLoose= false;
+			bool pileup_jetID_passMedium = false;
+			bool pileup_jetID_passTight = false;
 			
 
 			if(readJECuncertainty)

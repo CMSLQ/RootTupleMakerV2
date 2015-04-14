@@ -207,7 +207,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchEta" + suffix );
   produces <std::vector<double> > ( prefix + "HLTSingleEleWP80MatchPhi" + suffix );
 
-  // Gen matching: status 3 only 
+  // Gen matching: status 3, 1, or 23
 
   produces <std::vector<double> > ( prefix + "MatchedGenParticlePt"   + suffix );
   produces <std::vector<double> > ( prefix + "MatchedGenParticleEta"  + suffix );
@@ -365,7 +365,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchEta	 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  HLTSingleEleWP80MatchPhi  ( new std::vector<double>()  );
 
-  // Gen matching: Status 3 only
+  // Gen matching: Status 3, 1, or 23
   
   std::auto_ptr<std::vector<double> >  matchedGenParticlePt  ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  matchedGenParticleEta ( new std::vector<double>()   );
@@ -574,7 +574,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
 
       //------------------------------------------------------------------------
-      // Gen matching: Status 3 only
+      // Gen matching: Status 3, 1, or 23
       //------------------------------------------------------------------------
 
       double genPartPt = -999.;
@@ -583,7 +583,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       if ( !iEvent.isRealData() ) {
 	for(uint igen = 0 ; igen < it->genParticleRefs().size() ; ++igen ){ //it->genParticleRefs().size() should be 0, 1 or 2                
-	  if( it->genParticle(igen)->status()==3){
+    if(  it->genParticle(igen)->status()==1 || it->genParticle(igen)->status()==3 || it->genParticle(igen)->status()==23){
 	    genPartPt =it->genParticle(igen)->pt();
 	    genPartEta=it->genParticle(igen)->eta();
 	    genPartPhi=it->genParticle(igen)->phi();
@@ -960,7 +960,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( HLTSingleEleWP80MatchEta, prefix + "HLTSingleEleWP80MatchEta" + suffix );
   iEvent.put( HLTSingleEleWP80MatchPhi, prefix + "HLTSingleEleWP80MatchPhi" + suffix );
 
-  // Gen matching: Status 3 only
+  // Gen matching: Status 3, 1, or 23
 
   iEvent.put( matchedGenParticlePt ,   prefix + "MatchedGenParticlePt"      + suffix );
   iEvent.put( matchedGenParticleEta,   prefix + "MatchedGenParticleEta"     + suffix );

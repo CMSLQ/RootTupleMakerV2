@@ -20,7 +20,7 @@ from PhysicsTools.PatAlgos.mcMatchLayer0.tauMatch_cfi import *
 #----------------------------------------------------------------------------------------------------
 
 # Electron - Gen Particle Matching
-elMatch = electronMatch.clone(mcStatus = [3])
+elMatch = electronMatch.clone(mcStatus = [3,1,23])
 elMatch.maxDeltaR = cms.double(0.5)
 elMatch.maxDPtRel = cms.double(999.9)
 elMatch.resolveAmbiguities = cms.bool(True)

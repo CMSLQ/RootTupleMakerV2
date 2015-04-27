@@ -27,8 +27,8 @@ rootTupleCaloMET = cms.EDProducer("RootTupleMakerV2_MET",
     Suffix = cms.string(''),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
-    Uncertainty = cms.string(''),
-    Level = cms.string(''))
+    Uncertainty = cms.string('NoShift'),
+    Level = cms.string('Calo'))
 
 # Type1 CaloMET, no jet smearing
 
@@ -38,8 +38,8 @@ rootTupleCaloMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
     Suffix = cms.string('Type1Cor'),
     StoreUncorrectedMET = cms.bool(True),
     StoreMETSignificance = cms.bool(False),
-    Uncertainty = cms.string(''),
-    Level = cms.string(''))
+    Uncertainty = cms.string('NoShift'),
+    Level = cms.string('Calo'))
 
 #----------------------------------------------------------------------------------------------------
 # PFMET collections

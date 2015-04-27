@@ -56,7 +56,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pat::MET::METUncertainty shift = pat::MET::NoShift;
       pat::MET::METUncertaintyLevel lev = pat::MET::Type1;
 
-      if(uncertainty=="JetEnUp")               shift=pat::MET::JetEnUp;
+      if(uncertainty=="NoShift")               shift=pat::MET::NoShift;
+      else if(uncertainty=="JetEnUp")          shift=pat::MET::JetEnUp;
       else if(uncertainty=="JetEnDown")        shift=pat::MET::JetEnDown;
       else if(uncertainty=="JetResUp")         shift=pat::MET::JetResUp;
       else if(uncertainty=="JetResDown")       shift=pat::MET::JetResDown;
@@ -70,9 +71,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else if(uncertainty=="UnclusteredEnDown")shift=pat::MET::UnclusteredEnDown;
       else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET uncertainty label: " << uncertainty;
 
-      if(level=="Raw")           lev = pat::MET::Raw;
-      else if(level=="Type1")    lev = pat::MET::Type1;
-      else if(level=="Type1p2")  lev = pat::MET::Type1p2;
+      if(level=="Raw")          lev = pat::MET::Raw;
+      else if(level=="Type1")   lev = pat::MET::Type1;
+      else if(level=="Type1p2") lev = pat::MET::Type1p2;
+      //else if(level=="Calo")    lev = pat::MET::Calo;//not until 7_4_X
       else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET uncertainty level label: " << level;
 
       met->push_back( it->shiftedPt(shift,lev) );

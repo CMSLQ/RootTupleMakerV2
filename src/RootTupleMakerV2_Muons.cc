@@ -570,7 +570,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 					ctTrkD0Error             ->push_back( cocktail_track->d0Error()         );
 					ctTrkDz                  ->push_back( cocktail_track->dz()              );
 					ctTrkDzError             ->push_back( cocktail_track -> dzError()       );
-					ctGlobalChi2             ->push_back( cocktail_track ->normalizedChi2() );
+					ctlGlobalChi2            ->push_back( cocktail_track ->normalizedChi2() );
 
 
 					// Values will hold vertex distance information

@@ -1,19 +1,19 @@
 import FWCore.ParameterSet.Config as cms
 
 #----------------------------------------------------------------------------------------------------
-# TCMET collections
+# TCMET collections  -- no longer supported
 #----------------------------------------------------------------------------------------------------
 
 # Raw TCMET, no jet smearing
 
-rootTupleTCMET = cms.EDProducer("RootTupleMakerV2_MET",
-    InputTag = cms.InputTag('patMETsTC'),
-    Prefix = cms.string('TC'),
-    Suffix = cms.string(''),
-    StoreUncorrectedMET = cms.bool(False),
-    StoreMETSignificance = cms.bool(False),
-    Uncertainty = cms.string(''),
-    Level = cms.string(''))
+#rootTupleTCMET = cms.EDProducer("RootTupleMakerV2_MET",
+#    InputTag = cms.InputTag('patMETsTC'),
+#    Prefix = cms.string('TC'),
+#    Suffix = cms.string(''),
+#    StoreUncorrectedMET = cms.bool(False),
+#    StoreMETSignificance = cms.bool(False),
+#    Uncertainty = cms.string(''),
+#    Level = cms.string(''))
 
 #----------------------------------------------------------------------------------------------------
 # CaloMET collections

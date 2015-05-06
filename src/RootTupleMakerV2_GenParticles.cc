@@ -68,7 +68,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           break;
 
 	//skip LHC protons - pdgId=2212, extremely high eta, phi=0, energy ~= 6500
-	if(it->pdgId()==2212 && it->energy()>=6000)continue;
+	//if(it->pdgId()==2212 && it->energy()>=6000)continue;
 
         // fill in all the vectors
         eta->push_back( it->eta() );

@@ -35,4 +35,4 @@ ak5JetTracksAssociatorAtVertexPF.jets = cms.InputTag("ak5PFJetsCHS")
 ak5JetTracksAssociatorAtVertexPF.tracks = cms.InputTag("unpackedTracksAndVertices")
 impactParameterTagInfos.primaryVertex = cms.InputTag("unpackedTracksAndVertices")
 inclusiveSecondaryVertexFinderTagInfos.extSVCollection = cms.InputTag("unpackedTracksAndVertices","secondary","")
-combinedSecondaryVertex.trackMultiplicityMin = 1
+#combinedSecondaryVertex.trackMultiplicityMin = 1#DMM FIXME removed to get running in 744....

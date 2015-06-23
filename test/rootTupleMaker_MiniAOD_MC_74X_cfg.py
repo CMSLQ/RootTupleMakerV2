@@ -44,12 +44,12 @@ process.TFileService = cms.Service("TFileService",
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 # XXX SIC: below possibly needed depending on CMSSW version
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'PHYS14_25_V1', '')
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
 # override the GlobalTag, connection string and pfnPrefix
 if 'GlobalTag' in process.__dict__:
     from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
-    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_72_V1A::All')
+    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'MCRUN2_74_V9::All')
     #process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
     process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
     process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
@@ -60,7 +60,7 @@ if 'GlobalTag' in process.__dict__:
     process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
 # Otherwise, just plain GlobalTag
-#process.GlobalTag.globaltag = 'MCRUN2_72_V3'
+#process.GlobalTag.globaltag = 'MCRUN2_74_V9::All'
 #process.GlobalTag.globaltag = 'PHYS14_25_V1'
 
 # Events to process
@@ -69,63 +69,11 @@ process.maxEvents.input = 100
 # Input files
 process.source.fileNames = [
     # specified by InputList.txt
-    # Here is a test MiniAOD RelVal in CMSSW_7_2_2_patch1
-    #'/store/relval/CMSSW_7_2_2_patch1/RelValZEE_13/MINIAODSIM/PU25ns_MCRUN2_72_V3_71XGENSIM-v2/00000/4E19A622-3474-E411-A100-0026189438E1.root'
-    # Here is a file from dataset=/DYJetsToLL_M-50_13TeV-madgraph-pythia8/Phys14DR-PU20bx25_PHYS14_25_V1-v1/MINIAODSIM
-    '/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root'
-    # setup: https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/TSG-Phys14DR-00003
-    ## Here is a file from my Phys14-like MiniAOD LQ1 production
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_10_1_su7.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_11_1_xCf.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_12_1_D39.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_13_1_wyC.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_14_1_ZeD.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_15_1_k6e.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_16_1_EGW.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_17_1_hdA.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_18_1_JrI.root',
-    ##'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_19_1_1N4.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_1_1_Snm.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_20_1_Myo.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_21_1_n4c.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_22_1_NIS.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_23_1_aNs.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_24_1_no8.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_25_1_EFd.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_26_1_zHI.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_27_1_Mtd.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_28_1_COV.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_29_1_TLD.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_2_1_Xnu.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_30_1_EFt.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_31_1_oKN.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_32_1_gim.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_33_1_MMj.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_34_1_Dcx.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_35_1_X4p.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_36_1_D7h.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_37_1_xkq.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_38_1_c6Q.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_39_1_dcb.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_3_1_gCV.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_40_1_5wJ.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_41_1_I8M.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_42_1_DVK.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_43_1_152.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_44_1_sT1.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_45_1_uEL.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_46_1_m0b.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_47_1_6EJ.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_48_1_GJi.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_49_1_X78.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_4_1_FDs.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_50_1_gts.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_5_1_i9b.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_6_1_HFo.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_7_1_aUd.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_8_1_6kI.root',
-    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/721/miniAOD-noPU/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8/LQToUE_M-300_Tune4C_13TeV-pythia8-721rawToDigiL1RecoRecoEI-noPU/66cb3c103bb16b7a3fee248046c0ac3b/step3_PAT_9_1_cc9.root',
-]
+    #Here is a muon file
+    '/store/mc/RunIISpring15DR74/LQToCMu_M-1150_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/00070800-DE08-E511-8AD2-02163E00F2FB.root'
+    #Here is an electron file:
+    #'/store/mc/RunIISpring15DR74/LQToUE_M-1100_BetaOne_TuneCUETP8M1_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/200CE6FD-4405-E511-90DD-02163E013C94.root'
+    ]
 
 #----------------------------------------------------------------------------------------------------
 # HEEP 4.0 (electron ID) still uses the 2011 definitions of rho for isolation corrections.
@@ -151,12 +99,12 @@ process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 # Define which IDs we want to produce
 # Each of these two example IDs contains all four standard
 # cut-based ID working points
-my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V0_miniAOD_cff']
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V1_miniAOD_cff')
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
+#my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V0_miniAOD_cff']
+#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V1_miniAOD_cff')
+#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 #Add them to the VID producer
-for idmod in my_id_modules:
-  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+#for idmod in my_id_modules:
+#  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
 
 #----------------------------------------------------------------------------------------------------
@@ -359,6 +307,7 @@ runType1PFMEtUncertainties(process,
                            addToPatDefaultSequence=False,
                            jetCollection="selectedPatJetsAK5PFForMetUnc",
                            electronCollection="slimmedElectrons",
+                           photonCollection="slimmedPhotons",
                            muonCollection="slimmedMuons",
                            tauCollection="slimmedTaus",
                            makeType1p2corrPFMEt=True,
@@ -510,7 +459,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 	PdfSetNames = cms.untracked.vstring(
             "CT10.LHgrid" , 
             "MSTW2008nlo68cl.LHgrid",
-            "NNPDF20_100.LHgrid"
+            #"NNPDF20_100.LHgrid"#DMM FIXME couldn't find this file in /cvmfs/cms.cern.ch/slc6_amd64_gcc491/cms/cmssw/CMSSW_7_4_4/src/PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt
 	)
 )
 

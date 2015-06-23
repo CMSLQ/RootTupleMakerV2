@@ -6,41 +6,31 @@ process = cms.Process("PAT")
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 ## Options and Output Report
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 ## Source
-from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring()
-    #pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre8'
-    #                    , relVal        = 'RelValTTbar'
-    #                    , globalTag     = 'START42_V7'
-    #                    , numberOfFiles = 1
-    #                    )
-    #)
 )
 ## Maximal Number of Events
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.Geometry.GeometryRecoDB_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-from Configuration.PyReleaseValidation.autoCond import autoCond
-process.GlobalTag.globaltag = cms.string( autoCond[ 'startup' ] )
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
-## Standard PAT Configuration File
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
 ## Output Module Configuration (expects a path 'p')
-from PhysicsTools.PatAlgos.patEventContent_cff import patEventContent
+from PhysicsTools.PatAlgos.patEventContent_cff import patEventContentNoCleaning
 process.out = cms.OutputModule("PoolOutputModule",
                                fileName = cms.untracked.string('patTuple.root'),
-                               # save only events passing the full path
-                               SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
-                               # save PAT Layer 1 output; you need a '*' to
-                               # unpack the list of commands 'patEventContent'
-                               outputCommands = cms.untracked.vstring('drop *', *patEventContent )
+                               ## save only events passing the full path
+                               SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
+                               ## save PAT output; you need a '*' to unpack the list of commands
+                               ## 'patEventContent'
+                               outputCommands = cms.untracked.vstring('drop *', *patEventContentNoCleaning )
                                )
 
 process.outpath = cms.EndPath(process.out)

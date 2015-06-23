@@ -43,8 +43,8 @@ process.TFileService = cms.Service("TFileService",
 # Make sure a correct global tag is used:
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
 # XXX SIC: below possibly needed depending on CMSSW version
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-from Configuration.AlCa.GlobalTag import GlobalTag
+#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+#from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
 # override the GlobalTag, connection string and pfnPrefix
 if 'GlobalTag' in process.__dict__:

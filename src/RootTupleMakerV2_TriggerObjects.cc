@@ -130,7 +130,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     nTrigObjects++;
   }
-  std::cout << std::endl;
+  //std::cout << std::endl;
 
 
 

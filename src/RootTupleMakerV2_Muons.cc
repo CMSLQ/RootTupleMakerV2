@@ -153,6 +153,7 @@ vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag"))
 void RootTupleMakerV2_Muons::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
 	std::auto_ptr<bool>                  hasVeryForwardPFMuon    ( new bool() );
 	std::auto_ptr<std::vector<double> >  eta                     ( new std::vector<double>()  );
 	std::auto_ptr<std::vector<double> >  phi                     ( new std::vector<double>()  );
@@ -420,7 +421,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			//      now just ask if we have a match to whichever HLT path in the object
 			
 			// HLT Single Muon trigger matching
-			const pat::TriggerObjectStandAloneCollection matchesSingleMu = it->triggerObjectMatchesByPath("HLT_Mu40_v*");
+			const pat::TriggerObjectStandAloneCollection matchesSingleMu = it->triggerObjectMatchesByPath("HLT_Mu45_eta2p1_v*");
 			if (matchesSingleMu.size() > 0)
 			{
 				HLTSingleMuonMatched  -> push_back ( true ) ;
@@ -437,7 +438,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			}
 
 			// HLT Single Iso Muon trigger matching
-						const pat::TriggerObjectStandAloneCollection matchesSingleIsoMu = it->triggerObjectMatchesByPath("HLT_IsoMu24_IterTrk02_v*");
+						const pat::TriggerObjectStandAloneCollection matchesSingleIsoMu = it->triggerObjectMatchesByPath("HLT_IsoMu24_eta2p1_v*");
 			if (matchesSingleIsoMu.size() > 0)
 			{
 				HLTSingleIsoMuonMatched  -> push_back ( true ) ;
@@ -524,127 +525,127 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 			// Global High Pt Muons, aka Cocktail Muons
 			if ( useCocktailRefits )
-			{
-				if ( it->isGlobalMuon() )	
-				{
-				  //DMM FIXME - refits don't work in 7_2, will be added later
-				  //int refit_id = -999;
+			  {
+			    if ( it->isGlobalMuon())	
+			      {
+				//DMM FIXME - refits don't work in 7_2, will be added later
+				int refit_id = -999;
+				
+				// -----------------------------------------------------------------------------------------------------------------------------------------//
+				// HighPT Muon - 2015 Version
+				// Following instructions on https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonId2015#HighPT_Muon
+				//When using the High-pT selector, you should obtain the muon momentum from the muon track determined by the TuneP algorithm. To have access to the best muon track determined by the TuneP algorithm and its type, you can use the following functions, respectively:
+				//reco::TrackRef tunePBestTrack = recoMu.tunePMuonBestTrack();
+				//reco::Muon::MuonTrackType tunePBestTrackType = recoMu.tunePMuonBestTrackType();
+				//The pT assignment as obtained from the TuneP algorithm can be used anyway, independently of the adopted selection. Anyhow it is recommended not to use it directly for analyses that make use of Particle-Flow AND rely on quantities computed on the basis of the PF muon pT (e.g. PF MET). In fact, when using Particle-Flow the muon pT assignment can be further adjusted on the basis of the global event description. In this case, it is therefore advisable to stick with the estimation of the muon pT made by PF.
 
-					// -----------------------------------------------------------------------------------------------------------------------------------------//
-					// HighPT Muon - New Version (recommended)
-					// Following new instructions on https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#New_Version_recommended
-					// To use the new version of TuneP you have to follow these steps:
-					// Either run CMSSW_5_3_6_patch1 (or newer) or if you need to keep using an older CMSSW verison check out V09-04-03-02 DataFormats/MuonReco
-					// (if you have problems getting CMSSW to compile please do also addpkg RecoMuon/MuonIdentification).
-					// #include "DataFormats/MuonReco/interface/MuonCocktails.h" add this to your analysis code
-					// reco::TrackRef cktTrack = (muon::tevOptimized(*recoMu, 200, 17., 40., 0.25)).first; call to get the optimal muon track
-					// cktTrack->pt() - to get the pT of the muon
-					//
-					//Then you can apply the new HighPT ID, which still differs from Tight Muon selection in the following points:
-					//The Particle-Flow muon id is not required
-					//The cut of dpT/pT<0.3 for the track used for momentum determination is applied, i.e. cktTrack->ptError()/cktTrack->pt()<0.3
-					//The cuts applied on recoMu.muonBestTrack (impact parameter cuts) need to be applied to cktTrack since this is the new best track now.
-					// -----------------------------------------------------------------------------------------------------------------------------------------//
-				  /*
-					reco::TrackRef cocktail_track = (muon::tevOptimized(*it, 200, 17., 40., 0.25)).first;
+				// cktTrack->pt() - to get the pT of the muon
+				//
+				//Then you can apply the new HighPT ID, which still differs from Tight Muon selection in the following points:
+				//The Particle-Flow muon id is not required
+				//The cut of dpT/pT<0.3 for the track used for momentum determination is applied, i.e. cktTrack->ptError()/cktTrack->pt()<0.3
+				//The cuts applied on recoMu.muonBestTrack (impact parameter cuts) need to be applied to cktTrack since this is the new best track now.
+				// -----------------------------------------------------------------------------------------------------------------------------------------//
+			
+				reco::TrackRef cocktail_track = it->tunePMuonBestTrack();
 
-					double cttrkd0  = cocktail_track -> d0() ;
-					if( beamSpotCorr && beamSpot.isValid() )
-						cttrkd0 = -(cocktail_track->dxy( beamSpot->position()));
-
-					ctRefitID     -> push_back ( refit_id ) ;
-
-					ctEtaError    -> push_back ( cocktail_track->etaError()    );
-					ctPhiError    -> push_back ( cocktail_track->phiError()    );
-					ctPtError     -> push_back ( cocktail_track->ptError ()    );
-					ctQoverpError -> push_back ( cocktail_track->qoverpError() );
-
-					ctEta                    ->push_back( cocktail_track->eta()    );
-					ctPhi                    ->push_back( cocktail_track->phi()    );
-					ctPt                     ->push_back( cocktail_track->pt()     );
-					ctP                      ->push_back( cocktail_track->p()      );
-					ctCharge                 ->push_back( cocktail_track->charge() );
-					ctTrkHits                ->push_back( cocktail_track->hitPattern().numberOfValidTrackerHits() );
-					ctTrkValidFractionOfHits ->push_back( cocktail_track->validFraction()   );
-					ctTrkD0                  ->push_back( cttrkd0                           );
-					ctTrkD0Error             ->push_back( cocktail_track->d0Error()         );
-					ctTrkDz                  ->push_back( cocktail_track->dz()              );
-					ctTrkDzError             ->push_back( cocktail_track -> dzError()       );
-					ctlGlobalChi2            ->push_back( cocktail_track ->normalizedChi2() );
-
-
-					// Values will hold vertex distance information
-					int    bct_vtxIndex_    = -1;
-					double bct_vtxDistXY_   = -9999.;
-					double bct_vtxDistZ_    = -9999.;
-
-
-					// Loop over primary vertices
-					if(primaryVertices.isValid())
-					{
-						double bct_bestdist3D = 999999.;
-
-						for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
-						{
-							double bct_distXY = cocktail_track->dxy(v_it->position());
-							double bct_distZ  = cocktail_track->dz(v_it->position());
-							double bct_dist3D = sqrt( pow(bct_distXY,2) + pow(bct_distZ,2) );
-
-							if( bct_dist3D < bct_bestdist3D )
-							{
-								bct_bestdist3D = bct_dist3D;
-								bct_vtxIndex_    = int(std::distance(primaryVertices->begin(),v_it));
-								bct_vtxDistXY_   = bct_distXY;
-								bct_vtxDistZ_    = bct_distZ;
-							}
-
-						}				 //loop over primaryVertices
-					}
-
-
-					ctTrkvtxDistXY           ->push_back( bct_vtxDistXY_ );
-					ctTrkvtxDistZ            ->push_back( bct_vtxDistZ_ );
-					ctTrkvtxIndex            ->push_back( bct_vtxIndex_ );
-
-					// std::cout<<" Cocktail flag --> "<< bct_vtxDistXY_ <<"  "<<bct_vtxDistZ_ << std::endl;
-					*/
-
-
-				} //cocktail fits
-
-				else	
-				{
-					ctRefitID     -> push_back ( -1 ) ;
-					ctEtaError    -> push_back ( -1 );
-					ctPhiError    -> push_back ( -1 );
-					ctPtError     -> push_back ( -1 );
-					ctQoverpError -> push_back ( -1 );
-					ctEta                    ->push_back( -1 );
-					ctPhi                    ->push_back( -1 );
-					ctPt                     ->push_back( -1 );
-					ctP                      ->push_back( -1 );
-					ctCharge                 ->push_back( -1 );
-					ctTrkHits                ->push_back( -1 );
-					ctTrkValidFractionOfHits ->push_back( -1 );
-					ctTrkD0                  ->push_back( -1 );
-					ctTrkD0Error             ->push_back( -1 );
-					ctTrkDz                  ->push_back( -1 );
-					ctTrkDzError             ->push_back( -1 );
-					ctGlobalChi2             ->push_back( -1 );
-
-					ctTrkvtxDistXY           ->push_back( -1 );
-					ctTrkvtxDistZ            ->push_back( -1 );					
-					ctTrkvtxIndex            ->push_back( -1 );
-				}
-
-
-			}					 
-
+				double cttrkd0  = cocktail_track -> d0() ;
+				if( beamSpotCorr && beamSpot.isValid() )
+				  cttrkd0 = -(cocktail_track->dxy( beamSpot->position()));
+				
+				ctRefitID     -> push_back ( refit_id ) ;
+				
+				ctEtaError    -> push_back ( cocktail_track->etaError()    );
+				ctPhiError    -> push_back ( cocktail_track->phiError()    );
+				ctPtError     -> push_back ( cocktail_track->ptError ()    );
+				ctQoverpError -> push_back ( cocktail_track->qoverpError() );
+				
+				ctEta                    ->push_back( cocktail_track->eta()    );
+				ctPhi                    ->push_back( cocktail_track->phi()    );
+				ctPt                     ->push_back( cocktail_track->pt()     );
+				ctP                      ->push_back( cocktail_track->p()      );
+				ctCharge                 ->push_back( cocktail_track->charge() );
+				ctTrkHits                ->push_back( cocktail_track->hitPattern().numberOfValidTrackerHits() );
+				ctTrkValidFractionOfHits ->push_back( cocktail_track->validFraction()   );
+				ctTrkD0                  ->push_back( cttrkd0                           );
+				ctTrkD0Error             ->push_back( cocktail_track->d0Error()         );
+				ctTrkDz                  ->push_back( cocktail_track->dz()              );
+				ctTrkDzError             ->push_back( cocktail_track -> dzError()       );
+				ctGlobalChi2            ->push_back( cocktail_track ->normalizedChi2() );
+				
+				
+				// Values will hold vertex distance information
+				int    bct_vtxIndex_    = -1;
+				double bct_vtxDistXY_   = -9999.;
+				double bct_vtxDistZ_    = -9999.;
+				
+				
+				// Loop over primary vertices
+				if(primaryVertices.isValid())
+				  {
+				    double bct_bestdist3D = 999999.;
+				    
+				    for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
+				      {
+					double bct_distXY = cocktail_track->dxy(v_it->position());
+					double bct_distZ  = cocktail_track->dz(v_it->position());
+					double bct_dist3D = sqrt( pow(bct_distXY,2) + pow(bct_distZ,2) );
+					
+					if( bct_dist3D < bct_bestdist3D )
+					  {
+					    bct_bestdist3D = bct_dist3D;
+					    bct_vtxIndex_    = int(std::distance(primaryVertices->begin(),v_it));
+					    bct_vtxDistXY_   = bct_distXY;
+					    bct_vtxDistZ_    = bct_distZ;
+					  }
+					
+				      }				 //loop over primaryVertices
+				  }
+				
+				
+				ctTrkvtxDistXY           ->push_back( bct_vtxDistXY_ );
+				ctTrkvtxDistZ            ->push_back( bct_vtxDistZ_ );
+				ctTrkvtxIndex            ->push_back( bct_vtxIndex_ );
+				
+				// std::cout<<" Cocktail flag --> "<< bct_vtxDistXY_ <<"  "<<bct_vtxDistZ_ << std::endl;
+				
+				
+				
+			      } //cocktail fits
+			    
+			    else	
+			      {
+				ctRefitID     -> push_back ( -99 ) ;
+				ctEtaError    -> push_back ( -99 );
+				ctPhiError    -> push_back ( -99 );
+				ctPtError     -> push_back ( -99 );
+				ctQoverpError -> push_back ( -99 );
+				ctEta                    ->push_back( -99 );
+				ctPhi                    ->push_back( -99 );
+				ctPt                     ->push_back( -99 );
+				ctP                      ->push_back( -99 );
+				ctCharge                 ->push_back( -99 );
+				ctTrkHits                ->push_back( -99 );
+				ctTrkValidFractionOfHits ->push_back( -99 );
+				ctTrkD0                  ->push_back( -99 );
+				ctTrkD0Error             ->push_back( -99 );
+				ctTrkDz                  ->push_back( -99 );
+				ctTrkDzError             ->push_back( -99 );
+				ctGlobalChi2             ->push_back( -99 );
+				
+				ctTrkvtxDistXY           ->push_back( -99 );
+				ctTrkvtxDistZ            ->push_back( -99 );					
+				ctTrkvtxIndex            ->push_back( -99 );
+			      }
+			    
+			    
+			  }					 
+			
 			// New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
 			// https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012
 			isPF                       ->push_back( it->isPFMuon()       );
 			trackLayersWithMeasurement ->push_back( it->track()->hitPattern().trackerLayersWithMeasurement() );
-
+			
 			energy->push_back( it->energy() );
 			//
 			// 2011 isolation parameters..

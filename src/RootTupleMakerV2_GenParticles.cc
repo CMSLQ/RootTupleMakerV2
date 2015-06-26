@@ -19,6 +19,7 @@ RootTupleMakerV2_GenParticles::RootTupleMakerV2_GenParticles(const edm::Paramete
   produces <std::vector<double> > ( prefix + "Pz"           + suffix );
   produces <std::vector<double> > ( prefix + "Pt"           + suffix );
   produces <std::vector<double> > ( prefix + "Energy"       + suffix );
+  produces <std::vector<double> > ( prefix + "Mass"         + suffix );
   produces <std::vector<int> >    ( prefix + "PdgId"        + suffix );
   produces <std::vector<double> > ( prefix + "VX"           + suffix );
   produces <std::vector<double> > ( prefix + "VY"           + suffix );
@@ -43,6 +44,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pz   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  mass  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int> >     pdgId   ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  vx  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  vy  ( new std::vector<double>()  );
@@ -54,6 +56,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  tauvisiblept  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  tauvisibleeta ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  tauvisiblephi ( new std::vector<double>()  );
+  // not kept in ntuple
+  std::auto_ptr<std::vector<int> >     indexInGenPColl( new std::vector<int>()  );
   
   if( !iEvent.isRealData() ) {
     edm::Handle<reco::GenParticleCollection> genParticles;
@@ -67,8 +71,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         if(eta->size() >= maxSize)
           break;
 
-	//skip LHC protons - pdgId=2212, extremely high eta, phi=0, energy ~= 6500
-	//if(it->pdgId()==2212 && it->energy()>=6000)continue;
+        //skip LHC protons - pdgId=2212, extremely high eta, phi=0, energy ~= 6500
+        if(it->pdgId()==2212 && it->energy()>=6000) continue;
+        // actually let's skip any particle with huge eta
+        if(fabs(it->eta()) > 10) continue;
+        // skip pythia8 "partons in preparation of hadronization process"
+        // details here: http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
+        if(it->status() >= 71 && it->status()<=79) continue;
+
+        if(fabs(it->pdgId())==42)
+          edm::LogInfo("RootTupleMakerV2_GenParticlesInfo") << "LQ found with status: " << it->status();
 
         // fill in all the vectors
         eta->push_back( it->eta() );
@@ -79,46 +91,55 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         pz->push_back( it->pz() );
         pt->push_back( it->pt() );
         energy->push_back( it->energy() );
+        mass->push_back(it->mass() );
         pdgId->push_back( it->pdgId() );
         vx->push_back( it->vx() );
         vy->push_back( it->vy() );
         vz->push_back( it->vz() );
         numDaught->push_back( it->numberOfDaughters() );
         status->push_back( it->status() );
+        indexInGenPColl->push_back(std::distance(genParticles->begin(),it));
 
-	// >>>>>>  if gen-particle is a tau, check decay mode and fill-in visible momentum parameters:
-	int getGenTauDecayMode_ = 0; double tauVisPt  = -999.0; double tauVisEta = -999.0; double tauVisPhi = -999.0;
-	if( abs(it->pdgId()) == 15 ){
-	  getGenTauDecayMode_ =  getGenTauDecayMode( & (*it) );
-	  if( getGenTauDecayMode_>0 ){//get visible momentum only if decay mode is determined
-	    std::vector<const reco::GenParticle*> TauDaughters;
-	    findDaughters( & (*it), TauDaughters, 1);
-	    LorentzVector tauVis   = getVisMomentum( TauDaughters, 1);
-	    tauVisPt = tauVis.pt(); tauVisEta = tauVis.eta(); tauVisPhi = tauVis.phi();
-	    // ------------------------------------------------------------------ DEBUG OUTPUT --------------------------------------------------------------//
-	    //LorentzVector tauInvis = getInvisMomentum( TauDaughters, 1);
-	    //std::cout<< "Tau DecayMode/NoOfDaughters: "<<getGenTauDecayMode_<<" / "<<TauDaughters.size()<<std::endl;
-	    //std::cout<< "          visiblePt/Eta/Phi: "<<tauVisPt<<" / "<<tauVisEta<<" / "<<tauVisPhi <<std::endl;
-	    //std::cout<< "        invisiblePt/Eta/Phi: "<<tauInvis.pt()<<" / "<<tauInvis.eta()<<" / "<<tauInvis.phi() <<std::endl;
-	    //std::cout<< "visible+invisiblePt/Eta/Phi: "<<(tauVis+tauInvis).pt()<<" / "<<(tauVis+tauInvis).eta()<<" / "<<(tauVis+tauInvis).phi() <<std::endl;
-	    //std::cout<< "              genPt/Eta/Phi: "<<it->pt()<<" / "<< it->eta()<<" / "<<it->phi()<<std::endl;
-	    // ------------------------------------------------------------------ ------------ --------------------------------------------------------------//
-	  }
-	}
-	taudecaymode -> push_back( (int)(getGenTauDecayMode_) );
-	tauvisiblept -> push_back( tauVisPt  );
-	tauvisibleeta-> push_back( tauVisEta );
-	tauvisiblephi-> push_back( tauVisPhi );
-	// <<<<<<
-
-	int idx = -1;
-        for( reco::GenParticleCollection::const_iterator mit = genParticles->begin(); mit != genParticles->end(); ++mit ) {
-          if( it->mother()==&(*mit) ) {
-	    idx = std::distance(genParticles->begin(),mit);
-	    break;
+        // >>>>>>  if gen-particle is a tau, check decay mode and fill-in visible momentum parameters:
+        int getGenTauDecayMode_ = 0; double tauVisPt  = -999.0; double tauVisEta = -999.0; double tauVisPhi = -999.0;
+        if( abs(it->pdgId()) == 15 ){
+          getGenTauDecayMode_ =  getGenTauDecayMode( & (*it) );
+          if( getGenTauDecayMode_>0 ){//get visible momentum only if decay mode is determined
+            std::vector<const reco::GenParticle*> TauDaughters;
+            findDaughters( & (*it), TauDaughters, 1);
+            LorentzVector tauVis   = getVisMomentum( TauDaughters, 1);
+            tauVisPt = tauVis.pt(); tauVisEta = tauVis.eta(); tauVisPhi = tauVis.phi();
+            // ------------------------------------------------------------------ DEBUG OUTPUT --------------------------------------------------------------//
+            //LorentzVector tauInvis = getInvisMomentum( TauDaughters, 1);
+            //std::cout<< "Tau DecayMode/NoOfDaughters: "<<getGenTauDecayMode_<<" / "<<TauDaughters.size()<<std::endl;
+            //std::cout<< "          visiblePt/Eta/Phi: "<<tauVisPt<<" / "<<tauVisEta<<" / "<<tauVisPhi <<std::endl;
+            //std::cout<< "        invisiblePt/Eta/Phi: "<<tauInvis.pt()<<" / "<<tauInvis.eta()<<" / "<<tauInvis.phi() <<std::endl;
+            //std::cout<< "visible+invisiblePt/Eta/Phi: "<<(tauVis+tauInvis).pt()<<" / "<<(tauVis+tauInvis).eta()<<" / "<<(tauVis+tauInvis).phi() <<std::endl;
+            //std::cout<< "              genPt/Eta/Phi: "<<it->pt()<<" / "<< it->eta()<<" / "<<it->phi()<<std::endl;
+            // ------------------------------------------------------------------ ------------ --------------------------------------------------------------//
           }
         }
-        motherIndex->push_back( idx );
+        taudecaymode -> push_back( (int)(getGenTauDecayMode_) );
+        tauvisiblept -> push_back( tauVisPt  );
+        tauvisibleeta-> push_back( tauVisEta );
+        tauvisiblephi-> push_back( tauVisPhi );
+        // <<<<<<
+
+        int idx = -1;
+        for( reco::GenParticleCollection::const_iterator mit = genParticles->begin(); mit != genParticles->end(); ++mit ) {
+          if( it->mother()==&(*mit) ) {
+            idx = std::distance(genParticles->begin(),mit);
+            break;
+          }
+        }
+        // we have the mother inside the genparticle collection
+        // now find the index of mother in the kept/ntuple genparticle collection
+        int indexInKeptGenPColl = -1;
+        std::vector<int>::iterator genPCollItr = std::find(indexInGenPColl->begin(),indexInGenPColl->end(),idx);
+        if(genPCollItr != indexInGenPColl->end())
+          indexInKeptGenPColl = std::distance(indexInGenPColl->begin(),genPCollItr);
+        //motherIndex->push_back( idx );
+        motherIndex->push_back( indexInKeptGenPColl );
       }
     } else {
       edm::LogError("RootTupleMakerV2_GenParticlesError") << "Error! Can't get the product " << inputTag;
@@ -134,6 +155,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pz,           prefix + "Pz"           + suffix );
   iEvent.put( pt,           prefix + "Pt"           + suffix );
   iEvent.put( energy,       prefix + "Energy"       + suffix );
+  iEvent.put( mass,         prefix + "Mass"       + suffix );
   iEvent.put( pdgId,        prefix + "PdgId"        + suffix );
   iEvent.put( vx,           prefix + "VX"           + suffix );
   iEvent.put( vy,           prefix + "VY"           + suffix );

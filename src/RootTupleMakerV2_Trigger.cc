@@ -15,6 +15,8 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
   hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
+  prefix     (iConfig.getParameter<std::string>  ("Prefix")),
+  suffix     (iConfig.getParameter<std::string>  ("Suffix")),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
   sourceType(NOT_APPLICABLE)
 {
@@ -43,15 +45,15 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   produces <std::map< std::string, int  > > ("HLTOutsideDatasetPrescaleMap" );
   */
 
-  produces <std::vector<std::string> > ("HLTInsideDatasetTriggerNames"      );
-  produces <std::vector<std::string> > ("HLTOutsideDatasetTriggerNames"     );
-  produces <std::vector<bool > >       ("HLTInsideDatasetTriggerDecisions"  );
-  produces <std::vector<bool > >       ("HLTOutsideDatasetTriggerDecisions" );
-  produces <std::vector<int> >         ("HLTInsideDatasetTriggerPrescales"  );
-  produces <std::vector<int> >         ("HLTOutsideDatasetTriggerPrescales" );
+  produces <std::vector<std::string> > (prefix + "HLTInsideDatasetTriggerNames"      + suffix );
+  produces <std::vector<std::string> > (prefix + "HLTOutsideDatasetTriggerNames"     + suffix );
+  produces <std::vector<bool > >       (prefix + "HLTInsideDatasetTriggerDecisions"  + suffix );
+  produces <std::vector<bool > >       (prefix + "HLTOutsideDatasetTriggerDecisions" + suffix );
+  produces <std::vector<int> >         (prefix + "HLTInsideDatasetTriggerPrescales"  + suffix );
+  produces <std::vector<int> >         (prefix + "HLTOutsideDatasetTriggerPrescales" + suffix );
 
-  produces <std::vector<int> > ( "L1PhysBits" );
-  produces <std::vector<int> > ( "L1TechBits" );
+  produces <std::vector<int> > ( prefix + "L1PhysBits" + suffix );
+  produces <std::vector<int> > ( prefix + "L1TechBits" + suffix );
   // produces <std::vector<int> > ( "HLTBits" );
   // produces <std::vector<int> > ( "HLTResults" );
   // produces <std::vector<int> > ( "HLTPrescales" );
@@ -206,8 +208,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( l1physbits, "L1PhysBits" );
-  iEvent.put( l1techbits, "L1TechBits" );
+  iEvent.put( l1physbits, prefix + "L1PhysBits" + suffix );
+  iEvent.put( l1techbits, prefix + "L1TechBits" + suffix );
   // iEvent.put( hltbits,    "HLTBits" );
   // iEvent.put( hltresults, "HLTResults" );
   // iEvent.put( hltprescales, "HLTPrescales" );
@@ -221,12 +223,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( m_hlt_outsideDataset_namesToPrescales,"HLTOutsideDatasetPrescaleMap");
   */
 
-  iEvent.put ( v_hlt_insideDataset_names      , "HLTInsideDatasetTriggerNames"      ) ;
-  iEvent.put ( v_hlt_outsideDataset_names     , "HLTOutsideDatasetTriggerNames"     ) ;
-  iEvent.put ( v_hlt_insideDataset_decisions  , "HLTInsideDatasetTriggerDecisions"  ) ;
-  iEvent.put ( v_hlt_outsideDataset_decisions , "HLTOutsideDatasetTriggerDecisions" ) ;
-  iEvent.put ( v_hlt_insideDataset_prescales  , "HLTInsideDatasetTriggerPrescales"  ) ;
-  iEvent.put ( v_hlt_outsideDataset_prescales , "HLTOutsideDatasetTriggerPrescales" ) ;
+  iEvent.put ( v_hlt_insideDataset_names      , prefix + "HLTInsideDatasetTriggerNames"      + suffix ) ;
+  iEvent.put ( v_hlt_outsideDataset_names     , prefix + "HLTOutsideDatasetTriggerNames"     + suffix ) ;
+  iEvent.put ( v_hlt_insideDataset_decisions  , prefix + "HLTInsideDatasetTriggerDecisions"  + suffix ) ;
+  iEvent.put ( v_hlt_outsideDataset_decisions , prefix + "HLTOutsideDatasetTriggerDecisions" + suffix ) ;
+  iEvent.put ( v_hlt_insideDataset_prescales  , prefix + "HLTInsideDatasetTriggerPrescales"  + suffix ) ;
+  iEvent.put ( v_hlt_outsideDataset_prescales , prefix + "HLTOutsideDatasetTriggerPrescales" + suffix ) ;
 
   
 }

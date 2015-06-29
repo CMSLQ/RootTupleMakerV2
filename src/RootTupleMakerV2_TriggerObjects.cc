@@ -79,42 +79,54 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     v_type_ids   -> push_back ( std::vector<int>() );
     v_filter_names -> push_back (std::vector<std::string>() );
     obj.unpackPathNames(names);
-    //std::cout << "\tTrigger object:  pt " << obj.pt() << ", eta " << obj.eta() << ", phi " << obj.phi() << std::endl;
     v_pt->push_back(obj.pt());
     v_eta->push_back(obj.eta());
     v_phi->push_back(obj.phi());
-    //// Print trigger object collection and type
-    //std::cout << "\t   Collection: " << obj.collection() << std::endl;
     v_collection->push_back(obj.collection());
-    //std::cout << "\t   Type IDs:   ";
-    //for (unsigned h = 0; h < obj.filterIds().size(); ++h) std::cout << " " << obj.filterIds()[h] ;
+    bool egObjectTypeFound = false;
     for (unsigned h = 0; h < obj.triggerObjectTypes().size(); ++h)
+    {
       (*v_type_ids )[nTrigObjects].push_back ( obj.triggerObjectTypes()[h] );
-    //std::cout << std::endl;
-    //// Print associated trigger filters
-    //std::cout << "\t   Filters:    ";
-    //for (unsigned h = 0; h < obj.filterLabels().size(); ++h) std::cout << " " << obj.filterLabels()[h];
+      int objType = obj.triggerObjectTypes()[h];
+      if(objType==81 || objType==82 || objType==92)
+        egObjectTypeFound=true;
+    }
     for (unsigned h = 0; h < obj.filterLabels().size(); ++h)
       (*v_filter_names )[nTrigObjects].push_back ( obj.filterLabels()[h] );
-    //std::cout << std::endl;
-    //std::vector<std::string> pathNamesAll  = obj.pathNames(false);
-    //std::vector<std::string> pathNamesLast = obj.pathNames(true);
-    //// Print all trigger paths, for each one record also if the object is associated to a 'l3' filter (always true for the
-    //// definition used in the PAT trigger producer) and if it's associated to the last filter of a successfull path (which
-    //// means that this object did cause this trigger to succeed; however, it doesn't work on some multi-object triggers)
-    //std::cout << "\t   Paths (" << pathNamesAll.size()<<"/"<<pathNamesLast.size()<<"):    ";
-    //for (unsigned h = 0, n = pathNamesAll.size(); h < n; ++h) {
-    //  bool isBoth = obj.hasPathName( pathNamesAll[h], true, true ); 
-    //  bool isL3   = obj.hasPathName( pathNamesAll[h], false, true ); 
-    //  bool isLF   = obj.hasPathName( pathNamesAll[h], true, false ); 
-    //  bool isNone = obj.hasPathName( pathNamesAll[h], false, false ); 
-    //  std::cout << "   " << pathNamesAll[h];
-    //  if (isBoth) std::cout << "(L,3)";
-    //  if (isL3 && !isBoth) std::cout << "(*,3)";
-    //  if (isLF && !isBoth) std::cout << "(L,*)";
-    //  if (isNone && !isBoth && !isL3 && !isLF) std::cout << "(*,*)";
-    //}
-    //std::cout << std::endl;
+    bool verbose = egObjectTypeFound ? true : false;
+    if(verbose)
+    {
+      std::cout << "\tTrigger object:  pt " << obj.pt() << ", eta " << obj.eta() << ", phi " << obj.phi() << std::endl;
+      //// Print trigger object collection and type
+      std::cout << "\t   Collection: " << obj.collection() << std::endl;
+      std::cout << "\t   Filter IDs:   {";
+      for (unsigned h = 0; h < obj.filterIds().size(); ++h) std::cout << " " << obj.filterIds()[h] ;
+      std::cout << " }\t   Type IDs:   {";
+      for (unsigned h = 0; h < obj.triggerObjectTypes().size(); ++h) std::cout << " " << obj.triggerObjectTypes()[h] ;
+      std::cout << " }" << std::endl;
+      // Print associated trigger filters
+      std::cout << "\t   Filters:    {";
+      for (unsigned h = 0; h < obj.filterLabels().size(); ++h) std::cout << " " << obj.filterLabels()[h];
+      std::cout << " }" << std::endl;
+      std::vector<std::string> pathNamesAll  = obj.pathNames(false);
+      std::vector<std::string> pathNamesLast = obj.pathNames(true);
+      // Print all trigger paths, for each one record also if the object is associated to a 'l3' filter (always true for the
+      // definition used in the PAT trigger producer) and if it's associated to the last filter of a successfull path (which
+      // means that this object did cause this trigger to succeed; however, it doesn't work on some multi-object triggers)
+      std::cout << "\t   Paths (" << pathNamesAll.size()<<"/"<<pathNamesLast.size()<<"):    ";
+      for (unsigned h = 0, n = pathNamesAll.size(); h < n; ++h) {
+        bool isBoth = obj.hasPathName( pathNamesAll[h], true, true ); 
+        bool isL3   = obj.hasPathName( pathNamesAll[h], false, true ); 
+        bool isLF   = obj.hasPathName( pathNamesAll[h], true, false ); 
+        bool isNone = obj.hasPathName( pathNamesAll[h], false, false ); 
+        std::cout << "   " << pathNamesAll[h];
+        if (isBoth) std::cout << "(L,3)";
+        if (isL3 && !isBoth) std::cout << "(*,3)";
+        if (isLF && !isBoth) std::cout << "(L,*)";
+        if (isNone && !isBoth && !isL3 && !isLF) std::cout << "(*,*)";
+      }
+      std::cout << std::endl;
+    }
     // Record if the object is associated to a 'l3' filter (always true for the definition used in the PAT trigger producer)
     //   and if it's associated to the last filter of a successful path,
     //   which means that this object did cause this trigger to succeed. But it doesn't work on some multi-object triggers.

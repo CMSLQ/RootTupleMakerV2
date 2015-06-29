@@ -82,9 +82,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       sumet->push_back( it->shiftedSumEt(shift,lev) );
       
       if ( store_uncorrected_MET ) {
-	metuncorr->push_back( it->uncorrectedPt(pat::MET::uncorrALL) );
-	metphiuncorr->push_back( it->uncorrectedPhi(pat::MET::uncorrALL) );
-	sumetuncorr->push_back( it->sumEt() - it->corSumEt(pat::MET::uncorrALL) );
+        metuncorr->push_back( it->uncorrectedPt() );
+        metphiuncorr->push_back( it->uncorrectedPhi() );
+        sumetuncorr->push_back( it->uncorrectedSumEt() );
       }
 
       if ( store_MET_significance ) {

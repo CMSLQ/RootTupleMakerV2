@@ -7,5 +7,6 @@ rootTupleEvent = cms.EDProducer("RootTupleMakerV2_Event",
    FixedGridRhoFastjetCentralCaloInputTag          = cms.InputTag('fixedGridRhoFastjetCentralCalo'),
    FixedGridRhoFastjetCentralChargedPileUpInputTag = cms.InputTag('fixedGridRhoFastjetCentralChargedPileUp'),
    FixedGridRhoFastjetCentralNeutralInputTag       = cms.InputTag('fixedGridRhoFastjetCentralNeutral'),
+   FillRhos = cms.untracked.bool(False),
 )
 

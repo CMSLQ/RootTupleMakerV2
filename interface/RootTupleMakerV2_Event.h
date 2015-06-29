@@ -18,6 +18,7 @@ class RootTupleMakerV2_Event : public edm::EDProducer {
   const edm::InputTag fixedGridRhoFastjetCentralChargedPileUpInputTag;
   const edm::InputTag fixedGridRhoFastjetCentralNeutralInputTag;
 
+  const bool fillRhos;
 };
 
 #endif

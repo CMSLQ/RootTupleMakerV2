@@ -56,7 +56,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pat::MET::METUncertainty shift = pat::MET::NoShift;
       pat::MET::METUncertaintyLevel lev = pat::MET::Type1;
 
-      if(uncertainty=="NoShift")               shift=pat::MET::NoShift;
+      if(     uncertainty=="NoShift")          shift=pat::MET::NoShift;
       else if(uncertainty=="JetEnUp")          shift=pat::MET::JetEnUp;
       else if(uncertainty=="JetEnDown")        shift=pat::MET::JetEnDown;
       else if(uncertainty=="JetResUp")         shift=pat::MET::JetResUp;
@@ -74,7 +74,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if(level=="Raw")          lev = pat::MET::Raw;
       else if(level=="Type1")   lev = pat::MET::Type1;
       else if(level=="Type1p2") lev = pat::MET::Type1p2;
-      //else if(level=="Calo")    lev = pat::MET::Calo;//not until 7_4_X
+      else if(level=="Calo")    lev = pat::MET::Calo;
       else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET uncertainty level label: " << level;
 
       met->push_back( it->shiftedPt(shift,lev) );
@@ -82,9 +82,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       sumet->push_back( it->shiftedSumEt(shift,lev) );
       
       if ( store_uncorrected_MET ) {
-	metuncorr->push_back( it->uncorrectedPt(pat::MET::uncorrALL) );
-	metphiuncorr->push_back( it->uncorrectedPhi(pat::MET::uncorrALL) );
-	sumetuncorr->push_back( it->sumEt() - it->corSumEt(pat::MET::uncorrALL) );
+	metuncorr->push_back( it->uncorrectedPt() );
+	metphiuncorr->push_back( it->uncorrectedPhi() );
+	sumetuncorr->push_back( it->uncorrectedSumEt() );
       }
 
       if ( store_MET_significance ) {

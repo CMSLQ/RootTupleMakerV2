@@ -21,7 +21,7 @@ cleanMuonTriggerMatchHLTMuon = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag('slimmedMuons')
 , matched = cms.InputTag('unpackedPatTrigger')          
-, matchedCuts = cms.string(' type("TriggerMuon") && path("HLT_Mu40_v*") ')
+, matchedCuts = cms.string(' type("TriggerMuon") && path("HLT_Mu45_eta2p1_v*") ')
 , maxDeltaR = cms.double(0.5)
 , resolveAmbiguities    = cms.bool(True )        # only one match per trigger object
 , resolveByMatchQuality = cms.bool(True )        # take best match found per reco object: by DeltaR here (s. above)
@@ -32,7 +32,7 @@ cleanMuonTriggerMatchHLTSingleMuon = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag('slimmedMuons')
 , matched = cms.InputTag('patTrigger')          
-, matchedCuts = cms.string(' type("TriggerMuon") && path("HLT_Mu40_v*") ')
+, matchedCuts = cms.string(' type("TriggerMuon") && path("HLT_Mu45_eta2p1_v*") ')
 , maxDeltaR = cms.double(0.5)
 , resolveAmbiguities    = cms.bool(True )        # only one match per trigger object
 , resolveByMatchQuality = cms.bool(True )        # take best match found per reco object: by DeltaR here (s. above)
@@ -42,7 +42,7 @@ cleanMuonTriggerMatchHLTSingleIsoMuon = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag('slimmedMuons')
 , matched = cms.InputTag('patTrigger')          
-, matchedCuts = cms.string(' type("TriggerMuon") && path("HLT_IsoMu24_IterTrk02_v*") ')
+, matchedCuts = cms.string(' type("TriggerMuon") && path("HLT_IsoMu24_eta2p1_v*") ')
 , maxDeltaR = cms.double(0.5)
 , resolveAmbiguities    = cms.bool(True )        # only one match per trigger object
 , resolveByMatchQuality = cms.bool(True )        # take best match found per reco object: by DeltaR here (s. above)

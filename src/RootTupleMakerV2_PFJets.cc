@@ -290,7 +290,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //bool pileup_jetID_passMedium = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium);
       //bool pileup_jetID_passTight = PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight);
 
-
       if(readJECuncertainty)
       {
         jecUnc->setJetEta( it->eta() );

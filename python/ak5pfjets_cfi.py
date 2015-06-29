@@ -28,11 +28,19 @@ from RecoBTag.Configuration.RecoBTag_cff import *
 from RecoJets.Configuration.RecoJetAssociations_cff import *
 from RecoJets.JetAssociationProducers.ak5JTA_cff import *
 from PhysicsTools.PatAlgos.slimming.unpackedTracksAndVertices_cfi import *
-from Configuration.StandardSequences.Geometry_cff import *
-from Configuration.StandardSequences.MagneticField_38T_cff import *
+##DMM FIXME removed because of following error in 744:
+##--------
+##Exception Message:
+##two EventSetup Producers want to deliver type="CaloSubdetectorGeometry" label="ZDC"
+## from record ZDCGeometryRecord. The two providers are 
+##1) type="ZdcGeometryFromDBEP" label=""
+##2) type="ZdcHardcodeGeometryEP" label=""
+##--------
+#from Configuration.StandardSequences.Geometry_cff import *
+#from Configuration.StandardSequences.MagneticField_38T_cff import *
 
 ak5JetTracksAssociatorAtVertexPF.jets = cms.InputTag("ak5PFJetsCHS")
 ak5JetTracksAssociatorAtVertexPF.tracks = cms.InputTag("unpackedTracksAndVertices")
 impactParameterTagInfos.primaryVertex = cms.InputTag("unpackedTracksAndVertices")
 inclusiveSecondaryVertexFinderTagInfos.extSVCollection = cms.InputTag("unpackedTracksAndVertices","secondary","")
-combinedSecondaryVertex.trackMultiplicityMin = 1
+#combinedSecondaryVertex.trackMultiplicityMin = 1#DMM FIXME removed to get running in 744....

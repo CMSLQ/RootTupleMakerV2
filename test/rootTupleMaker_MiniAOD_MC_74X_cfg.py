@@ -70,9 +70,9 @@ process.maxEvents.input = 100
 process.source.fileNames = [
     # specified by InputList.txt
     #Here is a muon file
-    '/store/mc/RunIISpring15DR74/LQToCMu_M-1150_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/00070800-DE08-E511-8AD2-02163E00F2FB.root'
+    #'/store/mc/RunIISpring15DR74/LQToCMu_M-1150_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/00070800-DE08-E511-8AD2-02163E00F2FB.root'
     #Here is an electron file:
-    #'/store/mc/RunIISpring15DR74/LQToUE_M-1100_BetaOne_TuneCUETP8M1_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/200CE6FD-4405-E511-90DD-02163E013C94.root'
+    '/store/mc/RunIISpring15DR74/LQToUE_ENuJJFilter_M-450_BetaHalf_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v2/70000/8E2B58D7-890A-E511-BC42-00266CF9B274.root'
     ]
 
 #----------------------------------------------------------------------------------------------------
@@ -90,21 +90,22 @@ process.source.fileNames = [
 #
 # Load tools and function definitions
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
+#process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
 #process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
 # Note, must be the same as input collection used for electron ntuplizer
-process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
-from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
-process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
+#process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
+#from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
+#process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
+switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # Define which IDs we want to produce
 # Each of these two example IDs contains all four standard
 # cut-based ID working points
-#my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V0_miniAOD_cff']
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V1_miniAOD_cff')
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
+my_id_modules = []
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 #Add them to the VID producer
-#for idmod in my_id_modules:
-#  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+for idmod in my_id_modules:
+  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
 
 #----------------------------------------------------------------------------------------------------
@@ -542,7 +543,7 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 process.load('FWCore.Modules.printContent_cfi')
 
 process.p = cms.Path(
-    # extra Phys14 VIDs (inc. HEEP)
+    # electron VIDs (inc. HEEP)
     process.egmGsfElectronIDSequence*
     # ak5 jets
     process.ak5PFJetsCHS*

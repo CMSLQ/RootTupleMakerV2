@@ -90,10 +90,8 @@ process.source.fileNames = [
 #
 # Load tools and function definitions
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-#process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
+process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
 #process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
-# Note, must be the same as input collection used for electron ntuplizer
-#process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
 #from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
 #process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
@@ -107,6 +105,8 @@ my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElect
 for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
+# Note, must be the same as input collection used for electron ntuplizer
+process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
 
 #----------------------------------------------------------------------------------------------------
 # Turn on trigger matching
@@ -544,7 +544,7 @@ process.load('FWCore.Modules.printContent_cfi')
 
 process.p = cms.Path(
     # electron VIDs (inc. HEEP)
-    process.egmGsfElectronIDSequence*
+    #process.egmGsfElectronIDSequence*
     # ak5 jets
     process.ak5PFJetsCHS*
     process.ak5GenJets*

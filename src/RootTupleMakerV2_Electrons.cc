@@ -755,17 +755,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       isEE                     -> push_back( it->isEE() );
       
       // ECAL eta/phi vs tracker eta/phi
-
       deltaPhiTrkSC            -> push_back ( it->deltaPhiSuperClusterTrackAtVtx() );
       deltaEtaTrkSC            -> push_back ( it->deltaEtaSuperClusterTrackAtVtx() );
-      //FIXME: this works in 73X
-      //deltaEtaTrkSeedSC        -> push_back ( it->deltaEtaSeedClusterTrackAtVtx() );
-      float dEtaInSeed = it->superCluster().isNonnull() && it->superCluster()->seed().isNonnull() ? 
-        it->deltaEtaSuperClusterTrackAtVtx() - it->superCluster()->eta() + it->superCluster()->seed()->eta() : std::numeric_limits<float>::max();
-      deltaEtaTrkSeedSC        -> push_back ( dEtaInSeed );
+      deltaEtaTrkSeedSC        -> push_back ( it->deltaEtaSeedClusterTrackAtVtx() );
 
       // Shower shape
-
       sigmaEtaEta              -> push_back ( it->sigmaEtaEta() );
       sigmaIEtaIEta            -> push_back ( it->sigmaIetaIeta() );
       full5x5SigmaIEtaIEta     -> push_back ( it->full5x5_sigmaIetaIeta() );

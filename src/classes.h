@@ -12,9 +12,6 @@ namespace {
     std::vector<std::vector<float > > dummy2;
     edm::Wrapper< std::vector<std::vector<float> > > dummy3;
 
-    std::vector<std::vector<int > > dummy4;
-    edm::Wrapper< std::vector<std::vector<int> > > dummy5;
-
     std::vector<std::vector<bool > > dummy6;
     edm::Wrapper< std::vector<std::vector<bool> > > dummy7;
 

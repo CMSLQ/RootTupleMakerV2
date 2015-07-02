@@ -72,16 +72,11 @@ process.source.fileNames = [
     #Here is a muon file
     #'/store/mc/RunIISpring15DR74/LQToCMu_M-1150_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/00070800-DE08-E511-8AD2-02163E00F2FB.root'
     #Here is an electron file:
-    '/store/mc/RunIISpring15DR74/LQToUE_ENuJJFilter_M-450_BetaHalf_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v2/70000/8E2B58D7-890A-E511-BC42-00266CF9B274.root'
+    #'/store/mc/RunIISpring15DR74/LQToUE_M-1650_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
+    'file:D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
     ]
 
-#----------------------------------------------------------------------------------------------------
-# HEEP 4.0 (electron ID) still uses the 2011 definitions of rho for isolation corrections.
-# 
-# Recipe taken from here:
-# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection#Rho_for_2011_Effective_Areas
-#----------------------------------------------------------------------------------------------------
-# SIC Replace with HEEP 5.1
+# SIC Replace with HEEP 5.1/6.0
 # Also load Egamma cut-based ID in new VID framework while we're at it
 # See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
 #   and for HEEP: https://hypernews.cern.ch/HyperNews/CMS/get/egamma/1519/2/1/1/1.html
@@ -89,10 +84,11 @@ process.source.fileNames = [
 # add the ValueMaps with ID decisions into the event data stream
 #
 # Load tools and function definitions
-from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+#from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
 #process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
 #from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 #process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # Define which IDs we want to produce
@@ -101,10 +97,12 @@ switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 my_id_modules = []
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
+#FIXME get this working at some point?
+#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_PHYS14_PU20bx25_nonTrig_V1_cff')
 #Add them to the VID producer
 for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-
 # Note, must be the same as input collection used for electron ntuplizer
 process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
 
@@ -666,3 +664,4 @@ process.schedule = cms.Schedule(process.p)#,process.DUMP)
 # try to convert it to unscheduled explicitly?
 #from FWCore.ParameterSet.Utilities import convertToUnscheduled
 #convertToUnscheduled(process)
+

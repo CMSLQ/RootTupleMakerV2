@@ -34,7 +34,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string( "file.root" )
+    fileName = cms.string( "file_m650.root" )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ if 'GlobalTag' in process.__dict__:
 #process.GlobalTag.globaltag = 'PHYS14_25_V1'
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = -1
 
 # Input files
 process.source.fileNames = [
@@ -73,7 +73,9 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring15DR74/LQToCMu_M-1150_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/00070800-DE08-E511-8AD2-02163E00F2FB.root'
     #Here is an electron file:
     #'/store/mc/RunIISpring15DR74/LQToUE_M-1650_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
-    'file:D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
+    #'file:D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
+    #file dataset=/LQToUE_M-650_BetaOne_TuneCUETP8M1_13TeV-pythia8/*/MINIAODSIM
+    'file:B8AB1129-3B08-E511-95B0-B083FED73AA1.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0
@@ -99,12 +101,12 @@ my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedE
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
 #FIXME get this working at some point?
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_PHYS14_PU20bx25_nonTrig_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_PHYS14_PU20bx25_nonTrig_V1_cff')
 #Add them to the VID producer
 for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-# Note, must be the same as input collection used for electron ntuplizer
-process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
+# XXX NB, must be the same as input collection used for electron ntuplizer
+#process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
 
 #----------------------------------------------------------------------------------------------------
 # Turn on trigger matching

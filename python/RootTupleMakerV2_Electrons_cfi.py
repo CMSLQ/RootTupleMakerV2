@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     #DCSInputTag = cms.InputTag('scalersRawToDigi'),
-    #InputTag = cms.InputTag('slimmedElectrons'),
-    InputTag = cms.InputTag('electronsTriggerMatchAll'), # use all TriggerElectron/TriggerPhoton matches by default
+    InputTag = cms.InputTag('slimmedElectrons'),
+    #InputTag = cms.InputTag('electronsTriggerMatchAll'), # use all TriggerElectron/TriggerPhoton matches by default
     Prefix = cms.string('Electron'),
     Suffix = cms.string(''),
     MaxSize = cms.uint32(10),
@@ -20,7 +20,7 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     ElectronTightIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight"),
     ElectronMediumIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium"),
     ElectronLooseIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose"),
-    ElectronHEEPIdMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV51"),
+    ElectronHEEPIdMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
 )
 
 # Trigger matching
@@ -28,13 +28,17 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
 # See: https://hypernews.cern.ch/HyperNews/CMS/get/egamma-hlt/201/1.html
 cleanElectronTriggerMatchHLTSingleElectron = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
+  #"PATTriggerMatcherDRDPtLessByR"
 , src     = cms.InputTag( 'slimmedElectrons' )
 , matched = cms.InputTag( 'unpackedPatTrigger' )          
 #, matchedCuts = cms.string( 'path ( "HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*" )' )
 , matchedCuts = cms.string( 'type("TriggerPhoton") || type("TriggerElectron")' )
-, maxDeltaR = cms.double( 0.5 )
-, resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
-, resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
+#, maxDeltaR = cms.double( 0.5 )
+, maxDeltaR = cms.double( 1.0 )
+#, resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
+#, resolveByMatchQuality = cms.bool( True  )        # take best match found per reco object: by DeltaR here (s. above)
+, resolveAmbiguities    = cms.bool( False  )        # only one match per trigger object
+, resolveByMatchQuality = cms.bool( False  )        # take best match found per reco object: by DeltaR here (s. above)
 )
 
 cleanElectronTriggerMatchHLTSingleElectronWP85 = cms.EDProducer(

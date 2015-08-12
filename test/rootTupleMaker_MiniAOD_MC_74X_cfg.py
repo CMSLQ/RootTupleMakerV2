@@ -652,13 +652,12 @@ process.p = cms.Path(
 #                                )
 #process.DUMP    = cms.EndPath (process.dump)
 
-# Delete predefined Endpath (needed for running with CRAB)
-del process.out
-del process.outpath
-
 #----------------------------------------------------------------------------------------------------
 # Run the path
 #----------------------------------------------------------------------------------------------------
+# Delete predefined Endpath (needed for running with CRAB)
+del process.out
+del process.outpath
 
 process.schedule = cms.Schedule(process.p)#,process.DUMP)
 

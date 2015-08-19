@@ -19,6 +19,12 @@
 <use name="lhapdf"/>
 <use name="rootrflx"/>
 <use name="rootmath"/>
+
+<use   name="SimDataFormats/GeneratorProducts"/>
+<use   name="GeneratorInterface/LHEInterface"/>
+<use   name="FWCore/ServiceRegistry"/>
+<use   name="FWCore/Utilities"/>
+
 <export>
   <lib name="LeptoquarksRootTupleMakerV2"/>
 </export>

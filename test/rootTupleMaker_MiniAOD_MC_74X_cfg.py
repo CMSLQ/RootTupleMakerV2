@@ -64,7 +64,7 @@ if 'GlobalTag' in process.__dict__:
 #process.GlobalTag.globaltag = 'PHYS14_25_V1'
 
 # Events to process
-process.maxEvents.input = -1
+process.maxEvents.input = 10
 
 # Input files
 process.source.fileNames = [
@@ -75,7 +75,12 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring15DR74/LQToUE_M-1650_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
     #'file:D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
     #file dataset=/LQToUE_M-650_BetaOne_TuneCUETP8M1_13TeV-pythia8/*/MINIAODSIM
-    'file:B8AB1129-3B08-E511-95B0-B083FED73AA1.root'
+    #'file:B8AB1129-3B08-E511-95B0-B083FED73AA1.root'
+
+    #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/007C13B1-A037-E511-9056-00259073E51C.root'
+    #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0A03D5CB-1609-E511-9D94-0025904CF710.root'
+    #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9_ext1-v1/30000/002F5645-D03C-E511-8057-0025905A60AA.root'
+    'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/0E885FA4-FF01-E511-B2DB-002590A3C95E.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0

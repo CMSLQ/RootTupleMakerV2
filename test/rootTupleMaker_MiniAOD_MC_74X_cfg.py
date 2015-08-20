@@ -72,15 +72,14 @@ process.source.fileNames = [
     #Here is a muon file
     #'/store/mc/RunIISpring15DR74/LQToCMu_M-1150_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/00070800-DE08-E511-8AD2-02163E00F2FB.root'
     #Here is an electron file:
-    #'/store/mc/RunIISpring15DR74/LQToUE_M-1650_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
+    '/store/mc/RunIISpring15DR74/LQToUE_M-1650_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
     #'file:D25E4834-4E04-E511-B2AB-FA163EBCA72A.root'
     #file dataset=/LQToUE_M-650_BetaOne_TuneCUETP8M1_13TeV-pythia8/*/MINIAODSIM
     #'file:B8AB1129-3B08-E511-95B0-B083FED73AA1.root'
-
     #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/50000/007C13B1-A037-E511-9056-00259073E51C.root'
     #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/0A03D5CB-1609-E511-9D94-0025904CF710.root'
     #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9_ext1-v1/30000/002F5645-D03C-E511-8057-0025905A60AA.root'
-    'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/0E885FA4-FF01-E511-B2DB-002590A3C95E.root'
+    #'root://xrootd.unl.edu//store/mc/RunIISpring15DR74/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/0E885FA4-FF01-E511-B2DB-002590A3C95E.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0
@@ -102,11 +101,11 @@ switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # Each of these two example IDs contains all four standard
 # cut-based ID working points
 my_id_modules = []
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
 #FIXME get this working at some point?
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_PHYS14_PU20bx25_nonTrig_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
 #Add them to the VID producer
 for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)

@@ -38,16 +38,16 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   inputTag                     (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
   vtxInputTag                  (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
   rhoInputTag                  (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
-  electronVetoIdMapInputTag_   (iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"              )),
-  electronTightIdMapInputTag_  (iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"              )),
-  electronMediumIdMapInputTag_ (iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"              )),
-  electronLooseIdMapInputTag_  (iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"              )),
-  electronHEEPIdMapInputTag_   (iConfig.getParameter<edm::InputTag>("ElectronHEEPIdMap"              )),
   electronVetoIdMapToken_      (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"))),
   electronLooseIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"))),
   electronMediumIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"))),
   electronTightIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"))),
   electronHEEPIdMapToken_      (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronHEEPIdMap"))),
+  eleVetoIdCutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleVetoIdCutFlowResultMap"))),
+  eleLooseIdCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleLooseIdCutFlowResultMap"))),
+  eleMediumIdCutFlowResultMapToken_ (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleMediumIdCutFlowResultMap"))),
+  eleTightIdCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleTightIdCutFlowResultMap"))),
+  eleHEEPIdCutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdCutFlowResultMap"))),
   electronIso                  (iConfig.getParameter<double>       ("ElectronIso"              )),
   muonPt                       (iConfig.getParameter<double>       ("MuonPt"                   )),
   muonIso                      (iConfig.getParameter<double>       ("MuonIso"                  )),
@@ -84,16 +84,26 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 
   // ID information
   
-  produces <std::vector<int> >     ( prefix + "PassId"                   + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDVeto"         + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDLoose"        + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDMedium"       + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTight"        + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigTight"    + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigWP70"     + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDEoP"          + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassHEEPID"               + suffix );
-  produces <std::vector<float> >   ( prefix + "RhoIsoHEEP"               + suffix );
+  produces <std::vector<int> >     ( prefix + "PassId"                     + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDVeto"           + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDLoose"          + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDMedium"         + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTight"          + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassHEEPID"                 + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDMedium" + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDTight"  + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDHEEP"   + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDLoose" + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDTight" + suffix );
+  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDHEEP"  + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigTight"      + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigWP70"       + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaIDEoP"            + suffix );
+  produces <std::vector<float> >   ( prefix + "RhoIsoHEEP"                 + suffix );
 
   // Does this electron overlap with a muon?			        
   produces <std::vector<int> >    ( prefix + "Overlaps"                 + suffix );
@@ -259,16 +269,26 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  scEnergy                  ( new std::vector<double>()  );
 
   // ID information
-  std::auto_ptr<std::vector<int> >    passIds                   ( new std::vector<int>   ()  );
+  std::auto_ptr<std::vector<int> >     passIds                   ( new std::vector<int>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDVeto          ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDLoose         ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDMedium        ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDTight         ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passHEEPID                ( new std::vector<bool>   ()  ); 
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDVeto   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDLoose  ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMedium ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDTight  ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDHEEP   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDVeto   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDLoose  ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMedium ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDTight  ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDHEEP   ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<bool> >    passEGammaIDTrigTight     ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDTrigWP70      ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDEoP           ( new std::vector<bool>   ()  ); 
-  std::auto_ptr<std::vector<bool> >    passHEEPID           ( new std::vector<bool>   ()  ); 
-  std::auto_ptr<std::vector<float> >   rhoIsoHEEP           ( new std::vector<float>   ()  ); 
+  std::auto_ptr<std::vector<float> >   rhoIsoHEEP                ( new std::vector<float>   ()  ); 
   
   // Does this electron overlap with a muon?
   std::auto_ptr<std::vector<int> >     overlaps                  ( new std::vector<int>   ()  );
@@ -444,17 +464,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
   edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
   edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > veto_id_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > loose_id_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > tight_id_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > heep_id_cutflow_data;
   iEvent.getByToken(electronVetoIdMapToken_,veto_id_decisions);
   iEvent.getByToken(electronLooseIdMapToken_,loose_id_decisions);
   iEvent.getByToken(electronMediumIdMapToken_,medium_id_decisions);
   iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);
   iEvent.getByToken(electronHEEPIdMapToken_,heep_id_decisions);
-  // in case we want to store the instance name later
-  //std::cout << "Veto ID: " << electronVetoIdMapInputTag_.instance() << std::endl;
-  //std::cout << "Tight ID: " << electronTightIdMapInputTag_.instance() << std::endl;
-  //std::cout << "Medium ID: " << electronMediumIdMapInputTag_.instance() << std::endl;
-  //std::cout << "Loose ID: " << electronLooseIdMapInputTag_.instance() << std::endl;
-  //std::cout << "HEEP ID: " << electronHEEPIdMapInputTag_.instance() << std::endl;
+  iEvent.getByToken(eleVetoIdCutFlowResultMapToken_,veto_id_cutflow_data);
+  iEvent.getByToken(eleLooseIdCutFlowResultMapToken_,loose_id_cutflow_data);
+  iEvent.getByToken(eleMediumIdCutFlowResultMapToken_,medium_id_cutflow_data);
+  iEvent.getByToken(eleTightIdCutFlowResultMapToken_,tight_id_cutflow_data);
+  iEvent.getByToken(eleHEEPIdCutFlowResultMapToken_,heep_id_cutflow_data);
 
   //------------------------------------------------------------------------
   // Get magnetic field (need this for photon conversion information)
@@ -724,11 +748,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       passIds                  -> push_back( passId );
       // SIC: update to Run2 cut-based and HEEP ID's
       const edm::Ptr<pat::Electron> elPtr(electrons, it - electrons->begin() );
-      passEGammaIDVeto         -> push_back ((*veto_id_decisions)[ elPtr ]);
-      passEGammaIDLoose        -> push_back ((*loose_id_decisions)[ elPtr ]);
-      passEGammaIDMedium       -> push_back ((*medium_id_decisions)[ elPtr ]);
-      passEGammaIDTight        -> push_back ((*tight_id_decisions)[ elPtr ]);
-      passHEEPID               -> push_back ((*heep_id_decisions)[ elPtr ]);
+      passEGammaIDVeto           -> push_back ((*veto_id_decisions)[ elPtr ]);
+      passEGammaIDLoose          -> push_back ((*loose_id_decisions)[ elPtr ]);
+      passEGammaIDMedium         -> push_back ((*medium_id_decisions)[ elPtr ]);
+      passEGammaIDTight          -> push_back ((*tight_id_decisions)[ elPtr ]);
+      passHEEPID                 -> push_back ((*heep_id_decisions)[ elPtr ]);
+      cutFlowNamesEGammaIDVeto   -> push_back (((*veto_id_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaIDLoose  -> push_back (((*loose_id_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaIDMedium -> push_back (((*medium_id_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaIDTight  -> push_back (((*tight_id_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaIDHEEP   -> push_back (((*heep_id_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowHashesEGammaIDVeto  -> push_back (((*veto_id_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaIDLoose -> push_back (((*loose_id_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaIDMedium-> push_back (((*medium_id_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaIDTight -> push_back (((*tight_id_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaIDHEEP  -> push_back (((*heep_id_cutflow_data)[ elPtr ]).cutFlowHash());
+      //
       rhoIsoHEEP               -> push_back (rhoIso);
       // XXX FIXME SIC: update with trigger updates?
       //passEGammaIDTrigTight    -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, *it));
@@ -882,6 +917,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( passEGammaIDTrigWP70    , prefix + "PassEGammaIDTrigWP70"     + suffix );
   iEvent.put( passEGammaIDEoP         , prefix + "PassEGammaIDEoP"          + suffix );
   iEvent.put( passHEEPID              , prefix + "PassHEEPID"               + suffix );
+  iEvent.put( cutFlowNamesEGammaIDVeto   , prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
+  iEvent.put( cutFlowNamesEGammaIDLoose  , prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
+  iEvent.put( cutFlowNamesEGammaIDMedium , prefix + "CutFlowNamesEGammaIDMedium" + suffix );
+  iEvent.put( cutFlowNamesEGammaIDTight  , prefix + "CutFlowNamesEGammaIDTight"  + suffix );
+  iEvent.put( cutFlowNamesEGammaIDHEEP   , prefix + "CutFlowNamesEGammaIDHEEP"   + suffix );
+  iEvent.put( cutFlowHashesEGammaIDVeto  , prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
+  iEvent.put( cutFlowHashesEGammaIDLoose , prefix + "CutFlowHashesEGammaIDLoose" + suffix );
+  iEvent.put( cutFlowHashesEGammaIDMedium, prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
+  iEvent.put( cutFlowHashesEGammaIDTight , prefix + "CutFlowHashesEGammaIDTight" + suffix );
+  iEvent.put( cutFlowHashesEGammaIDHEEP  , prefix + "CutFlowHashesEGammaIDHEEP"  + suffix );
   iEvent.put( rhoIsoHEEP              , prefix + "RhoIsoHEEP"               + suffix );
   
   // Does this electron overlap with a muon?			        

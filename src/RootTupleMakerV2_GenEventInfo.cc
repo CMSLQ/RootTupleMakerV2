@@ -1,4 +1,4 @@
- #include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenEventInfo.h"
+#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenEventInfo.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -29,6 +29,7 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   produces <std::vector<double> > ( "PDFMSTWWeights" );
   produces <std::vector<double> > ( "PDFNNPDFWeights" );
   produces <std::vector<double> > ( "ScaleWeights" );
+  produces <std::vector<double> > ( "amcNLOWeights" );
   produces <std::vector<int> > ( "PileUpInteractions");
   produces <std::vector<int> > ( "PileUpOriginBX" ) ;
   produces <std::vector<float> > ( "PileUpInteractionsTrue" );
@@ -85,6 +86,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pdfMSTWWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pdfNNPDFWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scaleWeights  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  amcNLOweights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<int >  >   Number_interactions  ( new std::vector<int>() );
   std::auto_ptr<std::vector<float> >   trueNumberInteractions ( new std::vector<float>() );
   std::auto_ptr<std::vector<int >  >   OriginBX( new std::vector<int>() );
@@ -183,9 +185,24 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       	thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
 	scaleWeights->push_back(thisWeight);
       }
+      EvtHandle->weights()[0].wgt < 0 ? amcNLOweights->push_back(-1.) : amcNLOweights->push_back(1.);
+      
+      /*
+	unsigned int num_whichWeight = EvtHandle->weights().size();
+	for (unsigned int iWeight = 0; iWeight < num_whichWeight; iWeight++) {
+	amcNLOWeights->push_back( EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() ); 
+	if(iWeight==0){
+	std::cout << "           weightLHE[" << iWeight << "] = " << EvtHandle->weights()[iWeight].wgt << std::endl;
+	std::cout << "        newweightLHE[" << iWeight << "] = " << EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() << std::endl;
+	std::cout << " weight*newweightLHE[" << iWeight << "] = " << theWeight*EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() << std::endl;
+	int i = iWeight;
+	if(iWeight<=8)std::cout << " scaleWeight[" << iWeight << "] = " << theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()) << std::endl<<std::endl<<std::endl;
+	}
+	}
+      */
     }
   }
-
+  
   
   //-----------------------------------------------------------------
   iEvent.put( processID, "ProcessID" );
@@ -194,6 +211,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pdfMSTWWeights, "PDFMSTWWeights" );
   iEvent.put( pdfNNPDFWeights, "PDFNNPDFWeights" );
   iEvent.put( scaleWeights, "ScaleWeights" );
+  iEvent.put( amcNLOweights, "amcNLOWeights" );
   iEvent.put( Number_interactions,   "PileUpInteractions"   );
   iEvent.put( trueNumberInteractions, "PileUpInteractionsTrue" );
   iEvent.put( OriginBX,   "PileUpOriginBX" );

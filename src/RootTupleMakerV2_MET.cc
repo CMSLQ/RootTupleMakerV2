@@ -54,7 +54,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     for( std::vector<pat::MET>::const_iterator it = mets->begin(); it != mets->end(); ++it ) {
 
       pat::MET::METUncertainty shift = pat::MET::NoShift;
-      pat::MET::METUncertaintyLevel lev = pat::MET::Type1;
+      pat::MET::METCorrectionLevel lev = pat::MET::Type1;
 
       if(     uncertainty=="NoShift")          shift=pat::MET::NoShift;
       else if(uncertainty=="JetEnUp")          shift=pat::MET::JetEnUp;

@@ -13,7 +13,7 @@ rootTupleCaloMET = cms.EDProducer("RootTupleMakerV2_MET",
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
-    Level = cms.string('Calo'))
+    CorrectionLevel = cms.string('Calo'))
 
 # Type1 CaloMET, no jet smearing
 
@@ -24,7 +24,7 @@ rootTupleCaloMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
     StoreUncorrectedMET = cms.bool(True),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
-    Level = cms.string('Calo'))
+    CorrectionLevel = cms.string('Calo'))
 
 #----------------------------------------------------------------------------------------------------
 # PFMET collections
@@ -34,50 +34,66 @@ rootTupleCaloMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
 
 rootTuplePFMET = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patMETsRawPF'),
     Prefix = cms.string('PF'),
     Suffix = cms.string(''),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
-    Level = cms.string('Raw'))
+    CorrectionLevel = cms.string('Raw'))
 
 # Type1 PFMET, with jet smearing
 
 rootTuplePFMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetType1Only'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1Cor'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Type0+1 PFMET, with jet smearing
 
 rootTuplePFMETType01Cor = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetType01Only'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type01Cor'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
-    Level = cms.string('Type01'))
+    CorrectionLevel = cms.string('Type01'))
 
 # Type0+1+XY PFMET, with jet smearing
 
 rootTuplePFMETType01XYCor = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMet'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type01XYCor'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
-    Level = cms.string('Type01XY')                                       
+    CorrectionLevel = cms.string('Type01XY')                                       
 )
+
+# Raw PFMET, no jet smearing
+rootTuplePFMETPuppi = cms.EDProducer("RootTupleMakerV2_MET",
+    InputTag = cms.InputTag('slimmedMETsPuppi'),
+    Prefix = cms.string('PF'),
+    Suffix = cms.string('Puppi'),
+    StoreUncorrectedMET = cms.bool(False),
+    StoreMETSignificance = cms.bool(False),
+    Uncertainty = cms.string('NoShift'),
+    CorrectionLevel = cms.string('Raw'))
+
+# Type1 PFMET, with jet smearing
+rootTuplePFMETPuppiType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
+    InputTag = cms.InputTag('slimmedMETsPuppi'),
+    Prefix = cms.string('PF'),
+    Suffix = cms.string('PuppiType1Cor'),
+    StoreUncorrectedMET = cms.bool(False),
+    StoreMETSignificance = cms.bool(False),
+    Uncertainty = cms.string('NoShift'),
+    CorrectionLevel = cms.string('Type1'))
 
 #----------------------------------------------------------------------------------------------------
 # PFMET systematics collections                                                                
@@ -87,143 +103,131 @@ rootTuplePFMETType01XYCor = cms.EDProducer("RootTupleMakerV2_MET",
 
 rootTuplePFMETType01XYCorUnclusteredUp = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetUnclusteredEnUp'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorUnclusteredUp'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('UnclusteredEnUp'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered energy down
 
 rootTuplePFMETType01XYCorUnclusteredDown = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetUnclusteredEnDown'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorUnclusteredDown'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('UnclusteredEnDown'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered electron energy up
 
 rootTuplePFMETType01XYCorElectronEnUp   = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetElectronEnUp'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorElectronEnUp'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('ElectronEnUp'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered electron energy down
 
 rootTuplePFMETType01XYCorElectronEnDown = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetElectronEnDown'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorElectronEnDown'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('ElectronEnDown'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered muon energy up
 
 rootTuplePFMETType01XYCorMuonEnUp       = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetMuonEnUp'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorMuonEnUp'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('MuonEnUp'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered muon energy down
 
 rootTuplePFMETType01XYCorMuonEnDown     = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetMuonEnDown'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorMuonEnDown'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('MuonEnDown'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered tau energy up
 
 rootTuplePFMETType01XYCorTauEnUp        = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetTauEnUp'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorTauEnUp'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('TauEnUp'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered tau energy down
 
 rootTuplePFMETType01XYCorTauEnDown      = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetTauEnDown'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorTauEnDown'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('TauEnDown'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered jet energy resolution shifted up
 
 rootTuplePFMETType01XYCorJetResUp       = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetJetResUp'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorJetResUp'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('JetResUp'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered jet energy resolution shifted down
 
 rootTuplePFMETType01XYCorJetResDown     = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetJetResDown'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorJetResDown'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('JetResDown'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered jet energy shifted up
 
 rootTuplePFMETType01XYCorJetEnUp        = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetJetEnUp'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorJetEnUp'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('JetEnUp'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 
 # Shift unclustered jet energy shifted down
 
 rootTuplePFMETType01XYCorJetEnDown      = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
-    #InputTag = cms.InputTag('patType1CorrectedPFMetJetEnDown'),
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1CorJetEnDown'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('JetEnDown'),
-    Level = cms.string('Type1'))
+    CorrectionLevel = cms.string('Type1'))
 

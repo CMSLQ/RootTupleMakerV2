@@ -15,6 +15,7 @@ process._Process__name="ROOTTUPLEMAKERV2"
 # Options and Output Report
 process.options.wantSummary = False
 process.options.allowUnscheduled = cms.untracked.bool(True)
+#process.options.allowUnscheduled = cms.untracked.bool(False)
 
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
@@ -41,27 +42,13 @@ process.TFileService = cms.Service("TFileService",
 # Set global settings (number of events, global tag, input files, etc)
 #----------------------------------------------------------------------------------------------------
 # Make sure a correct global tag is used:
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2015
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions#Valid_Global_Tags_by_Release
-# XXX SIC: below possibly needed depending on CMSSW version
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-#from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
-# override the GlobalTag, connection string and pfnPrefix
-if 'GlobalTag' in process.__dict__:
-    from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
-    process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag ='GR_P_V56::All')
-    #process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
-    process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
-    process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
-    for pset in process.GlobalTag.toGet.value():
-        pset.connect = pset.connect.value().replace('frontier://FrontierProd/', 'frontier://FrontierProd/')
-    # fix for multi-run processing
-    process.GlobalTag.RefreshEachRun = cms.untracked.bool( False )
-    process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
-
-# Otherwise, just plain GlobalTag
-#process.GlobalTag.globaltag = 'MCRUN2_74_V9::All'
-#process.GlobalTag.globaltag = 'PHYS14_25_V1'
+# just plain GlobalTag
+#process.GlobalTag.globaltag = '74X_dataRun2_v2'
+process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
 
 # Events to process
 process.maxEvents.input = 50
@@ -69,7 +56,9 @@ process.maxEvents.input = 50
 # Input files
 process.source.fileNames = [
     # specified by InputList.txt
-    '/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/254/833/00000/220E01C3-104B-E511-837F-02163E015541.root'
+    #'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/254/833/00000/220E01C3-104B-E511-837F-02163E015541.root'
+    #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
+    'file:BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0
@@ -94,7 +83,6 @@ my_id_modules = []
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
-#FIXME get this working at some point?
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
 #Add them to the VID producer
 for idmod in my_id_modules:
@@ -134,10 +122,11 @@ process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 # See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Tools
 #----------------------------------------------------------------------------------------------------
 # SIC: I think we can get away with using the default MiniAOD MET
-# Reproduce "raw" MET from packedPFCandidates
-from RecoMET.METProducers.PFMET_cfi import pfMet
-process.pfMet = pfMet.clone(src = "packedPFCandidates")
-process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment (as of Feb 17 2015)
+# in any case, below does not work in CMSSW_7_4_14 with 2015D PromptReco-v3
+## Reproduce "raw" MET from packedPFCandidates
+#from RecoMET.METProducers.PFMET_cfi import pfMet
+#process.pfMet = pfMet.clone(src = "packedPFCandidates")
+#process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment (as of Feb 17 2015)
 
 #----------------------------------------------------------------------------------------------------
 # MET filters
@@ -198,20 +187,9 @@ process.pfMet.calculateSignificance = False # this can't be easily implemented o
 # Add MVA electron ID
 #
 # MVA electron ID details on this twiki:
-# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentification#MVA_based_Id_in_PAT
+# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
 #
-# Taken from the example:
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/EgammaAnalysis/ElectronTools/test/patTuple_electronId_cfg.py?revision=1.2&view=markup&pathrev=V00-00-09
 #----------------------------------------------------------------------------------------------------
-#process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaTrigNoIPV0 + process.mvaNonTrigV0 )
-#process.patElectrons.electronIDSources.mvaTrigV0     = cms.InputTag("mvaTrigV0")  
-#process.patElectrons.electronIDSources.mvaNonTrigV0  = cms.InputTag("mvaNonTrigV0") 
-#process.patElectrons.electronIDSources.mvaTrigNoIPV0 = cms.InputTag("mvaTrigNoIPV0")
-# Updated for 72X Run II
-# must checkout private code from Hugues for the moment
-## See: https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
-#process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_CSA14_cfi')
-#process.mvaID = cms.Sequence(  process.mvaTrigV025nsCSA14 + process.mvaNonTrigV025nsPHYS14 )
 #FIXME: Add the stuff to calculate this in the analyzer as per Hugues' example
 # See https://github.com/HuguesBrun/ExampleElectronMVAid/blob/master/plugins/ExampleElectronMVAid.cc
 
@@ -237,23 +215,50 @@ process.pfMet.calculateSignificance = False # this can't be easily implemented o
 # FIXME: Do we need to rebuild AK5 jets? Or can we stick with AK4?
 # AK4 will possibly have more support (for JECs, etc.)
 process.load('Leptoquarks.RootTupleMakerV2.ak5pfjets_cfi')
+## b-tag discriminators
+bTagDiscriminators = [
+    'pfCombinedInclusiveSecondaryVertexV2BJetTags'
+]
 from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
-addJetCollection(process, labelName = 'AK5',
+addJetCollection(process,
+                 labelName = 'AK5PF',
                  jetSource = cms.InputTag('ak5PFJets'),
-                 algo = 'AK', rParam = 0.5,
+                 pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
+                 pfCandidates = cms.InputTag('packedPFCandidates'),
+                 svSource = cms.InputTag('slimmedSecondaryVertices'),
+                 btagDiscriminators = bTagDiscriminators,
                  jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-                 #btagInfos = ['caTopTagInfos']
-                 )
-process.patJetsAK5.userData.userFloats.src = [] # start with empty list of user floats
-process.selectedPatJetsAK5.cut = cms.string("pt > 10")
-process.patJetGenJetMatchAK5.matched =  'slimmedGenJets'
-process.patJetPartonMatchAK5.matched = 'prunedGenParticles'
-process.patJetPartons.particles = 'prunedGenParticles'
-process.patJetPartonsLegacy.src = 'prunedGenParticles'
-process.patJetCorrFactorsAK5.primaryVertices = 'offlineSlimmedPrimaryVertices'
-# needed when using btagInfos?
-#process.jetTracksAssociatorAtVertexAK5.tracks = 'unpackedTracksAndVertices'
-#process.jetTracksAssociatorAtVertexAK5.pvSrc = 'offlineSlimmedPrimaryVertices'
+                 genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
+                 genParticles = cms.InputTag('prunedGenParticles'),
+                 algo = 'AK',
+                 rParam = 0.5,
+)
+addJetCollection(process,
+                 labelName = 'AK5PFCHS',
+                 jetSource = cms.InputTag('ak5PFJetsCHS'),
+                 pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
+                 pfCandidates = cms.InputTag('packedPFCandidates'),
+                 svSource = cms.InputTag('slimmedSecondaryVertices'),
+                 btagDiscriminators = bTagDiscriminators,
+                 jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+                 genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
+                 genParticles = cms.InputTag('prunedGenParticles'),
+                 algo = 'AK',
+                 rParam = 0.5,
+)
+#process.patJetsAK5.userData.userFloats.src = [] # start with empty list of user floats
+process.selectedPatJetsAK5PFCHS.cut = cms.string("pt > 10")
+#process.patJetGenJetMatchAK5.matched =  'slimmedGenJets'
+#process.patJetPartonMatchAK5.matched = 'prunedGenParticles'
+#process.patJetPartons.particles = 'prunedGenParticles'
+#process.patJetPartonsLegacy.src = 'prunedGenParticles'
+#process.patJetCorrFactorsAK5.primaryVertices = 'offlineSlimmedPrimaryVertices'
+## needed when using btagInfos?
+##process.jetTracksAssociatorAtVertexAK5.tracks = 'unpackedTracksAndVertices'
+##process.jetTracksAssociatorAtVertexAK5.pvSrc = 'offlineSlimmedPrimaryVertices'
+from PhysicsTools.PatAlgos.tools.pfTools import *
+## Adapt primary vertex collection
+adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
 
 #process.out.outputCommands += ['keep *_ak5GenJets_*_EX',
 #                               'keep *_ak5PFJets_*_EX',
@@ -274,112 +279,55 @@ process.patJetCorrFactorsAK5.primaryVertices = 'offlineSlimmedPrimaryVertices'
 #----------------------------------------------------------------------------------------------------
 # Add the pileup MVA to the PFJets
 #----------------------------------------------------------------------------------------------------
-#process.load("Leptoquarks.RootTupleMakerV2.pujetidsequence_cff")
-# SIC FIXME
-# This needs an update for 72X. Not sure what the official recipe is now.
+# already included in non-puppi jets in MiniAOD V2
 
 #----------------------------------------------------------------------------------------------------
 # No CaloJets in MiniAOD
+#----------------------------------------------------------------------------------------------------
 
-#----------------------------------------------------------------------------------------------------
-# Define the systematic shift correction
-#----------------------------------------------------------------------------------------------------
-process.load("JetMETCorrections.Type1MET.correctedMet_cff")
-process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
-process.load("JetMETCorrections.Type1MET.correctionTermsPfMetShiftXY_cff")
-# FIXME needs 72X update when available
-process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data
-# Type1 PFMET provided with MiniAOD default
-# FIXME Check implementation of this
+##----------------------------------------------------------------------------------------------------
+## Define the systematic shift correction
+##----------------------------------------------------------------------------------------------------
+#process.load("JetMETCorrections.Type1MET.correctedMet_cff")
+#process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+#process.load("JetMETCorrections.Type1MET.correctionTermsPfMetShiftXY_cff")
+## FIXME needs 72X update when available
+#process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data
+## Type1 PFMET provided with MiniAOD default
+## FIXME Check implementation of this -- no longer needed?
 
-#----------------------------------------------------------------------------------------------------
-# Use the runMetUncertainties tool for AK5PFJets
-#----------------------------------------------------------------------------------------------------
-from PhysicsTools.PatUtils.tools.runType1PFMEtUncertainties import runType1PFMEtUncertainties
+##----------------------------------------------------------------------------------------------------
+## Use the runMetUncertainties tool for AK5PFJets
+## https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription
+## https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#METSysTools
+##----------------------------------------------------------------------------------------------------
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMETCorrectionsAndUncertainties
 addJetCollection(process, postfix   = "ForMetUnc", labelName = 'AK5PF', jetSource = cms.InputTag('ak5PFJets'), jetCorrections = ('AK5PF', ['L1FastJet', 'L2Relative', 'L3Absolute'], ''))
-process.patJetsAK5PFForMetUnc.getJetMCFlavour = False
-runType1PFMEtUncertainties(process,
-                           addToPatDefaultSequence=False,
-                           jetCollection="selectedPatJetsAK5PFForMetUnc",
-                           electronCollection="slimmedElectrons",
-                           photonCollection="slimmedPhotons",
-                           muonCollection="slimmedMuons",
-                           tauCollection="slimmedTaus",
-                           makeType1p2corrPFMEt=True,
-                           outputModule=None)
-process.patJetPartonMatchAK5PFForMetUnc.matched = 'prunedGenParticles'
-process.patJetPartonsForMetUnc.particles = 'prunedGenParticles'
-process.patJetPartonsLegacyForMetUnc.src = 'prunedGenParticles'
-process.patJetCorrFactorsAK5PFForMetUnc.primaryVertices = 'offlineSlimmedPrimaryVertices'
+
+# FIXME: this seems to rerun the PFMET producer, which requires RECO
+#process.patJetsAK5PFForMetUnc.getJetMCFlavour = False
+#runMETCorrectionsAndUncertainties(process,
+#                                  metType='PF',
+#                                  correctionLevel=["T0","T1","T2","Txy","Smear",""],
+#                                  electronCollection="slimmedElectrons",
+#                                  photonCollection="slimmedPhotons",
+#                                  muonCollection="slimmedMuons",
+#                                  tauCollection="slimmedTaus",
+#                                  jetCollection="selectedPatJetsAK5PFForMetUnc",
+#                                  jetCollectionUnskimmed="ak5PFJets",
+#                                  addToPatDefaultSequence=False,
+#                                  onMiniAOD=True,
+#                                  runOnData=True,
+#                                  postfix='')
+#process.patJetPartonMatchAK5PFForMetUnc.matched = 'prunedGenParticles'
+#process.patJetPartonsForMetUnc.particles = 'prunedGenParticles'
+#process.patJetPartonsLegacyForMetUnc.src = 'prunedGenParticles'
+#process.patJetCorrFactorsAK5PFForMetUnc.primaryVertices = 'offlineSlimmedPrimaryVertices'
 
 #----------------------------------------------------------------------------------------------------
 # Available pat::MET collections for analysis
-# https://indico.cern.ch/event/374824/contribution/5/material/slides/0.pdf
-# - process.patMETsTC                               : raw        TCMET   (NO  jet smearing)
-# 
-# - process.patMETsRawCalo                          : raw        CaloMET (NO  jet smearing)
-# - process.patMETs                                 : Type1      CaloMET (NO  jet smearing)
-# 
-# - process.patMETsRawPF                            : raw        PFMET   (NO  jet smearing)
-# - process.patType1CorrectedPFMet_Type1Only        : Type1      PFMET   (YES jet smearing)
-# - process.patType1CorrectedPFMet_Type01Only       : Type0+1    PFMET   (YES jet smearing)
-# - process.patType1CorrectedPFMet                  : Type0+1+XY PFMET   (YES jet smearing) <-- Recommended for analysis
-# 
-# Available pat::MET collections for systematic studies
-# - process.patType1CorrectedPFMetElectronEnUp      : Type0+1+XY PFMET   (YES jet smearing), Electron energy shifted up 
-# - process.patType1CorrectedPFMetElectronEnDown    : Type0+1+XY PFMET   (YES jet smearing), Electron energy shifted down
-# - process.patType1CorrectedPFMetMuonEnUp          : Type0+1+XY PFMET   (YES jet smearing), Muon energy shifted up
-# - process.patType1CorrectedPFMetMuonEnDown        : Type0+1+XY PFMET   (YES jet smearing), Muon energy shifted down 
-# - process.patType1CorrectedPFMetTauEnUp           : Type0+1+XY PFMET   (YES jet smearing), Tau energy shifted up   
-# - process.patType1CorrectedPFMetTauEnDown         : Type0+1+XY PFMET   (YES jet smearing), Tau energy shifted down 
-# - process.patType1CorrectedPFMetJetResUp          : Type0+1+XY PFMET   (YES jet smearing), Jet resolution smeared up
-# - process.patType1CorrectedPFMetJetResDown        : Type0+1+XY PFMET   (YES jet smearing), Jet resolution smeared down
-# - process.patType1CorrectedPFMetJetEnUp           : Type0+1+XY PFMET   (YES jet smearing), Jet energy shifted up   
-# - process.patType1CorrectedPFMetJetEnDown         : Type0+1+XY PFMET   (YES jet smearing), Jet energy shifted down  
-# - process.patType1CorrectedPFMetUnclusteredEnUp   : Type0+1+XY PFMET   (YES jet smearing), Unclustered energy shifted up  
-# - process.patType1CorrectedPFMetUnclusteredEnDown : Type0+1+XY PFMET   (YES jet smearing), Unclustered energy shifted down
-# 
-# Available shifted object collections:
-# - process.shiftedPatElectronsEnUp                 : pat electrons, energy scale shifted up
-# - process.shiftedPatElectronsEnDown               : pat electrons, energy scale shifted down
-# - process.shiftedPatMuonsEnUp                     : pat muons    , energy scale shifted up
-# - process.shiftedPatMuonsEnDown                   : pat muons    , energy scale shifted down
-# - process.shiftedPatTausEnUp                      : pat taus     , energy scale shifted up
-# - process.shiftedPatTausEnDown                    : pat taus     , energy scale shifted down
-# - process.smearedPatJetsAK5PF                     : pat jets     , energy resolution smeared to match data  <-- Recommended for analysis
-# - process.smearedPatJetsAK5PFresUp                : pat jets     , energy resolution smeared worse data
-# - process.smearedPatJetsAK5PFresDown              : pat jets     , energy resolution sharpened better than data
-# - process.shiftedPatJetsAK5PFenUpForCorrMEt       : pat jets     , energy scale shifted up  
-# - process.shiftedPatJetsAK5PFenDownForCorrMEt     : pat jets     , energy scale shifted down 
-# 
-# Notes:
-# - No Type0 corrections are available for CaloMET
-# - No Type0 or Type1 corrections are available for TCMET
-# - No Type2 corrections recommended for any MET, since they degrade the MET resolution
-#
-# Thanks to Jared Sturdy, Christian Veelken, and Guler Karapinar
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2015#ETmiss
 #----------------------------------------------------------------------------------------------------
-
-#----------------------------------------------------------------------------------------------------
-# Add the raw CaloMET and raw PFMET
-#----------------------------------------------------------------------------------------------------
-# SIC XXX no raw calo met
-
-# PFMET: raw
-# PFMET: Type1, with jet smearing
-# XXX SIC now called: pfMetT1
-# PFMET: Type0+1, with jet smearing
-# FIXME I think all of these can be extracted from the pat::MET object
-process.load('JetMETCorrections.Type1MET.pfMETCorrectionType0_cfi')
-process.pfMetT1Txy = cms.EDProducer(
-  "AddCorrectionsToPFMET",
-  src = cms.InputTag('pfMet'),
-  srcCorrections = cms.VInputTag(
-  cms.InputTag('pfMETcorrType0'),
-  cms.InputTag('corrPfMetType1', 'type1'),
-  ),
-) 
-
 
 #----------------------------------------------------------------------------------------------------
 # This is MC, so analyze the smeared PFJets by default
@@ -471,25 +419,22 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleEventSelection_*_*',
         # Single objects
         'keep *_rootTuplePFCandidates_*_*',
-        'keep *_rootTuplePFJets_*_*',
+        'keep *_rootTuplePFJetsAK5_*_*',
+        'keep *_rootTuplePFJetsAK4CHS_*_*',
+        'keep *_rootTuplePFJetsAK4Puppi_*_*',
         'keep *_rootTupleElectrons_*_*',
-        # FIXME ignore for now
         'keep *_rootTupleMuons_*_*',
-        #'keep *_rootTupleHPSTaus_*_*',
         # FIXME ignore for now
         #'keep *_rootTuplePhotons_*_*',
         'keep *_rootTupleVertex_*_*',
-        # FIXME ignore for now
         ## MET objects for analysis
-        #'keep *_rootTupleTCMET_*_*',
-        #'keep *_rootTupleCaloMET_*_*',
-        #'keep *_rootTupleCaloMETType1Cor_*_*',
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTuplePFMETType01Cor_*_*',
         'keep *_rootTuplePFMETType01XYCor_*_*',
         'keep *_rootTuplePFMETType01XYCor_*_*',
-        # pdf weights
+        'keep *_rootTuplePFMETPuppi_*_*',
+        'keep *_rootTuplePFMETPuppiType1Cor_*_*',
         'keep *_rootTuplePFMETType01XYCorUnclusteredUp_*_*',
         'keep *_rootTuplePFMETType01XYCorUnclusteredDown_*_*',
         'keep *_rootTuplePFMETType01XYCorElectronEnUp_*_*',
@@ -515,9 +460,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleGenMuonsFromZs_*_*',
         'keep *_rootTupleGenTausFromWs_*_*',
         'keep *_rootTupleGenTausFromZs_*_*',
-        # FIXME ignore for now
         'keep *_rootTupleGenMETTrue_*_*',
-        #'keep *_rootTupleGenMETCalo_*_*'       
     )
 )
 
@@ -534,101 +477,72 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 # to see EventSetup content
 #process.esContent = cms.EDAnalyzer("PrintEventSetupContent")
 # to see Event content
-process.load('FWCore.Modules.printContent_cfi')
+#process.load('FWCore.Modules.printContent_cfi')
 
 process.p = cms.Path(
-    # electron VIDs (inc. HEEP)
-    #process.egmGsfElectronIDSequence*
-    # ak5 jets
-    process.ak5PFJetsCHS*
-    #process.ak5GenJets*
-    process.ak5PFJets*
-    process.patJetsAK5*
-    process.patJetsAK5PFForMetUnc*
-    process.patJetsAK5PFForMetUncNotOverlappingWithLeptonsForJetMEtUncertainty*
-    # MVA electron ID (can't be run on MiniAOD?)
-    #process.mvaID*
-    # gen particle skimmer modules
-    process.genTausFromWs*
-    process.genMuonsFromWs*
-    process.genElectronsFromWs*
-    process.genTausFromZs*
-    process.genMuonsFromZs*
-    process.genElectronsFromZs*
-    # FIXME ADD PDF WEIGHTS BACK LATER?
+    ## gen particle skimmer modules
+    #process.genTausFromWs*
+    #process.genMuonsFromWs*
+    #process.genElectronsFromWs*
+    #process.genTausFromZs*
+    #process.genMuonsFromZs*
+    #process.genElectronsFromZs*
+    ## FIXME ADD PDF WEIGHTS BACK LATER?
     # pdf weights
     #process.pdfWeights*
     # Now the regular PAT default sequence
-    #process.patDefaultSequence*
-    # Add the pileup MVA to the jets
-    #FIXME process.puJetIdSequence*
-    # MET producers (included by default)
-    # process.patMETsRawCalo*
-    #process.patMETsRawPF*
-    #process.pfMetT1*
-    #process.patType1CorrectedPFMetType01Only*
+    # Add the pileup MVA to the jets -- included in the miniaod object
     # L+J Filter
     process.LJFilter*  
     # Run PAT conversions for electrons (no longer needed, I assume)
     #process.patConversions*
-    # Re-run full HPS sequence to fully profit from the fix of high pT taus (no longer needed, I assume)
-    #process.recoTauClassicHPSSequence*
-    #process.esContent*
     # RootTupleMakerV2
-    (
     # Event information
-    process.rootTupleEvent+
-    process.rootTupleEventSelection+
+    process.rootTupleEvent*
+    process.rootTupleEventSelection*
     # Single objects
-    process.rootTuplePFCandidates+
-    #process.printContent*
-    process.rootTuplePFJets+
-    process.rootTupleElectrons+
-    process.rootTupleMuons+
+    process.rootTuplePFCandidates*
+    process.rootTuplePFJetsAK5*
+    process.rootTuplePFJetsAK5CHS*
+    process.rootTuplePFJetsAK4CHS*
+    process.rootTuplePFJetsAK4Puppi*
+    process.rootTupleElectrons*
+    process.rootTupleMuons*
     # FIXME ignore for now
-    #process.rootTupleHPSTaus+
-    #process.rootTuplePhotons+
-    process.rootTupleVertex+
+    #process.rootTuplePhotons*
+    process.rootTupleVertex*
     ## MET objects for analysis
-    ##process.rootTupleTCMET+ # no longer made?
-    # FIXME ignore for now
-    #process.rootTupleCaloMET+
-    #process.rootTupleCaloMETType1Cor+
-    process.rootTuplePFMET+
-    process.rootTuplePFMETType1Cor+
-    process.rootTuplePFMETType01Cor+
-    process.rootTuplePFMETType01XYCor+
+    process.rootTuplePFMET*
+    process.rootTuplePFMETType1Cor*
+    process.rootTuplePFMETType01Cor*
+    process.rootTuplePFMETType01XYCor*
     ## MET objects for systematics
-    process.rootTuplePFMETType01XYCorUnclusteredUp+
-    process.rootTuplePFMETType01XYCorUnclusteredDown+
-    process.rootTuplePFMETType01XYCorElectronEnUp+
-    process.rootTuplePFMETType01XYCorElectronEnDown+
-    process.rootTuplePFMETType01XYCorMuonEnUp+
-    process.rootTuplePFMETType01XYCorMuonEnDown+
-    process.rootTuplePFMETType01XYCorTauEnUp+
-    process.rootTuplePFMETType01XYCorTauEnDown+
-    process.rootTuplePFMETType01XYCorJetResUp+
-    process.rootTuplePFMETType01XYCorJetResDown+
-    process.rootTuplePFMETType01XYCorJetEnUp+
-    process.rootTuplePFMETType01XYCorJetEnDown+
+    process.rootTuplePFMETType01XYCorUnclusteredUp*
+    process.rootTuplePFMETType01XYCorUnclusteredDown*
+    process.rootTuplePFMETType01XYCorElectronEnUp*
+    process.rootTuplePFMETType01XYCorElectronEnDown*
+    process.rootTuplePFMETType01XYCorMuonEnUp*
+    process.rootTuplePFMETType01XYCorMuonEnDown*
+    process.rootTuplePFMETType01XYCorTauEnUp*
+    process.rootTuplePFMETType01XYCorTauEnDown*
+    process.rootTuplePFMETType01XYCorJetResUp*
+    process.rootTuplePFMETType01XYCorJetResDown*
+    process.rootTuplePFMETType01XYCorJetEnUp*
+    process.rootTuplePFMETType01XYCorJetEnDown*
     # Trigger objects
-    process.rootTupleTrigger+
-    process.rootTupleTriggerObjects+
+    process.rootTupleTrigger*
+    process.rootTupleTriggerObjects*
     # GEN objects
-    process.rootTupleGenEventInfo+
-    process.rootTupleGenParticles+
-    process.rootTupleGenJets+
-    process.rootTupleGenElectronsFromWs+
-    process.rootTupleGenElectronsFromZs+
-    process.rootTupleGenMuonsFromWs+
-    process.rootTupleGenMuonsFromZs+
-    process.rootTupleGenTausFromWs+
-    process.rootTupleGenTausFromZs+
-    #+
-    # FIXME ignore for now
-    process.rootTupleGenMETTrue
-    #process.rootTupleGenMETCalo
-    )*
+    process.rootTupleGenEventInfo*
+    process.rootTupleGenParticles*
+    process.rootTupleGenJets*
+    process.rootTupleGenElectronsFromWs*
+    process.rootTupleGenElectronsFromZs*
+    process.rootTupleGenMuonsFromWs*
+    process.rootTupleGenMuonsFromZs*
+    process.rootTupleGenTausFromWs*
+    process.rootTupleGenTausFromZs*
+    process.rootTupleGenMETTrue*
     # Put everything into the tree
     process.rootTupleTree
 )

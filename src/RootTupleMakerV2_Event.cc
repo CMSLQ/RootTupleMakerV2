@@ -2,12 +2,15 @@
 #include "FWCore/Framework/interface/Event.h"
 
 RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig) :
+  globalTag(iConfig.getParameter<std::string>("globalTag")),
   fixedGridRhoAllInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoAllInputTag")),
   fixedGridRhoFastjetAllCaloInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetAllCaloInputTag")),
   fixedGridRhoFastjetCentralCaloInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralCaloInputTag")),
   fixedGridRhoFastjetCentralChargedPileUpInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralChargedPileUpInputTag")),
   fixedGridRhoFastjetCentralNeutralInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralNeutralInputTag"))
 {
+  produces <std::string>  ("globalTag");
+  produces <std::string>  ("cmsswRelease");
   produces <unsigned int> ( "run"    );
   produces <unsigned int> ( "event"  );
   produces <unsigned int> ( "bunch"  );
@@ -25,6 +28,9 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
 void RootTupleMakerV2_Event::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
+  std::string releaseVersion = (iEvent.processHistory().rbegin())->releaseVersion();
+  std::auto_ptr<std::string>  globaltag   ( new std::string(globalTag) );
+  std::auto_ptr<std::string>  cmsswrelease   ( new std::string(releaseVersion) );
   std::auto_ptr<unsigned int >  run   ( new unsigned int(iEvent.id().run()        ) );
   std::auto_ptr<unsigned int >  event ( new unsigned int(iEvent.id().event()      ) );
   std::auto_ptr<unsigned int >  ls    ( new unsigned int(iEvent.luminosityBlock() ) );
@@ -63,6 +69,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 
   //-----------------------------------------------------------------
+  iEvent.put( globaltag, "globalTag");
+  iEvent.put( cmsswrelease, "cmsswRelease");
   iEvent.put( run,   "run"   );
   iEvent.put( event, "event" );
   iEvent.put( ls   , "ls"    );

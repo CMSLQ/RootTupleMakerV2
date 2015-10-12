@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleEvent = cms.EDProducer("RootTupleMakerV2_Event",
+   globalTag                                       = cms.string(''),
    FixedGridRhoAllInputTag                         = cms.InputTag('fixedGridRhoAll'),
    FixedGridRhoFastjetAllInputTag                  = cms.InputTag('fixedGridRhoFastjetAll'),
    FixedGridRhoFastjetAllCaloInputTag              = cms.InputTag('fixedGridRhoFastjetAllCalo'),
@@ -8,4 +9,3 @@ rootTupleEvent = cms.EDProducer("RootTupleMakerV2_Event",
    FixedGridRhoFastjetCentralChargedPileUpInputTag = cms.InputTag('fixedGridRhoFastjetCentralChargedPileUp'),
    FixedGridRhoFastjetCentralNeutralInputTag       = cms.InputTag('fixedGridRhoFastjetCentralNeutral'),
 )
-

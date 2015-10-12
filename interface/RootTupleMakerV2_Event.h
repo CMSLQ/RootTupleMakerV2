@@ -11,6 +11,7 @@ class RootTupleMakerV2_Event : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
 
+  const std::string globalTag;
   const edm::InputTag fixedGridRhoAllInputTag;
   const edm::InputTag fixedGridRhoFastjetAllInputTag;
   const edm::InputTag fixedGridRhoFastjetAllCaloInputTag;

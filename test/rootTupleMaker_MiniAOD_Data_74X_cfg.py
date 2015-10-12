@@ -49,9 +49,11 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 #process.GlobalTag.globaltag = '74X_dataRun2_v2'
 process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+# feed it into the ntuple
+process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 # Events to process
-process.maxEvents.input = 50
+process.maxEvents.input = 1000
 
 # Input files
 process.source.fileNames = [
@@ -130,8 +132,10 @@ process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 
 #----------------------------------------------------------------------------------------------------
 # MET filters
+# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 #----------------------------------------------------------------------------------------------------
 # SIC: A number of filters are run by default:
+# FIXME NEEDS UPDATE
 #Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilter)
 #Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
 #Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)

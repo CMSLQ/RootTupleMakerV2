@@ -60,7 +60,7 @@ process.source.fileNames = [
     # specified by InputList.txt
     #'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/254/833/00000/220E01C3-104B-E511-837F-02163E015541.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
-    'file:BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
+    '/store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0
@@ -539,7 +539,8 @@ process.p = cms.Path(
     # GEN objects
     process.rootTupleGenEventInfo*
     process.rootTupleGenParticles*
-    process.rootTupleGenJets*
+    process.rootTupleGenJetsAK5*
+    process.rootTupleGenJetsAK4*
     process.rootTupleGenElectronsFromWs*
     process.rootTupleGenElectronsFromZs*
     process.rootTupleGenMuonsFromWs*
@@ -577,3 +578,4 @@ process.schedule = cms.Schedule(process.p)#,process.DUMP)
 # try to convert it to unscheduled explicitly?
 #from FWCore.ParameterSet.Utilities import convertToUnscheduled
 #convertToUnscheduled(process)
+

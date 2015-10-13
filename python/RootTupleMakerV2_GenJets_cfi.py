@@ -1,9 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 
-rootTupleGenJets = cms.EDProducer("RootTupleMakerV2_GenJets",
-    InputTag = cms.InputTag('ak5GenJets'),
+rootTupleGenJetsAK5 = cms.EDProducer("RootTupleMakerV2_GenJets",
+    InputTag = cms.InputTag('ak5GenJetsNoNu'),
     Prefix = cms.string('GenJet'),
-    Suffix = cms.string(''),
+    Suffix = cms.string('AK5'),
+    MaxSize = cms.uint32(10)
+)
+
+rootTupleGenJetsAK4 = cms.EDProducer("RootTupleMakerV2_GenJets",
+    InputTag = cms.InputTag('slimmedGenJets'),
+    Prefix = cms.string('GenJet'),
+    Suffix = cms.string('AK4'),
     MaxSize = cms.uint32(10)
 )
 

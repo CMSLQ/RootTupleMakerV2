@@ -51,7 +51,7 @@ process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v2'
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 # Events to process
-process.maxEvents.input = 1000
+process.maxEvents.input = 10
 
 # Input files
 process.source.fileNames = [
@@ -420,47 +420,24 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleEventSelection_*_*',
         # Single objects
         'keep *_rootTuplePFCandidates_*_*',
-        'keep *_rootTuplePFJetsAK5_*_*',
-        'keep *_rootTuplePFJetsAK4CHS_*_*',
-        'keep *_rootTuplePFJetsAK4Puppi_*_*',
+        'keep *_rootTuplePFJets*_*_*',
         'keep *_rootTupleElectrons_*_*',
         'keep *_rootTupleMuons_*_*',
         # FIXME ignore for now
         #'keep *_rootTuplePhotons_*_*',
         'keep *_rootTupleVertex_*_*',
         ## MET objects for analysis
-        'keep *_rootTuplePFMET_*_*',
-        'keep *_rootTuplePFMETType1Cor_*_*',
-        'keep *_rootTuplePFMETType01Cor_*_*',
-        'keep *_rootTuplePFMETType01XYCor_*_*',
-        'keep *_rootTuplePFMETType01XYCor_*_*',
-        'keep *_rootTuplePFMETPuppi_*_*',
-        'keep *_rootTuplePFMETPuppiType1Cor_*_*',
-        'keep *_rootTuplePFMETType01XYCorUnclusteredUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorUnclusteredDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorElectronEnUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorElectronEnDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorMuonEnUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorMuonEnDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorTauEnUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorTauEnDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetResUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetResDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetEnUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetEnDown_*_*',
+        'keep *_rootTuplePFMET*_*_*',
         # Trigger objects
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
         # GEN objects
         'keep *_rootTupleGenEventInfo_*_*',
         'keep *_rootTupleGenParticles_*_*',
-        'keep *_rootTupleGenJets_*_*',
-        'keep *_rootTupleGenElectronsFromWs_*_*',
-        'keep *_rootTupleGenElectronsFromZs_*_*',
-        'keep *_rootTupleGenMuonsFromWs_*_*',
-        'keep *_rootTupleGenMuonsFromZs_*_*',
-        'keep *_rootTupleGenTausFromWs_*_*',
-        'keep *_rootTupleGenTausFromZs_*_*',
+        'keep *_rootTupleGenJets*_*_*',
+        'keep *_rootTupleGenElectrons*_*_*',
+        'keep *_rootTupleGenMuons*_*_*',
+        'keep *_rootTupleGenTaus*_*_*',
         'keep *_rootTupleGenMETTrue_*_*',
     )
 )
@@ -481,71 +458,11 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 #process.load('FWCore.Modules.printContent_cfi')
 
 process.p = cms.Path(
-    ## gen particle skimmer modules
-    #process.genTausFromWs*
-    #process.genMuonsFromWs*
-    #process.genElectronsFromWs*
-    #process.genTausFromZs*
-    #process.genMuonsFromZs*
-    #process.genElectronsFromZs*
-    ## FIXME ADD PDF WEIGHTS BACK LATER?
-    # pdf weights
-    #process.pdfWeights*
-    # Now the regular PAT default sequence
-    # Add the pileup MVA to the jets -- included in the miniaod object
     # L+J Filter
     process.LJFilter*  
-    # Run PAT conversions for electrons (no longer needed, I assume)
-    #process.patConversions*
-    # RootTupleMakerV2
-    # Event information
-    process.rootTupleEvent*
-    process.rootTupleEventSelection*
-    # Single objects
-    process.rootTuplePFCandidates*
-    process.rootTuplePFJetsAK5*
-    process.rootTuplePFJetsAK5CHS*
-    process.rootTuplePFJetsAK4CHS*
-    process.rootTuplePFJetsAK4Puppi*
-    process.rootTupleElectrons*
-    process.rootTupleMuons*
-    # FIXME ignore for now
-    #process.rootTuplePhotons*
-    process.rootTupleVertex*
-    ## MET objects for analysis
-    process.rootTuplePFMET*
-    process.rootTuplePFMETType1Cor*
-    process.rootTuplePFMETType01Cor*
-    process.rootTuplePFMETType01XYCor*
-    ## MET objects for systematics
-    process.rootTuplePFMETType01XYCorUnclusteredUp*
-    process.rootTuplePFMETType01XYCorUnclusteredDown*
-    process.rootTuplePFMETType01XYCorElectronEnUp*
-    process.rootTuplePFMETType01XYCorElectronEnDown*
-    process.rootTuplePFMETType01XYCorMuonEnUp*
-    process.rootTuplePFMETType01XYCorMuonEnDown*
-    process.rootTuplePFMETType01XYCorTauEnUp*
-    process.rootTuplePFMETType01XYCorTauEnDown*
-    process.rootTuplePFMETType01XYCorJetResUp*
-    process.rootTuplePFMETType01XYCorJetResDown*
-    process.rootTuplePFMETType01XYCorJetEnUp*
-    process.rootTuplePFMETType01XYCorJetEnDown*
-    # Trigger objects
-    process.rootTupleTrigger*
-    process.rootTupleTriggerObjects*
-    # GEN objects
-    process.rootTupleGenEventInfo*
-    process.rootTupleGenParticles*
-    process.rootTupleGenJetsAK5*
-    process.rootTupleGenJetsAK4*
-    process.rootTupleGenElectronsFromWs*
-    process.rootTupleGenElectronsFromZs*
-    process.rootTupleGenMuonsFromWs*
-    process.rootTupleGenMuonsFromZs*
-    process.rootTupleGenTausFromWs*
-    process.rootTupleGenTausFromZs*
-    process.rootTupleGenMETTrue*
     # Put everything into the tree
+    # In unscheduled mode, anything 'kept' in the output commands above
+    #  will have its producer module called automatically
     process.rootTupleTree
 )
 
@@ -572,7 +489,4 @@ del process.outpath
 process.schedule = cms.Schedule(process.p)#,process.DUMP)
 
 #print process.dumpPython()
-# try to convert it to unscheduled explicitly?
-#from FWCore.ParameterSet.Utilities import convertToUnscheduled
-#convertToUnscheduled(process)
 

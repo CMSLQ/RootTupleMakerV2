@@ -18,6 +18,7 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("isBSCBeamHalo");
   produces <bool> ("isPrimaryVertex");
   produces <bool> ("passHBHENoiseFilter");
+  produces <bool> ("passHBHENoiseIsoFilter");
   produces <bool> ("passHcalLaserEventFilter");
   produces <bool> ("passBeamHaloFilterTight");
   produces <bool> ("isTrackingFailure");
@@ -41,6 +42,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> isbscbeamhalo( new bool() );
   std::auto_ptr<bool> isprimaryvertex( new bool() );
   std::auto_ptr<bool> passhbhenoisefilter( new bool() );
+  std::auto_ptr<bool> passhbhenoiseisofilter( new bool() );
   std::auto_ptr<bool> passHcalLaserEventFilter( new bool() );
   std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
   std::auto_ptr<bool> istrackingfailure ( new bool() ) ;
@@ -60,6 +62,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *isbscbeamhalo.get() = false;
   *isprimaryvertex.get() = true;
   *passhbhenoisefilter.get() = true;
+  *passhbhenoiseisofilter.get() = true;
   *passHcalLaserEventFilter.get() = true;
   *passbeamhalofiltertight.get() = true;
   //
@@ -133,6 +136,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //  Flag_METFilters
   // individual filters:
   //  Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilter)
+  //  Flag_HBHENoiseIsoFilter = cms.Path(HBHENoiseIsoFilter)
   //  Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
   //  Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
   //  Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
@@ -215,6 +219,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if(index < filterNames.size())
       *passhbhenoisefilter.get() = filterResults->accept(index);
 
+   // Hcal Noise Iso Part (HBHE)
+    index = filterNames.triggerIndex("Flag_HBHENoiseIsoFilter");
+    if(index < filterNames.size())
+      *passhbhenoiseisofilter.get() = filterResults->accept(index);
+
     // Hcal Laser Event Filter
     index = filterNames.triggerIndex("Flag_hcalLaserEventFilter");
     if(index < filterNames.size())
@@ -232,6 +241,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(isbscbeamhalo,"isBSCBeamHalo");
   iEvent.put(isprimaryvertex,"isPrimaryVertex");
   iEvent.put(passhbhenoisefilter,"passHBHENoiseFilter");
+  iEvent.put(passhbhenoiseisofilter,"passHBHENoiseIsoFilter");
   iEvent.put(passHcalLaserEventFilter,"passHcalLaserEventFilter");
   iEvent.put(passbeamhalofiltertight,"passBeamHaloFilterTight");
   iEvent.put(istrackingfailure, "isTrackingFailure");

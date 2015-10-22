@@ -175,31 +175,34 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     //Non-madgraph samples may not have this information, if so, skip
     if (EvtHandle.isValid() && genEvtInfo.isValid()){
+      //Powheg samples have valid EvtHandle but seg fault when trying to access weights, so skip if the weights vector is empty
+      if (EvtHandle->weights().size()>0){
 
-      double theWeight = genEvtInfo->weight();
-      double thisWeight = -1.;
-
-      //This follows the suggestion here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW#How_to_use_weights
-      //WARNING: This assumes the first 9 weights are renormalization/factorization-related  This seems to be true for all Madgraph samples
-      for (unsigned int i=0; i <= 8; i++) {
-      	thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
-	scaleWeights->push_back(thisWeight);
-      }
-      EvtHandle->weights()[0].wgt < 0 ? *amcNLOweight.get()=-1. : *amcNLOweight.get()=1.;
+      	double theWeight = genEvtInfo->weight();
+      	double thisWeight = -1.;
+	
+      	//This follows the suggestion here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW#How_to_use_weights
+      	//WARNING: This assumes the first 9 weights are renormalization/factorization-related  This seems to be true for all Madgraph samples
+      	for (unsigned int i=0; i <= 8; i++) {
+      		thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
+		scaleWeights->push_back(thisWeight);
+      	}
+      	EvtHandle->weights()[0].wgt < 0 ? *amcNLOweight.get()=-1. : *amcNLOweight.get()=1.;
       
-      /*
-	unsigned int num_whichWeight = EvtHandle->weights().size();
-	for (unsigned int iWeight = 0; iWeight < num_whichWeight; iWeight++) {
-	amcNLOWeights->push_back( EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() ); 
-	if(iWeight==0){
-	std::cout << "           weightLHE[" << iWeight << "] = " << EvtHandle->weights()[iWeight].wgt << std::endl;
-	std::cout << "        newweightLHE[" << iWeight << "] = " << EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() << std::endl;
-	std::cout << " weight*newweightLHE[" << iWeight << "] = " << theWeight*EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() << std::endl;
-	int i = iWeight;
-	if(iWeight<=8)std::cout << " scaleWeight[" << iWeight << "] = " << theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()) << std::endl<<std::endl<<std::endl;
-	}
-	}
-      */
+      	/*
+		unsigned int num_whichWeight = EvtHandle->weights().size();
+		for (unsigned int iWeight = 0; iWeight < num_whichWeight; iWeight++) {
+		amcNLOWeights->push_back( EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() ); 
+		if(iWeight==0){
+		std::cout << "           weightLHE[" << iWeight << "] = " << EvtHandle->weights()[iWeight].wgt << std::endl;
+		std::cout << "        newweightLHE[" << iWeight << "] = " << EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() << std::endl;
+		std::cout << " weight*newweightLHE[" << iWeight << "] = " << theWeight*EvtHandle->weights()[iWeight].wgt/EvtHandle->originalXWGTUP() << std::endl;
+		int i = iWeight;
+		if(iWeight<=8)std::cout << " scaleWeight[" << iWeight << "] = " << theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()) << std::endl<<std::endl<<std::endl;
+		}
+		}
+      	*/
+      }
     }
   }
   

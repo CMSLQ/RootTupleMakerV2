@@ -56,7 +56,7 @@ process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 # Events to process
-process.maxEvents.input = 10
+process.maxEvents.input = -1
 
 # Input files
 process.source.fileNames = [
@@ -66,7 +66,9 @@ process.source.fileNames = [
     # Data files
     #'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/254/833/00000/220E01C3-104B-E511-837F-02163E015541.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
-    '/store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
+    'root://cms-xrd-global.cern.ch//store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
+    # reHLT
+    #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/ReHLT/7415/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/LQ300_BetaOne_7415ReHLT/151124_100054/0000/outputPhysicsEGammaCommissioning_1.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0
@@ -141,7 +143,6 @@ process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 #----------------------------------------------------------------------------------------------------
 # SIC: A number of filters are run by default:
-# FIXME NEEDS UPDATE
 #Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilter)
 #Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
 #Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
@@ -151,11 +152,31 @@ process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 #Flag_eeBadScFilter = cms.Path(eeBadScFilter)
 #Flag_ecalLaserCorrFilter = cms.Path(ecalLaserCorrFilter)
 #Flag_trkPOGFilters = cms.Path(trkPOGFilters)
-#Flag_trkPOG_manystripclus53X = cms.Path(~manystripclus53X)
-#Flag_trkPOG_toomanystripclus53X = cms.Path(~toomanystripclus53X)
-#Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)
+#Flag_trkPOG_manystripclus53X = cms.Path(manystripclus53X)
+#Flag_trkPOG_toomanystripclus53X = cms.Path(toomanystripclus53X)
+#Flag_trkPOG_logErrorTooManyClusters = cms.Path(logErrorTooManyClusters)
 # See: https://github.com/cms-sw/cmssw/blob/CMSSW_7_2_X/PhysicsTools/PatAlgos/python/slimming/metFilterPaths_cff.py
 # They are stored in edm::TriggerResults of the PAT process, and can be checked the same way as HLT paths.
+# As per https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#early_data_issues_for_the_septem
+#  For jamboree, use:
+#  - Flag_HBHENoiseFilter: needs to be re-run manually as below
+#  - Flag_HBHENoiseIsoFilter: needs to be re-run manually as below
+#  - Flag_CSCTightHaloFilter: will need to be replaced with run2 version (use txt files)
+#  - Flag_goodVertices 
+#  - Flag_eeBadScFilter (use txt files for one bad SC; 3 others are tagged by this flag)
+# HCAL_Noise_Filter
+process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
+process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
+process.HBHENoiseFilterResultProducer.IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False) 
+process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFilterResultRun2Loose")
+process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
+   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
+   reverseDecision = cms.bool(False)
+)
+process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
+   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHEIsoNoiseFilterResult'),
+   reverseDecision = cms.bool(False)
+)
 
 
 #----------------------------------------------------------------------------------------------------
@@ -469,6 +490,9 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 process.p = cms.Path(
     # L+J Filter
     process.LJFilter*  
+    process.HBHENoiseFilterResultProducer* #produces HBHE baseline bools
+    process.ApplyBaselineHBHENoiseFilter*  # reject events based 
+    process.ApplyBaselineHBHEIsoNoiseFilter*   # reject events based  < 10e-3 mistake rate 
     # Put everything into the tree
     # In unscheduled mode, anything 'kept' in the output commands above
     #  will have its producer module called automatically

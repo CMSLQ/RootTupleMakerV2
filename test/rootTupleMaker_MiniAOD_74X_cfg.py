@@ -56,7 +56,7 @@ process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 # Events to process
-process.maxEvents.input = -1
+process.maxEvents.input = 100
 
 # Input files
 process.source.fileNames = [
@@ -66,9 +66,10 @@ process.source.fileNames = [
     # Data files
     #'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/254/833/00000/220E01C3-104B-E511-837F-02163E015541.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
-    'root://cms-xrd-global.cern.ch//store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
+    #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
     # reHLT
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/ReHLT/7415/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/LQ300_BetaOne_7415ReHLT/151124_100054/0000/outputPhysicsEGammaCommissioning_1.root'
+    '/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/0A69ADC9-CA6D-E511-9A59-34E6D7E05F28.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0
@@ -248,8 +249,16 @@ process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
 process.load('Leptoquarks.RootTupleMakerV2.ak5pfjets_cfi')
 ## b-tag discriminators
 bTagDiscriminators = [
-    'pfCombinedInclusiveSecondaryVertexV2BJetTags'
-]
+  'pfTrackCountingHighEffBJetTags',
+  'pfTtrackCountingHighPurBJetTags',
+  'pfJetProbabilityBJetTags',
+  'pfJetBProbabilityBJetTags',
+  'pfSimpleSecondaryVertexHighEffBJetTags',
+  'pfSimpleSecondaryVertexHighPurBJetTags',
+  'pfCombinedSecondaryVertexV2BJetTags',
+  'pfCombinedInclusiveSecondaryVertexV2BJetTags',
+  'pfCombinedMVABJetTags'
+  ]
 from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
 addJetCollection(process,
                  labelName = 'AK5PF',

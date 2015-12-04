@@ -74,7 +74,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else if(uncertainty=="JetResUpSmear")    shift=pat::MET::JetResUpSmear;
       else if(uncertainty=="JetResDownSmear")  shift=pat::MET::JetResDownSmear;
       else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET uncertainty label: " << uncertainty;
-
+      /*
       if(corLevel=="Raw")                level = pat::MET::Raw;
       else if(corLevel=="Type1")         level = pat::MET::Type1;
       else if(corLevel=="Type01")        level = pat::MET::Type01;
@@ -85,6 +85,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else if(corLevel=="Type01Smear")   level = pat::MET::Type01Smear;
       else if(corLevel=="Type1SmearXY")  level = pat::MET::Type1SmearXY;
       else if(corLevel=="Type01SmearXY") level = pat::MET::Type01SmearXY;
+      else if(corLevel=="RawCalo")       level = pat::MET::RawCalo;
+      else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET correction level label: " << corLevel;
+      */
+      if(corLevel=="Raw")                level = pat::MET::Raw;
+      else if(corLevel=="Type1")         level = pat::MET::Type1;
+      else if(corLevel=="Type01")        level = pat::MET::Type1;
+      else if(corLevel=="TypeXY")        level = pat::MET::Type1;
+      else if(corLevel=="Type1XY")       level = pat::MET::Type1;
+      else if(corLevel=="Type01XY")      level = pat::MET::Type1;
+      else if(corLevel=="Type1Smear")    level = pat::MET::Type1;
+      else if(corLevel=="Type01Smear")   level = pat::MET::Type1;
+      else if(corLevel=="Type1SmearXY")  level = pat::MET::Type1;
+      else if(corLevel=="Type01SmearXY") level = pat::MET::Type1;
       else if(corLevel=="RawCalo")       level = pat::MET::RawCalo;
       else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET correction level label: " << corLevel;
 

@@ -250,7 +250,7 @@ process.load('Leptoquarks.RootTupleMakerV2.ak5pfjets_cfi')
 ## b-tag discriminators
 bTagDiscriminators = [
   'pfTrackCountingHighEffBJetTags',
-  'pfTtrackCountingHighPurBJetTags',
+  'pfTrackCountingHighPurBJetTags',
   'pfJetProbabilityBJetTags',
   'pfJetBProbabilityBJetTags',
   'pfSimpleSecondaryVertexHighEffBJetTags',

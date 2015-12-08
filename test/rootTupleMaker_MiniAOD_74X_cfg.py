@@ -259,6 +259,9 @@ bTagDiscriminators = [
   'pfCombinedInclusiveSecondaryVertexV2BJetTags',
   'pfCombinedMVABJetTags'
   ]
+bTagDiscriminatorsAK5 = [
+    'pfCombinedInclusiveSecondaryVertexV2BJetTags'
+]
 from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
 addJetCollection(process,
                  labelName = 'AK5PF',
@@ -266,7 +269,7 @@ addJetCollection(process,
                  pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
                  pfCandidates = cms.InputTag('packedPFCandidates'),
                  svSource = cms.InputTag('slimmedSecondaryVertices'),
-                 btagDiscriminators = bTagDiscriminators,
+                 btagDiscriminators = bTagDiscriminatorsAK5,
                  jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
                  genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
                  genParticles = cms.InputTag('prunedGenParticles'),
@@ -279,7 +282,7 @@ addJetCollection(process,
                  pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
                  pfCandidates = cms.InputTag('packedPFCandidates'),
                  svSource = cms.InputTag('slimmedSecondaryVertices'),
-                 btagDiscriminators = bTagDiscriminators,
+                 btagDiscriminators = bTagDiscriminatorsAK5,
                  jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
                  genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
                  genParticles = cms.InputTag('prunedGenParticles'),

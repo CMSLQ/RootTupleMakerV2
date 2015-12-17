@@ -4,7 +4,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 
 class RootTupleMakerV2_Trigger : public edm::EDProducer {
  public:
@@ -19,7 +19,7 @@ class RootTupleMakerV2_Trigger : public edm::EDProducer {
   const edm::InputTag   l1InputTag;
   const edm::InputTag   hltInputTag;
   const std::vector<std::string> hltPathsOfInterest;
-  HLTConfigProvider hltConfig;
+  HLTPrescaleProvider hltPrescaleProvider_;
 
   std::string                 sourceName;
   DataSource                  sourceType;

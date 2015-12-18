@@ -1,4 +1,4 @@
-#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Event.h"
+#include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_Event.h"
 #include "FWCore/Framework/interface/Event.h"
 
 RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig) :

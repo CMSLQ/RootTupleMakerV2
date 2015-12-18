@@ -1,4 +1,4 @@
-#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenMET.h"
+#include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_GenMET.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/PatCandidates/interface/MET.h"

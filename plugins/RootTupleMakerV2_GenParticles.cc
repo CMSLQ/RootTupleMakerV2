@@ -1,4 +1,4 @@
-#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_GenParticles.h"
+#include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_GenParticles.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "RecoTauTag/TauTagTools/interface/GeneratorTau.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"

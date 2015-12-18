@@ -1,4 +1,4 @@
-#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Tree.h"
+#include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_Tree.h"
 
 #include "FWCore/Framework/interface/ConstProductRegistry.h"
 #include "FWCore/Framework/interface/ProductSelector.h"

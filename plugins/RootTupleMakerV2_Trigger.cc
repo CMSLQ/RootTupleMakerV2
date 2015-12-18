@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "Leptoquarks/RootTupleMakerV2/interface/RootTupleMakerV2_Trigger.h"
+#include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_Trigger.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"

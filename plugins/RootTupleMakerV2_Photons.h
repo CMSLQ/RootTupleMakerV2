@@ -18,10 +18,10 @@ class RootTupleMakerV2_Photons : public edm::EDProducer {
   inline float recHitE( const DetId id, const EcalRecHitCollection & recHits,int di, int dj );
   inline float recHitApproxEt(  const DetId id,  const EcalRecHitCollection &recHits );
   float GetE2OverE9( const DetId id, const EcalRecHitCollection & recHits);
-  const edm::InputTag   inputTag;
+  const edm::EDGetTokenT<edm::InputTag>   inputToken_;
   const std::string     prefix, suffix;
   const unsigned int    maxSize;
-  const edm::InputTag   beamSpotInputTag, conversionsInputTag, electronsInputTag, ecalRecHitsEBInputTag, ecalRecHitsEEInputTag;
+  const edm::EDGetTokenT<edm::InputTag>   beamSpotInputToken_, conversionsInputToken_, electronsInputToken_, ecalRecHitsEBInputToken_, ecalRecHitsEEInputToken_;
 };
 
 #endif

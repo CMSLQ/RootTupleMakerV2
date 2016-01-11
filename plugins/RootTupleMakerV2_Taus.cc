@@ -19,8 +19,8 @@
 #include "DataFormats/TauReco/interface/PFTau.h"
 
 RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
-  inputTag    (iConfig.getParameter<edm::InputTag>("InputTag")),
-  vtxInputTag (iConfig.getParameter<edm::InputTag>("VertexInputTag")),
+  inputToken_    (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  vtxInputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))),
   prefix      (iConfig.getParameter<std::string>("Prefix")),
   suffix      (iConfig.getParameter<std::string>("Suffix")),
   maxSize     (iConfig.getParameter<unsigned int>("MaxSize")),
@@ -322,10 +322,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // --------------------------------------------------------------------------------------- //
   //  
   edm::Handle<reco::VertexCollection> primaryVertices;
-  iEvent.getByLabel(vtxInputTag,primaryVertices);
+  iEvent.getByToken(vtxInputToken_,primaryVertices);
   //
   edm::Handle<std::vector<pat::Tau> > taus;
-  iEvent.getByLabel(inputTag, taus);
+  iEvent.getByToken(inputToken_, taus);
   //
   if(taus.isValid()) {
     edm::LogInfo("RootTupleMakerV2_TausInfo") << "Total # Taus: " << taus->size();
@@ -508,7 +508,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  i_vertex++;
         }
       } else {
-	edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the product " << vtxInputTag;
+	edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the product " << primaryVertices;//fixme what to put here?
       }
       vtxIndex                 -> push_back( vtxIndex_  );
       vtxDistXY                -> push_back( vtxDistXY_ );
@@ -647,7 +647,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the product " << inputTag;
+    edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the product " << taus;//fixme what to put here?
   }
   iEvent.put( eta,                              prefix + "Eta"                               + suffix );
   iEvent.put( phi,                              prefix + "Phi"                               + suffix );

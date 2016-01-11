@@ -11,7 +11,7 @@ class RootTupleMakerV2_Vertex : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTag;
+  const edm::EDGetTokenT<edm::InputTag>   inputToken_;
   const std::string     prefix,suffix;
 };
 

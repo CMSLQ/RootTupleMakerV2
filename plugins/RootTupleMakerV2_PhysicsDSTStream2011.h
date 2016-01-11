@@ -18,7 +18,8 @@ class RootTupleMakerV2_PhysicsDSTStream2011 : public edm::EDProducer {
   HLTConfigProvider hltConfig;
 
   const edm::InputTag         hltInputTag;
-  const edm::InputTag         inputTagHLTPFJets, inputTagHLTCaloJetsRaw, inputTagHLTCaloJetsCorr, inputTagHLTPixelVertices;
+  const edm::EDGetTokenT<edm::InputTag>         hltInputToken_;
+  const edm::EDGetTokenT<edm::InputTag>         inputTokenHLTPFJets_, inputTokenHLTCaloJetsRaw_, inputTokenHLTCaloJetsCorr_, inputTokenHLTPixelVertices_;
   const std::string           suffix;
   const std::string           prefixHLTPFJets, prefixHLTCaloJetsRaw, prefixHLTCaloJetsCorr, prefixHLTPixelVertices;
   const double                minPtHLTPFJets, maxEtaHLTPFJets;

@@ -11,14 +11,16 @@ class RootTupleMakerV2_Muons : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTag, triggerEventInputTag;
+  const edm::EDGetTokenT<edm::InputTag>     inputToken_,triggerEventInputToken_;
+  //const edm::InputTag   inputTag, triggerEventInputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
   const double          muonIso;
   const std::string     muonID, singleMuonTriggerMatch, singleIsoMuonTriggerMatch;
   const bool            beamSpotCorr;
   const bool            useCocktailRefits;
-  const edm::InputTag   vtxInputTag;
+  //const edm::InputTag   vtxInputTag;
+  const edm::EDGetTokenT<edm::InputTag>     vtxInputToken_;
 };
 
 #endif

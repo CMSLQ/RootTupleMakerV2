@@ -23,15 +23,15 @@
 
 
 RootTupleMakerV2_Photons::RootTupleMakerV2_Photons(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
-    prefix  (iConfig.getParameter<std::string>  ("Prefix")),
-    suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
-    beamSpotInputTag(iConfig.getParameter<edm::InputTag>    ("BeamSpotInputTag")),
-    conversionsInputTag(iConfig.getParameter<edm::InputTag> ("ConversionsInputTag")),
-    electronsInputTag(iConfig.getParameter<edm::InputTag>   ("ElectronsInputTag")),
-    ecalRecHitsEBInputTag(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEBInputTag")),
-    ecalRecHitsEEInputTag(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEEInputTag"))
+  inputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  prefix  (iConfig.getParameter<std::string>  ("Prefix")),
+  suffix  (iConfig.getParameter<std::string>  ("Suffix")),
+  maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
+  beamSpotInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>    ("BeamSpotInputTag"))),
+  conversionsInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag> ("ConversionsInputTag"))),
+  electronsInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>   ("ElectronsInputTag"))),
+  ecalRecHitsEBInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEBInputTag"))),
+  ecalRecHitsEEInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEEInputTag")))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -137,107 +137,107 @@ float RootTupleMakerV2_Photons::GetE2OverE9( const DetId id, const EcalRecHitCol
   //   if energy of 2>1 and KillSecondHit is set to true, function returns value of E2/E9 centered around 2
   //   *provided* that 1 is the highest energy hit in a 3x3 centered around 2, otherwise, function returns 0
   
-float recHitEtThreshold = 10.0;
-float recHitEtThreshold2 = 1.0;
-bool avoidIeta85=false;
-bool KillSecondHit=true;
+  float recHitEtThreshold = 10.0;
+  float recHitEtThreshold2 = 1.0;
+  bool avoidIeta85=false;
+  bool KillSecondHit=true;
 
-if ( id.subdetId() == EcalBarrel ) {
-  EBDetId ebId( id );
-  // avoid recHits at |eta|=85 where one side of the neighbours is missing
-  if ( abs(ebId.ieta())==85 && avoidIeta85) return 0;
-  // select recHits with Et above recHitEtThreshold
-  float e1 = recHitE( id, recHits );
-  float ete1=recHitApproxEt( id, recHits );
-  // check that rechit E_t is above threshold
-  if (ete1 < std::min(recHitEtThreshold,recHitEtThreshold2) ) return 0;
-  if (ete1 < recHitEtThreshold && !KillSecondHit ) return 0;
+  if ( id.subdetId() == EcalBarrel ) {
+    EBDetId ebId( id );
+    // avoid recHits at |eta|=85 where one side of the neighbours is missing
+    if ( abs(ebId.ieta())==85 && avoidIeta85) return 0;
+    // select recHits with Et above recHitEtThreshold
+    float e1 = recHitE( id, recHits );
+    float ete1=recHitApproxEt( id, recHits );
+    // check that rechit E_t is above threshold
+    if (ete1 < std::min(recHitEtThreshold,recHitEtThreshold2) ) return 0;
+    if (ete1 < recHitEtThreshold && !KillSecondHit ) return 0;
 
-  float e2=-1;
-  float ete2=0;
-  float s9 = 0;
-  // coordinates of 2nd hit relative to central hit
-  int e2eta=0;
-  int e2phi=0;
+    float e2=-1;
+    float ete2=0;
+    float s9 = 0;
+    // coordinates of 2nd hit relative to central hit
+    int e2eta=0;
+    int e2phi=0;
 
-  // LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 1
-  for ( int deta = -1; deta <= +1; ++deta ) {
-    for ( int dphi = -1; dphi <= +1; ++dphi ) {
-      // compute 3x3 energy
-      float etmp=recHitE( id, recHits, deta, dphi );
-      s9 += etmp;
-      EBDetId idtmp=EBDetId::offsetBy(id,deta,dphi);
-      float eapproxet=recHitApproxEt( idtmp, recHits );
-      // remember 2nd highest energy deposit (above threshold) in 3x3 array
-      if (etmp>e2 && eapproxet>recHitEtThreshold2 && !(deta==0 && dphi==0)) {
-	e2=etmp;
-	ete2=eapproxet;
-	e2eta=deta;
-	e2phi=dphi;
+    // LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 1
+    for ( int deta = -1; deta <= +1; ++deta ) {
+      for ( int dphi = -1; dphi <= +1; ++dphi ) {
+	// compute 3x3 energy
+	float etmp=recHitE( id, recHits, deta, dphi );
+	s9 += etmp;
+	EBDetId idtmp=EBDetId::offsetBy(id,deta,dphi);
+	float eapproxet=recHitApproxEt( idtmp, recHits );
+	// remember 2nd highest energy deposit (above threshold) in 3x3 array
+	if (etmp>e2 && eapproxet>recHitEtThreshold2 && !(deta==0 && dphi==0)) {
+	  e2=etmp;
+	  ete2=eapproxet;
+	  e2eta=deta;
+	  e2phi=dphi;
+	}
       }
     }
-  }
 
-  if ( e1 == 0 )  return 0;
-  // return 0 if 2nd hit is below threshold
-  if ( e2 == -1 ) return 0;
-  // compute e2/e9 centered around 1st hit
-  float e2nd=e1+e2;
-  float e2e9=0;
+    if ( e1 == 0 )  return 0;
+    // return 0 if 2nd hit is below threshold
+    if ( e2 == -1 ) return 0;
+    // compute e2/e9 centered around 1st hit
+    float e2nd=e1+e2;
+    float e2e9=0;
 
-  if (s9!=0) e2e9=e2nd/s9;
-  // if central hit has higher energy than 2nd hit
-  //  return e2/e9 if 1st hit is above E_t threshold
-  if (e1 > e2 && ete1>recHitEtThreshold) return e2e9;
-  // if second hit has higher energy than 1st hit
-  if ( e2 > e1 ) {
-    // return 0 if user does not want to flag 2nd hit, or
-    // hits are below E_t thresholds - note here we
-    // now assume the 2nd hit to be the leading hit.
+    if (s9!=0) e2e9=e2nd/s9;
+    // if central hit has higher energy than 2nd hit
+    //  return e2/e9 if 1st hit is above E_t threshold
+    if (e1 > e2 && ete1>recHitEtThreshold) return e2e9;
+    // if second hit has higher energy than 1st hit
+    if ( e2 > e1 ) {
+      // return 0 if user does not want to flag 2nd hit, or
+      // hits are below E_t thresholds - note here we
+      // now assume the 2nd hit to be the leading hit.
 
-    if (!KillSecondHit || ete2<recHitEtThreshold || ete1<recHitEtThreshold2) {
-      return 0;
-    }
-    else {
-      // LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 2
-      float s92nd=0;
-      float e2nd_prime=0;
-      int e2prime_eta=0;
-      int e2prime_phi=0;
+      if (!KillSecondHit || ete2<recHitEtThreshold || ete1<recHitEtThreshold2) {
+	return 0;
+      }
+      else {
+	// LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 2
+	float s92nd=0;
+	float e2nd_prime=0;
+	int e2prime_eta=0;
+	int e2prime_phi=0;
 
-      EBDetId secondid=EBDetId::offsetBy(id,e2eta,e2phi);
+	EBDetId secondid=EBDetId::offsetBy(id,e2eta,e2phi);
 
-      for ( int deta = -1; deta <= +1; ++deta ) {
-	for ( int dphi = -1; dphi <= +1; ++dphi ) {
+	for ( int deta = -1; deta <= +1; ++deta ) {
+	  for ( int dphi = -1; dphi <= +1; ++dphi ) {
 
-	  // compute 3x3 energy
-	  float etmp=recHitE( secondid, recHits, deta, dphi );
-	  s92nd += etmp;
+	    // compute 3x3 energy
+	    float etmp=recHitE( secondid, recHits, deta, dphi );
+	    s92nd += etmp;
 
-	  if (etmp>e2nd_prime && !(deta==0 && dphi==0)) {
-	    e2nd_prime=etmp;
-	    e2prime_eta=deta;
-	    e2prime_phi=dphi;
+	    if (etmp>e2nd_prime && !(deta==0 && dphi==0)) {
+	      e2nd_prime=etmp;
+	      e2prime_eta=deta;
+	      e2prime_phi=dphi;
+	    }
 	  }
 	}
+	// if highest energy hit around E2 is not the same as the input hit, return 0;
+	if (!(e2prime_eta==-e2eta && e2prime_phi==-e2phi))
+	  {
+	    return 0;
+	  }
+	// compute E2/E9 around second hit
+	float e2e9_2=0;
+	if (s92nd!=0) e2e9_2=e2nd/s92nd;
+	//   return the value of E2/E9 calculated around 2nd hit
+	return e2e9_2;
       }
-      // if highest energy hit around E2 is not the same as the input hit, return 0;
-      if (!(e2prime_eta==-e2eta && e2prime_phi==-e2phi))
-	{
-	  return 0;
-	}
-      // compute E2/E9 around second hit
-      float e2e9_2=0;
-      if (s92nd!=0) e2e9_2=e2nd/s92nd;
-      //   return the value of E2/E9 calculated around 2nd hit
-      return e2e9_2;
     }
+  } else if ( id.subdetId() == EcalEndcap ) {
+    // only used for EB at the moment
+    return 0;
   }
- } else if ( id.subdetId() == EcalEndcap ) {
-  // only used for EB at the moment
   return 0;
- }
-return 0;
 }
 
 
@@ -301,25 +301,25 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-----------------------------------------------------------------
 
   edm::Handle<std::vector<pat::Photon> > photons;
-  iEvent.getByLabel(inputTag, photons);
+  iEvent.getByToken(inputToken_, photons);
 
   edm::Handle<reco::BeamSpot> bsHandle; 
-  iEvent.getByLabel(beamSpotInputTag, bsHandle); 
+  iEvent.getByToken(beamSpotInputToken_, bsHandle); 
 
   edm::Handle<reco::ConversionCollection> hConversions;
-  iEvent.getByLabel(conversionsInputTag, hConversions); 
+  iEvent.getByToken(conversionsInputToken_, hConversions); 
 
   edm::Handle<reco::GsfElectronCollection> electrons;
-  iEvent.getByLabel(electronsInputTag, electrons);
+  iEvent.getByToken(electronsInputToken_, electrons);
 
   edm::Handle<EBRecHitCollection> ecalhitseb;
   const EBRecHitCollection* rhitseb=0;
-  iEvent.getByLabel(ecalRecHitsEBInputTag, ecalhitseb);
+  iEvent.getByToken(ecalRecHitsEBInputToken_, ecalhitseb);
   rhitseb = ecalhitseb.product(); // get a ptr to the product
 
   edm::Handle<EERecHitCollection> ecalhitsee;
   const EERecHitCollection* rhitsee=0;
-  iEvent.getByLabel(ecalRecHitsEEInputTag, ecalhitsee);
+  iEvent.getByToken(ecalRecHitsEEInputToken_, ecalhitsee);
   rhitsee = ecalhitsee.product(); // get a ptr to the product
 
   edm::ESHandle<CaloTopology> pTopology;
@@ -348,11 +348,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else 
 	{
 	  if( !bsHandle.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << beamSpotInputTag;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << bsHandle;
 	  if( !hConversions.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << conversionsInputTag;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << hConversions;
 	  if( !electrons.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << electronsInputTag;	  
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << electrons;	  
 	}
 
       //photon conversions
@@ -402,11 +402,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else 
 	{
 	  if( !bsHandle.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << beamSpotInputTag;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << bsHandle;
 	  if( !hConversions.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << conversionsInputTag;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << hConversions;
 	  if( !electrons.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << electronsInputTag;	  
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << electrons;	  
 	}
 
       //variables from ecal rechits collection
@@ -456,9 +456,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else
 	{
 	  if( !ecalhitseb.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalRecHitsEBInputTag; //FIXME
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalhitseb; //FIXME //fixme what to put here?
 	  if( !ecalhitsee.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalRecHitsEEInputTag; //FIXME
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalhitsee; //FIXME //fixme what to put here?
 	}
 
       //-----------------------------------------------------------------      
@@ -528,7 +528,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       e2OverE9->push_back( e2OverE9_ );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << inputTag;
+    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << photons;//fixme what to put here?
   }
 
   //-----------------------------------------------------------------

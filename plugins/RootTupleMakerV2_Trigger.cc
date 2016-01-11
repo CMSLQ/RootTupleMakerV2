@@ -12,8 +12,10 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
-  l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
-  hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
+  l1InputTag  (iConfig.getParameter<edm::InputTag>("L1InputTag")),
+  hltInputTag (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
+  l1InputToken_  (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
+  hltInputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
   hltPrescaleProvider_(iConfig, consumesCollector(), *this),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
@@ -136,10 +138,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
-  iEvent.getByLabel(l1InputTag, l1GtReadoutRecord);
+  iEvent.getByToken(l1InputToken_, l1GtReadoutRecord);
 
   if(l1GtReadoutRecord.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1InputTag;
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1GtReadoutRecord;//fixme what to put here?
 
     for (unsigned int i = 0; i < NmaxL1AlgoBit; ++i) {
       l1physbits->push_back( l1GtReadoutRecord->decisionWord()[i] ? 1 : 0 );
@@ -148,16 +150,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       l1techbits->push_back( l1GtReadoutRecord->technicalTriggerWord()[i] ? 1 : 0 );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << l1InputTag;
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << l1GtReadoutRecord;//fixme what to put here?
   }
 
   edm::Handle<edm::TriggerResults> triggerResults;
-  iEvent.getByLabel(hltInputTag, triggerResults);
+  iEvent.getByToken(hltInputToken_, triggerResults);
 
   HLTConfigProvider const& hltConfig = hltPrescaleProvider_.hltConfigProvider();
 
   if(triggerResults.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << hltInputTag;
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << triggerResults;//fixme what to put here?
 
     const edm::TriggerNames& names = iEvent.triggerNames(*triggerResults);
 
@@ -205,7 +207,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
     */
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << hltInputTag;
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << triggerResults;//fixme what to put here?
   }
   
   //-----------------------------------------------------------------

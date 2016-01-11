@@ -6,9 +6,9 @@
 
 
 RootTupleMakerV2_Vertex::RootTupleMakerV2_Vertex(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
-    prefix  (iConfig.getParameter<std::string>  ("Prefix")),
-    suffix  (iConfig.getParameter<std::string>  ("Suffix"))
+  inputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  prefix  (iConfig.getParameter<std::string>  ("Prefix")),
+  suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
   produces <std::vector<double> > ( prefix + "X" + suffix );
   produces <std::vector<double> > ( prefix + "Y" + suffix );
@@ -42,7 +42,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   edm::Handle<reco::VertexCollection> primaryVertices;
-  iEvent.getByLabel(inputTag,primaryVertices);
+  iEvent.getByToken(inputToken_,primaryVertices);
 
   if(primaryVertices.isValid()) {
     edm::LogInfo("RootTupleMakerV2_VertexInfo") << "Total # Primary Vertices: " << primaryVertices->size();
@@ -62,7 +62,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       isfake->push_back( it->isFake() );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_VertexError") << "Error! Can't get the product " << inputTag;
+    edm::LogError("RootTupleMakerV2_VertexError") << "Error! Can't get the product " << primaryVertices;//fixme what to put here?
   }
 
   //-----------------------------------------------------------------

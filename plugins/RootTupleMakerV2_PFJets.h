@@ -13,14 +13,16 @@ class RootTupleMakerV2_PFJets : public edm::EDProducer {
  private:
   std::string upperCase(std::string input);
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   inputTag , inputTagL1Offset;
-  const edm::InputTag   inputTagSmearedUp, inputTagSmearedDown;
-  const edm::InputTag   inputTagScaledUp, inputTagScaledDown;	 
+  const edm::EDGetTokenT<edm::InputTag>   inputToken_;
+  const edm::InputTag   inputTag;
+  const edm::EDGetTokenT<edm::InputTag>   inputTokenL1Offset_;
+  const edm::EDGetTokenT<edm::InputTag>   inputTokenSmearedUp_, inputTokenSmearedDown_;
+    const edm::EDGetTokenT<edm::InputTag> inputTokenScaledUp_, inputTokenScaledDown_;	
   const std::string     prefix,suffix,mvaPileupIDname;
   const unsigned int    maxSize;
   const std::string     jecUncPath; 
   const bool            readJECuncertainty;
-  const edm::InputTag   vtxInputTag;
+  const edm::EDGetTokenT<edm::InputTag>   vtxInputToken_;
   bool            isPuppiJetColl;
 
   //OLD

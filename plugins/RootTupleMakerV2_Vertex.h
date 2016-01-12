@@ -4,6 +4,8 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 class RootTupleMakerV2_Vertex : public edm::EDProducer {
  public:
@@ -11,7 +13,7 @@ class RootTupleMakerV2_Vertex : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::EDGetTokenT<edm::InputTag>   inputToken_;
+  const edm::EDGetTokenT<reco::VertexCollection>   vtxInputToken_;
   const std::string     prefix,suffix;
 };
 

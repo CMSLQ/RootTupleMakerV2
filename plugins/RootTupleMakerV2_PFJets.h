@@ -5,6 +5,9 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include <string>
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 class RootTupleMakerV2_PFJets : public edm::EDProducer {
  public:
@@ -13,16 +16,16 @@ class RootTupleMakerV2_PFJets : public edm::EDProducer {
  private:
   std::string upperCase(std::string input);
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::EDGetTokenT<edm::InputTag>   inputToken_;
+  const edm::EDGetTokenT<std::vector<pat::Jet> >   jetInputToken_;
   const edm::InputTag   inputTag;
-  const edm::EDGetTokenT<edm::InputTag>   inputTokenL1Offset_;
-  const edm::EDGetTokenT<edm::InputTag>   inputTokenSmearedUp_, inputTokenSmearedDown_;
-    const edm::EDGetTokenT<edm::InputTag> inputTokenScaledUp_, inputTokenScaledDown_;	
+  //const edm::EDGetTokenT<edm::InputTag>   inputTokenL1Offset_;
+  //const edm::EDGetTokenT<edm::InputTag>   inputTokenSmearedUp_, inputTokenSmearedDown_;
+  //const edm::EDGetTokenT<edm::InputTag> inputTokenScaledUp_, inputTokenScaledDown_;	
   const std::string     prefix,suffix,mvaPileupIDname;
   const unsigned int    maxSize;
   const std::string     jecUncPath; 
   const bool            readJECuncertainty;
-  const edm::EDGetTokenT<edm::InputTag>   vtxInputToken_;
+  const edm::EDGetTokenT<reco::VertexCollection>   vtxInputToken_;
   bool            isPuppiJetColl;
 
   //OLD

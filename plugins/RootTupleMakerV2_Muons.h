@@ -4,6 +4,9 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 class RootTupleMakerV2_Muons : public edm::EDProducer {
  public:
@@ -11,7 +14,8 @@ class RootTupleMakerV2_Muons : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::EDGetTokenT<edm::InputTag>     inputToken_,triggerEventInputToken_;
+  edm::EDGetTokenT<std::vector<pat::Muon> >  muonInputToken_;
+  //const edm::EDGetTokenT<reco::VertexCollection>   triggerEventInputToken_;
   //const edm::InputTag   inputTag, triggerEventInputTag;
   const std::string     prefix,suffix;
   const unsigned int    maxSize;
@@ -20,7 +24,8 @@ class RootTupleMakerV2_Muons : public edm::EDProducer {
   const bool            beamSpotCorr;
   const bool            useCocktailRefits;
   //const edm::InputTag   vtxInputTag;
-  const edm::EDGetTokenT<edm::InputTag>     vtxInputToken_;
+  //const edm::EDGetTokenT<edm::InputTag>     vtxInputToken_;
+  edm::EDGetTokenT<reco::VertexCollection> vtxInputToken_;
 };
 
 #endif

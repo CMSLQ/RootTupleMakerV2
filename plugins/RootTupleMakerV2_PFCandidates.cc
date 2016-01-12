@@ -2,20 +2,16 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "Math/GenVector/VectorUtil.h"
 
 #include <set>
 
 RootTupleMakerV2_PFCandidates::RootTupleMakerV2_PFCandidates(const edm::ParameterSet& iConfig) :
-  jetInputToken_ (consumes<edm::InputTag >(iConfig.getParameter<edm::InputTag>("JetInputTag"))),
-  electronInputToken_ (consumes<edm::InputTag >(iConfig.getParameter<edm::InputTag>("ElectronInputTag"))),
-  muonInputToken_ (consumes<edm::InputTag >(iConfig.getParameter<edm::InputTag>("MuonInputTag"))),
-  pfcandInputToken_ (consumes<edm::InputTag >(iConfig.getParameter<edm::InputTag>("PFCandInputTag"))),
+  jetInputToken_ (consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("JetInputTag"))),
+  electronInputToken_ (consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("ElectronInputTag"))),
+  muonInputToken_ (consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("MuonInputTag"))),
+  pfcandInputToken_ (consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("PFCandInputTag"))),
   prefix  (iConfig.getParameter<std::string>  ("Prefix")),
   maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
   DRmatch (iConfig.getParameter<double>       ("DRmatch"))

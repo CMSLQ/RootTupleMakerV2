@@ -14,7 +14,7 @@
 
 RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig) :
   //inputTag (iConfig.getParameter<edm::InputTag>("InputTag")),
-  inputToken_  (consumes<edm::InputTag >(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  muonInputToken_  (consumes<std::vector<pat::Muon> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
   //triggerEventInputTag     (iConfig.getParameter<edm::InputTag>("TriggerEventInputTag"     )),
   prefix   (iConfig.getParameter<std::string>  ("Prefix")),
   suffix   (iConfig.getParameter<std::string>  ("Suffix")),
@@ -27,7 +27,7 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   useCocktailRefits (iConfig.getParameter<bool>("UseCocktailRefits")),
   // collection of primary vertices to be used.
   //vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag"))
-  vtxInputToken_  (consumes<edm::InputTag >(iConfig.getParameter<edm::InputTag>("VertexInputTag")))
+  vtxInputToken_  (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag")))
 {
   produces <bool>                 ( "hasVeryForwardPFMuon" );
   produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
@@ -277,7 +277,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::Muon> > muons;
   //iEvent.getByLabel(inputTag, muons);
-  iEvent.getByToken(inputToken_, muons);
+  iEvent.getByToken(muonInputToken_, muons);
 
   edm::Handle<reco::VertexCollection> primaryVertices;
   //iEvent.getByLabel(vtxInputTag,primaryVertices);

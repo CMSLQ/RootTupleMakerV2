@@ -10,13 +10,11 @@
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "FWCore/Framework/interface/ESHandle.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoJets/JetProducers/interface/PileupJetIdAlgo.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
-  inputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  jetInputToken_ (consumes<std::vector<pat::Jet> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
   inputTag (iConfig.getParameter<edm::InputTag>("InputTag")),//fixme using old way to find PUPPI, is this a problem?
   //FIXME TODO later
   //inputTagSmearedUp  (iConfig.getParameter<edm::InputTag>("InputTagSmearedUp"  )),
@@ -31,7 +29,7 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
   readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
   //
-  vtxInputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("VertexInputTag")))
+  vtxInputToken_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag")))
 {
   if(upperCase(inputTag.label()).find(upperCase("PUPPI")) != std::string::npos)
     isPuppiJetColl = true;
@@ -231,7 +229,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
 
   edm::Handle<std::vector<pat::Jet> > jets;
-  iEvent.getByToken(inputToken_, jets);
+  iEvent.getByToken(jetInputToken_, jets);
 
   // edm::Handle<std::vector<pat::Jet> > jetsL1Offset;
   // iEvent.getByLabel(inputTagL1Offset, jetsL1Offset);

@@ -2,14 +2,12 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 #include "TLorentzVector.h"
 
 RootTupleMakerV2_TriggerObjects::RootTupleMakerV2_TriggerObjects(const edm::ParameterSet& iConfig) :
-  triggerBitsToken_   (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("TriggerBitsTag"))),
-  triggerObjectsToken_   (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("TriggerObjectsTag"))),
+  triggerBitsToken_    (consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("TriggerBitsTag"))),
+  triggerObjectsToken_ (consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("TriggerObjectsTag"))),
   prefix     (iConfig.getParameter<std::string>  ("Prefix")),
   suffix     (iConfig.getParameter<std::string>  ("Suffix"))
 {

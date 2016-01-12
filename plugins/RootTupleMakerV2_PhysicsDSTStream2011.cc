@@ -2,24 +2,17 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "FWCore/Framework/interface/ESHandle.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "DataFormats/JetReco/interface/PFJetCollection.h"
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
-#include "DataFormats/JetReco/interface/Jet.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-#include "FWCore/Framework/interface/Event.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 
 RootTupleMakerV2_PhysicsDSTStream2011::RootTupleMakerV2_PhysicsDSTStream2011(const edm::ParameterSet& iConfig) :
   hltInputTag      (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
-  hltInputToken_      (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
-  inputTokenHLTPFJets_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTPFJets"))),
-  inputTokenHLTCaloJetsRaw_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsRaw"))),
-  inputTokenHLTCaloJetsCorr_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsCorr"))),
-  inputTokenHLTPixelVertices_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTPixelVertices"))),
+  hltInputToken_      (consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
+  inputTokenHLTPFJets_ (consumes<reco::PFJetCollection>(iConfig.getParameter<edm::InputTag>("InputTagHLTPFJets"))),
+  inputTokenHLTCaloJetsRaw_ (consumes<reco::CaloJetCollection>(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsRaw"))),
+  inputTokenHLTCaloJetsCorr_ (consumes<reco::CaloJetCollection>(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsCorr"))),
+  inputTokenHLTPixelVertices_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("InputTagHLTPixelVertices"))),
   suffix  (iConfig.getParameter<std::string>  ("Suffix")),
   prefixHLTPFJets  (iConfig.getParameter<std::string>  ("PrefixHLTPFJets")),
   prefixHLTCaloJetsRaw  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsRaw")),

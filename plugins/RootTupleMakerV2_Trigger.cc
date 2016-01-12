@@ -14,9 +14,9 @@ unsigned int NmaxL1TechBit = 64;
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
   l1InputTag  (iConfig.getParameter<edm::InputTag>("L1InputTag")),
   hltInputTag (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
-  l1InputToken_  (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
-  hltInputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
-  hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
+  l1InputToken_  (consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
+  hltInputToken_ (consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
+  hltPathsOfInterest(consumes<std::vector<std::string> >(iConfig.getParameter<edm::InputTag> ("HLTPathsOfInterest"))),
   hltPrescaleProvider_(iConfig, consumesCollector(), *this),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
   sourceType(NOT_APPLICABLE)

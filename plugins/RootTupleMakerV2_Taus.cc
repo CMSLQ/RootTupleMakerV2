@@ -2,9 +2,6 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
-#include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/Scalers/interface/DcsStatus.h"
@@ -12,15 +9,11 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include <DataFormats/Common/interface/Ref.h>
-#include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
-#include "DataFormats/TauReco/interface/PFTau.h"
 
 RootTupleMakerV2_Taus::RootTupleMakerV2_Taus(const edm::ParameterSet& iConfig) :
-  inputToken_    (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTag"))),
-  vtxInputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))),
+  tauInputToken_ (consumes<std::vector<pat::Tau> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  vtxInputToken_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))),
   prefix      (iConfig.getParameter<std::string>("Prefix")),
   suffix      (iConfig.getParameter<std::string>("Suffix")),
   maxSize     (iConfig.getParameter<unsigned int>("MaxSize")),
@@ -325,7 +318,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByToken(vtxInputToken_,primaryVertices);
   //
   edm::Handle<std::vector<pat::Tau> > taus;
-  iEvent.getByToken(inputToken_, taus);
+  iEvent.getByToken(tauInputToken_, taus);
   //
   if(taus.isValid()) {
     edm::LogInfo("RootTupleMakerV2_TausInfo") << "Total # Taus: " << taus->size();

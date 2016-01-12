@@ -2,8 +2,6 @@
 #include "Leptoquarks/RootTupleMakerV2/interface/PatUtilities.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Photon.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/Scalers/interface/DcsStatus.h"
@@ -11,9 +9,6 @@
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "DataFormats/EgammaCandidates/interface/Conversion.h" 
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
@@ -23,15 +18,15 @@
 
 
 RootTupleMakerV2_Photons::RootTupleMakerV2_Photons(const edm::ParameterSet& iConfig) :
-  inputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  photonInputToken_ (consumes<std::vector<pat::Photon> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
   prefix  (iConfig.getParameter<std::string>  ("Prefix")),
   suffix  (iConfig.getParameter<std::string>  ("Suffix")),
   maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
-  beamSpotInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>    ("BeamSpotInputTag"))),
-  conversionsInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag> ("ConversionsInputTag"))),
-  electronsInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>   ("ElectronsInputTag"))),
-  ecalRecHitsEBInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEBInputTag"))),
-  ecalRecHitsEEInputToken_(consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEEInputTag")))
+  beamSpotInputToken_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>    ("BeamSpotInputTag"))),
+  conversionsInputToken_(consumes<reco::ConversionCollection>(iConfig.getParameter<edm::InputTag> ("ConversionsInputTag"))),
+  electronsInputToken_(consumes<reco::GsfElectronCollection>(iConfig.getParameter<edm::InputTag>   ("ElectronsInputTag"))),
+  ecalRecHitsEBInputToken_(consumes<EBRecHitCollection>(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEBInputTag"))),
+  ecalRecHitsEEInputToken_(consumes<EERecHitCollection>(iConfig.getParameter<edm::InputTag>   ("EcalRecHitsEEInputTag")))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -301,7 +296,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-----------------------------------------------------------------
 
   edm::Handle<std::vector<pat::Photon> > photons;
-  iEvent.getByToken(inputToken_, photons);
+  iEvent.getByToken(photonInputToken_, photons);
 
   edm::Handle<reco::BeamSpot> bsHandle; 
   iEvent.getByToken(beamSpotInputToken_, bsHandle); 

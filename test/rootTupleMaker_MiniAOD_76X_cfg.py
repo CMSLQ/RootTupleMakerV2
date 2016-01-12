@@ -21,6 +21,7 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 # the size of the output by prescaling the report of the event number
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.MessageLogger.cerr.default.limit = 10
+process.MessageLogger.threshold = cms.untracked.string('DEBUG')
 #################################################################
 
 # We should be using PFIso by default in newer CMSSW

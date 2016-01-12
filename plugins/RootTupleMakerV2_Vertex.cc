@@ -1,12 +1,10 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_Vertex.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 
 RootTupleMakerV2_Vertex::RootTupleMakerV2_Vertex(const edm::ParameterSet& iConfig) :
-  inputToken_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  vtxInputToken_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("InputTag"))),
   prefix  (iConfig.getParameter<std::string>  ("Prefix")),
   suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
@@ -42,7 +40,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   edm::Handle<reco::VertexCollection> primaryVertices;
-  iEvent.getByToken(inputToken_,primaryVertices);
+  iEvent.getByToken(vtxInputToken_,primaryVertices);
 
   if(primaryVertices.isValid()) {
     edm::LogInfo("RootTupleMakerV2_VertexInfo") << "Total # Primary Vertices: " << primaryVertices->size();

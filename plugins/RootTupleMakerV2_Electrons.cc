@@ -35,9 +35,9 @@
 //------------------------------------------------------------------------
 
 RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& iConfig) :
-  inputTag                     (iConfig.getParameter<edm::InputTag>("InputTag"                 )),
-  vtxInputTag                  (iConfig.getParameter<edm::InputTag>("VertexInputTag"           )), 
-  rhoInputTag                  (iConfig.getParameter<edm::InputTag>("RhoInputTag"              )),
+  electronInputToken_          (consumes<std::vector<pat::Electron> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  vtxInputToken_               (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))), 
+  rhoInputToken_               (consumes<double>(iConfig.getParameter<edm::InputTag>("RhoInputTag"))),
   electronVetoIdMapToken_      (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronVetoIdMap"))),
   electronLooseIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"))),
   electronMediumIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"))),
@@ -429,7 +429,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Primary vertices
   
   edm::Handle<reco::VertexCollection> primaryVertices;
-  iEvent.getByLabel(vtxInputTag,primaryVertices);
+  iEvent.getByToken(vtxInputToken_,primaryVertices);
 
   // Beamspot information
 
@@ -438,7 +438,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // PAT electrons
 
   edm::Handle<std::vector<pat::Electron> > electrons;
-  iEvent.getByLabel(inputTag, electrons);
+  iEvent.getByToken(electronInputToken_, electrons);
 
   // PAT trigger matches by HLT path
   // we embed these in the regular pat::Electron collection
@@ -453,7 +453,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // rho for EGamma isolation calculation
   edm::Handle<double> rho;
-  iEvent.getByLabel(rhoInputTag, rho);
+  iEvent.getByToken(rhoInputToken_, rho);
   double rhoIso = *(rho.product());
   
   // SIC add for new egamma VID framework
@@ -716,7 +716,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  i_vertex++;
         }
       } else {
-        edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << vtxInputTag;
+        edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the vertex collection";
       }
 
       //------------------------------------------------------------------------ 
@@ -879,7 +879,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       ++iElectron;
     }
   } else {
-    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the product " << inputTag;
+    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the electrons";
   }
 
   //------------------------------------------------------------------------

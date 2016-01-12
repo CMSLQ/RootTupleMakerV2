@@ -87,7 +87,7 @@ switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # cut-based ID working points
 my_id_modules = []
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
+#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
 #Add them to the VID producer
@@ -466,7 +466,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         ## MET objects for analysis
         'keep *_rootTuplePFMET*_*_*',
         # Trigger objects
-        'keep *_rootTupleTrigger_*_*',
+        #'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
         # GEN objects
         'keep *_rootTupleGenEventInfo_*_*',
@@ -498,7 +498,6 @@ process.p = cms.Path(
     # L+J Filter
     process.LJFilter*  
     process.HBHENoiseFilterResultProducer* #produces HBHE baseline bools
-    process.ApplyBaselineHBHENoiseFilter*  # reject events based 
     process.ApplyBaselineHBHEIsoNoiseFilter*   # reject events based  < 10e-3 mistake rate 
     # Put everything into the tree
     # In unscheduled mode, anything 'kept' in the output commands above
@@ -507,16 +506,40 @@ process.p = cms.Path(
 )
 
 
-#----------------------------------------------------------------------------------------------------
-# Dump if necessary
-#----------------------------------------------------------------------------------------------------
-
+##----------------------------------------------------------------------------------------------------
+## Dump if necessary
+##----------------------------------------------------------------------------------------------------
+#
 #process.dump = cms.OutputModule("PoolOutputModule",
 #                                outputCommands = cms.untracked.vstring(
-#                                'keep *',
-#                                ),
-#                                fileName = cms.untracked.string('dump.root')
-#                                )
+#        'drop *',
+#        # Event information
+#        'keep *_rootTupleEvent_*_*',
+#        'keep *_rootTupleEventSelection_*_*',
+#        # Single objects
+#        'keep *_rootTuplePFCandidates_*_*',
+#        'keep *_rootTuplePFJets*_*_*',
+#        'keep *_rootTupleElectrons_*_*',
+#        'keep *_rootTupleMuons_*_*',
+#        # FIXME ignore for now
+#        #'keep *_rootTuplePhotons_*_*',
+#        'keep *_rootTupleVertex_*_*',
+#        ## MET objects for analysis
+#        'keep *_rootTuplePFMET*_*_*',
+#        # Trigger objects
+#        'keep *_rootTupleTrigger_*_*',
+#        'keep *_rootTupleTriggerObjects_*_*',
+#        # GEN objects
+#        'keep *_rootTupleGenEventInfo_*_*',
+#        'keep *_rootTupleGenParticles_*_*',
+#        'keep *_rootTupleGenJets*_*_*',
+#        'keep *_rootTupleGenElectrons*_*_*',
+#        'keep *_rootTupleGenMuons*_*_*',
+#        'keep *_rootTupleGenTaus*_*_*',
+#        'keep *_rootTupleGenMETTrue_*_*',
+#        ),
+#        fileName = cms.untracked.string('dump.root')
+#        )
 #process.DUMP    = cms.EndPath (process.dump)
 
 #----------------------------------------------------------------------------------------------------

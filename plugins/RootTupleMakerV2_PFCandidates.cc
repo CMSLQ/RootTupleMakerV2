@@ -36,22 +36,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // get the Jet Collection
   edm::Handle<pat::JetCollection> jets;
-  //iEvent.getByLabel(jetInputTag, jets);
   iEvent.getByToken(jetInputToken_, jets);
 
   // get the Electron Collection
   edm::Handle<pat::ElectronCollection> electrons;
-  //iEvent.getByLabel(electronInputTag, electrons);
   iEvent.getByToken(electronInputToken_, electrons);
 
   // get the Muon Collection
   edm::Handle<pat::MuonCollection> muons;
-  //iEvent.getByLabel(muonInputTag, muons);
   iEvent.getByToken(muonInputToken_, muons);
   
   // get the PFCandidate Collection
   edm::Handle<pat::PackedCandidateCollection> pfcands;
-  //iEvent.getByLabel(pfcandInputTag, pfcands);
   iEvent.getByToken(pfcandInputToken_, pfcands);
 
   //-------------------------------------------

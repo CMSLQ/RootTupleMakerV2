@@ -277,15 +277,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::Muon> > muons;
-  //iEvent.getByLabel(inputTag, muons);
   iEvent.getByToken(muonInputToken_, muons);
 
   edm::Handle<reco::VertexCollection> primaryVertices;
-  //iEvent.getByLabel(vtxInputTag,primaryVertices);
   iEvent.getByToken(vtxInputToken_,primaryVertices);
 
   edm::Handle<reco::BeamSpot> beamSpot;
-  //iEvent.getByLabel("offlineBeamSpot", beamSpot );//fixme how to deal with this getbylabel -> getbytoken?
   iEvent.getByToken(beamSpotToken_,beamSpot);
 
   //edm::Handle< pat::TriggerEvent > triggerEvent;

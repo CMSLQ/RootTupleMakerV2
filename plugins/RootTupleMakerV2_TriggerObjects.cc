@@ -51,7 +51,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<edm::TriggerResults> triggerBits;
   iEvent.getByToken( triggerBitsToken_ , triggerBits);
   if ( ! triggerBits.isValid() )
-    edm::LogError("RootTupleMakerV2_TriggerObjectsError") << "Error! Can't get the product " << triggerBits;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_TriggerObjectsError") << "Error! Can't get the trigger bits";
 
   //------------------------------------------------------------------------
   // Get the trigger objects and make sure they are valid
@@ -59,7 +59,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
   iEvent.getByToken( triggerObjectsToken_ , triggerObjects);
   if ( ! triggerObjects.isValid() )
-    edm::LogError("RootTupleMakerV2_TriggerObjectsError") << "Error! Can't get the product " << triggerObjects;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_TriggerObjectsError") << "Error! Can't get the trigger objects";
 
   //edm::Handle<pat::PackedTriggerPrescales> triggerPrescales;
 

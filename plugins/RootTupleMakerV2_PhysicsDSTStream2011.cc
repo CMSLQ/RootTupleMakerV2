@@ -245,7 +245,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //v_hlt_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));	
     } 
   } else {
-    edm::LogError("RootTupleMakerV2_PhysicsDSTStream2011_TriggerError") << "Error! Can't get the product " << triggerResults;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_PhysicsDSTStream2011_TriggerError") << "Error! Can't get the triggerResults";
   }
 
   //---------------

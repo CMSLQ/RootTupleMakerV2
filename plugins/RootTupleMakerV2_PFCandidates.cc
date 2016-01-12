@@ -192,11 +192,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
   else {
     if( !electrons.isValid() )
-      edm::LogError("RootTupleMakerV2_PFCandidatesError") << "Error! Can't get the product " << electrons;//fixme what to put here?
+      edm::LogError("RootTupleMakerV2_PFCandidatesError") << "Error! Can't get the electrons";
     if( !muons.isValid() )
-      edm::LogError("RootTupleMakerV2_PFCandidatesError") << "Error! Can't get the product " << muons;//fixme what to put here?
+      edm::LogError("RootTupleMakerV2_PFCandidatesError") << "Error! Can't get the muons";
     if( !pfcands.isValid() )
-      edm::LogError("RootTupleMakerV2_PFCandidatesError") << "Error! Can't get the product " << pfcands;//fixme what to put here? 
+      edm::LogError("RootTupleMakerV2_PFCandidatesError") << "Error! Can't get the pfcands";
   }
   
   //-----------------------------------------------------------------

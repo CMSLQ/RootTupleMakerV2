@@ -60,7 +60,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       isfake->push_back( it->isFake() );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_VertexError") << "Error! Can't get the product " << primaryVertices;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_VertexError") << "Error! Can't get the vertex collection";
   }
 
   //-----------------------------------------------------------------

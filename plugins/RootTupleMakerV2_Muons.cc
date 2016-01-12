@@ -403,7 +403,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  else
 	    {
-	      edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << primaryVertices;//fixme what to put here?
+	      edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the primary vertices";
 	    }
 
 	  //
@@ -710,7 +710,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   else
     {
-      edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the product " << muons;//fixme what to put here?
+      edm::LogError("RootTupleMakerV2_MuonsError") << "Error! Can't get the muons";
     }
 
   //-----------------------------------------------------------------

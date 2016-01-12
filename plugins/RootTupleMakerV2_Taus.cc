@@ -501,7 +501,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  i_vertex++;
         }
       } else {
-	edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the product " << primaryVertices;//fixme what to put here?
+	edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the product primary vertices";
       }
       vtxIndex                 -> push_back( vtxIndex_  );
       vtxDistXY                -> push_back( vtxDistXY_ );
@@ -640,7 +640,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the product " << taus;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_TausError") << "Error! Can't get the taus";
   }
   iEvent.put( eta,                              prefix + "Eta"                               + suffix );
   iEvent.put( phi,                              prefix + "Phi"                               + suffix );

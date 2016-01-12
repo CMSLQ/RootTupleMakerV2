@@ -343,11 +343,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else 
 	{
 	  if( !bsHandle.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << bsHandle;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the beam spot";
 	  if( !hConversions.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << hConversions;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the conversions";
 	  if( !electrons.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << electrons;	  
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the electrons";	  
 	}
 
       //photon conversions
@@ -397,11 +397,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else 
 	{
 	  if( !bsHandle.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << bsHandle;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the beam spot";
 	  if( !hConversions.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << hConversions;
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the conversions";
 	  if( !electrons.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << electrons;	  
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the electrons"; 
 	}
 
       //variables from ecal rechits collection
@@ -451,9 +451,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else
 	{
 	  if( !ecalhitseb.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalhitseb; //FIXME //fixme what to put here?
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the eb ecal hits"; //FIXME
 	  if( !ecalhitsee.isValid() )
-	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << ecalhitsee; //FIXME //fixme what to put here?
+	    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product ee ecal hits";//FIXME
 	}
 
       //-----------------------------------------------------------------      
@@ -523,7 +523,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       e2OverE9->push_back( e2OverE9_ );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the product " << photons;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_PhotonsError") << "Error! Can't get the photons";
   }
 
   //-----------------------------------------------------------------

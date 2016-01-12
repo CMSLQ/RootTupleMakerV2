@@ -150,7 +150,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       l1techbits->push_back( l1GtReadoutRecord->technicalTriggerWord()[i] ? 1 : 0 );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << l1GtReadoutRecord;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the l1GtReadoutRecord";
   }
 
   edm::Handle<edm::TriggerResults> triggerResults;
@@ -207,7 +207,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
     */
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << triggerResults;//fixme what to put here?
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product triggerResults";
   }
   
   //-----------------------------------------------------------------

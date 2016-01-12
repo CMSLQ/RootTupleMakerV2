@@ -400,7 +400,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }	
 	  else
 	    {
-	      edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << primaryVertices;//fixme what to put here?
+	      edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product primary vertices";
 	    }
 
 	  // Get the constituents of the PFJet
@@ -650,7 +650,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   else
     {
-      edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTag;
+      edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the pf jets";
     }
 
   //L1Offset JEC

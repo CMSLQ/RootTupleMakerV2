@@ -27,7 +27,8 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   useCocktailRefits (iConfig.getParameter<bool>("UseCocktailRefits")),
   // collection of primary vertices to be used.
   //vtxInputTag       (iConfig.getParameter<edm::InputTag>("VertexInputTag"))
-  vtxInputToken_  (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag")))
+  vtxInputToken_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))),
+  beamSpotToken_ (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag")))
 {
   produces <bool>                 ( "hasVeryForwardPFMuon" );
   produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
@@ -284,7 +285,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByToken(vtxInputToken_,primaryVertices);
 
   edm::Handle<reco::BeamSpot> beamSpot;
-  iEvent.getByLabel("offlineBeamSpot", beamSpot );//fixme how to deal with this getbylabel -> getbytoken?
+  //iEvent.getByLabel("offlineBeamSpot", beamSpot );//fixme how to deal with this getbylabel -> getbytoken?
+  iEvent.getByToken(beamSpotToken_,beamSpot);
 
   //edm::Handle< pat::TriggerEvent > triggerEvent;
   //iEvent.getByLabel( triggerEventInputTag, triggerEvent );

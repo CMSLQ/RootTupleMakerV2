@@ -12,6 +12,7 @@ rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Muons",
     BeamSpotCorr = cms.bool(True),
     UseCocktailRefits = cms.bool(True),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    BeamSpotInputTag = cms.InputTag('offlineBeamSpot')
     #SingleMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleMuon"),
     #SingleIsoMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleIsoMuon")
 )

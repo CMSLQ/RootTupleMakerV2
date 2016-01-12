@@ -26,6 +26,7 @@ class RootTupleMakerV2_Muons : public edm::EDProducer {
   //const edm::InputTag   vtxInputTag;
   //const edm::EDGetTokenT<edm::InputTag>     vtxInputToken_;
   edm::EDGetTokenT<reco::VertexCollection> vtxInputToken_;
+  edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
 };
 
 #endif

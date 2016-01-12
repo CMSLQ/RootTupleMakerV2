@@ -9,7 +9,7 @@ rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
     # HLT Tools https://twiki.cern.ch/twiki/bin/view/CMS/HLTriggerTools
     # ID/Iso egamma definitions: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaWorkingPointsv3
 
-    HLTPathsOfInterest = cms.vstring(
+    HLTPathsOfInterest = cms.InputTag(
                                      ##############
                                      ## 2011: run range 160329-165980
                                      ##############

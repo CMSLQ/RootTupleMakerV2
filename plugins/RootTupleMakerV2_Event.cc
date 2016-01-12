@@ -2,15 +2,16 @@
 #include "FWCore/Framework/interface/Event.h"
 
 RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig) :
-  globalTag(iConfig.getParameter<std::string>("globalTag")),
-  fixedGridRhoAllInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoAllInputTag")),
-  fixedGridRhoFastjetAllCaloInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetAllCaloInputTag")),
-  fixedGridRhoFastjetCentralCaloInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralCaloInputTag")),
-  fixedGridRhoFastjetCentralChargedPileUpInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralChargedPileUpInputTag")),
-  fixedGridRhoFastjetCentralNeutralInputTag(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralNeutralInputTag"))
+  globalTagLabel_(iConfig.getParameter<std::string>("globalTag")),
+  globalTagToken_(consumes<std::string>(iConfig.getParameter<std::string>("globalTag"))),
+  fixedGridRhoAllToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoAllInputTag"))),
+  fixedGridRhoFastjetAllCaloToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetAllCaloInputTag"))),
+  fixedGridRhoFastjetCentralCaloToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralCaloInputTag"))),
+  fixedGridRhoFastjetCentralChargedPileUpToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralChargedPileUpInputTag"))),
+  fixedGridRhoFastjetCentralNeutralToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralNeutralInputTag")))
 {
-  produces <std::string>  ("globalTag");
-  produces <std::string>  ("cmsswRelease");
+  //produces <std::string>  ("globalTag");
+  //produces <std::string>  ("cmsswRelease");
   produces <unsigned int> ( "run"    );
   produces <unsigned int> ( "event"  );
   produces <unsigned int> ( "bunch"  );
@@ -28,9 +29,11 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
 void RootTupleMakerV2_Event::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::string releaseVersion = (iEvent.processHistory().rbegin())->releaseVersion();
-  std::auto_ptr<std::string>  globaltag   ( new std::string(globalTag) );
-  std::auto_ptr<std::string>  cmsswrelease   ( new std::string(releaseVersion) );
+  //std::string releaseVersion = (iEvent.processHistory().rbegin())->releaseVersion();
+  //std::string releaseVersion = "";
+  //std::auto_ptr<std::string>  globaltag   ( new std::string(globalTagLabel_) );
+  //std::auto_ptr<std::string>  cmsswrelease   ( new std::string(releaseVersion) );
+  //std::auto_ptr<std::string>  cmsswrelease   ( new std::string((iEvent.processHistory().rbegin())->releaseVersion()) );
   std::auto_ptr<unsigned int >  run   ( new unsigned int(iEvent.id().run()        ) );
   std::auto_ptr<unsigned int >  event ( new unsigned int(iEvent.id().event()      ) );
   std::auto_ptr<unsigned int >  ls    ( new unsigned int(iEvent.luminosityBlock() ) );
@@ -46,31 +49,31 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool >          isdata  ( new bool(iEvent.isRealData()));
 
   edm::Handle<double> fixedGridRhoAllH;
-  iEvent.getByLabel(fixedGridRhoAllInputTag,fixedGridRhoAllH);
+  iEvent.getByToken(fixedGridRhoAllToken_,fixedGridRhoAllH);
   std::auto_ptr<double> fixedGridRhoAll (new double(*fixedGridRhoAllH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetAllCaloH;
-  iEvent.getByLabel(fixedGridRhoFastjetAllCaloInputTag,fixedGridRhoFastjetAllCaloH);
+  iEvent.getByToken(fixedGridRhoFastjetAllCaloToken_,fixedGridRhoFastjetAllCaloH);
   std::auto_ptr<double> fixedGridRhoFastjetAllCalo (new double(*fixedGridRhoFastjetAllCaloH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralCaloH;
-  iEvent.getByLabel(fixedGridRhoFastjetCentralCaloInputTag,fixedGridRhoFastjetCentralCaloH);
+  iEvent.getByToken(fixedGridRhoFastjetCentralCaloToken_,fixedGridRhoFastjetCentralCaloH);
   std::auto_ptr<double> fixedGridRhoFastjetCentralCalo (new double(*fixedGridRhoFastjetCentralCaloH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralChargedPileUpH;
-  iEvent.getByLabel(fixedGridRhoFastjetCentralChargedPileUpInputTag,fixedGridRhoFastjetCentralChargedPileUpH);
+  iEvent.getByToken(fixedGridRhoFastjetCentralChargedPileUpToken_,fixedGridRhoFastjetCentralChargedPileUpH);
   std::auto_ptr<double> fixedGridRhoFastjetCentralChargedPileUp (new double(*fixedGridRhoFastjetCentralChargedPileUpH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralNeutralH;
-  iEvent.getByLabel(fixedGridRhoFastjetCentralNeutralInputTag,fixedGridRhoFastjetCentralNeutralH);
+  iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken_,fixedGridRhoFastjetCentralNeutralH);
   std::auto_ptr<double> fixedGridRhoFastjetCentralNeutral (new double(*fixedGridRhoFastjetCentralNeutralH.product() ) );
 
 
 
 
   //-----------------------------------------------------------------
-  iEvent.put( globaltag, "globalTag");
-  iEvent.put( cmsswrelease, "cmsswRelease");
+  //iEvent.put( globaltag, "globalTag");
+  //iEvent.put( cmsswrelease, "cmsswRelease");
   iEvent.put( run,   "run"   );
   iEvent.put( event, "event" );
   iEvent.put( ls   , "ls"    );

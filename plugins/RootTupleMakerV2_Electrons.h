@@ -6,6 +6,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
 
 class RootTupleMakerV2_Electrons : public edm::EDProducer {
  public:
@@ -13,8 +14,10 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag trkInputTag, inputTag;
-  const edm::InputTag vtxInputTag, rhoInputTag;
+  const edm::InputTag trkInputTag;
+  edm::EDGetTokenT<std::vector<pat::Electron> >electronInputToken_;
+  edm::EDGetTokenT<reco::VertexCollection> vtxInputToken_;
+  edm::EDGetTokenT<double> rhoInputToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronVetoIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronLooseIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > electronMediumIdMapToken_;

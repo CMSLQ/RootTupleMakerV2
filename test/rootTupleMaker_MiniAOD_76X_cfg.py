@@ -62,7 +62,8 @@ process.maxEvents.input = 100
 process.source.fileNames = [
     # specified by InputList.txt
     # LQToUE-M550
-    '/store/mc/RunIIFall15MiniAODv1/LQToUE_M-550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/106D05E3-96A3-E511-8BB2-02163E016451.root'
+    #'/store/mc/RunIIFall15MiniAODv1/LQToUE_M-550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/106D05E3-96A3-E511-8BB2-02163E016451.root'
+    '/store/mc/RunIIFall15MiniAODv1/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/DA82E787-46A6-E511-A34F-002590200ABC.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0

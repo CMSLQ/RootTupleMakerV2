@@ -13,8 +13,8 @@ class RootTupleMakerV2_TriggerObjects : public edm::EDProducer {
 
  private:
   void produce( edm::Event &, const edm::EventSetup & );
-  const edm::InputTag   triggerBitsTag;
-  const edm::InputTag   triggerObjectsTag;
+  const edm::EDGetTokenT<edm::InputTag>   triggerBitsToken_;
+  const edm::EDGetTokenT<edm::InputTag>   triggerObjectsToken_;
   const std::string     prefix, suffix;
 
 };

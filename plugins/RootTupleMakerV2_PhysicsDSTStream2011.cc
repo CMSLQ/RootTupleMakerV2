@@ -14,23 +14,24 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 
 RootTupleMakerV2_PhysicsDSTStream2011::RootTupleMakerV2_PhysicsDSTStream2011(const edm::ParameterSet& iConfig) :
-hltInputTag      (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
-inputTagHLTPFJets(iConfig.getParameter<edm::InputTag>("InputTagHLTPFJets")),
-inputTagHLTCaloJetsRaw(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsRaw")),
-inputTagHLTCaloJetsCorr(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsCorr")),
-inputTagHLTPixelVertices (iConfig.getParameter<edm::InputTag>("InputTagHLTPixelVertices")),
-suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-prefixHLTPFJets  (iConfig.getParameter<std::string>  ("PrefixHLTPFJets")),
-prefixHLTCaloJetsRaw  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsRaw")),
-prefixHLTCaloJetsCorr  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsCorr")),
-prefixHLTPixelVertices   (iConfig.getParameter<std::string>  ("PrefixHLTPixelVertices")),
-minPtHLTPFJets   (iConfig.getParameter<double> ("MinPtHLTPFJets")),
-maxEtaHLTPFJets  (iConfig.getParameter<double> ("MaxEtaHLTPFJets")),
-minPtHLTCaloJetsRaw   (iConfig.getParameter<double> ("MinPtHLTCaloJetsRaw")),
-maxEtaHLTCaloJetsRaw  (iConfig.getParameter<double> ("MaxEtaHLTCaloJetsRaw")),
-minPtHLTCaloJetsCorr   (iConfig.getParameter<double> ("MinPtHLTCaloJetsCorr")),
-maxEtaHLTCaloJetsCorr  (iConfig.getParameter<double> ("MaxEtaHLTCaloJetsCorr")),
-storeEventInfo   (iConfig.getParameter<bool> ("StoreEventInfo"))
+  hltInputTag      (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
+  hltInputToken_      (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
+  inputTokenHLTPFJets_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTPFJets"))),
+  inputTokenHLTCaloJetsRaw_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsRaw"))),
+  inputTokenHLTCaloJetsCorr_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTCaloJetsCorr"))),
+  inputTokenHLTPixelVertices_ (consumes<edm::InputTag>(iConfig.getParameter<edm::InputTag>("InputTagHLTPixelVertices"))),
+  suffix  (iConfig.getParameter<std::string>  ("Suffix")),
+  prefixHLTPFJets  (iConfig.getParameter<std::string>  ("PrefixHLTPFJets")),
+  prefixHLTCaloJetsRaw  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsRaw")),
+  prefixHLTCaloJetsCorr  (iConfig.getParameter<std::string>  ("PrefixHLTCaloJetsCorr")),
+  prefixHLTPixelVertices   (iConfig.getParameter<std::string>  ("PrefixHLTPixelVertices")),
+  minPtHLTPFJets   (iConfig.getParameter<double> ("MinPtHLTPFJets")),
+  maxEtaHLTPFJets  (iConfig.getParameter<double> ("MaxEtaHLTPFJets")),
+  minPtHLTCaloJetsRaw   (iConfig.getParameter<double> ("MinPtHLTCaloJetsRaw")),
+  maxEtaHLTCaloJetsRaw  (iConfig.getParameter<double> ("MaxEtaHLTCaloJetsRaw")),
+  minPtHLTCaloJetsCorr   (iConfig.getParameter<double> ("MinPtHLTCaloJetsCorr")),
+  maxEtaHLTCaloJetsCorr  (iConfig.getParameter<double> ("MaxEtaHLTCaloJetsCorr")),
+  storeEventInfo   (iConfig.getParameter<bool> ("StoreEventInfo"))
 {
   produces <unsigned int> ( "run"   );
   produces <unsigned int> ( "event" );
@@ -238,10 +239,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //---------------
 
   edm::Handle<edm::TriggerResults> triggerResults;
-  iEvent.getByLabel(hltInputTag, triggerResults);
+  iEvent.getByToken(hltInputToken_, triggerResults);
 
   if(triggerResults.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011_TriggerInfo") << "Successfully obtained " << hltInputTag;
+    edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011_TriggerInfo") << "Successfully obtained " << triggerResults;//fixme what to put here?
     
     const edm::TriggerNames& names = iEvent.triggerNames(*triggerResults);
     
@@ -251,7 +252,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //v_hlt_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));	
     } 
   } else {
-    edm::LogError("RootTupleMakerV2_PhysicsDSTStream2011_TriggerError") << "Error! Can't get the product " << hltInputTag;
+    edm::LogError("RootTupleMakerV2_PhysicsDSTStream2011_TriggerError") << "Error! Can't get the product " << triggerResults;//fixme what to put here?
   }
 
   //---------------
@@ -259,7 +260,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //---------------
 
   edm::Handle<reco::PFJetCollection> pfjets;
-  iEvent.getByLabel(inputTagHLTPFJets, pfjets);
+  iEvent.getByToken(inputTokenHLTPFJets_, pfjets);
 	
   if(pfjets.isValid())
     {
@@ -350,7 +351,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   else
     {
-      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << inputTagHLTPFJets;
+      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << pfjets;//fixme what to put here?
     }
   
   //---------------
@@ -358,7 +359,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //---------------
 
   edm::Handle<reco::CaloJetCollection> calojetsraw;
-  iEvent.getByLabel(inputTagHLTCaloJetsRaw, calojetsraw);
+  iEvent.getByToken(inputTokenHLTCaloJetsRaw_, calojetsraw);
 	
   if(calojetsraw.isValid())
     {
@@ -392,7 +393,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   else
     {
-      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << inputTagHLTCaloJetsRaw;
+      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << calojetsraw; //fixme what to put here?
     }
 
 
@@ -401,7 +402,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //---------------
 
   edm::Handle<reco::CaloJetCollection> calojetscorr;
-  iEvent.getByLabel(inputTagHLTCaloJetsCorr, calojetscorr);
+  iEvent.getByToken(inputTokenHLTCaloJetsCorr_, calojetscorr);
 	
   if(calojetscorr.isValid())
     {
@@ -435,7 +436,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   else
     {
-      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << inputTagHLTCaloJetsCorr;
+      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << calojetscorr; //fixme what to put here?
     }
 
 
@@ -445,7 +446,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //---------------
 
   edm::Handle<reco::VertexCollection> pixelvertices;
-  iEvent.getByLabel(inputTagHLTPixelVertices, pixelvertices);
+  iEvent.getByToken(inputTokenHLTPixelVertices_, pixelvertices);
 	
   if(pixelvertices.isValid())
     {
@@ -468,7 +469,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   else
     {
-      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << inputTagHLTPixelVertices;
+      edm::LogInfo("RootTupleMakerV2_PhysicsDSTStream2011Info") << "Can't get the product " << pixelvertices; //fixme what to put here?
     }
 
        

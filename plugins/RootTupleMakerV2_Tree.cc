@@ -1,5 +1,7 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_Tree.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
+#include "FWCore/Utilities/interface/TypeID.h"
+#include "FWCore/Utilities/interface/TypeToGet.h"
 
 #include "FWCore/Framework/interface/ConstProductRegistry.h"
 #include "FWCore/Framework/interface/ProductSelector.h"
@@ -8,6 +10,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "Math/LorentzVector.h"
 #include "Math/Vector3D.h"
+#include <typeinfo>
 
 #include "boost/foreach.hpp"
 #include <TBranch.h>
@@ -36,7 +39,7 @@ RootTupleMakerV2_Tree::TypedBranchConnector<T>::
 TypedBranchConnector(edm::BranchDescription const* desc,
                      std::string t,
                      TTree * tree,
-                     edm::EDGetTokenT<T> token)
+                     edm::EDGetToken token)
   :  ml( desc->moduleLabel() ),
      pin( desc->productInstanceName() ),
      token_(token)
@@ -118,38 +121,39 @@ void RootTupleMakerV2_Tree::beginJob() {
       //Create RootTupleMakerV2_Tree branch
 
       std::string tokenName=selection->moduleLabel()+"_"+selection->productInstanceName();
+      //edm::InputTag tag(selection->moduleLabel(),selection->productInstanceName());
+      edm::EDGetToken token = tokenMap[tokenName];
       
       switch(leafmap.find( selection->friendlyClassName() )->second) {
-      case BOOL            : { connectors.push_back( new TypedBranchConnector                      <bool>         (selection, "/O", tree, tokenMap.find(tokenName)->second) ); break; }
-      case BOOL_V          : { connectors.push_back( new TypedBranchConnector<std::vector          <bool> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case INT             : { connectors.push_back( new TypedBranchConnector                       <int>         (selection, "/I", tree, tokenMap.find(tokenName)->second) ); break; }
-      case INT_V           : { connectors.push_back( new TypedBranchConnector<std::vector           <int> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case U_INT           : { connectors.push_back( new TypedBranchConnector              <unsigned int>         (selection, "/i", tree, tokenMap.find(tokenName)->second) ); break; }
-      case U_INT_V         : { connectors.push_back( new TypedBranchConnector<std::vector  <unsigned int> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case SHORT           : { connectors.push_back( new TypedBranchConnector                     <short>         (selection, "/S", tree, tokenMap.find(tokenName)->second) ); break; }
-      case SHORT_V         : { connectors.push_back( new TypedBranchConnector<std::vector         <short> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case U_SHORT         : { connectors.push_back( new TypedBranchConnector            <unsigned short>         (selection, "/s", tree, tokenMap.find(tokenName)->second) ); break; }
-      case U_SHORT_V       : { connectors.push_back( new TypedBranchConnector<std::vector<unsigned short> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case FLOAT           : { connectors.push_back( new TypedBranchConnector                     <float>         (selection, "/F", tree, tokenMap.find(tokenName)->second) ); break; }
-      case FLOAT_V         : { connectors.push_back( new TypedBranchConnector<std::vector         <float> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case DOUBLE          : { connectors.push_back( new TypedBranchConnector                    <double>         (selection, "/D", tree, tokenMap.find(tokenName)->second) ); break; }
-      case DOUBLE_V        : { connectors.push_back( new TypedBranchConnector<std::vector        <double> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case LONG            : { connectors.push_back( new TypedBranchConnector                      <long>         (selection, "/L", tree, tokenMap.find(tokenName)->second) ); break; }
-      case LONG_V          : { connectors.push_back( new TypedBranchConnector<std::vector          <long> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case U_LONG          : { connectors.push_back( new TypedBranchConnector             <unsigned long>         (selection, "/l", tree, tokenMap.find(tokenName)->second) ); break; }
-      case U_LONG_V        : { connectors.push_back( new TypedBranchConnector<std::vector <unsigned long> >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-	//                     {       }
-      case STRING          : { connectors.push_back( new TypedBranchConnector             <std::string  >         (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case STRING_V        : { connectors.push_back( new TypedBranchConnector<std::vector <std::string  > >       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-	{       }
-      case STRING_INT_M    : { connectors.push_back( new TypedBranchConnector<mapStringInt>        (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case STRING_BOOL_M   : { connectors.push_back( new TypedBranchConnector<mapStringBool>       (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case STRING_STRING_M : { connectors.push_back( new TypedBranchConnector<mapStringString>     (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case STRING_FLOAT_V_M: { connectors.push_back( new TypedBranchConnector<mapStringDoubles>    (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case FLOAT_V_V       : { connectors.push_back( new TypedBranchConnector<vectorVectorFloats>  (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case INT_V_V         : { connectors.push_back( new TypedBranchConnector<vectorVectorInts>    (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case BOOL_V_V        : { connectors.push_back( new TypedBranchConnector<vectorVectorBools>   (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
-      case STRING_V_V      : { connectors.push_back( new TypedBranchConnector<vectorVectorStrings> (selection,   "", tree, tokenMap.find(tokenName)->second) ); break; }
+      case BOOL            : { connectors.push_back( new TypedBranchConnector                      <bool>         (selection, "/O", tree, token) ); break; }
+      case BOOL_V          : { connectors.push_back( new TypedBranchConnector<std::vector          <bool> >       (selection,   "", tree, token) ); break; }
+      case INT             : { connectors.push_back( new TypedBranchConnector                       <int>         (selection, "/I", tree, token) ); break; }
+      case INT_V           : { connectors.push_back( new TypedBranchConnector<std::vector           <int> >       (selection,   "", tree, token) ); break; }
+      case U_INT           : { connectors.push_back( new TypedBranchConnector              <unsigned int>         (selection, "/i", tree, token) ); break; }
+      case U_INT_V         : { connectors.push_back( new TypedBranchConnector<std::vector  <unsigned int> >       (selection,   "", tree, token) ); break; }
+      case SHORT           : { connectors.push_back( new TypedBranchConnector                     <short>         (selection, "/S", tree, token) ); break; }
+      case SHORT_V         : { connectors.push_back( new TypedBranchConnector<std::vector         <short> >       (selection,   "", tree, token) ); break; }
+      case U_SHORT         : { connectors.push_back( new TypedBranchConnector            <unsigned short>         (selection, "/s", tree, token) ); break; }
+      case U_SHORT_V       : { connectors.push_back( new TypedBranchConnector<std::vector<unsigned short> >       (selection,   "", tree, token) ); break; }
+      case FLOAT           : { connectors.push_back( new TypedBranchConnector                     <float>         (selection, "/F", tree, token) ); break; }
+      case FLOAT_V         : { connectors.push_back( new TypedBranchConnector<std::vector         <float> >       (selection,   "", tree, token) ); break; }
+      case DOUBLE          : { connectors.push_back( new TypedBranchConnector                    <double>         (selection, "/D", tree, token) ); break; }
+      case DOUBLE_V        : { connectors.push_back( new TypedBranchConnector<std::vector        <double> >       (selection,   "", tree, token) ); break; }
+      case LONG            : { connectors.push_back( new TypedBranchConnector                      <long>         (selection, "/L", tree, token) ); break; }
+      case LONG_V          : { connectors.push_back( new TypedBranchConnector<std::vector          <long> >       (selection,   "", tree, token) ); break; }
+      case U_LONG          : { connectors.push_back( new TypedBranchConnector             <unsigned long>         (selection, "/l", tree, token) ); break; }
+      case U_LONG_V        : { connectors.push_back( new TypedBranchConnector<std::vector <unsigned long> >       (selection,   "", tree, token) ); break; }
+      //
+      case STRING          : { connectors.push_back( new TypedBranchConnector             <std::string  >         (selection,   "", tree, token) ); break; }
+      case STRING_V        : { connectors.push_back( new TypedBranchConnector<std::vector <std::string  > >       (selection,   "", tree, token) ); break; }
+      case STRING_INT_M    : { connectors.push_back( new TypedBranchConnector<mapStringInt>        (selection,   "", tree, token) ); break; }
+      case STRING_BOOL_M   : { connectors.push_back( new TypedBranchConnector<mapStringBool>       (selection,   "", tree, token) ); break; }
+      case STRING_STRING_M : { connectors.push_back( new TypedBranchConnector<mapStringString>     (selection,   "", tree, token) ); break; }
+      case STRING_FLOAT_V_M: { connectors.push_back( new TypedBranchConnector<mapStringDoubles>    (selection,   "", tree, token) ); break; }
+      case FLOAT_V_V       : { connectors.push_back( new TypedBranchConnector<vectorVectorFloats>  (selection,   "", tree, token) ); break; }
+      case INT_V_V         : { connectors.push_back( new TypedBranchConnector<vectorVectorInts>    (selection,   "", tree, token) ); break; }
+      case BOOL_V_V        : { connectors.push_back( new TypedBranchConnector<vectorVectorBools>   (selection,   "", tree, token) ); break; }
+      case STRING_V_V      : { connectors.push_back( new TypedBranchConnector<vectorVectorStrings> (selection,   "", tree, token) ); break; }
 
       default:
         {
@@ -189,6 +193,760 @@ void RootTupleMakerV2_Tree::beginJob() {
 RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) : 
   cfg(pset)
 {
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowHashesEGammaIDHEEP_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowHashesEGammaIDHEEP"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowHashesEGammaIDLoose_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowHashesEGammaIDLoose"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowHashesEGammaIDMedium_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowHashesEGammaIDMedium"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowHashesEGammaIDTight_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowHashesEGammaIDTight"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowHashesEGammaIDVeto_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowHashesEGammaIDVeto"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowNamesEGammaIDHEEP_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowNamesEGammaIDHEEP"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowNamesEGammaIDLoose_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowNamesEGammaIDLoose"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowNamesEGammaIDMedium_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowNamesEGammaIDMedium"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowNamesEGammaIDTight_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowNamesEGammaIDTight"));
+  edm::EDGetToken rootTupleElectrons_ElectronCutFlowNamesEGammaIDVeto_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleElectrons","ElectronCutFlowNamesEGammaIDVeto"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjCollectionName_Token_ = consumes(edm::TypeToGet::make<std::vector<std::string> >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjCollectionName"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjFilterNames_Token_ = consumes(edm::TypeToGet::make<std::vector<std::vector<std::string> > >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjFilterNames"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjPathNames_Token_ = consumes(edm::TypeToGet::make<std::vector<std::vector<std::string> > >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjPathNames"));
+  edm::EDGetToken rootTupleEventSelection_isBPTX0_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","isBPTX0"));
+  edm::EDGetToken rootTupleEventSelection_isBSCBeamHalo_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","isBSCBeamHalo"));
+  edm::EDGetToken rootTupleEventSelection_isBSCMinBias_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","isBSCMinBias"));
+  edm::EDGetToken rootTupleEventSelection_isPhysDeclared_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","isPhysDeclared"));
+  edm::EDGetToken rootTupleEventSelection_isPrimaryVertex_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","isPrimaryVertex"));
+  edm::EDGetToken rootTupleEventSelection_isTrackingFailure_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","isTrackingFailure"));
+  edm::EDGetToken rootTupleEventSelection_passBadEESupercrystalFilter_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passBadEESupercrystalFilter"));
+  edm::EDGetToken rootTupleEventSelection_passBeamHaloFilterTight_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passBeamHaloFilterTight"));
+  edm::EDGetToken rootTupleEventSelection_passEcalDeadCellTriggerPrimitiveFilter_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passEcalDeadCellTriggerPrimitiveFilter"));
+  edm::EDGetToken rootTupleEventSelection_passEcalLaserCorrFilter_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passEcalLaserCorrFilter"));
+  edm::EDGetToken rootTupleEventSelection_passHBHENoiseFilter_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passHBHENoiseFilter"));
+  edm::EDGetToken rootTupleEventSelection_passHBHENoiseIsoFilter_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passHBHENoiseIsoFilter"));
+  edm::EDGetToken rootTupleEventSelection_passHcalLaserEventFilter_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passHcalLaserEventFilter"));
+  edm::EDGetToken rootTupleEventSelection_passLogErrorTooManyClusters_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passLogErrorTooManyClusters"));
+  edm::EDGetToken rootTupleEventSelection_passManyStripClus53X_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passManyStripClus53X"));
+  edm::EDGetToken rootTupleEventSelection_passTooManyStripClus53X_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passTooManyStripClus53X"));
+  edm::EDGetToken rootTupleEventSelection_passTrackingFailureFilter_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEventSelection","passTrackingFailureFilter"));
+  edm::EDGetToken rootTupleEvent_isData_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleEvent","isData"));
+  edm::EDGetToken rootTupleMuons_hasVeryForwardPFMuon_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTupleMuons","hasVeryForwardPFMuon"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJethasJetWithBadUncAK4CHS_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJethasJetWithBadUncAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJethasJetWithBadUncAK4Puppi_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJethasJetWithBadUncAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJethasJetWithBadUncAK5CHS_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJethasJetWithBadUncAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJethasJetWithBadUncAK5_Token_ = consumes(edm::TypeToGet::make<bool>(),edm::InputTag("rootTuplePFJetsAK5","PFJethasJetWithBadUncAK5"));
+  edm::EDGetToken rootTupleElectrons_ElectronGsfCtfCharge_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronGsfCtfCharge"));
+  edm::EDGetToken rootTupleElectrons_ElectronGsfCtfScPixCharge_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronGsfCtfScPixCharge"));
+  edm::EDGetToken rootTupleElectrons_ElectronGsfScPixCharge_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronGsfScPixCharge"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTDoubleEleMatched_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronHLTDoubleEleMatched"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTEleJetJetMatched_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronHLTEleJetJetMatched"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleMatched_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleMatched"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleWP85Matched_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleWP85Matched"));
+  edm::EDGetToken rootTupleElectrons_ElectronHasEcalDrivenSeed_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronHasEcalDrivenSeed"));
+  edm::EDGetToken rootTupleElectrons_ElectronHasMatchedConvPhot_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronHasMatchedConvPhot"));
+  edm::EDGetToken rootTupleElectrons_ElectronHasTrackerDrivenSeed_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronHasTrackerDrivenSeed"));
+  edm::EDGetToken rootTupleElectrons_ElectronIsEB_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronIsEB"));
+  edm::EDGetToken rootTupleElectrons_ElectronIsEE_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronIsEE"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassEGammaIDEoP_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassEGammaIDEoP"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassEGammaIDLoose_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassEGammaIDLoose"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassEGammaIDMedium_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassEGammaIDMedium"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassEGammaIDTight_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassEGammaIDTight"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassEGammaIDTrigTight_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassEGammaIDTrigTight"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassEGammaIDTrigWP70_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassEGammaIDTrigWP70"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassEGammaIDVeto_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassEGammaIDVeto"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassHEEPID_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleElectrons","ElectronPassHEEPID"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleIsoMuonMatched_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleIsoMuonMatched"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleMuonMatched_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleMuonMatched"));
+  edm::EDGetToken rootTupleVertex_VertexIsFake_Token_ = consumes(edm::TypeToGet::make<std::vector<bool> >(),edm::InputTag("rootTupleVertex","VertexIsFake"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjPassedPathL3Filter_Token_ = consumes(edm::TypeToGet::make<std::vector<std::vector<bool> > >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjPassedPathL3Filter"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjPassedPathLastFilter_Token_ = consumes(edm::TypeToGet::make<std::vector<std::vector<bool> > >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjPassedPathLastFilter"));
+  edm::EDGetToken rootTupleEvent_fixedGridRhoAll_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleEvent","fixedGridRhoAll"));
+  edm::EDGetToken rootTupleEvent_fixedGridRhoFastjetAllCalo_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleEvent","fixedGridRhoFastjetAllCalo"));
+  edm::EDGetToken rootTupleEvent_fixedGridRhoFastjetCentralCalo_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleEvent","fixedGridRhoFastjetCentralCalo"));
+  edm::EDGetToken rootTupleEvent_fixedGridRhoFastjetCentralChargedPileUp_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleEvent","fixedGridRhoFastjetCentralChargedPileUp"));
+  edm::EDGetToken rootTupleEvent_fixedGridRhoFastjetCentralNeutral_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleEvent","fixedGridRhoFastjetCentralNeutral"));
+  edm::EDGetToken rootTupleEvent_time_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleEvent","time"));
+  edm::EDGetToken rootTupleGenEventInfo_PtHat_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleGenEventInfo","PtHat"));
+  edm::EDGetToken rootTupleGenEventInfo_Weight_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleGenEventInfo","Weight"));
+  edm::EDGetToken rootTupleGenEventInfo_amcNLOWeight_Token_ = consumes(edm::TypeToGet::make<double>(),edm::InputTag("rootTupleGenEventInfo","amcNLOWeight"));
+  edm::EDGetToken rootTupleElectrons_ElectronBeamSpotDXYError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronBeamSpotDXYError"));
+  edm::EDGetToken rootTupleElectrons_ElectronBeamSpotDXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronBeamSpotDXY"));
+  edm::EDGetToken rootTupleElectrons_ElectronCaloEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronCaloEnergy"));
+  edm::EDGetToken rootTupleElectrons_ElectronDCotTheta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronDCotTheta"));
+  edm::EDGetToken rootTupleElectrons_ElectronDeltaEtaTrkSC_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronDeltaEtaTrkSC"));
+  edm::EDGetToken rootTupleElectrons_ElectronDeltaEtaTrkSeedSC_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronDeltaEtaTrkSeedSC"));
+  edm::EDGetToken rootTupleElectrons_ElectronDeltaPhiTrkSC_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronDeltaPhiTrkSC"));
+  edm::EDGetToken rootTupleElectrons_ElectronDist_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronDist"));
+  edm::EDGetToken rootTupleElectrons_ElectronE1x5OverE5x5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronE1x5OverE5x5"));
+  edm::EDGetToken rootTupleElectrons_ElectronE2x5OverE5x5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronE2x5OverE5x5"));
+  edm::EDGetToken rootTupleElectrons_ElectronESuperClusterOverP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronESuperClusterOverP"));
+  edm::EDGetToken rootTupleElectrons_ElectronEcalEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronEcalEnergy"));
+  edm::EDGetToken rootTupleElectrons_ElectronEcalIsoDR03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronEcalIsoDR03"));
+  edm::EDGetToken rootTupleElectrons_ElectronEcalIsoPAT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronEcalIsoPAT"));
+  edm::EDGetToken rootTupleElectrons_ElectronEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronEnergy"));
+  edm::EDGetToken rootTupleElectrons_ElectronEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronFbrem_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronFbrem"));
+  edm::EDGetToken rootTupleElectrons_ElectronFull5x5E1x5OverE5x5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronFull5x5E1x5OverE5x5"));
+  edm::EDGetToken rootTupleElectrons_ElectronFull5x5E2x5OverE5x5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronFull5x5E2x5OverE5x5"));
+  edm::EDGetToken rootTupleElectrons_ElectronFull5x5SigmaIEtaIEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronFull5x5SigmaIEtaIEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTDoubleEleMatchEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTDoubleEleMatchEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTDoubleEleMatchPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTDoubleEleMatchPhi"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTDoubleEleMatchPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTDoubleEleMatchPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTEleJetJetMatchEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTEleJetJetMatchEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTEleJetJetMatchPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTEleJetJetMatchPhi"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTEleJetJetMatchPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTEleJetJetMatchPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleMatchEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleMatchEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleMatchPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleMatchPhi"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleMatchPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleMatchPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleWP85MatchEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleWP85MatchEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleWP85MatchPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleWP85MatchPhi"));
+  edm::EDGetToken rootTupleElectrons_ElectronHLTSingleEleWP85MatchPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHLTSingleEleWP85MatchPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronHcalIsoD1DR03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHcalIsoD1DR03"));
+  edm::EDGetToken rootTupleElectrons_ElectronHcalIsoD2DR03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHcalIsoD2DR03"));
+  edm::EDGetToken rootTupleElectrons_ElectronHcalIsoDR03FullCone_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHcalIsoDR03FullCone"));
+  edm::EDGetToken rootTupleElectrons_ElectronHcalIsoDR03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHcalIsoDR03"));
+  edm::EDGetToken rootTupleElectrons_ElectronHcalIsoPAT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHcalIsoPAT"));
+  edm::EDGetToken rootTupleElectrons_ElectronHoE_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronHoE"));
+  edm::EDGetToken rootTupleElectrons_ElectronLeadVtxDistXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronLeadVtxDistXY"));
+  edm::EDGetToken rootTupleElectrons_ElectronLeadVtxDistZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronLeadVtxDistZ"));
+  edm::EDGetToken rootTupleElectrons_ElectronMatchedGenParticleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronMatchedGenParticleEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronMatchedGenParticlePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronMatchedGenParticlePhi"));
+  edm::EDGetToken rootTupleElectrons_ElectronMatchedGenParticlePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronMatchedGenParticlePt"));
+  edm::EDGetToken rootTupleElectrons_ElectronPFChargedHadronIso03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPFChargedHadronIso03"));
+  edm::EDGetToken rootTupleElectrons_ElectronPFChargedHadronIso04_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPFChargedHadronIso04"));
+  edm::EDGetToken rootTupleElectrons_ElectronPFNeutralHadronIso03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPFNeutralHadronIso03"));
+  edm::EDGetToken rootTupleElectrons_ElectronPFNeutralHadronIso04_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPFNeutralHadronIso04"));
+  edm::EDGetToken rootTupleElectrons_ElectronPFPUIso03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPFPUIso03"));
+  edm::EDGetToken rootTupleElectrons_ElectronPFPhotonIso03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPFPhotonIso03"));
+  edm::EDGetToken rootTupleElectrons_ElectronPFPhotonIso04_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPFPhotonIso04"));
+  edm::EDGetToken rootTupleElectrons_ElectronPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPhi"));
+  edm::EDGetToken rootTupleElectrons_ElectronPrimaryVertexDXYError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPrimaryVertexDXYError"));
+  edm::EDGetToken rootTupleElectrons_ElectronPrimaryVertexDXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPrimaryVertexDXY"));
+  edm::EDGetToken rootTupleElectrons_ElectronPtHeep_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPtHeep"));
+  edm::EDGetToken rootTupleElectrons_ElectronPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronR9_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronR9"));
+  edm::EDGetToken rootTupleElectrons_ElectronRelIsoPAT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronRelIsoPAT"));
+  edm::EDGetToken rootTupleElectrons_ElectronSCEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronSCEnergy"));
+  edm::EDGetToken rootTupleElectrons_ElectronSCEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronSCEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronSCPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronSCPhi"));
+  edm::EDGetToken rootTupleElectrons_ElectronSCPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronSCPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronSCRawEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronSCRawEnergy"));
+  edm::EDGetToken rootTupleElectrons_ElectronSigmaEtaEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronSigmaEtaEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronSigmaIEtaIEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronSigmaIEtaIEta"));
+  edm::EDGetToken rootTupleElectrons_ElectronTrackPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronTrackPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronTrackValidFractionOfHits_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronTrackValidFractionOfHits"));
+  edm::EDGetToken rootTupleElectrons_ElectronTrackVx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronTrackVx"));
+  edm::EDGetToken rootTupleElectrons_ElectronTrackVy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronTrackVy"));
+  edm::EDGetToken rootTupleElectrons_ElectronTrackVz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronTrackVz"));
+  edm::EDGetToken rootTupleElectrons_ElectronTrkIsoDR03_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronTrkIsoDR03"));
+  edm::EDGetToken rootTupleElectrons_ElectronTrkIsoPAT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronTrkIsoPAT"));
+  edm::EDGetToken rootTupleElectrons_ElectronVtxDistXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronVtxDistXY"));
+  edm::EDGetToken rootTupleElectrons_ElectronVtxDistZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleElectrons","ElectronVtxDistZ"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronEnergy"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronEta"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronMass_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronMass"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronP"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronPhi"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronPt"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronPx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronPx"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronPy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronPy"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronPz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronPz"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronTauVisibleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronTauVisibleEta"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronTauVisiblePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronTauVisiblePhi"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronTauVisiblePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronTauVisiblePt"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronVX"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronVY"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronVZ"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronEnergy"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronEta"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronMass_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronMass"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronP"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronPhi"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronPt"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronPx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronPx"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronPy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronPy"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronPz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronPz"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronTauVisibleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronTauVisibleEta"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronTauVisiblePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronTauVisiblePhi"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronTauVisiblePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronTauVisiblePt"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronVX"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronVY"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronVZ"));
+  edm::EDGetToken rootTupleGenEventInfo_PDFCTEQWeights_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenEventInfo","PDFCTEQWeights"));
+  edm::EDGetToken rootTupleGenEventInfo_PDFMSTWWeights_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenEventInfo","PDFMSTWWeights"));
+  edm::EDGetToken rootTupleGenEventInfo_PDFNNPDFWeights_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenEventInfo","PDFNNPDFWeights"));
+  edm::EDGetToken rootTupleGenEventInfo_ScaleWeights_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenEventInfo","ScaleWeights"));
+  edm::EDGetToken rootTupleGenJetsAK4_GenJetEMFAK4_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK4","GenJetEMFAK4"));
+  edm::EDGetToken rootTupleGenJetsAK4_GenJetEnergyAK4_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK4","GenJetEnergyAK4"));
+  edm::EDGetToken rootTupleGenJetsAK4_GenJetEtaAK4_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK4","GenJetEtaAK4"));
+  edm::EDGetToken rootTupleGenJetsAK4_GenJetHADFAK4_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK4","GenJetHADFAK4"));
+  edm::EDGetToken rootTupleGenJetsAK4_GenJetPAK4_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK4","GenJetPAK4"));
+  edm::EDGetToken rootTupleGenJetsAK4_GenJetPhiAK4_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK4","GenJetPhiAK4"));
+  edm::EDGetToken rootTupleGenJetsAK4_GenJetPtAK4_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK4","GenJetPtAK4"));
+  edm::EDGetToken rootTupleGenJetsAK5_GenJetEMFAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK5","GenJetEMFAK5"));
+  edm::EDGetToken rootTupleGenJetsAK5_GenJetEnergyAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK5","GenJetEnergyAK5"));
+  edm::EDGetToken rootTupleGenJetsAK5_GenJetEtaAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK5","GenJetEtaAK5"));
+  edm::EDGetToken rootTupleGenJetsAK5_GenJetHADFAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK5","GenJetHADFAK5"));
+  edm::EDGetToken rootTupleGenJetsAK5_GenJetPAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK5","GenJetPAK5"));
+  edm::EDGetToken rootTupleGenJetsAK5_GenJetPhiAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK5","GenJetPhiAK5"));
+  edm::EDGetToken rootTupleGenJetsAK5_GenJetPtAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenJetsAK5","GenJetPtAK5"));
+  edm::EDGetToken rootTupleGenMETTrue_GenMETPhiTrue_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMETTrue","GenMETPhiTrue"));
+  edm::EDGetToken rootTupleGenMETTrue_GenMETTrue_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMETTrue","GenMETTrue"));
+  edm::EDGetToken rootTupleGenMETTrue_GenSumETTrue_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMETTrue","GenSumETTrue"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuEnergy"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuEta"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuMass_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuMass"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuP"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuPhi"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuPt"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuPx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuPx"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuPy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuPy"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuPz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuPz"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuTauVisibleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuTauVisibleEta"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuTauVisiblePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuTauVisiblePhi"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuTauVisiblePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuTauVisiblePt"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuVX"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuVY"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuVZ"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuEnergy"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuEta"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuMass_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuMass"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuP"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuPhi"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuPt"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuPx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuPx"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuPy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuPy"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuPz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuPz"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuTauVisibleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuTauVisibleEta"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuTauVisiblePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuTauVisiblePhi"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuTauVisiblePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuTauVisiblePt"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuVX"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuVY"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuVZ"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleEnergy"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleEta"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleMass_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleMass"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleP"));
+  edm::EDGetToken rootTupleGenParticles_GenParticlePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticlePhi"));
+  edm::EDGetToken rootTupleGenParticles_GenParticlePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticlePt"));
+  edm::EDGetToken rootTupleGenParticles_GenParticlePx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticlePx"));
+  edm::EDGetToken rootTupleGenParticles_GenParticlePy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticlePy"));
+  edm::EDGetToken rootTupleGenParticles_GenParticlePz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticlePz"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleTauVisibleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleTauVisibleEta"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleTauVisiblePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleTauVisiblePhi"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleTauVisiblePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleTauVisiblePt"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleVX"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleVY"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenParticles","GenParticleVZ"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauEnergy"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauEta"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauMass_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauMass"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauP"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauPhi"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauPt"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauPx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauPx"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauPy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauPy"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauPz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauPz"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauTauVisibleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauTauVisibleEta"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauTauVisiblePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauTauVisiblePhi"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauTauVisiblePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauTauVisiblePt"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauVX"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauVY"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauVZ"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauEnergy"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauEta"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauMass_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauMass"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauP"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauPhi"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauPt"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauPx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauPx"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauPy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauPy"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauPz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauPz"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauTauVisibleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauTauVisibleEta"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauTauVisiblePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauTauVisiblePhi"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauTauVisiblePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauTauVisiblePt"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauVX"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauVY"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauVZ"));
+  edm::EDGetToken rootTupleMuons_MuonBackToBackCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBackToBackCompatibility"));
+  edm::EDGetToken rootTupleMuons_MuonBeamSpotDXYError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBeamSpotDXYError"));
+  edm::EDGetToken rootTupleMuons_MuonBeamSpotDXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBeamSpotDXY"));
+  edm::EDGetToken rootTupleMuons_MuonBestTrackVtxDistXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBestTrackVtxDistXY"));
+  edm::EDGetToken rootTupleMuons_MuonBestTrackVtxDistZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBestTrackVtxDistZ"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailEtaError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailEtaError"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailEta"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailGlobalChi2_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailGlobalChi2"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailP"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailPhiError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailPhiError"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailPhi"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailPtError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailPtError"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailPt"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailQOverPError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailQOverPError"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkD0Error_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkD0Error"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkD0_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkD0"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkDzError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkDzError"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkDz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkDz"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkValidFractionOfHits_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkValidFractionOfHits"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkVtxDXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkVtxDXY"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkVtxDZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkVtxDZ"));
+  edm::EDGetToken rootTupleMuons_MuonCosmicCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCosmicCompatibility"));
+  edm::EDGetToken rootTupleMuons_MuonEcalIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEcalIso"));
+  edm::EDGetToken rootTupleMuons_MuonEcalVetoIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEcalVetoIso"));
+  edm::EDGetToken rootTupleMuons_MuonEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEnergy"));
+  edm::EDGetToken rootTupleMuons_MuonEtaError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEtaError"));
+  edm::EDGetToken rootTupleMuons_MuonEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEta"));
+  edm::EDGetToken rootTupleMuons_MuonGlobalChi2_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonGlobalChi2"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleIsoMuonMatchEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleIsoMuonMatchEta"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleIsoMuonMatchPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleIsoMuonMatchPhi"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleIsoMuonMatchPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleIsoMuonMatchPt"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleMuonMatchEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleMuonMatchEta"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleMuonMatchPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleMuonMatchPhi"));
+  edm::EDGetToken rootTupleMuons_MuonHLTSingleMuonMatchPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHLTSingleMuonMatchPt"));
+  edm::EDGetToken rootTupleMuons_MuonHOIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHOIso"));
+  edm::EDGetToken rootTupleMuons_MuonHcalIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHcalIso"));
+  edm::EDGetToken rootTupleMuons_MuonHcalVetoIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonHcalVetoIso"));
+  edm::EDGetToken rootTupleMuons_MuonMatchedGenParticleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonMatchedGenParticleEta"));
+  edm::EDGetToken rootTupleMuons_MuonMatchedGenParticlePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonMatchedGenParticlePhi"));
+  edm::EDGetToken rootTupleMuons_MuonMatchedGenParticlePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonMatchedGenParticlePt"));
+  edm::EDGetToken rootTupleMuons_MuonOverlapCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonOverlapCompatibility"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR03ChargedHadron_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03ChargedHadron"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR03ChargedParticle_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03ChargedParticle"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR03NeutralHadronHT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03NeutralHadronHT"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR03NeutralHadron_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03NeutralHadron"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR03PU_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03PU"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR03PhotonHT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03PhotonHT"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR03Photon_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03Photon"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR04ChargedHadron_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR04ChargedHadron"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR04ChargedParticle_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR04ChargedParticle"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR04NeutralHadronHT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR04NeutralHadronHT"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR04NeutralHadron_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR04NeutralHadron"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR04PU_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR04PU"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR04PhotonHT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR04PhotonHT"));
+  edm::EDGetToken rootTupleMuons_MuonPFIsoR04Photon_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR04Photon"));
+  edm::EDGetToken rootTupleMuons_MuonP_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonP"));
+  edm::EDGetToken rootTupleMuons_MuonPhiError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPhiError"));
+  edm::EDGetToken rootTupleMuons_MuonPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPhi"));
+  edm::EDGetToken rootTupleMuons_MuonPrimaryVertexDXYError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPrimaryVertexDXYError"));
+  edm::EDGetToken rootTupleMuons_MuonPrimaryVertexDXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPrimaryVertexDXY"));
+  edm::EDGetToken rootTupleMuons_MuonPtError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPtError"));
+  edm::EDGetToken rootTupleMuons_MuonPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPt"));
+  edm::EDGetToken rootTupleMuons_MuonQOverPError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonQOverPError"));
+  edm::EDGetToken rootTupleMuons_MuonTimeCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTimeCompatibility"));
+  edm::EDGetToken rootTupleMuons_MuonTrackChi2_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrackChi2"));
+  edm::EDGetToken rootTupleMuons_MuonTrackerIsoSumPT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrackerIsoSumPT"));
+  edm::EDGetToken rootTupleMuons_MuonTrkD0Error_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkD0Error"));
+  edm::EDGetToken rootTupleMuons_MuonTrkD0_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkD0"));
+  edm::EDGetToken rootTupleMuons_MuonTrkDzError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkDzError"));
+  edm::EDGetToken rootTupleMuons_MuonTrkDz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkDz"));
+  edm::EDGetToken rootTupleMuons_MuonTrkEtaError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkEtaError"));
+  edm::EDGetToken rootTupleMuons_MuonTrkEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkEta"));
+  edm::EDGetToken rootTupleMuons_MuonTrkIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkIso"));
+  edm::EDGetToken rootTupleMuons_MuonTrkPhiError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkPhiError"));
+  edm::EDGetToken rootTupleMuons_MuonTrkPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkPhi"));
+  edm::EDGetToken rootTupleMuons_MuonTrkPtError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkPtError"));
+  edm::EDGetToken rootTupleMuons_MuonTrkPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkPt"));
+  edm::EDGetToken rootTupleMuons_MuonTrkValidFractionOfHits_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkValidFractionOfHits"));
+  edm::EDGetToken rootTupleMuons_MuonTrkVx_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkVx"));
+  edm::EDGetToken rootTupleMuons_MuonTrkVy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkVy"));
+  edm::EDGetToken rootTupleMuons_MuonTrkVz_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkVz"));
+  edm::EDGetToken rootTupleMuons_MuonVtxDistXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonVtxDistXY"));
+  edm::EDGetToken rootTupleMuons_MuonVtxDistZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonVtxDistZ"));
+  edm::EDGetToken rootTuplePFCandidates_PFCandEnergyLeptLink_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFCandidates","PFCandEnergyLeptLink"));
+  edm::EDGetToken rootTuplePFCandidates_PFCandEtaLeptLink_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFCandidates","PFCandEtaLeptLink"));
+  edm::EDGetToken rootTuplePFCandidates_PFCandPhiLeptLink_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFCandidates","PFCandPhiLeptLink"));
+  edm::EDGetToken rootTuplePFCandidates_PFCandPtLeptLink_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFCandidates","PFCandPtLeptLink"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetBestVertexTrackAssociationFactorAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetBestVertexTrackAssociationFactorAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetBetaAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetBetaAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetBetaClassicAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetBetaClassicAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetBetaStarAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetBetaStarAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetBetaStarClassicAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetBetaStarClassicAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetChargedEmEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetChargedEmEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetChargedHadronEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetChargedHadronEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetChargedMuEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetChargedMuEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetClosestVertexWeighted3DSeparationAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetClosestVertexWeighted3DSeparationAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetClosestVertexWeightedXYSeparationAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetClosestVertexWeightedXYSeparationAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetClosestVertexWeightedZSeparationAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetClosestVertexWeightedZSeparationAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetCombinedInclusiveSecondaryVertexBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetCombinedInclusiveSecondaryVertexBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetCombinedMVABTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetCombinedMVABTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetCombinedSecondaryVertexBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetCombinedSecondaryVertexBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetElectronEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetElectronEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetEnergyAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetEnergyAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetEnergyRawAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetEnergyRawAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetEtaAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetEtaAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetHFEMEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetHFEMEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetHFHadronEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetHFHadronEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetJECUncAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetJECUncAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetJetBProbabilityBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetJetBProbabilityBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetJetProbabilityBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetJetProbabilityBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetL1FastJetJECAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetL1FastJetJECAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetL2L3ResJECAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetL2L3ResJECAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetL2RelJECAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetL2RelJECAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetL3AbsJECAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetL3AbsJECAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetMuonEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetMuonEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetNeutralEmEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetNeutralEmEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetNeutralHadronEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetNeutralHadronEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPhiAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPhiAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPhotonEnergyFractionAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPhotonEnergyFractionAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPileupMVAAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPileupMVAAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPtAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPtAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPtRawAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPtRawAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetScaledDownEnergyAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetScaledDownEnergyAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetScaledDownPtAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetScaledDownPtAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetScaledUpEnergyAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetScaledUpEnergyAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetScaledUpPtAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetScaledUpPtAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetSimpleSecondaryVertexHighEffBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetSimpleSecondaryVertexHighEffBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetSimpleSecondaryVertexHighPurBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetSimpleSecondaryVertexHighPurBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetSmearedDownEnergyAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetSmearedDownEnergyAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetSmearedDownPtAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetSmearedDownPtAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetSmearedUpEnergyAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetSmearedUpEnergyAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetSmearedUpPtAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetSmearedUpPtAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetTrackCountingHighEffBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetTrackCountingHighEffBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetTrackCountingHighPurBTagAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetTrackCountingHighPurBTagAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetBestVertexTrackAssociationFactorAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetBestVertexTrackAssociationFactorAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetBetaAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetBetaAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetBetaClassicAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetBetaClassicAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetBetaStarAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetBetaStarAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetBetaStarClassicAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetBetaStarClassicAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetChargedEmEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetChargedEmEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetChargedHadronEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetChargedHadronEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetChargedMuEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetChargedMuEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetClosestVertexWeighted3DSeparationAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetClosestVertexWeighted3DSeparationAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetClosestVertexWeightedXYSeparationAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetClosestVertexWeightedXYSeparationAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetClosestVertexWeightedZSeparationAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetClosestVertexWeightedZSeparationAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetCombinedInclusiveSecondaryVertexBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetCombinedInclusiveSecondaryVertexBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetCombinedMVABTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetCombinedMVABTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetCombinedSecondaryVertexBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetCombinedSecondaryVertexBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetElectronEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetElectronEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetEnergyAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetEnergyAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetEnergyRawAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetEnergyRawAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetEtaAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetEtaAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetHFEMEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetHFEMEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetHFHadronEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetHFHadronEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetJECUncAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetJECUncAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetJetBProbabilityBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetJetBProbabilityBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetJetProbabilityBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetJetProbabilityBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetL1FastJetJECAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetL1FastJetJECAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetL2L3ResJECAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetL2L3ResJECAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetL2RelJECAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetL2RelJECAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetL3AbsJECAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetL3AbsJECAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetMuonEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetMuonEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetNeutralEmEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetNeutralEmEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetNeutralHadronEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetNeutralHadronEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPhiAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPhiAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPhotonEnergyFractionAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPhotonEnergyFractionAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPtAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPtAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPtRawAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPtRawAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetScaledDownEnergyAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetScaledDownEnergyAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetScaledDownPtAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetScaledDownPtAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetScaledUpEnergyAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetScaledUpEnergyAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetScaledUpPtAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetScaledUpPtAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetSimpleSecondaryVertexHighEffBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetSimpleSecondaryVertexHighEffBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetSimpleSecondaryVertexHighPurBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetSimpleSecondaryVertexHighPurBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetSmearedDownEnergyAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetSmearedDownEnergyAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetSmearedDownPtAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetSmearedDownPtAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetSmearedUpEnergyAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetSmearedUpEnergyAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetSmearedUpPtAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetSmearedUpPtAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetTrackCountingHighEffBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetTrackCountingHighEffBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetTrackCountingHighPurBTagAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetTrackCountingHighPurBTagAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetBestVertexTrackAssociationFactorAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetBestVertexTrackAssociationFactorAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetBetaAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetBetaAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetBetaClassicAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetBetaClassicAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetBetaStarAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetBetaStarAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetBetaStarClassicAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetBetaStarClassicAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetChargedEmEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetChargedEmEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetChargedHadronEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetChargedHadronEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetChargedMuEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetChargedMuEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetClosestVertexWeighted3DSeparationAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetClosestVertexWeighted3DSeparationAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetClosestVertexWeightedXYSeparationAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetClosestVertexWeightedXYSeparationAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetClosestVertexWeightedZSeparationAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetClosestVertexWeightedZSeparationAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetCombinedInclusiveSecondaryVertexBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetCombinedInclusiveSecondaryVertexBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetCombinedMVABTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetCombinedMVABTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetCombinedSecondaryVertexBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetCombinedSecondaryVertexBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetElectronEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetElectronEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetEnergyAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetEnergyAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetEnergyRawAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetEnergyRawAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetEtaAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetEtaAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetHFEMEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetHFEMEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetHFHadronEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetHFHadronEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetJECUncAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetJECUncAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetJetBProbabilityBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetJetBProbabilityBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetJetProbabilityBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetJetProbabilityBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetL1FastJetJECAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetL1FastJetJECAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetL2L3ResJECAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetL2L3ResJECAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetL2RelJECAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetL2RelJECAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetL3AbsJECAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetL3AbsJECAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetMuonEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetMuonEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetNeutralEmEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetNeutralEmEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetNeutralHadronEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetNeutralHadronEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPhiAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPhiAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPhotonEnergyFractionAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPhotonEnergyFractionAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPileupMVAAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPileupMVAAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPtAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPtAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPtRawAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPtRawAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetScaledDownEnergyAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetScaledDownEnergyAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetScaledDownPtAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetScaledDownPtAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetScaledUpEnergyAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetScaledUpEnergyAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetScaledUpPtAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetScaledUpPtAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetSimpleSecondaryVertexHighEffBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetSimpleSecondaryVertexHighEffBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetSimpleSecondaryVertexHighPurBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetSimpleSecondaryVertexHighPurBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetSmearedDownEnergyAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetSmearedDownEnergyAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetSmearedDownPtAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetSmearedDownPtAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetSmearedUpEnergyAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetSmearedUpEnergyAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetSmearedUpPtAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetSmearedUpPtAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetTrackCountingHighEffBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetTrackCountingHighEffBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetTrackCountingHighPurBTagAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetTrackCountingHighPurBTagAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetBestVertexTrackAssociationFactorAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetBestVertexTrackAssociationFactorAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetBetaAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetBetaAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetBetaClassicAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetBetaClassicAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetBetaStarAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetBetaStarAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetBetaStarClassicAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetBetaStarClassicAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetChargedEmEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetChargedEmEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetChargedHadronEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetChargedHadronEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetChargedMuEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetChargedMuEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetClosestVertexWeighted3DSeparationAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetClosestVertexWeighted3DSeparationAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetClosestVertexWeightedXYSeparationAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetClosestVertexWeightedXYSeparationAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetClosestVertexWeightedZSeparationAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetClosestVertexWeightedZSeparationAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetCombinedInclusiveSecondaryVertexBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetCombinedInclusiveSecondaryVertexBTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetCombinedMVABTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetCombinedMVABTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetCombinedSecondaryVertexBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetCombinedSecondaryVertexBTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetElectronEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetElectronEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetEnergyAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetEnergyAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetEnergyRawAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetEnergyRawAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetEtaAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetEtaAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetHFEMEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetHFEMEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetHFHadronEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetHFHadronEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetJECUncAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetJECUncAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetJetBProbabilityBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetJetBProbabilityBTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetJetProbabilityBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetJetProbabilityBTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetL1FastJetJECAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetL1FastJetJECAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetL2L3ResJECAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetL2L3ResJECAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetL2RelJECAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetL2RelJECAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetL3AbsJECAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetL3AbsJECAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetMuonEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetMuonEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetNeutralEmEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetNeutralEmEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetNeutralHadronEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetNeutralHadronEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPhiAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPhiAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPhotonEnergyFractionAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPhotonEnergyFractionAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPileupMVAAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPileupMVAAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPtAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPtAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPtRawAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPtRawAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetScaledDownEnergyAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetScaledDownEnergyAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetScaledDownPtAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetScaledDownPtAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetScaledUpEnergyAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetScaledUpEnergyAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetScaledUpPtAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetScaledUpPtAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetSimpleSecondaryVertexHighEffBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetSimpleSecondaryVertexHighEffBTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetSimpleSecondaryVertexHighPurBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetSimpleSecondaryVertexHighPurBTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetSmearedDownEnergyAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetSmearedDownEnergyAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetSmearedDownPtAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetSmearedDownPtAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetSmearedUpEnergyAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetSmearedUpEnergyAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetSmearedUpPtAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetSmearedUpPtAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetTrackCountingHighEffBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetTrackCountingHighEffBTagAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetTrackCountingHighPurBTagAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetTrackCountingHighPurBTagAK5"));
+  edm::EDGetToken rootTuplePFMETPuppiType1Cor_PFMETPhiPuppiType1Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETPuppiType1Cor","PFMETPhiPuppiType1Cor"));
+  edm::EDGetToken rootTuplePFMETPuppiType1Cor_PFMETPuppiType1Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETPuppiType1Cor","PFMETPuppiType1Cor"));
+  edm::EDGetToken rootTuplePFMETPuppiType1Cor_PFSumETPuppiType1Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETPuppiType1Cor","PFSumETPuppiType1Cor"));
+  edm::EDGetToken rootTuplePFMETPuppi_PFMETPhiPuppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETPuppi","PFMETPhiPuppi"));
+  edm::EDGetToken rootTuplePFMETPuppi_PFMETPuppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETPuppi","PFMETPuppi"));
+  edm::EDGetToken rootTuplePFMETPuppi_PFSumETPuppi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETPuppi","PFSumETPuppi"));
+  edm::EDGetToken rootTuplePFMETType01Cor_PFMETPhiType01Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01Cor","PFMETPhiType01Cor"));
+  edm::EDGetToken rootTuplePFMETType01Cor_PFMETType01Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01Cor","PFMETType01Cor"));
+  edm::EDGetToken rootTuplePFMETType01Cor_PFSumETType01Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01Cor","PFSumETType01Cor"));
+  edm::EDGetToken rootTuplePFMETType01XYCorElectronEnDown_PFMETPhiType1CorElectronEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorElectronEnDown","PFMETPhiType1CorElectronEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorElectronEnDown_PFMETType1CorElectronEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorElectronEnDown","PFMETType1CorElectronEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorElectronEnDown_PFSumETType1CorElectronEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorElectronEnDown","PFSumETType1CorElectronEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorElectronEnUp_PFMETPhiType1CorElectronEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorElectronEnUp","PFMETPhiType1CorElectronEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorElectronEnUp_PFMETType1CorElectronEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorElectronEnUp","PFMETType1CorElectronEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorElectronEnUp_PFSumETType1CorElectronEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorElectronEnUp","PFSumETType1CorElectronEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetEnDown_PFMETPhiType1CorJetEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetEnDown","PFMETPhiType1CorJetEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetEnDown_PFMETType1CorJetEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetEnDown","PFMETType1CorJetEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetEnDown_PFSumETType1CorJetEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetEnDown","PFSumETType1CorJetEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetEnUp_PFMETPhiType1CorJetEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetEnUp","PFMETPhiType1CorJetEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetEnUp_PFMETType1CorJetEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetEnUp","PFMETType1CorJetEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetEnUp_PFSumETType1CorJetEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetEnUp","PFSumETType1CorJetEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetResDown_PFMETPhiType1CorJetResDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetResDown","PFMETPhiType1CorJetResDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetResDown_PFMETType1CorJetResDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetResDown","PFMETType1CorJetResDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetResDown_PFSumETType1CorJetResDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetResDown","PFSumETType1CorJetResDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetResUp_PFMETPhiType1CorJetResUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetResUp","PFMETPhiType1CorJetResUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetResUp_PFMETType1CorJetResUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetResUp","PFMETType1CorJetResUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorJetResUp_PFSumETType1CorJetResUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorJetResUp","PFSumETType1CorJetResUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorMuonEnDown_PFMETPhiType1CorMuonEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorMuonEnDown","PFMETPhiType1CorMuonEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorMuonEnDown_PFMETType1CorMuonEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorMuonEnDown","PFMETType1CorMuonEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorMuonEnDown_PFSumETType1CorMuonEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorMuonEnDown","PFSumETType1CorMuonEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorMuonEnUp_PFMETPhiType1CorMuonEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorMuonEnUp","PFMETPhiType1CorMuonEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorMuonEnUp_PFMETType1CorMuonEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorMuonEnUp","PFMETType1CorMuonEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorMuonEnUp_PFSumETType1CorMuonEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorMuonEnUp","PFSumETType1CorMuonEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorTauEnDown_PFMETPhiType1CorTauEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorTauEnDown","PFMETPhiType1CorTauEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorTauEnDown_PFMETType1CorTauEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorTauEnDown","PFMETType1CorTauEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorTauEnDown_PFSumETType1CorTauEnDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorTauEnDown","PFSumETType1CorTauEnDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorTauEnUp_PFMETPhiType1CorTauEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorTauEnUp","PFMETPhiType1CorTauEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorTauEnUp_PFMETType1CorTauEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorTauEnUp","PFMETType1CorTauEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorTauEnUp_PFSumETType1CorTauEnUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorTauEnUp","PFSumETType1CorTauEnUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorUnclusteredDown_PFMETPhiType1CorUnclusteredDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorUnclusteredDown","PFMETPhiType1CorUnclusteredDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorUnclusteredDown_PFMETType1CorUnclusteredDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorUnclusteredDown","PFMETType1CorUnclusteredDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorUnclusteredDown_PFSumETType1CorUnclusteredDown_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorUnclusteredDown","PFSumETType1CorUnclusteredDown"));
+  edm::EDGetToken rootTuplePFMETType01XYCorUnclusteredUp_PFMETPhiType1CorUnclusteredUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorUnclusteredUp","PFMETPhiType1CorUnclusteredUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorUnclusteredUp_PFMETType1CorUnclusteredUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorUnclusteredUp","PFMETType1CorUnclusteredUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCorUnclusteredUp_PFSumETType1CorUnclusteredUp_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCorUnclusteredUp","PFSumETType1CorUnclusteredUp"));
+  edm::EDGetToken rootTuplePFMETType01XYCor_PFMETPhiType01XYCor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCor","PFMETPhiType01XYCor"));
+  edm::EDGetToken rootTuplePFMETType01XYCor_PFMETType01XYCor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCor","PFMETType01XYCor"));
+  edm::EDGetToken rootTuplePFMETType01XYCor_PFSumETType01XYCor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType01XYCor","PFSumETType01XYCor"));
+  edm::EDGetToken rootTuplePFMETType1Cor_PFMETPhiType1Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType1Cor","PFMETPhiType1Cor"));
+  edm::EDGetToken rootTuplePFMETType1Cor_PFMETType1Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType1Cor","PFMETType1Cor"));
+  edm::EDGetToken rootTuplePFMETType1Cor_PFSumETType1Cor_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMETType1Cor","PFSumETType1Cor"));
+  edm::EDGetToken rootTuplePFMET_PFMETPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMET","PFMETPhi"));
+  edm::EDGetToken rootTuplePFMET_PFMET_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMET","PFMET"));
+  edm::EDGetToken rootTuplePFMET_PFSumET_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTuplePFMET","PFSumET"));
+  edm::EDGetToken rootTupleVertex_VertexChi2_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexChi2"));
+  edm::EDGetToken rootTupleVertex_VertexNDF_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexNDF"));
+  edm::EDGetToken rootTupleVertex_VertexRho_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexRho"));
+  edm::EDGetToken rootTupleVertex_VertexXErr_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexXErr"));
+  edm::EDGetToken rootTupleVertex_VertexX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexX"));
+  edm::EDGetToken rootTupleVertex_VertexYErr_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexYErr"));
+  edm::EDGetToken rootTupleVertex_VertexY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexY"));
+  edm::EDGetToken rootTupleVertex_VertexZErr_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexZErr"));
+  edm::EDGetToken rootTupleVertex_VertexZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleVertex","VertexZ"));
+  edm::EDGetToken rootTupleElectrons_ElectronRhoIsoHEEP_Token_ = consumes(edm::TypeToGet::make<std::vector<float> >(),edm::InputTag("rootTupleElectrons","ElectronRhoIsoHEEP"));
+  edm::EDGetToken rootTupleGenEventInfo_PileUpInteractionsTrue_Token_ = consumes(edm::TypeToGet::make<std::vector<float> >(),edm::InputTag("rootTupleGenEventInfo","PileUpInteractionsTrue"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjEta_Token_ = consumes(edm::TypeToGet::make<std::vector<float> >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjEta"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjPhi_Token_ = consumes(edm::TypeToGet::make<std::vector<float> >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjPhi"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjPt_Token_ = consumes(edm::TypeToGet::make<std::vector<float> >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjPt"));
+  edm::EDGetToken rootTupleElectrons_ElectronCharge_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronCharge"));
+  edm::EDGetToken rootTupleElectrons_ElectronClassif_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronClassif"));
+  edm::EDGetToken rootTupleElectrons_ElectronMissingHitsEG_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronMissingHitsEG"));
+  edm::EDGetToken rootTupleElectrons_ElectronMissingHits_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronMissingHits"));
+  edm::EDGetToken rootTupleElectrons_ElectronNumberOfBrems_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronNumberOfBrems"));
+  edm::EDGetToken rootTupleElectrons_ElectronOverlaps_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronOverlaps"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronPassId"));
+  edm::EDGetToken rootTupleElectrons_ElectronPassIsoPAT_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronPassIsoPAT"));
+  edm::EDGetToken rootTupleElectrons_ElectronVtxIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleElectrons","ElectronVtxIndex"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronMotherIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronMotherIndex"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronNumDaught_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronNumDaught"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronPdgId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronPdgId"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronStatus_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronStatus"));
+  edm::EDGetToken rootTupleGenElectronsFromWs_GenWElectronTauDecayMode_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromWs","GenWElectronTauDecayMode"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronMotherIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronMotherIndex"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronNumDaught_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronNumDaught"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronPdgId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronPdgId"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronStatus_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronStatus"));
+  edm::EDGetToken rootTupleGenElectronsFromZs_GenZElectronTauDecayMode_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenElectronsFromZs","GenZElectronTauDecayMode"));
+  edm::EDGetToken rootTupleGenEventInfo_PileUpInteractions_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenEventInfo","PileUpInteractions"));
+  edm::EDGetToken rootTupleGenEventInfo_PileUpOriginBX_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenEventInfo","PileUpOriginBX"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuMotherIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuMotherIndex"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuNumDaught_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuNumDaught"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuPdgId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuPdgId"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuStatus_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuStatus"));
+  edm::EDGetToken rootTupleGenMuonsFromWs_GenWMuTauDecayMode_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromWs","GenWMuTauDecayMode"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuMotherIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuMotherIndex"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuNumDaught_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuNumDaught"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuPdgId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuPdgId"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuStatus_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuStatus"));
+  edm::EDGetToken rootTupleGenMuonsFromZs_GenZMuTauDecayMode_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenMuonsFromZs","GenZMuTauDecayMode"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleMotherIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenParticles","GenParticleMotherIndex"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleNumDaught_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenParticles","GenParticleNumDaught"));
+  edm::EDGetToken rootTupleGenParticles_GenParticlePdgId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenParticles","GenParticlePdgId"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleStatus_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenParticles","GenParticleStatus"));
+  edm::EDGetToken rootTupleGenParticles_GenParticleTauDecayMode_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenParticles","GenParticleTauDecayMode"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauMotherIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauMotherIndex"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauNumDaught_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauNumDaught"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauPdgId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauPdgId"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauStatus_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauStatus"));
+  edm::EDGetToken rootTupleGenTausFromWs_GenWTauTauDecayMode_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromWs","GenWTauTauDecayMode"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauMotherIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauMotherIndex"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauNumDaught_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauNumDaught"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauPdgId_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauPdgId"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauStatus_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauStatus"));
+  edm::EDGetToken rootTupleGenTausFromZs_GenZTauTauDecayMode_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauTauDecayMode"));
+  edm::EDGetToken rootTupleMuons_MuonBestTrackVtxIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonBestTrackVtxIndex"));
+  edm::EDGetToken rootTupleMuons_MuonCharge_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonCharge"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailCharge_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonCocktailCharge"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailRefitID_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonCocktailRefitID"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkHits_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkHits"));
+  edm::EDGetToken rootTupleMuons_MuonCocktailTrkVtxIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkVtxIndex"));
+  edm::EDGetToken rootTupleMuons_MuonGlobalTrkValidHits_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonGlobalTrkValidHits"));
+  edm::EDGetToken rootTupleMuons_MuonIsGlobal_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonIsGlobal"));
+  edm::EDGetToken rootTupleMuons_MuonIsPF_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonIsPF"));
+  edm::EDGetToken rootTupleMuons_MuonIsTracker_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonIsTracker"));
+  edm::EDGetToken rootTupleMuons_MuonPassID_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonPassID"));
+  edm::EDGetToken rootTupleMuons_MuonPixelHits_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonPixelHits"));
+  edm::EDGetToken rootTupleMuons_MuonSegmentMatches_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonSegmentMatches"));
+  edm::EDGetToken rootTupleMuons_MuonStationMatches_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonStationMatches"));
+  edm::EDGetToken rootTupleMuons_MuonTrackLayersWithMeasurement_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonTrackLayersWithMeasurement"));
+  edm::EDGetToken rootTupleMuons_MuonTrkHitsTrackerOnly_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonTrkHitsTrackerOnly"));
+  edm::EDGetToken rootTupleMuons_MuonTrkHits_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonTrkHits"));
+  edm::EDGetToken rootTupleMuons_MuonTrkPixelHits_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonTrkPixelHits"));
+  edm::EDGetToken rootTupleMuons_MuonVtxIndex_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleMuons","MuonVtxIndex"));
+  edm::EDGetToken rootTuplePFCandidates_PFCandChargeLeptLink_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFCandidates","PFCandChargeLeptLink"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetBestVertexTrackAssociationIndexAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetBestVertexTrackAssociationIndexAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetChargedHadronMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetChargedHadronMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetChargedMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetChargedMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetClosestVertex3DIndexAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetClosestVertex3DIndexAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetClosestVertexXYIndexAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetClosestVertexXYIndexAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetClosestVertexZIndexAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetClosestVertexZIndexAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetElectronMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetElectronMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetHFEMMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetHFEMMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetHFHadronMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetHFHadronMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetMuonMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetMuonMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetNConstituentsAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetNConstituentsAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetNeutralHadronMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetNeutralHadronMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetNeutralMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetNeutralMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPartonFlavourAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPartonFlavourAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPassLooseIDAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPassLooseIDAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPassTightIDAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPassTightIDAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4CHS_PFJetPhotonMultiplicityAK4CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4CHS","PFJetPhotonMultiplicityAK4CHS"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetBestVertexTrackAssociationIndexAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetBestVertexTrackAssociationIndexAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetChargedHadronMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetChargedHadronMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetChargedMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetChargedMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetClosestVertex3DIndexAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetClosestVertex3DIndexAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetClosestVertexXYIndexAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetClosestVertexXYIndexAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetClosestVertexZIndexAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetClosestVertexZIndexAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetElectronMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetElectronMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetHFEMMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetHFEMMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetHFHadronMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetHFHadronMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetMuonMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetMuonMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetNConstituentsAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetNConstituentsAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetNeutralHadronMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetNeutralHadronMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetNeutralMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetNeutralMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPartonFlavourAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPartonFlavourAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPassLooseIDAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPassLooseIDAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPassTightIDAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPassTightIDAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK4Puppi_PFJetPhotonMultiplicityAK4Puppi_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK4Puppi","PFJetPhotonMultiplicityAK4Puppi"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetBestVertexTrackAssociationIndexAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetBestVertexTrackAssociationIndexAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetChargedHadronMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetChargedHadronMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetChargedMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetChargedMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetClosestVertex3DIndexAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetClosestVertex3DIndexAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetClosestVertexXYIndexAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetClosestVertexXYIndexAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetClosestVertexZIndexAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetClosestVertexZIndexAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetElectronMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetElectronMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetHFEMMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetHFEMMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetHFHadronMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetHFHadronMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetMuonMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetMuonMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetNConstituentsAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetNConstituentsAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetNeutralHadronMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetNeutralHadronMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetNeutralMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetNeutralMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPartonFlavourAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPartonFlavourAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPassLooseIDAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPassLooseIDAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPassTightIDAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPassTightIDAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5CHS_PFJetPhotonMultiplicityAK5CHS_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5CHS","PFJetPhotonMultiplicityAK5CHS"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetBestVertexTrackAssociationIndexAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetBestVertexTrackAssociationIndexAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetChargedHadronMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetChargedHadronMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetChargedMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetChargedMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetClosestVertex3DIndexAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetClosestVertex3DIndexAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetClosestVertexXYIndexAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetClosestVertexXYIndexAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetClosestVertexZIndexAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetClosestVertexZIndexAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetElectronMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetElectronMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetHFEMMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetHFEMMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetHFHadronMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetHFHadronMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetMuonMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetMuonMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetNConstituentsAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetNConstituentsAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetNeutralHadronMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetNeutralHadronMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetNeutralMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetNeutralMultiplicityAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPartonFlavourAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPartonFlavourAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPassLooseIDAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPassLooseIDAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPassTightIDAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPassTightIDAK5"));
+  edm::EDGetToken rootTuplePFJetsAK5_PFJetPhotonMultiplicityAK5_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTuplePFJetsAK5","PFJetPhotonMultiplicityAK5"));
+  edm::EDGetToken rootTupleVertex_VertexNTracksW05_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleVertex","VertexNTracksW05"));
+  edm::EDGetToken rootTupleVertex_VertexNTracks_Token_ = consumes(edm::TypeToGet::make<std::vector<int> >(),edm::InputTag("rootTupleVertex","VertexNTracks"));
+  edm::EDGetToken rootTupleTriggerObjects_HLTriggerObjTypeIds_Token_ = consumes(edm::TypeToGet::make<std::vector<std::vector<int> > >(),edm::InputTag("rootTupleTriggerObjects","HLTriggerObjTypeIds"));
+  edm::EDGetToken rootTupleEvent_bunch_Token_ = consumes(edm::TypeToGet::make<unsigned int>(),edm::InputTag("rootTupleEvent","bunch"));
+  edm::EDGetToken rootTupleEvent_event_Token_ = consumes(edm::TypeToGet::make<unsigned int>(),edm::InputTag("rootTupleEvent","event"));
+  edm::EDGetToken rootTupleEvent_ls_Token_ = consumes(edm::TypeToGet::make<unsigned int>(),edm::InputTag("rootTupleEvent","ls"));
+  edm::EDGetToken rootTupleEvent_orbit_Token_ = consumes(edm::TypeToGet::make<unsigned int>(),edm::InputTag("rootTupleEvent","orbit"));
+  edm::EDGetToken rootTupleEvent_run_Token_ = consumes(edm::TypeToGet::make<unsigned int>(),edm::InputTag("rootTupleEvent","run"));
+  edm::EDGetToken rootTupleGenEventInfo_ProcessID_Token_ = consumes(edm::TypeToGet::make<unsigned int>(),edm::InputTag("rootTupleGenEventInfo","ProcessID"));
   tokenMap["rootTupleElectrons_ElectronCutFlowHashesEGammaIDHEEP"]=rootTupleElectrons_ElectronCutFlowHashesEGammaIDHEEP_Token_;
   tokenMap["rootTupleElectrons_ElectronCutFlowHashesEGammaIDLoose"]=rootTupleElectrons_ElectronCutFlowHashesEGammaIDLoose_Token_;
   tokenMap["rootTupleElectrons_ElectronCutFlowHashesEGammaIDMedium"]=rootTupleElectrons_ElectronCutFlowHashesEGammaIDMedium_Token_;

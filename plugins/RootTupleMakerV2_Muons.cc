@@ -2,11 +2,8 @@
 #include "DataFormats/MuonReco/interface/MuonCocktails.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonPFIsolation.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include <iostream>
 #include <DataFormats/TrackReco/interface/Track.h>
 #include "TLorentzVector.h"
@@ -145,11 +142,12 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
       produces <std::vector<int> >    ( prefix + "CocktailTrkVtxIndex"               + suffix ) ;
 
     }
-
+  /*
   produces <std::vector<double> > ( prefix + "CosmicCompatibility"     + suffix );
   produces <std::vector<double> > ( prefix + "TimeCompatibility"       + suffix );
   produces <std::vector<double> > ( prefix + "BackToBackCompatibility" + suffix );
   produces <std::vector<double> > ( prefix + "OverlapCompatibility"    + suffix );
+  */
 }
 
 
@@ -270,10 +268,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
   //
+  /*
   std::auto_ptr<std::vector<double> >  cosmicCompatibility     ( new std::vector<double> () );
   std::auto_ptr<std::vector<double> >  timeCompatibility       ( new std::vector<double> () );
   std::auto_ptr<std::vector<double> >  backToBackCompatibility ( new std::vector<double> () );
   std::auto_ptr<std::vector<double> >  overlapCompatibility    ( new std::vector<double> () );
+  */
 
   //-----------------------------------------------------------------
   edm::Handle<std::vector<pat::Muon> > muons;
@@ -698,11 +698,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  // See https://indico.cern.ch/getFile.py/access?contribId=7&resId=0&materialId=slides&confId=102306
 	  // and https://indico.cern.ch/getFile.py/access?contribId=5&resId=0&materialId=slides&confId=128840
+	  /*
 	  cosmicCompatibility    ->push_back( it->userFloat("cosmicCompatibility")     );
 	  timeCompatibility      ->push_back( it->userFloat("timeCompatibility")       );
 	  backToBackCompatibility->push_back( it->userFloat("backToBackCompatibility") );
 	  overlapCompatibility   ->push_back( it->userFloat("overlapCompatibility")    );
-
+	  */
 	  iMuon++;
 
 	}						 //end of loop over muons
@@ -825,9 +826,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( HLTSingleIsoMuonMatchPt  , prefix + "HLTSingleIsoMuonMatchPt"   + suffix );
   iEvent.put( HLTSingleIsoMuonMatchEta , prefix + "HLTSingleIsoMuonMatchEta"  + suffix );
   iEvent.put( HLTSingleIsoMuonMatchPhi , prefix + "HLTSingleIsoMuonMatchPhi"  + suffix );
-
+  /*
   iEvent.put( cosmicCompatibility,     prefix + "CosmicCompatibility"     + suffix );
   iEvent.put( timeCompatibility,       prefix + "TimeCompatibility"       + suffix );
   iEvent.put( backToBackCompatibility, prefix + "BackToBackCompatibility" + suffix );
   iEvent.put( overlapCompatibility,    prefix + "OverlapCompatibility"    + suffix );
+  */
 }

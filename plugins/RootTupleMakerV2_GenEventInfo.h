@@ -4,12 +4,14 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 class RootTupleMakerV2_GenEventInfo : public edm::EDProducer {
  public:
@@ -19,12 +21,14 @@ class RootTupleMakerV2_GenEventInfo : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
   virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
-  const edm::InputTag   genEvtInfoInputTag;
-  const bool            storePDFWeights;
-  const edm::InputTag   pdfCTEQWeightsInputTag;
-  const edm::InputTag   pdfMSTWWeightsInputTag;
-  const edm::InputTag   pdfNNPDFWeightsInputTag;
-  const edm::InputTag   pileupInfoSrc;
+  const edm::EDGetTokenT<GenEventInfoProduct>  genEvtInfoInputToken_;
+  const bool  storePDFWeights;
+  const edm::EDGetTokenT<std::vector<double> > pdfCTEQWeightsInputToken_;
+  const edm::EDGetTokenT<std::vector<double> > pdfMSTWWeightsInputToken_;
+  const edm::EDGetTokenT<std::vector<double> > pdfNNPDFWeightsInputToken_;
+  const edm::EDGetTokenT<std::vector<PileupSummaryInfo> >   pileupInfoSrcToken_;
+  const edm::EDGetTokenT<LHERunInfoProduct>    LHERunInfoToken_;
+  const edm::EDGetTokenT<LHEEventProduct>      LHEEventProductToken_;
 };
 
 #endif

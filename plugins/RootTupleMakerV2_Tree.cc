@@ -462,7 +462,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   edm::EDGetToken rootTupleGenTausFromZs_GenZTauVX_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauVX"));
   edm::EDGetToken rootTupleGenTausFromZs_GenZTauVY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauVY"));
   edm::EDGetToken rootTupleGenTausFromZs_GenZTauVZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleGenTausFromZs","GenZTauVZ"));
-  edm::EDGetToken rootTupleMuons_MuonBackToBackCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBackToBackCompatibility"));
+  //edm::EDGetToken rootTupleMuons_MuonBackToBackCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBackToBackCompatibility"));
   edm::EDGetToken rootTupleMuons_MuonBeamSpotDXYError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBeamSpotDXYError"));
   edm::EDGetToken rootTupleMuons_MuonBeamSpotDXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBeamSpotDXY"));
   edm::EDGetToken rootTupleMuons_MuonBestTrackVtxDistXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonBestTrackVtxDistXY"));
@@ -483,7 +483,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   edm::EDGetToken rootTupleMuons_MuonCocktailTrkValidFractionOfHits_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkValidFractionOfHits"));
   edm::EDGetToken rootTupleMuons_MuonCocktailTrkVtxDXY_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkVtxDXY"));
   edm::EDGetToken rootTupleMuons_MuonCocktailTrkVtxDZ_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCocktailTrkVtxDZ"));
-  edm::EDGetToken rootTupleMuons_MuonCosmicCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCosmicCompatibility"));
+  //edm::EDGetToken rootTupleMuons_MuonCosmicCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonCosmicCompatibility"));
   edm::EDGetToken rootTupleMuons_MuonEcalIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEcalIso"));
   edm::EDGetToken rootTupleMuons_MuonEcalVetoIso_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEcalVetoIso"));
   edm::EDGetToken rootTupleMuons_MuonEnergy_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonEnergy"));
@@ -502,7 +502,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   edm::EDGetToken rootTupleMuons_MuonMatchedGenParticleEta_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonMatchedGenParticleEta"));
   edm::EDGetToken rootTupleMuons_MuonMatchedGenParticlePhi_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonMatchedGenParticlePhi"));
   edm::EDGetToken rootTupleMuons_MuonMatchedGenParticlePt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonMatchedGenParticlePt"));
-  edm::EDGetToken rootTupleMuons_MuonOverlapCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonOverlapCompatibility"));
+  //edm::EDGetToken rootTupleMuons_MuonOverlapCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonOverlapCompatibility"));
   edm::EDGetToken rootTupleMuons_MuonPFIsoR03ChargedHadron_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03ChargedHadron"));
   edm::EDGetToken rootTupleMuons_MuonPFIsoR03ChargedParticle_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03ChargedParticle"));
   edm::EDGetToken rootTupleMuons_MuonPFIsoR03NeutralHadronHT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPFIsoR03NeutralHadronHT"));
@@ -525,7 +525,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   edm::EDGetToken rootTupleMuons_MuonPtError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPtError"));
   edm::EDGetToken rootTupleMuons_MuonPt_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonPt"));
   edm::EDGetToken rootTupleMuons_MuonQOverPError_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonQOverPError"));
-  edm::EDGetToken rootTupleMuons_MuonTimeCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTimeCompatibility"));
+  //edm::EDGetToken rootTupleMuons_MuonTimeCompatibility_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTimeCompatibility"));
   edm::EDGetToken rootTupleMuons_MuonTrackChi2_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrackChi2"));
   edm::EDGetToken rootTupleMuons_MuonTrackerIsoSumPT_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrackerIsoSumPT"));
   edm::EDGetToken rootTupleMuons_MuonTrkD0Error_Token_ = consumes(edm::TypeToGet::make<std::vector<double> >(),edm::InputTag("rootTupleMuons","MuonTrkD0Error"));
@@ -1216,7 +1216,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   tokenMap["rootTupleGenTausFromZs_GenZTauVX"]=rootTupleGenTausFromZs_GenZTauVX_Token_;
   tokenMap["rootTupleGenTausFromZs_GenZTauVY"]=rootTupleGenTausFromZs_GenZTauVY_Token_;
   tokenMap["rootTupleGenTausFromZs_GenZTauVZ"]=rootTupleGenTausFromZs_GenZTauVZ_Token_;
-  tokenMap["rootTupleMuons_MuonBackToBackCompatibility"]=rootTupleMuons_MuonBackToBackCompatibility_Token_;
+  //tokenMap["rootTupleMuons_MuonBackToBackCompatibility"]=rootTupleMuons_MuonBackToBackCompatibility_Token_;
   tokenMap["rootTupleMuons_MuonBeamSpotDXYError"]=rootTupleMuons_MuonBeamSpotDXYError_Token_;
   tokenMap["rootTupleMuons_MuonBeamSpotDXY"]=rootTupleMuons_MuonBeamSpotDXY_Token_;
   tokenMap["rootTupleMuons_MuonBestTrackVtxDistXY"]=rootTupleMuons_MuonBestTrackVtxDistXY_Token_;
@@ -1237,7 +1237,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   tokenMap["rootTupleMuons_MuonCocktailTrkValidFractionOfHits"]=rootTupleMuons_MuonCocktailTrkValidFractionOfHits_Token_;
   tokenMap["rootTupleMuons_MuonCocktailTrkVtxDXY"]=rootTupleMuons_MuonCocktailTrkVtxDXY_Token_;
   tokenMap["rootTupleMuons_MuonCocktailTrkVtxDZ"]=rootTupleMuons_MuonCocktailTrkVtxDZ_Token_;
-  tokenMap["rootTupleMuons_MuonCosmicCompatibility"]=rootTupleMuons_MuonCosmicCompatibility_Token_;
+  //tokenMap["rootTupleMuons_MuonCosmicCompatibility"]=rootTupleMuons_MuonCosmicCompatibility_Token_;
   tokenMap["rootTupleMuons_MuonEcalIso"]=rootTupleMuons_MuonEcalIso_Token_;
   tokenMap["rootTupleMuons_MuonEcalVetoIso"]=rootTupleMuons_MuonEcalVetoIso_Token_;
   tokenMap["rootTupleMuons_MuonEnergy"]=rootTupleMuons_MuonEnergy_Token_;
@@ -1256,7 +1256,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   tokenMap["rootTupleMuons_MuonMatchedGenParticleEta"]=rootTupleMuons_MuonMatchedGenParticleEta_Token_;
   tokenMap["rootTupleMuons_MuonMatchedGenParticlePhi"]=rootTupleMuons_MuonMatchedGenParticlePhi_Token_;
   tokenMap["rootTupleMuons_MuonMatchedGenParticlePt"]=rootTupleMuons_MuonMatchedGenParticlePt_Token_;
-  tokenMap["rootTupleMuons_MuonOverlapCompatibility"]=rootTupleMuons_MuonOverlapCompatibility_Token_;
+  //tokenMap["rootTupleMuons_MuonOverlapCompatibility"]=rootTupleMuons_MuonOverlapCompatibility_Token_;
   tokenMap["rootTupleMuons_MuonPFIsoR03ChargedHadron"]=rootTupleMuons_MuonPFIsoR03ChargedHadron_Token_;
   tokenMap["rootTupleMuons_MuonPFIsoR03ChargedParticle"]=rootTupleMuons_MuonPFIsoR03ChargedParticle_Token_;
   tokenMap["rootTupleMuons_MuonPFIsoR03NeutralHadronHT"]=rootTupleMuons_MuonPFIsoR03NeutralHadronHT_Token_;
@@ -1279,7 +1279,7 @@ RootTupleMakerV2_Tree::RootTupleMakerV2_Tree(const edm::ParameterSet& pset) :
   tokenMap["rootTupleMuons_MuonPtError"]=rootTupleMuons_MuonPtError_Token_;
   tokenMap["rootTupleMuons_MuonPt"]=rootTupleMuons_MuonPt_Token_;
   tokenMap["rootTupleMuons_MuonQOverPError"]=rootTupleMuons_MuonQOverPError_Token_;
-  tokenMap["rootTupleMuons_MuonTimeCompatibility"]=rootTupleMuons_MuonTimeCompatibility_Token_;
+  //tokenMap["rootTupleMuons_MuonTimeCompatibility"]=rootTupleMuons_MuonTimeCompatibility_Token_;
   tokenMap["rootTupleMuons_MuonTrackChi2"]=rootTupleMuons_MuonTrackChi2_Token_;
   tokenMap["rootTupleMuons_MuonTrackerIsoSumPT"]=rootTupleMuons_MuonTrackerIsoSumPT_Token_;
   tokenMap["rootTupleMuons_MuonTrkD0Error"]=rootTupleMuons_MuonTrkD0Error_Token_;

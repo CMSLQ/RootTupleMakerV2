@@ -1,27 +1,24 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_GenEventInfo.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
-
 
 #include <iostream>
-#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include <string>
 
 
 RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::ParameterSet& iConfig) :
-    genEvtInfoInputTag(iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag")),
-    storePDFWeights(iConfig.getParameter<bool>("StorePDFWeights")),
-    pdfCTEQWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFCTEQWeightsInputTag")),
-    pdfMSTWWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFMSTWWeightsInputTag")),
-    pdfNNPDFWeightsInputTag(iConfig.getParameter<edm::InputTag>("PDFNNPDFWeightsInputTag")),
-    pileupInfoSrc(iConfig.getParameter<edm::InputTag>("pileupInfo"))
+  genEvtInfoInputToken_(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag"))),
+  storePDFWeights(iConfig.getParameter<bool>("StorePDFWeights")),
+  pdfCTEQWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFCTEQWeightsInputTag"))),
+  pdfMSTWWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFMSTWWeightsInputTag"))),
+  pdfNNPDFWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFNNPDFWeightsInputTag"))),
+  pileupInfoSrcToken_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupInfo"))),
+  LHERunInfoToken_(consumes<LHERunInfoProduct>(iConfig.getParameter<edm::InputTag>("LHERunInfoProductInputTag"))),
+  LHEEventProductToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductInputTag")))
 {
   produces <unsigned int> ( "ProcessID" );
   produces <double>       ( "PtHat" );
@@ -61,7 +58,7 @@ endRun(edm::Run const& iRun, edm::EventSetup const&) {
 
   edm::Handle<LHERunInfoProduct> run; 
   typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator; 
-  iRun.getByLabel( "externalLHEProducer", run );
+  iRun.getByToken(LHERunInfoToken_, run );
 
   if (run.isValid()){
     LHERunInfoProduct myLHERunInfoProduct = *(run.product());
@@ -104,10 +101,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   if( !iEvent.isRealData() ) {
     // GenEventInfo Part
     edm::Handle<GenEventInfoProduct> genEvtInfoProduct;
-    iEvent.getByLabel(genEvtInfoInputTag, genEvtInfoProduct);
+    iEvent.getByToken(genEvtInfoInputToken_, genEvtInfoProduct);
 
     if( genEvtInfoProduct.isValid() ) {
-      edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << genEvtInfoInputTag;
+      edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained genEvtInfoInputToken_";
 
       *processID.get() = genEvtInfoProduct->signalProcessID();
       *ptHat.get() = ( genEvtInfoProduct->hasBinningValues() ? genEvtInfoProduct->binningValues()[0] : 0. );
@@ -116,7 +113,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 //       *alphaQED.get() = genEvtInfoProduct->alphaQED();
 
     } else {
-      edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << genEvtInfoInputTag;
+      edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the genEvtInfoInputToken_";
     }
     // PDF Weights Part
     if( storePDFWeights ) {
@@ -125,36 +122,36 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       edm::Handle<std::vector<double> > pdfMSTWWeightsHandle;
       edm::Handle<std::vector<double> > pdfNNPDFWeightsHandle;
 
-      iEvent.getByLabel(pdfCTEQWeightsInputTag, pdfCTEQWeightsHandle);
-      iEvent.getByLabel(pdfMSTWWeightsInputTag, pdfMSTWWeightsHandle);
-      iEvent.getByLabel(pdfNNPDFWeightsInputTag, pdfNNPDFWeightsHandle);
+      iEvent.getByToken(pdfCTEQWeightsInputToken_, pdfCTEQWeightsHandle);
+      iEvent.getByToken(pdfMSTWWeightsInputToken_, pdfMSTWWeightsHandle);
+      iEvent.getByToken(pdfNNPDFWeightsInputToken_, pdfNNPDFWeightsHandle);
 
       if( pdfCTEQWeightsHandle.isValid() ) {
-        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfCTEQWeightsInputTag;
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfCTEQWeightsInputToken_";
         *pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
       } else {
-        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfCTEQWeightsInputTag;
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfCTEQWeightsInputToken_";
       }
 
       if( pdfMSTWWeightsHandle.isValid() ) {
-        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfMSTWWeightsInputTag;
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfMSTWWeightsInputToken_";
         *pdfMSTWWeights.get() = *pdfMSTWWeightsHandle;
       } else {
-        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfMSTWWeightsInputTag;
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfMSTWWeightsInputToken_";
       }
 
       if( pdfNNPDFWeightsHandle.isValid() ) {
-        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfNNPDFWeightsInputTag;
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfNNPDFWeightsInputToken_";
 
         *pdfNNPDFWeights.get() = *pdfNNPDFWeightsHandle;
       } else {
-        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfNNPDFWeightsInputTag;
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfNNPDFWeightsInputToken_";
       }
 
     }
     // PileupSummary Part
     edm::Handle<std::vector<PileupSummaryInfo> >  puInfo;
-    iEvent.getByLabel(pileupInfoSrc, puInfo);
+    iEvent.getByToken(pileupInfoSrcToken_, puInfo);
     
     if(puInfo.isValid()) {
       for( std::vector<PileupSummaryInfo>::const_iterator it = puInfo->begin(); it != puInfo->end(); ++it ) {
@@ -164,14 +161,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
     }
     else {
-      edm::LogError("RootTupleMakerV2_PileUpError") << "Error! Can't get the product " << pileupInfoSrc;
+      edm::LogError("RootTupleMakerV2_PileUpError") << "Error! Can't get the pileupInfoSrcToken_";
     }
     ///Weights from LHE part
     edm::Handle<LHEEventProduct> EvtHandle;
-    iEvent.getByLabel( "externalLHEProducer" , EvtHandle );
+    iEvent.getByToken(LHEEventProductToken_, EvtHandle );
 
     edm::Handle<GenEventInfoProduct> genEvtInfo;
-    iEvent.getByLabel(genEvtInfoInputTag, genEvtInfo);
+    iEvent.getByToken(genEvtInfoInputToken_, genEvtInfo);
 
     //Non-madgraph samples may not have this information, if so, skip
     if (EvtHandle.isValid() && genEvtInfo.isValid()){

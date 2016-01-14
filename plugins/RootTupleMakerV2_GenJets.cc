@@ -1,11 +1,10 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_GenJets.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/JetReco/interface/GenJetCollection.h"
 
 
 RootTupleMakerV2_GenJets::RootTupleMakerV2_GenJets(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
+  genJetsInputToken_ (consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("InputTag"))),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
@@ -33,7 +32,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
     edm::Handle<reco::GenJetCollection> genJets;
-    iEvent.getByLabel(inputTag, genJets);
+    iEvent.getByToken(genJetsInputToken_, genJets);
 
     if( genJets.isValid() ) {
       edm::LogInfo("RootTupleMakerV2_GenJetsInfo") << "Total # GenJets: " << genJets->size();
@@ -53,7 +52,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         hadf->push_back( it->hadEnergy()/it->energy() );
       }
     } else {
-      edm::LogError("RootTupleMakerV2_GenJetsError") << "Error! Can't get the product " << inputTag;
+      edm::LogError("RootTupleMakerV2_GenJetsError") << "Error! Can't get the genJetsInputToken_";
     }
   }
 

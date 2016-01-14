@@ -1,17 +1,13 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_EventSelection.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
-#include "DataFormats/L1GlobalTrigger/interface/L1GtFdlWord.h"
-#include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
-  l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
-  hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag")),
-  filterResultsInputTag(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag"))
-{
+  l1InputToken_(consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
+  //hcalNoiseInputToken_(consumes<>(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag"))),
+  filterResultsInputToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag")))
+		       {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
   produces <bool> ("isBSCMinBias");
@@ -77,11 +73,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
-  iEvent.getByLabel(l1InputTag, l1GtReadoutRecord);
+  iEvent.getByToken(l1InputToken_, l1GtReadoutRecord);
 
   // Technical Trigger Part
   if(l1GtReadoutRecord.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained " << l1InputTag;
+    edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained l1InputTag";
 
     L1GtFdlWord fdlWord = l1GtReadoutRecord->gtFdlWord();
     if (fdlWord.physicsDeclared() == 1)
@@ -103,7 +99,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       *isbscbeamhalo.get() = true;
 
   } else {
-    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << l1InputTag;
+    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the l1InputTag";
   }
 
 
@@ -151,7 +147,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //  Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)
 
   edm::Handle<edm::TriggerResults> filterResults;
-  iEvent.getByLabel(filterResultsInputTag, filterResults);
+  iEvent.getByToken(filterResultsInputToken_, filterResults);
   if(filterResults.isValid())
   {
     //edm::LogInfo("RootTupleMakerV2_EventSelection") << "Successfully obtained " << filterResultsInputTag;
@@ -230,7 +226,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       *passHcalLaserEventFilter.get() = filterResults->accept(index);
 
   } else {
-    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << filterResultsInputTag;
+    edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the filterResultsInputTag";
   }
 
 

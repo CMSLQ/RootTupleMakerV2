@@ -1,11 +1,10 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_GenMET.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/MET.h"
 
 
 RootTupleMakerV2_GenMET::RootTupleMakerV2_GenMET(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
+  genMETInputToken_ (consumes<std::vector<pat::MET> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
     prefix  (iConfig.getParameter<std::string>  ("Prefix")),
     suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
@@ -24,7 +23,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
     edm::Handle<std::vector<pat::MET> > mets;
-    iEvent.getByLabel(inputTag, mets);
+    iEvent.getByToken(genMETInputToken_, mets);
 
     if(mets.isValid()) {
       edm::LogInfo("RootTupleMakerV2_GenMETInfo") << "Total # GenMETs: " << mets->size();
@@ -37,7 +36,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         sumet->push_back( it->genMET()->sumEt() );
       }
     } else {
-      edm::LogError("RootTupleMakerV2_GenMETError") << "Error! Can't get the product " << inputTag;
+      edm::LogError("RootTupleMakerV2_GenMETError") << "Error! Can't get the genMETInputToken_";
     }
   }
 

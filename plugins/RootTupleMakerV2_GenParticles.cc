@@ -1,15 +1,14 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_GenParticles.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "RecoTauTag/TauTagTools/interface/GeneratorTau.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "TMath.h"
 
 RootTupleMakerV2_GenParticles::RootTupleMakerV2_GenParticles(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
-    prefix  (iConfig.getParameter<std::string>  ("Prefix")),
-    suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
+  genPartInputToken_ (consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  prefix  (iConfig.getParameter<std::string>  ("Prefix")),
+  suffix  (iConfig.getParameter<std::string>  ("Suffix")),
+  maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
 {
   produces <std::vector<double> > ( prefix + "Eta"          + suffix );
   produces <std::vector<double> > ( prefix + "Phi"          + suffix );
@@ -61,7 +60,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   if( !iEvent.isRealData() ) {
     edm::Handle<reco::GenParticleCollection> genParticles;
-    iEvent.getByLabel(inputTag, genParticles);
+    iEvent.getByToken(genPartInputToken_, genParticles);
 
     if( genParticles.isValid() ) {
       edm::LogInfo("RootTupleMakerV2_GenParticlesInfo") << "Total # GenParticles: " << genParticles->size();
@@ -142,7 +141,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         motherIndex->push_back( indexInKeptGenPColl );
       }
     } else {
-      edm::LogError("RootTupleMakerV2_GenParticlesError") << "Error! Can't get the product " << inputTag;
+      edm::LogError("RootTupleMakerV2_GenParticlesError") << "Error! Can't get the genPartInputToken_";
     }
   }
 

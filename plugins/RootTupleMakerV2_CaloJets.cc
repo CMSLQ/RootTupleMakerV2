@@ -2,10 +2,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Electron.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -14,20 +11,20 @@
 
 
 RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iConfig) :
-    inputTag(iConfig.getParameter<edm::InputTag>("InputTag")),
-    // inputTagL1Offset(iConfig.getParameter<edm::InputTag>("InputTagL1Offset")),
-    prefix  (iConfig.getParameter<std::string>  ("Prefix")),
-    suffix  (iConfig.getParameter<std::string>  ("Suffix")),
-    maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
-    electronPt (iConfig.getParameter<double>    ("ElectronPt")),
-    electronIso (iConfig.getParameter<double>   ("ElectronIso")),
-    muonPt (iConfig.getParameter<double>        ("MuonPt")),
-    muonIso (iConfig.getParameter<double>       ("MuonIso")),
-    jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
-    readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty"))
-    //OLD
-    //     applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
-    //     resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
+  jetInputToken_ (consumes<std::vector<pat::Jet> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
+  // inputTagL1Offset(iConfig.getParameter<edm::InputTag>("InputTagL1Offset")),
+  prefix  (iConfig.getParameter<std::string>  ("Prefix")),
+  suffix  (iConfig.getParameter<std::string>  ("Suffix")),
+  maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
+  electronPt (iConfig.getParameter<double>    ("ElectronPt")),
+  electronIso (iConfig.getParameter<double>   ("ElectronIso")),
+  muonPt (iConfig.getParameter<double>        ("MuonPt")),
+  muonIso (iConfig.getParameter<double>       ("MuonIso")),
+  jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
+  readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty"))
+  //OLD
+  //     applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
+  //     resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
@@ -132,7 +129,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }  
 
   edm::Handle<std::vector<pat::Jet> > jets;
-  iEvent.getByLabel(inputTag, jets);
+  iEvent.getByToken(jetInputToken_, jets);
 
   // edm::Handle<std::vector<pat::Jet> > jetsL1Offset;
   // iEvent.getByLabel(inputTagL1Offset, jetsL1Offset);
@@ -261,7 +258,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       passTightID->push_back( passjetTight );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the product " << inputTag;
+    edm::LogError("RootTupleMakerV2_CaloJetsError") << "Error! Can't get the jetInputToken_";
   }
 
   //L1Offset JEC

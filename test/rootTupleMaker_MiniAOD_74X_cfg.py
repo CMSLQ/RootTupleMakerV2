@@ -34,8 +34,8 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
-    #fileName = cms.string( "file_m650.root" )
-    fileName = cms.string( "file_data.root" )
+    fileName = cms.string( "file_m300.root" )
+    #fileName = cms.string( "file_data.root" )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -48,10 +48,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 # MC
-#process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v2'
+process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4'
 # Data
 #process.GlobalTag.globaltag = '74X_dataRun2_v2'
-process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+#process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
@@ -69,7 +69,9 @@ process.source.fileNames = [
     #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
     # reHLT
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/ReHLT/7415/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/LQ300_BetaOne_7415ReHLT/151124_100054/0000/outputPhysicsEGammaCommissioning_1.root'
-    '/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/0A69ADC9-CA6D-E511-9A59-34E6D7E05F28.root'
+    #'/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/0A69ADC9-CA6D-E511-9A59-34E6D7E05F28.root'
+    # LQM300
+    '/store/mc/RunIISpring15MiniAODv2/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/5E4FDA56-0E72-E511-88C0-000F530E4784.root'
     ]
 
 # SIC Replace with HEEP 5.1/6.0
@@ -307,6 +309,35 @@ adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
 #                               'keep *_ak5PFJets_*_EX',
 #                               'keep *_ak5PFJetsCHS_*_EX', ]
 
+# JER from text files
+process.rootTuplePFJetsAK5.ReadJERFromGT = False
+process.rootTuplePFJetsAK5CHS.ReadJERFromGT = False
+process.rootTuplePFJetsAK4CHS.ReadJERFromGT = False
+process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = False
+## load JER from database, and into global tag
+#process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
+#from CondCore.DBCommon.CondDBSetup_cfi import *
+#process.jer = cms.ESSource("PoolDBESSource",
+#        CondDBSetup,
+#        toGet = cms.VPSet(
+#            # Resolution
+#            cms.PSet(
+#                record = cms.string('JetResolutionRcd'),
+#                tag    = cms.string('JER_MC_PtResolution_Summer15_25nsV6_AK4PFchs'),
+#                label  = cms.untracked.string('AK4PFchs')
+#                ),
+#
+#            # Scale factors
+#            cms.PSet(
+#                record = cms.string('JetResolutionScaleFactorRcd'),
+#                tag    = cms.string('JER_DATAMCSF_Summer15_25nsV6_AK4PFchs'),
+#                label  = cms.untracked.string('AK4PFchs')
+#                ),
+#        ),
+#        connect = cms.string('sqlite:Summer15_25nsV6.db')
+#)
+#process.es_prefer_jer = cms.ESPrefer('PoolDBESSource', 'jer')
+
 #----------------------------------------------------------------------------------------------------
 # Make analysisPatJets and add them to the patDefaultSequence
 #----------------------------------------------------------------------------------------------------
@@ -503,8 +534,9 @@ process.p = cms.Path(
     # L+J Filter
     process.LJFilter*  
     process.HBHENoiseFilterResultProducer* #produces HBHE baseline bools
-    process.ApplyBaselineHBHENoiseFilter*  # reject events based 
-    process.ApplyBaselineHBHEIsoNoiseFilter*   # reject events based  < 10e-3 mistake rate 
+    # don't apply them. just put the results in the tree.
+    #process.ApplyBaselineHBHENoiseFilter*  # reject events based 
+    #process.ApplyBaselineHBHEIsoNoiseFilter*   # reject events based  < 10e-3 mistake rate 
     # Put everything into the tree
     # In unscheduled mode, anything 'kept' in the output commands above
     #  will have its producer module called automatically

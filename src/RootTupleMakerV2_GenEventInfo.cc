@@ -128,10 +128,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       iEvent.getByLabel(pdfCTEQWeightsInputTag, pdfCTEQWeightsHandle);
       iEvent.getByLabel(pdfMSTWWeightsInputTag, pdfMSTWWeightsHandle);
       iEvent.getByLabel(pdfNNPDFWeightsInputTag, pdfNNPDFWeightsHandle);
-
+      
       if( pdfCTEQWeightsHandle.isValid() ) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained " << pdfCTEQWeightsInputTag;
         *pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
+	/*//for debugging to see what the weight variations are
+	std::vector<double> weights = (*pdfCTEQWeightsHandle);
+	std::cout << "Event weight for central PDF:" << weights[0] << std::endl;
+	unsigned int nmembers = weights.size();
+	for (unsigned int j=1; j<nmembers; j+=2) {
+	  std::cout << "Event weight for PDF variation +" << (j+1)/2 << ": " << weights[j] << std::endl;
+	  std::cout << "Event weight for PDF variation -" << (j+1)/2 << ": " << weights[j+1] << std::endl;
+	}
+	*/
       } else {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfCTEQWeightsInputTag;
       }
@@ -150,7 +159,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       } else {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the product " << pdfNNPDFWeightsInputTag;
       }
-
+      
     }
     // PileupSummary Part
     edm::Handle<std::vector<PileupSummaryInfo> >  puInfo;
@@ -187,6 +196,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       		thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
 		scaleWeights->push_back(thisWeight);
       	}
+	//This is for MG PDF weights.  PYTHIA doesn't have externalLHEProducer, need to get them in a different way
+      	for (unsigned int i=9; i <= 109; i++) {
+	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
+	  pdfNNPDFWeights->push_back(thisWeight);
+	}
+      	for (unsigned int i=315; i <= 365; i++) {
+	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
+	  pdfMSTWWeights->push_back(thisWeight);
+	}
+      	for (unsigned int i=392; i <= 444; i++) {
+	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
+	  pdfCTEQWeights->push_back(thisWeight);
+	}
+	
       	EvtHandle->weights()[0].wgt < 0 ? *amcNLOweight.get()=-1. : *amcNLOweight.get()=1.;
       
       	/*

@@ -9,7 +9,8 @@
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
   l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
-  hcalNoiseInputTag(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag")),
+  hbheNoiseFilterResultInputTag(iConfig.getParameter<edm::InputTag>("HBHENoiseFilterResultInputTag")),
+  hbheIsoNoiseFilterResultInputTag(iConfig.getParameter<edm::InputTag>("HBHEIsoNoiseFilterResultInputTag")),
   filterResultsInputTag(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag"))
 {
   produces <bool> ("isPhysDeclared");
@@ -214,15 +215,30 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if(index < filterNames.size())
       *isprimaryvertex.get() = filterResults->accept(index);
 
-    // Hcal Noise Part (HBHE)
-    index = filterNames.triggerIndex("Flag_HBHENoiseFilter");
-    if(index < filterNames.size())
-      *passhbhenoisefilter.get() = filterResults->accept(index);
+    //// Hcal Noise Part (HBHE)
+    //index = filterNames.triggerIndex("Flag_HBHENoiseFilter");
+    //if(index < filterNames.size())
+    //  *passhbhenoisefilter.get() = filterResults->accept(index);
+    //// Hcal Noise Iso Part (HBHE)
+    //index = filterNames.triggerIndex("Flag_HBHENoiseIsoFilter");
+    //if(index < filterNames.size())
+    //  *passhbhenoiseisofilter.get() = filterResults->accept(index);
+    // Run these manually in 74X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#MiniAOD_74X
+    // XXX TODO change back to simply getting the flags in 76X
+    edm::Handle<bool> hbheNoiseFilterResultHandle;
+    iEvent.getByLabel(hbheNoiseFilterResultInputTag, hbheNoiseFilterResultHandle);
+    if(hbheNoiseFilterResultHandle.isValid())
+      *passhbhenoisefilter.get() = *hbheNoiseFilterResultHandle;
+    else
+      edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << hbheNoiseFilterResultInputTag;
+    // iso
+    edm::Handle<bool> hbheIsoNoiseFilterResultHandle;
+    iEvent.getByLabel(hbheIsoNoiseFilterResultInputTag, hbheIsoNoiseFilterResultHandle);
+    if(hbheNoiseFilterResultHandle.isValid())
+      *passhbhenoiseisofilter.get() = *hbheIsoNoiseFilterResultHandle;
+    else
+      edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << hbheIsoNoiseFilterResultInputTag;
 
-   // Hcal Noise Iso Part (HBHE)
-    index = filterNames.triggerIndex("Flag_HBHENoiseIsoFilter");
-    if(index < filterNames.size())
-      *passhbhenoiseisofilter.get() = filterResults->accept(index);
 
     // Hcal Laser Event Filter
     index = filterNames.triggerIndex("Flag_hcalLaserEventFilter");

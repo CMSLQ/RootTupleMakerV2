@@ -74,20 +74,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else if(uncertainty=="JetResUpSmear")    shift=pat::MET::JetResUpSmear;
       else if(uncertainty=="JetResDownSmear")  shift=pat::MET::JetResDownSmear;
       else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET uncertainty label: " << uncertainty;
-      /*
-      if(corLevel=="Raw")                level = pat::MET::Raw;
-      else if(corLevel=="Type1")         level = pat::MET::Type1;
-      else if(corLevel=="Type01")        level = pat::MET::Type01;
-      else if(corLevel=="TypeXY")        level = pat::MET::TypeXY;
-      else if(corLevel=="Type1XY")       level = pat::MET::Type1XY;
-      else if(corLevel=="Type01XY")      level = pat::MET::Type01XY;
-      else if(corLevel=="Type1Smear")    level = pat::MET::Type1Smear;
-      else if(corLevel=="Type01Smear")   level = pat::MET::Type01Smear;
-      else if(corLevel=="Type1SmearXY")  level = pat::MET::Type1SmearXY;
-      else if(corLevel=="Type01SmearXY") level = pat::MET::Type01SmearXY;
-      else if(corLevel=="RawCalo")       level = pat::MET::RawCalo;
-      else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET correction level label: " << corLevel;
-      */
+
+      bool applyCorrection = true;
       if(corLevel=="Raw")                level = pat::MET::Raw;
       else if(corLevel=="Type1")         level = pat::MET::Type1;
       else if(corLevel=="Type01")        level = pat::MET::Type1;
@@ -99,11 +87,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       else if(corLevel=="Type1SmearXY")  level = pat::MET::Type1;
       else if(corLevel=="Type01SmearXY") level = pat::MET::Type1;
       else if(corLevel=="RawCalo")       level = pat::MET::RawCalo;
+      // this is our adhoc way of not running the shiftedPt, shiftedPhi, shiftedSumEt on the recorrected MET collections
+      //  (which we don't want to do because they aren't filled, so accessing them causes a seg fault)
+      else if(corLevel=="NoCorrection")  applyCorrection = false;
       else edm::LogError("RootTupleMakerV2_METError") << "Error! Can't find MET correction level label: " << corLevel;
 
-      met->push_back( it->shiftedPt(shift,level) );
-      metphi->push_back( it->shiftedPhi(shift,level) );
-      sumet->push_back( it->shiftedSumEt(shift,level) );
+      if(applyCorrection)
+      {
+        met->push_back( it->shiftedPt(shift,level) );
+        metphi->push_back( it->shiftedPhi(shift,level) );
+        sumet->push_back( it->shiftedSumEt(shift,level) );
+      }
+      else
+      {
+        met->push_back( it->pt() );
+        metphi->push_back( it->phi() );
+        sumet->push_back( it->sumEt() );
+      }
       
       if ( store_uncorrected_MET ) {
         // this will not work running in CMSSW_7_4_12+ on miniAOD v1

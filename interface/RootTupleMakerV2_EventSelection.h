@@ -12,7 +12,8 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::InputTag   l1InputTag,vtxInputTag;
-  const edm::InputTag   hcalNoiseInputTag;
+  const edm::InputTag   hbheNoiseFilterResultInputTag;
+  const edm::InputTag   hbheIsoNoiseFilterResultInputTag;
   const edm::InputTag   filterResultsInputTag;
 
 };

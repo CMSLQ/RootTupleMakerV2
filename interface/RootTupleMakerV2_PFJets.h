@@ -20,6 +20,7 @@ class RootTupleMakerV2_PFJets : public edm::EDProducer {
   const unsigned int    maxSize;
   const std::string     jecUncPath; 
   const bool            readJECuncertainty;
+  const bool            readJERuncertainty;
   const edm::InputTag   vtxInputTag;
   bool            isPuppiJetColl;
   const std::string jerUncPath;

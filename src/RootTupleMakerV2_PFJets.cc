@@ -24,6 +24,7 @@ mvaPileupIDname  (iConfig.getParameter<std::string>  ("MVAPileupIDName")),
 maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
 jecUncPath (iConfig.getParameter<std::string>("JECUncertainty")),
 readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
+readJERuncertainty (iConfig.getParameter<bool>   ("ReadJERuncertainty")),
 //
 vtxInputTag (iConfig.getParameter<edm::InputTag>("VertexInputTag")),
 jerUncPath (iConfig.getParameter<std::string>("JERUncertainty")),
@@ -241,16 +242,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // or from text files
   JME::JetResolution resolution;
   JME::JetResolutionScaleFactor res_sf;
-  // Two differents way to create a class instance
-  if (jer_from_gt) {
-    // First way, using the get() static method
-    resolution = JME::JetResolution::get(iSetup, jerUncPath);
-    res_sf = JME::JetResolutionScaleFactor::get(iSetup, jerUncPath);
-  } else {
-    // Second way, using the constructor
-    resolution = JME::JetResolution(jer_resolutions_file);
-    res_sf = JME::JetResolutionScaleFactor(jer_scale_factors_file);
-  }// get the factors from the global tag or from test file
+  if (readJERuncertainty)
+  {
+    // Two differents way to create a class instance
+    if (jer_from_gt)
+    {
+      // First way, using the get() static method
+      resolution = JME::JetResolution::get(iSetup, jerUncPath);
+      res_sf = JME::JetResolutionScaleFactor::get(iSetup, jerUncPath);
+    }
+    else
+    {
+      // Second way, using the constructor
+      resolution = JME::JetResolution(jer_resolutions_file);
+      res_sf = JME::JetResolutionScaleFactor(jer_scale_factors_file);
+      edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Reading scale factors from: " << jer_scale_factors_file;
+    }// get the factors from the global tag or from test file
+  }
 
   // need rho for JER
   edm::Handle<double> rho;
@@ -299,15 +307,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //std::cout << "PF: currentJECSet(): " << it->currentJECSet() << std::endl;
       //-------------------
 
-      // JER
-      // create a JetParameters object
-      // You *must* now in advance which variables are needed for getting the resolution. For the moment, only pt and eta are needed, but this will
-      // probably change in the future when PU dependency is added. Please keep an eye on the twiki page:
-      //     https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution
-      JME::JetParameters jetParameters;
-      jetParameters.setJetPt(it->pt());
-      jetParameters.setJetEta(it->eta());
-      jetParameters.setRho(*rho);
 
       // Vertex association
 
@@ -512,33 +511,52 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       pt->push_back( it->pt() );
 
       // JER
-      // get resolution
-      float jetRes = resolution.getResolution(jetParameters);
-      // We do the same thing to access the scale factor
-      float jetResScaleFactor = res_sf.getScaleFactor(jetParameters);
-      // Access up and down variation of the scale factor
-      float jetResScaleFactorUp = res_sf.getScaleFactor(jetParameters, Variation::UP);
-      float jetResScaleFactorDown = res_sf.getScaleFactor(jetParameters, Variation::DOWN);
+      if(readJERuncertainty)
+      {
+        // JER
+        // create a JetParameters object
+        // You *must* now in advance which variables are needed for getting the resolution. For the moment, only pt and eta are needed, but this will
+        // probably change in the future when PU dependency is added. Please keep an eye on the twiki page:
+        //     https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution
+        JME::JetParameters jetParameters;
+        jetParameters.setJetPt(it->pt());
+        jetParameters.setJetEta(it->eta());
+        jetParameters.setRho(*rho);
+        // get resolution
+        float jetRes = resolution.getResolution(jetParameters);
+        // We do the same thing to access the scale factor
+        float jetResScaleFactor = res_sf.getScaleFactor(jetParameters);
+        // Access up and down variation of the scale factor
+        float jetResScaleFactorUp = res_sf.getScaleFactor(jetParameters, Variation::UP);
+        float jetResScaleFactorDown = res_sf.getScaleFactor(jetParameters, Variation::DOWN);
 
-      //// JER smearing: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Smearing_procedures
-      // requires matching to gen jet, so just store the info needed to do the smearing here
-      //if ( !iEvent.isRealData() ) { 
-      //  // make the collections
-      //}
-      //else { 
-      //  ptSmearedUp       -> push_back ( it -> pt()     );
-      //  energySmearedUp   -> push_back ( it -> energy() );
-      //  ptSmearedDown     -> push_back ( it -> pt()     );
-      //  energySmearedDown -> push_back ( it -> energy() );
-      //  ptScaledUp        -> push_back ( it -> pt()     );
-      //  energyScaledUp    -> push_back ( it -> energy() );
-      //  ptScaledDown      -> push_back ( it -> pt()     );
-      //  energyScaledDown  -> push_back ( it -> energy() );
-      //}
-      jerRes_vec->push_back(jetRes);
-      jerResSF_vec->push_back(jetResScaleFactor);
-      jerResSFup_vec->push_back(jetResScaleFactorUp);
-      jerResSFdown_vec->push_back(jetResScaleFactorDown);
+        //// JER smearing: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Smearing_procedures
+        // requires matching to gen jet, so just store the info needed to do the smearing here
+        //if ( !iEvent.isRealData() ) { 
+        //  // make the collections
+        //}
+        //else { 
+        //  ptSmearedUp       -> push_back ( it -> pt()     );
+        //  energySmearedUp   -> push_back ( it -> energy() );
+        //  ptSmearedDown     -> push_back ( it -> pt()     );
+        //  energySmearedDown -> push_back ( it -> energy() );
+        //  ptScaledUp        -> push_back ( it -> pt()     );
+        //  energyScaledUp    -> push_back ( it -> energy() );
+        //  ptScaledDown      -> push_back ( it -> pt()     );
+        //  energyScaledDown  -> push_back ( it -> energy() );
+        //}
+        jerRes_vec->push_back(jetRes);
+        jerResSF_vec->push_back(jetResScaleFactor);
+        jerResSFup_vec->push_back(jetResScaleFactorUp);
+        jerResSFdown_vec->push_back(jetResScaleFactorDown);
+      }
+      else
+      {
+        jerRes_vec->push_back(-999);
+        jerResSF_vec->push_back(-999);
+        jerResSFup_vec->push_back(-999);
+        jerResSFdown_vec->push_back(-999);
+      }
 
       pt_raw->push_back( it->correctedJet("Uncorrected").pt() );
       energy->push_back( it->energy() );

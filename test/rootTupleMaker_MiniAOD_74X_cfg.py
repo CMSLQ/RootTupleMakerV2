@@ -48,6 +48,7 @@ process.options.allowUnscheduled = cms.untracked.bool(True)
 # the size of the output by prescaling the report of the event number
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.MessageLogger.cerr.default.limit = 10
+#process.MessageLogger.cerr.threshold = "DEBUG"
 #################################################################
 
 # We should be using PFIso by default in newer CMSSW
@@ -200,7 +201,11 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/0A69ADC9-CA6D-E511-9A59-34E6D7E05F28.root'
     # LQM300
     '/store/mc/RunIISpring15MiniAODv2/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/5E4FDA56-0E72-E511-88C0-000F530E4784.root'
-    ]
+    #'/store/mc/RunIISpring15MiniAODv2/LQToCMu_M-200_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/D8DFFA06-A474-E511-A89C-00259090768E.root'
+    #'/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/009AE141-CA6D-E511-A060-002590A3716C.root'
+    #'/store/mc/RunIISpring15MiniAODv2/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/003F1529-D36D-E511-9E33-001E6724816F.root'
+    #'/store/mc/RunIISpring15MiniAODv2/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/306372CE-3E74-E511-9F2B-008CFA0A5684.root'
+]
 
 
 #----------------------------------------------------------------------------------------------------
@@ -708,19 +713,22 @@ process.load("Leptoquarks.RootTupleMakerV2.leptonGenMatching_cfi")
 #----------------------------------------------------------------------------------------------------
 # PDF weights
 #----------------------------------------------------------------------------------------------------
-
-#process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-#	# Fix POWHEG if buggy (this PDF set will also appear on output,
-#	# so only two more PDF sets can be added in PdfSetNames if not "")
-#	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
-#       # GenTag = cms.untracked.InputTag("genParticles"),
-#	PdfInfoTag = cms.untracked.InputTag("generator"),
-#	PdfSetNames = cms.untracked.vstring(
-#            "CT10.LHgrid" , 
-#            "MSTW2008nlo68cl.LHgrid",
-#            #"NNPDF20_100.LHgrid"#DMM FIXME couldn't find this file in /cvmfs/cms.cern.ch/slc6_amd64_gcc491/cms/cmssw/CMSSW_7_4_4/src/PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt
-#	)
-#)
+#To get PDF weights from PYTHIA and POWHEG we need this, why isn't it working?
+#
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+	# Fix POWHEG if buggy (this PDF set will also appear on output,
+	# so only two more PDF sets can be added in PdfSetNames if not "")
+	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
+        #GenTag = cms.untracked.InputTag("genParticles"),
+	PdfInfoTag = cms.untracked.InputTag("generator"),
+	PdfSetNames = cms.untracked.vstring(
+            "CT10.LHgrid" , 
+            "MMHT2014nlo68cl.LHgrid",
+            "NNPDF30_nlo_as_0118.LHgrid",
+            #"MSTW2008nlo68cl.LHgrid",
+            #"NNPDF20_100.LHgrid"
+	)
+)
 
 #----------------------------------------------------------------------------------------------------
 # Define GEN particle skimmer modules

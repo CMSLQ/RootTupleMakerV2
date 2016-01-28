@@ -435,10 +435,11 @@ adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
 jerResFile = 'Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'
 jerScaleFactorsFile = 'Summer15_25nsV6_DATAMCSF_AK4PFchs.txt'
 # JEC from text files
-# need these text files in the same directory as this cfg.py
+# have these text files in the same directory as this cfg.py
 # expand the CMSSW_SEARCH_PATH
-jecUncFileData='Leptoquarks/RootTupleMakerV2/test/'+'Summer15_25nsV6_DATA_UncertaintySources_AK4PFchs.txt'
-jecUncFileMC='Leptoquarks/RootTupleMakerV2/test/'+'Summer15_25nsV6_MC_UncertaintySources_AK4PFchs.txt'
+os.environ['CMSSW_SEARCH_PATH']+=':'+os.getcwd()
+jecUncFileData='Summer15_25nsV6_DATA_UncertaintySources_AK4PFchs.txt'
+jecUncFileMC='Summer15_25nsV6_MC_UncertaintySources_AK4PFchs.txt'
 
 dbJetMCDBFile = 'Summer15_25nsV6_MC.db'
 dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'

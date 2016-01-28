@@ -21,6 +21,8 @@ varOptions.register(
 varOptions.parseArguments()
 if varOptions.isMC:
   print 'We are running on MC!'
+else:
+  print 'We are running on Data!'
 
 #process.load('PhysicsTools.PatAlgos.patSequences_cff')
 #process.load('Configuration.StandardSequences.Services_cff')
@@ -236,17 +238,6 @@ process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 #                               'keep *_ electronsTriggeredHLTDoubleElectron_*_*' ]
 
 #----------------------------------------------------------------------------------------------------
-# Add PFMET and TCMET
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Tools
-#----------------------------------------------------------------------------------------------------
-# SIC: I think we can get away with using the default MiniAOD MET
-# in any case, below does not work in CMSSW_7_4_14 with 2015D PromptReco-v3
-## Reproduce "raw" MET from packedPFCandidates
-#from RecoMET.METProducers.PFMET_cfi import pfMet
-#process.pfMet = pfMet.clone(src = "packedPFCandidates")
-#process.pfMet.calculateSignificance = False # this can't be easily implemented on packed PF candidates at the moment (as of Feb 17 2015)
-
-#----------------------------------------------------------------------------------------------------
 # MET filters
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 #----------------------------------------------------------------------------------------------------
@@ -331,6 +322,8 @@ process.rootTupleElectrons.InputTag = cms.InputTag('calibratedPatElectrons','')
 # HEEP ID 5.1/6.0
 # Also load Egamma cut-based ID in new VID framework while we're at it
 # See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
+# MVA electron ID details on this twiki:
+# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
 # Set up everything that is needed to compute electron IDs and
 # add the ValueMaps with ID decisions into the event data stream
 #
@@ -347,7 +340,7 @@ switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # cut-based ID working points
 my_id_modules = []
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
+#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
 #Add them to the VID producer
@@ -357,20 +350,6 @@ for idmod in my_id_modules:
 process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
 process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag
 
-
-#----------------------------------------------------------------------------------------------------
-# Add MVA electron ID
-#
-# MVA electron ID details on this twiki:
-# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
-#
-#----------------------------------------------------------------------------------------------------
-#TODO
-
-#process.patConversions = cms.EDProducer("PATConversionProducer",
-#    electronSource = cms.InputTag("cleanPatElectrons")  
-#)
-# XXX FIXME still needed?
 
 #----------------------------------------------------------------------------------------------------
 # Add the PFJets
@@ -550,52 +529,42 @@ process.patJetsReapplyJEC = patJetsUpdated.clone(
 )
 
 #----------------------------------------------------------------------------------------------------
-# Make analysisPatJets and add them to the patDefaultSequence
-#----------------------------------------------------------------------------------------------------
-#process.cleanPatJetsAK5PF = process.cleanPatJets.clone()
-#process.cleanPatJetsAK5PF.src = cms.InputTag('patJetsAK5PF')
-#process.patDefaultSequence.replace (process.cleanPatJets, process.cleanPatJets + process.cleanPatJetsAK5PF)
-## FIXME
-#process.analysisPatJetsAK5PF = process.cleanPatJetsAK5PF.clone()
-#process.analysisPatJetsAK5PF.finalCut = cms.string("abs(eta)<2.5 & pt > 20")
-#process.patDefaultSequence.replace ( process.cleanPatJetsAK5PF, process.cleanPatJetsAK5PF + process.analysisPatJetsAK5PF )
-## FIXME
-
-#----------------------------------------------------------------------------------------------------
-# MET Uncertainties
+# MET Re-Corrections and Uncertainties
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Systematics_Tools
 #----------------------------------------------------------------------------------------------------
-postfix = 'RecorrectedMet'
+postfix = 'Recorrected'
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
 #default configuration for miniAOD reprocessing
 #for a full met computation, remove the pfCandColl input
 runMetCorAndUncFromMiniAOD(process,
-                           jetCollUnskimmed='slimmedJets',
+                           #jetCollUnskimmed='slimmedJets',
+                           jetColl='slimmedJets',
                            isData=not varOptions.isMC,
-                           electronColl=cms.InputTag('calibratedPatElectrons'),
-                           repro74X=True,
+                           electronColl=cms.InputTag('slimmedElectrons'),
+                           #repro74X=True,
                            jecUncFile=myJecUncFile,
                            postfix=postfix,
 )
-# this should be it, but fails
-#process.applyCorrections = cms.Path(getattr(process,'fullPatMetSequence{0}'.format(postfix)))
-# fix things
-getattr(process,'patPFMetT1T2Corr{0}'.format(postfix)).src = cms.InputTag('patJets')
-getattr(process,'patPFMetT2Corr{0}'.format(postfix)).src = cms.InputTag('patJets')
-getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
 process.applyCorrections = cms.Path()
-if varOptions.isMC: process.applyCorrections += process.genMetExtractor
-process.applyCorrections += getattr(process,'patPFMet{0}'.format(postfix))
-process.applyCorrections += process.patJetCorrFactorsReapplyJEC
+#if varOptions.isMC: process.applyCorrections += process.genMetExtractor
+#process.applyCorrections += getattr(process,'patPFMet{0}'.format(postfix))
+#process.applyCorrections += process.patJetCorrFactorsReapplyJEC
 process.applyCorrections += process.patJets
-process.applyCorrections += getattr(process,'patPFMetT1Txy{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMetT1{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMetTxy{0}'.format(postfix))
-#process.schedule.append(process.applyCorrections)
+#process.applyCorrections += getattr(process,'patPFMetT1{0}'.format(postfix))
+#process.applyCorrections += getattr(process,'patPFMetTxy{0}'.format(postfix))
+#process.applyCorrections += getattr(process,'patPFMetT1Txy{0}'.format(postfix))
+process.schedule.append(process.applyCorrections)
+getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
+del getattr(process,'slimmedMETs'+postfix).caloMET
 
 # ntuplize the newly-corrected MET
+process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
+process.rootTuplePFMETType1Cor.InputTag = 'slimmedMETs'+postfix
+process.rootTuplePFMETType1CorNotRecorrected.Suffix = 'Type1CorNotRecorrected'
+
+# ntuplize the new MET shifts
 process.rootNTupleNewMETs = cms.Path()
 allowedShifts = ['jres','jes','mes','ees','tes','ues']
 allowedSigns = ['+','-']
@@ -604,6 +573,7 @@ signMap = {
     '-' : 'Down',
 }
 collMap = {
+    # TODO
     #'jres' : {'Jets'     : 'shiftedPatJetRes{sign}{postfix}'},
     'jres' : {},
     'jes'  : {'Jets'     : 'shiftedPatJetEn{sign}{postfix}'},
@@ -649,11 +619,7 @@ for shift in allowedShifts:
         for mettype in mettypes:
           modName = 'rootTuple{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
           metName = metMap[shift].format(sign=signMap[sign],postfix=postfix)
-          #label = '{shift}{sign}MET'.format(shift=shift,sign=signMap[sign])
           prefix = '{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
-          #prefix = modName
-          #suffix = mettype[7:] if 'Calo' in mettype else mettype[5:]
-          #suffix = postfix
           suffix = ''
           module = cms.EDProducer(
               'RootTupleMakerV2_MET',
@@ -666,7 +632,6 @@ for shift in allowedShifts:
               CorrectionLevel = cms.string('NoCorrection'), # call pt(), etc., instead of shiftedPt()
           )
           setattr(process,modName,module)
-          #fs_daughter_inputs['pfmet'] = modName
           process.rootNTupleNewMETs *= getattr(process,modName)
 #process.schedule.append(process.rootNTupleNewMETs)
 

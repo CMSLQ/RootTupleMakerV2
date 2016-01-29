@@ -18,8 +18,8 @@ rootTuplePFJetsAK5 = cms.EDProducer("RootTupleMakerV2_PFJets",
     JERUncertainty = cms.string('AK5PF'),
     ReadJERFromGT = cms.bool(True),
     RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-    JERResolutionsFile = cms.string(''),
-    JERScaleFactorsFile = cms.string('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
+    JERResolutionsFile = cms.FileInPath(''),
+    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
 #rootTuplePFJetsAK5CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
@@ -39,8 +39,8 @@ rootTuplePFJetsAK5 = cms.EDProducer("RootTupleMakerV2_PFJets",
 #    JERUncertainty = cms.string('AK5PF'),
 #    ReadJERFromGT = cms.bool(True),
 #    RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-#    JERResolutionsFile = cms.string('Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'),
-#    JERScaleFactorsFile = cms.string('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
+#    JERResolutionsFile = cms.FileInPath('Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'),
+#    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
 #    VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 #)
 rootTuplePFJetsAK4CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
@@ -61,8 +61,8 @@ rootTuplePFJetsAK4CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
     JERUncertainty = cms.string('AK4PFchs'),
     ReadJERFromGT = cms.bool(True),
     RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-    JERResolutionsFile = cms.string('Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'),
-    JERScaleFactorsFile = cms.string('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
+    JERResolutionsFile = cms.FileInPath('Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'),
+    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
 rootTuplePFJetsAK4Puppi = cms.EDProducer("RootTupleMakerV2_PFJets",
@@ -83,8 +83,8 @@ rootTuplePFJetsAK4Puppi = cms.EDProducer("RootTupleMakerV2_PFJets",
     JERUncertainty = cms.string('AK4PFPuppi'),
     ReadJERFromGT = cms.bool(True),
     RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-    JERResolutionsFile = cms.string('Summer15_25nsV6_MC_PtResolution_AK4PFPuppi.txt'),
-    JERScaleFactorsFile = cms.string('Summer15_25nsV6_MC_JER_SF_AK4PFPuppi.txt'),
+    JERResolutionsFile = cms.FileInPath('Summer15_25nsV6_MC_PtResolution_AK4PFPuppi.txt'),
+    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFPuppi.txt'),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
 

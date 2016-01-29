@@ -29,8 +29,8 @@ readJERuncertainty (iConfig.getParameter<bool>   ("ReadJERuncertainty")),
 vtxInputTag (iConfig.getParameter<edm::InputTag>("VertexInputTag")),
 jerUncPath (iConfig.getParameter<std::string>("JERUncertainty")),
 jer_from_gt (iConfig.getParameter<bool>   ("ReadJERFromGT")),
-jer_resolutions_file (iConfig.getParameter<std::string>("JERResolutionsFile")),
-jer_scale_factors_file (iConfig.getParameter<std::string>("JERScaleFactorsFile")),
+jer_resolutions_file (iConfig.getParameter<edm::FileInPath>("JERResolutionsFile")),
+jer_scale_factors_file (iConfig.getParameter<edm::FileInPath>("JERScaleFactorsFile")),
 rhoToken (consumes<double>(iConfig.getParameter<edm::InputTag>("RhoCollection")))
 
 {
@@ -254,8 +254,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     else
     {
       // Second way, using the constructor
-      resolution = JME::JetResolution(jer_resolutions_file);
-      res_sf = JME::JetResolutionScaleFactor(jer_scale_factors_file);
+      resolution = JME::JetResolution(jer_resolutions_file.fullPath());
+      res_sf = JME::JetResolutionScaleFactor(jer_scale_factors_file.fullPath());
       edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Reading scale factors from: " << jer_scale_factors_file;
     }// get the factors from the global tag or from test file
   }

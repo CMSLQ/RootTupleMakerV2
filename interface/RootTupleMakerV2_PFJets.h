@@ -4,6 +4,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 #include <string>
 
 class RootTupleMakerV2_PFJets : public edm::EDProducer {
@@ -25,8 +26,8 @@ class RootTupleMakerV2_PFJets : public edm::EDProducer {
   bool            isPuppiJetColl;
   const std::string jerUncPath;
   const bool jer_from_gt;
-  const std::string jer_resolutions_file;
-  const std::string jer_scale_factors_file;
+  const edm::FileInPath jer_resolutions_file;
+  const edm::FileInPath jer_scale_factors_file;
   const edm::EDGetTokenT<double> rhoToken;
 
 };

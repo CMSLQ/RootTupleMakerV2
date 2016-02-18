@@ -90,8 +90,8 @@ process.LJFilter.customfilterEMuTauJet2012 = True
 # Output ROOT file
 #----------------------------------------------------------------------------------------------------
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string( "file_m300.root" )
-    #fileName = cms.string( "file_data.root" )
+    #fileName = cms.string( "file_m300.root" )
+    fileName = cms.string( "file_data.root" )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -179,10 +179,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 # MC
-process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v4'
+#process.GlobalTag.globaltag = '74X_mcRun2_asymptotic_v5'
 # Data
-#process.GlobalTag.globaltag = '74X_dataRun2_v2'
-#process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v2'
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
@@ -196,13 +195,13 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-100to200_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/D461E72B-306D-E511-9457-90B11C04FE38.root'
     # Data files
     #'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/254/833/00000/220E01C3-104B-E511-837F-02163E015541.root'
-    #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
+    'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
     # reHLT
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/ReHLT/7415/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/LQ300_BetaOne_7415ReHLT/151124_100054/0000/outputPhysicsEGammaCommissioning_1.root'
     #'/store/mc/RunIISpring15MiniAODv2/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/0A69ADC9-CA6D-E511-9A59-34E6D7E05F28.root'
     # LQM300
-    '/store/mc/RunIISpring15MiniAODv2/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/5E4FDA56-0E72-E511-88C0-000F530E4784.root'
+    #'/store/mc/RunIISpring15MiniAODv2/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/5E4FDA56-0E72-E511-88C0-000F530E4784.root'
     #'/store/mc/RunIISpring15MiniAODv2/LQToCMu_M-200_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/D8DFFA06-A474-E511-A89C-00259090768E.root'
     #'/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/50000/009AE141-CA6D-E511-A060-002590A3716C.root'
     #'/store/mc/RunIISpring15MiniAODv2/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/10000/003F1529-D36D-E511-9E33-001E6724816F.root'
@@ -436,11 +435,11 @@ jerResFile = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_MC_PtResolution_
 jerScaleFactorsFile = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_DATAMCSF_AK4PFchs.txt'
 # JEC from text files
 # stored in 'data' directory, they should be available in the CMSSW_SEARCH_PATH
-jecUncFileData='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_DATA_UncertaintySources_AK4PFchs.txt'
-jecUncFileMC='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_MC_UncertaintySources_AK4PFchs.txt'
+jecUncFileData='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_DATA_UncertaintySources_AK4PFchs.txt'
+jecUncFileMC='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_UncertaintySources_AK4PFchs.txt'
 
-dbJetMCDBFile = 'Summer15_25nsV6_MC.db'
-dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
+#dbJetMCDBFile = 'Summer15_25nsV6_MC.db'
+#dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
 
 # Get JER from text files
 process.rootTuplePFJetsAK5.ReadJERFromGT = False

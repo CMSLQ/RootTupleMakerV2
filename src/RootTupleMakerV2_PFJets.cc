@@ -574,7 +574,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       //  std::cout << std::endl;
       //}
       //// end test
-      l2l3resJEC_vec->push_back( it->pt()/it->correctedJet("L3Absolute").pt() );
+      l2l3resJEC_vec->push_back( it->correctedJet("L2L3Residual").pt()/it->pt() );
       l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
       // puppi appears to have no L1FastJet correction available for 2012D PromptReco-v3
       if(!isPuppiJetColl)

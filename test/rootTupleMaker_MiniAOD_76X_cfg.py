@@ -14,7 +14,7 @@ process.load('JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff'
 process._Process__name="ROOTTUPLEMAKERV2"
 # Options and Output Report
 process.options.wantSummary = False
-process.options.allowUnscheduled = cms.untracked.bool(True)
+process.options.allowUnscheduled = cms.untracked.bool(False)
 
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
@@ -57,13 +57,13 @@ process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12' # (25ns, Data2015v1 PU
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = 10
 
 # Input files
 process.source.fileNames = [
     # specified by InputList.txt
     # LQToUE-M550
-    #'/store/mc/RunIIFall15MiniAODv1/LQToUE_M-550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/106D05E3-96A3-E511-8BB2-02163E016451.root'
+    '/store/mc/RunIIFall15MiniAODv1/LQToUE_M-550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/106D05E3-96A3-E511-8BB2-02163E016451.root',
     '/store/mc/RunIIFall15MiniAODv1/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/DA82E787-46A6-E511-A34F-002590200ABC.root'
     ]
 
@@ -94,7 +94,7 @@ my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectr
 for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 # XXX NB, must be the same as input collection used for electron ntuplizer
-#process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
+process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
 
 #----------------------------------------------------------------------------------------------------
 # Turn on trigger matching
@@ -496,15 +496,31 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 
 process.p = cms.Path(
     # L+J Filter
+    #process.LJFilter
     process.LJFilter*  
-    process.HBHENoiseFilterResultProducer* #produces HBHE baseline bools
-    process.ApplyBaselineHBHEIsoNoiseFilter*   # reject events based  < 10e-3 mistake rate 
+    #process.HBHENoiseFilterResultProducer* #produces HBHE baseline bools
+    #process.ApplyBaselineHBHEIsoNoiseFilter*   # reject events based  < 10e-3 mistake rate 
     # Put everything into the tree
     # In unscheduled mode, anything 'kept' in the output commands above
     #  will have its producer module called automatically
+    process.rootTupleEvent*
+    #process.rootTupleEventSelection*
+    #process.rootTuplePFCandidates*
+    #process.rootTuplePFJets*
+    process.egmGsfElectronIDs*
+    process.rootTupleElectrons*
+    #process.rootTupleMuons*
+    #process.rootTupleVertex*
+    #process.rootTuplePFMET*
+    #process.rootTupleTriggerObjects*
+    #process.rootTupleGenEventInfo*
+    #process.rootTupleGenParticles*
+    #process.rootTupleGenJets*
+    #process.rootTupleGenMETTrue*
     process.rootTupleTree
 )
 
+#process.makeTree = cms.EndPath(process.rootTupleTree)
 
 ##----------------------------------------------------------------------------------------------------
 ## Dump if necessary
@@ -550,6 +566,7 @@ del process.out
 del process.outpath
 
 process.schedule = cms.Schedule(process.p)#,process.DUMP)
+#process.schedule = cms.Schedule(process.p,process.makeTree)
 
 #print process.dumpPython()
 

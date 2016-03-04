@@ -16,24 +16,54 @@
  */
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include <boost/variant.hpp>
 
-#include <map>
 #include <string>
 #include <vector>
 #include <TTree.h>
 #include <TH1I.h>
 
-class RootTupleMakerV2_Tree : public edm::EDAnalyzer {
- public:
+class RootTupleMakerV2_Tree : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+private:
+  virtual void beginJob() override;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+  virtual void endJob() override;
+
+  class BranchConnector {
+  public:
+    virtual ~BranchConnector() {};
+    virtual void connect(const edm::Event&) = 0;
+  };
+
+  template <class T>
+  class TypedBranchConnector : public BranchConnector {
+  private:
+    std::string ml;   //module label
+    std::string pin;  //product instance name
+    T object_;
+    T* object_ptr_;
+  public:
+    TypedBranchConnector(edm::BranchDescription const*, std::string, TTree*);
+    void connect(const edm::Event&);
+  };
+
+  edm::Service<TFileService> fs;
+  TTree * tree;
+
+  std::vector<BranchConnector*> connectors;
+  edm::ParameterSet pset;
+
+public:
+  //explicit RootTupleMakerV2_Tree(const edm::ParameterSet& iConfig) : pset(iConfig) {}
   explicit RootTupleMakerV2_Tree(const edm::ParameterSet&);
   ~RootTupleMakerV2_Tree();
+
+  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
   enum LEAFTYPE {BOOL=1,  BOOL_V,
                  SHORT,   SHORT_V,           U_SHORT, U_SHORT_V,
@@ -45,55 +75,9 @@ class RootTupleMakerV2_Tree : public edm::EDAnalyzer {
 		 STRING_FLOAT_V_M,
 		 FLOAT_V_V,
 		 INT_V_V,
-		 BOOL_V_V,
-		 STRING_V_V
-  };
-
- private:
-  virtual void beginJob();
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
-  virtual void endJob(){}
-
-  class BranchConnector {
-  public:
-    virtual ~BranchConnector() {};
-    virtual void connect(const edm::Event&) = 0;
-  };
-
-  template <class T>
-    class TypedBranchConnector : public BranchConnector {
-  private:
-    std::string ml;   //module label
-    std::string pin;  //product instance name
-    edm::EDGetToken token_;
-    T object_;
-    T* object_ptr_;
-  public:
-    TypedBranchConnector(edm::BranchDescription const*, std::string, TTree*, edm::EDGetToken token);
-    void connect(const edm::Event&);
-  };
-
-  edm::Service<TFileService> fs;
-  TTree * tree;
-
-  std::vector<BranchConnector*> connectors;
-  edm::ParameterSet cfg;
-  //std::string tokenName = selection->moduleLabel()+"_"+selection->productInstanceName();
-
-  //std::map <std::string, boost::variant<
-  //  edm::EDGetTokenT<std::vector<std::string> >,
-  //  edm::EDGetTokenT<std::vector<std::vector<std::string> > >,
-  //  edm::EDGetTokenT<bool>,
-  //  edm::EDGetTokenT<std::vector<bool> >,
-  //  edm::EDGetTokenT<std::vector<std::vector<bool> > >,
-  //  edm::EDGetTokenT<double>,
-  //  edm::EDGetTokenT<std::vector<double> >,
-  //  edm::EDGetTokenT<std::vector<float> >,
-  //  edm::EDGetTokenT<std::vector<int> >,
-  //  edm::EDGetTokenT<std::vector<std::vector<int> > >,
-  //  edm::EDGetTokenT<unsigned int> > > tokenMap;
-  std::map<std::string,edm::EDGetToken> tokenMap;
-
+     BOOL_V_V,
+     STRING_V_V
+                 };
 };
 
 #endif

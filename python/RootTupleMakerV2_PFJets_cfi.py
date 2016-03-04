@@ -89,3 +89,7 @@ pfjetTriggerMatchEmbedderHLTEleJetJet = cms.EDProducer(
   cms.InputTag( 'pfjetTriggerMatchHLTEleJetJet' )
   )
 )
+
+rootTuplePFJets = cms.Sequence(rootTuplePFJetsAK5+rootTuplePFJetsAK5CHS+rootTuplePFJetsAK4CHS+rootTuplePFJetsAK4Puppi
+    +pfjetTriggerMatchHLTEleJetJet+pfjetTriggerMatchEmbedderHLTEleJetJet)
+

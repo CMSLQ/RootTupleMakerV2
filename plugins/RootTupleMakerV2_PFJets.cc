@@ -608,10 +608,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  combinedMVABTag                     ->push_back( it->bDiscriminator("pfCombinedMVABJetTags") );
 	  passLooseID->push_back( passjetLoose );
 	  passTightID->push_back( passjetTight );
-	  // XXX SIC FIXME PU JET ID
-	  // JET Pileup MVA
-	  if(!isPuppiJetColl)
-	    jetpileup_mva->push_back(it->userFloat(mvaPileupIDname));
+	  //// XXX SIC FIXME PU JET ID
+	  //// JET Pileup MVA
+	  //if(!isPuppiJetColl)
+	  //  jetpileup_mva->push_back(it->userFloat(mvaPileupIDname));
 
 	  // 			//////////////////////////////////////////////////////////////////// 
 	  // 			if( fabs(it->eta()) > 3) 

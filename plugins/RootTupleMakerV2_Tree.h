@@ -22,6 +22,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include <string>
 #include <vector>
@@ -33,6 +34,11 @@ private:
   virtual void beginJob() override;
   virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
   virtual void endJob() override;
+
+  template<class T> void eat(edm::BranchDescription const* desc) {
+    consumes<T>(edm::InputTag(desc->moduleLabel(), desc->productInstanceName()));
+  }
+
 
   class BranchConnector {
   public:

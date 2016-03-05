@@ -297,7 +297,27 @@ process.selectedPatJetsAK5PFCHS.cut = cms.string("pt > 10")
 from PhysicsTools.PatAlgos.tools.pfTools import *
 ## Adapt primary vertex collection
 adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
-
+process.ak5PatJetSequence = cms.Sequence(
+    process.patJetCorrFactorsAK5PF*
+    process.patJetCorrFactorsAK5PFCHS*
+    process.patJetPartons*
+    process.patJetPartonMatchAK5PF*
+    process.patJetPartonMatchAK5PFCHS*
+    process.patJetFlavourAssociationAK5PF*
+    process.patJetFlavourAssociationAK5PFCHS*
+    process.patJetGenJetMatchAK5PF*
+    process.patJetGenJetMatchAK5PFCHS*
+    process.pfImpactParameterTagInfosAK5PF*
+    process.pfImpactParameterTagInfosAK5PFCHS*
+    process.pfInclusiveSecondaryVertexFinderTagInfosAK5PF*
+    process.pfInclusiveSecondaryVertexFinderTagInfosAK5PFCHS*
+    process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PF*
+    process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PFCHS*
+    process.patJetsAK5PF*
+    process.patJetsAK5PFCHS*
+    process.selectedPatJetsAK5PF*
+    process.selectedPatJetsAK5PFCHS
+)
 #process.out.outputCommands += ['keep *_ak5GenJets_*_EX',
 #                               'keep *_ak5PFJets_*_EX',
 #                               'keep *_ak5PFJetsCHS_*_EX', ]
@@ -494,29 +514,31 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 # to see Event content
 #process.load('FWCore.Modules.printContent_cfi')
 
-process.p = cms.Path(
+process.prereqs = cms.Path(
     # L+J Filter
-    #process.LJFilter
     process.LJFilter*  
-    #process.HBHENoiseFilterResultProducer* #produces HBHE baseline bools
-    #process.ApplyBaselineHBHEIsoNoiseFilter*   # reject events based  < 10e-3 mistake rate 
+    # supporting producers
+    process.ak5PFJetsSequence*
+    process.ak5PatJetSequence*
+    process.unpackedPatTrigger*
+    process.egmGsfElectronIDs
+)
+
+process.p = cms.Path(
     # Put everything into the tree
-    # In unscheduled mode, anything 'kept' in the output commands above
-    #  will have its producer module called automatically
     process.rootTupleEvent*
-    #process.rootTupleEventSelection*
-    #process.rootTuplePFCandidates*
-    #process.rootTuplePFJets*
-    process.egmGsfElectronIDs*
-    process.rootTupleElectrons*
-    #process.rootTupleMuons*
-    #process.rootTupleVertex*
-    #process.rootTuplePFMET*
-    #process.rootTupleTriggerObjects*
-    #process.rootTupleGenEventInfo*
-    #process.rootTupleGenParticles*
-    #process.rootTupleGenJets*
-    #process.rootTupleGenMETTrue*
+    process.rootTupleEventSelection*
+    process.rootTuplePFCandidates*
+    process.rootTupleElectronsSequence*
+    process.rootTupleMuonsSequence*
+    process.rootTupleVertex*
+    process.rootTuplePFJetsSequence*
+    process.rootTuplePFMET*
+    process.rootTupleTriggerObjects*
+    process.rootTupleGenEventInfo*
+    process.rootTupleGenParticles*
+    process.rootTupleGenJetsSequence*
+    process.rootTupleGenMETTrue*
     process.rootTupleTree
 )
 
@@ -565,7 +587,7 @@ process.p = cms.Path(
 del process.out
 del process.outpath
 
-process.schedule = cms.Schedule(process.p)#,process.DUMP)
+process.schedule = cms.Schedule(process.prereqs,process.p)#,process.DUMP)
 #process.schedule = cms.Schedule(process.p,process.makeTree)
 
 #print process.dumpPython()

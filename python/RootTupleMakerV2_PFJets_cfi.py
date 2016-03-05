@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTuplePFJetsAK5 = cms.EDProducer("RootTupleMakerV2_PFJets",
-    InputTag = cms.InputTag('patJetsAK5PF'),
+    InputTag = cms.InputTag('selectedPatJetsAK5PF'),
     #InputTag = cms.InputTag('pfjetTriggerMatchEmbedderHLTEleJetJet'),
     ## InputTagL1Offset    = cms.InputTag('selectedPatJetsAK5PFL1Offset'),
     #InputTagSmearedUp   = cms.InputTag('smearedPatJetsAK5PFresUp'),                                 
@@ -17,7 +17,7 @@ rootTuplePFJetsAK5 = cms.EDProducer("RootTupleMakerV2_PFJets",
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
 rootTuplePFJetsAK5CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
-    InputTag = cms.InputTag('patJetsAK5PFCHS'),
+    InputTag = cms.InputTag('selectedPatJetsAK5PFCHS'),
     #InputTag = cms.InputTag('pfjetTriggerMatchEmbedderHLTEleJetJet'),
     ## InputTagL1Offset    = cms.InputTag('selectedPatJetsAK5PFL1Offset'),
     #InputTagSmearedUp   = cms.InputTag('smearedPatJetsAK5PFresUp'),                                 
@@ -73,7 +73,7 @@ rootTuplePFJetsAK4Puppi = cms.EDProducer("RootTupleMakerV2_PFJets",
 # Maybe this HN post could help: https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2372/1/1/2.html
 pfjetTriggerMatchHLTEleJetJet = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
-, src     = cms.InputTag( 'slimmedJets' )
+, src     = cms.InputTag( 'slimmedElectrons' )
 , matched = cms.InputTag( 'unpackedPatTrigger' )          
 , matchedCuts = cms.string( 'path ( "HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*" )' )
 #, matchedCuts = cms.string( 'type("TriggerPhoton") || type("TriggerElectron")' )
@@ -84,12 +84,18 @@ pfjetTriggerMatchHLTEleJetJet = cms.EDProducer(
 
 pfjetTriggerMatchEmbedderHLTEleJetJet = cms.EDProducer(
   "PATTriggerMatchElectronEmbedder"
-, src = cms.InputTag( 'slimmedJets' )
+, src = cms.InputTag( 'slimmedElectrons' )
 , matches = cms.VInputTag(
   cms.InputTag( 'pfjetTriggerMatchHLTEleJetJet' )
   )
 )
 
-rootTuplePFJets = cms.Sequence(rootTuplePFJetsAK5+rootTuplePFJetsAK5CHS+rootTuplePFJetsAK4CHS+rootTuplePFJetsAK4Puppi
-    +pfjetTriggerMatchHLTEleJetJet+pfjetTriggerMatchEmbedderHLTEleJetJet)
+rootTuplePFJetsSequence = cms.Sequence(
+  pfjetTriggerMatchHLTEleJetJet*
+  pfjetTriggerMatchEmbedderHLTEleJetJet*
+  rootTuplePFJetsAK5*
+  rootTuplePFJetsAK5CHS*
+  rootTuplePFJetsAK4CHS*
+  rootTuplePFJetsAK4Puppi
+)
 

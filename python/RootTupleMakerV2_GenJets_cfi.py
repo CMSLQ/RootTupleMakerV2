@@ -14,4 +14,4 @@ rootTupleGenJetsAK4 = cms.EDProducer("RootTupleMakerV2_GenJets",
     MaxSize = cms.uint32(10)
 )
 
-rootTupleGenJets = cms.Sequence(rootTupleGenJetsAK5+rootTupleGenJetsAK4)
+rootTupleGenJetsSequence = cms.Sequence(rootTupleGenJetsAK5+rootTupleGenJetsAK4)

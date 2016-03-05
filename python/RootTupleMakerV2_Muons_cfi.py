@@ -76,6 +76,15 @@ muonsTriggerMatchAll = cms.EDProducer(
   )
 )
 
+rootTupleMuonsSequence = cms.Sequence(
+  cleanMuonTriggerMatchHLTMuon*
+  cleanMuonTriggerMatchHLTSingleMuon*
+  cleanMuonTriggerMatchHLTSingleIsoMuon*
+  muonsTriggerMatchHLTSingleMuon*
+  muonsTriggerMatchHLTSingleIsoMuon*
+  muonsTriggerMatchAll*
+  rootTupleMuons
+)
 
 
 # these will skim out (from the collections above with embedded matches) only the objects which have a trigger object match

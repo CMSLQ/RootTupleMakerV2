@@ -120,6 +120,19 @@ electronsTriggerMatchAll = cms.EDProducer(
   )
 )
 
+# add all to the sequence
+rootTupleElectronsSequence = cms.Sequence(
+  cleanElectronTriggerMatchHLTSingleElectron*
+  cleanElectronTriggerMatchHLTSingleElectronWP85*
+  cleanElectronTriggerMatchHLTDoubleElectron*
+  cleanElectronTriggerMatchHLTElectronJetJet*
+  electronsTriggerMatchHLTSingleElectronWP85*
+  electronsTriggerMatchHLTDoubleElectron*
+  electronsTriggerMatchHLTElectronJetJet*
+  electronsTriggerMatchAll*
+  rootTupleElectrons
+)
+
 # these will skim out (from the collections above with embedded matches) only the objects which have a trigger object match
 #from PhysicsTools.PatAlgos.selectionLayer1.electronSelector_cfi import selectedPatElectrons
 #electronsTriggeredHLTSingleElectron = selectedPatElectrons.clone(

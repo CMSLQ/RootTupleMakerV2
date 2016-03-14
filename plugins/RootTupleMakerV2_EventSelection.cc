@@ -5,7 +5,6 @@
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
   l1InputToken_(consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
-  //hcalNoiseInputToken_(consumes<>(iConfig.getParameter<edm::InputTag>("HcalNoiseInputTag"))),
   filterResultsInputToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag")))
 		       {
   produces <bool> ("isPhysDeclared");
@@ -17,9 +16,13 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passHBHENoiseIsoFilter");
   produces <bool> ("passHcalLaserEventFilter");
   produces <bool> ("passBeamHaloFilterTight");
-  produces <bool> ("isTrackingFailure");
+  produces <bool> ("passTightHaloTrkMuUnvetoFilter");
+  produces <bool> ("passBeamHalo2015FilterTight");
+  produces <bool> ("passHcalStripHaloFilter");
+  produces <bool> ("passHcalLaserEventFilter");
   //
   produces <bool> ("passEcalDeadCellTriggerPrimitiveFilter");
+  produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
   produces <bool> ("passTrackingFailureFilter");
   produces <bool> ("passBadEESupercrystalFilter");
   produces <bool> ("passEcalLaserCorrFilter");
@@ -35,41 +38,51 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> isphysdeclared( new bool() );
   std::auto_ptr<bool> isbptx0( new bool() );
   std::auto_ptr<bool> isbscminbias( new bool() );
-  std::auto_ptr<bool> isbscbeamhalo( new bool() );
-  std::auto_ptr<bool> isprimaryvertex( new bool() );
+
   std::auto_ptr<bool> passhbhenoisefilter( new bool() );
   std::auto_ptr<bool> passhbhenoiseisofilter( new bool() );
-  std::auto_ptr<bool> passHcalLaserEventFilter( new bool() );
   std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
-  std::auto_ptr<bool> istrackingfailure ( new bool() ) ;
-  //
-  std::auto_ptr<bool> passEcalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
-  std::auto_ptr<bool> passTrackingFailureFilter ( new bool() ) ;
-  std::auto_ptr<bool> passBadEESupercrystalFilter ( new bool() ) ;
-  std::auto_ptr<bool> passEcalLaserCorrFilter (new bool() );
-  //
-  std::auto_ptr<bool> passLogErrorTooManyClusters(new bool());
-  std::auto_ptr<bool> passManyStripClus53X       (new bool());
-  std::auto_ptr<bool> passTooManyStripClus53X    (new bool());
+  std::auto_ptr<bool> passtightHaloTrkMuUnvetoFilter( new bool() );
+  std::auto_ptr<bool> passbeamhalo2015filtertight( new bool() );
+  std::auto_ptr<bool> passhcalStripHaloFilter( new bool() );
+  std::auto_ptr<bool> passhcalLaserEventFilter( new bool() );
+  std::auto_ptr<bool> passecalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
+  std::auto_ptr<bool> passecalDeadCellBoundaryEnergyFilter( new bool() );
+  std::auto_ptr<bool> isprimaryvertex( new bool() );
+  std::auto_ptr<bool> passtrackingFailureFilter ( new bool() ) ;
+  std::auto_ptr<bool> passbadEESupercrystalFilter ( new bool() ) ;
+  std::auto_ptr<bool> passecalLaserCorrFilter (new bool() );
+  std::auto_ptr<bool> passtrkPOGFilters( new bool() );
+  std::auto_ptr<bool> passchargedHadronTrackResolutionFilter( new bool() );
+  std::auto_ptr<bool> passmuonBadTrackFilter( new bool() );
+  std::auto_ptr<bool> isbscbeamhalo( new bool() );
+  std::auto_ptr<bool> passmanyStripClus53X       (new bool());
+  std::auto_ptr<bool> passtooManyStripClus53X    (new bool());
+  std::auto_ptr<bool> passlogErrorTooManyClusters(new bool());
   
   *isphysdeclared.get() = false;
   *isbptx0.get() = false;
   *isbscminbias.get() = false;
   *isbscbeamhalo.get() = false;
-  *isprimaryvertex.get() = true;
   *passhbhenoisefilter.get() = true;
   *passhbhenoiseisofilter.get() = true;
-  *passHcalLaserEventFilter.get() = true;
   *passbeamhalofiltertight.get() = true;
-  //
-  *passEcalDeadCellTriggerPrimitiveFilter.get() = true;
-  *passTrackingFailureFilter.get()              = true;
-  *passBadEESupercrystalFilter.get()            = true;
-  *passEcalLaserCorrFilter.get()                = true;
-  // 
-  *passLogErrorTooManyClusters.get() = true;
-  *passManyStripClus53X       .get() = true;
-  *passTooManyStripClus53X    .get() = true;
+  *passtightHaloTrkMuUnvetoFilter.get() = true;
+  *passbeamhalo2015filtertight.get() = true;
+  *passhcalStripHaloFilter.get() = true;  
+  *passhcalLaserEventFilter.get() = true;
+  *passecalDeadCellTriggerPrimitiveFilter.get() = true;
+  *passecalDeadCellBoundaryEnergyFilter.get() = true;
+  *isprimaryvertex.get() = true;
+  *passtrackingFailureFilter.get()              = true;
+  *passbadEESupercrystalFilter.get()            = true;
+  *passecalLaserCorrFilter.get()                = true;
+  *passtrkPOGFilters.get() = true;
+  *passchargedHadronTrackResolutionFilter.get() = true;
+  *passmuonBadTrackFilter.get() = true;
+  *passmanyStripClus53X       .get() = true;
+  *passtooManyStripClus53X    .get() = true;
+  *passlogErrorTooManyClusters.get() = true;
   
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
@@ -126,26 +139,32 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //}
 
   // These filters are now run in MiniAOD and saved as an edm::TriggerResults of the PAT process
-  // See: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD
-  // List of filters: https://github.com/cms-sw/cmssw/blob/CMSSW_7_0_X/PhysicsTools/PatAlgos/python/slimming/metFilterPaths_cff.py
+  // See: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2015
+  // List of filters: https://github.com/cms-sw/cmssw/blob/CMSSW_7_6_X/PhysicsTools/PatAlgos/python/slimming/metFilterPaths_cff.py
   // combination of all filters:
   //  Flag_METFilters
-  // individual filters:
-  //  Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilter)
-  //  Flag_HBHENoiseIsoFilter = cms.Path(HBHENoiseIsoFilter)
-  //  Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
-  //  Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
-  //  Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
-  //  Flag_goodVertices = cms.Path(goodVertices)
-  //  Flag_trackingFailureFilter = cms.Path(goodVertices + trackingFailureFilter)
-  //  Flag_eeBadScFilter = cms.Path(eeBadScFilter)
-  //  Flag_ecalLaserCorrFilter = cms.Path(ecalLaserCorrFilter)
-  //  Flag_trkPOGFilters = cms.Path(trkPOGFilters) --> This is made up of the three trkPOG filters below
-  // and the individual trkPOG filters
-  //  Flag_trkPOG_manystripclus53X = cms.Path(~manystripclus53X)
-  //  Flag_trkPOG_toomanystripclus53X = cms.Path(~toomanystripclus53X)
-  //  Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)
-
+  //# individual filters
+  //Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilterResultProducer * HBHENoiseFilter)
+  //Flag_HBHENoiseIsoFilter = cms.Path(HBHENoiseFilterResultProducer * HBHENoiseIsoFilter)
+  //Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
+  //Flag_CSCTightHaloTrkMuUnvetoFilter = cms.Path(CSCTightHaloTrkMuUnvetoFilter)
+  //Flag_CSCTightHalo2015Filter = cms.Path(CSCTightHalo2015Filter)
+  //Flag_HcalStripHaloFilter = cms.Path(HcalStripHaloFilter)
+  //Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
+  //Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
+  //Flag_EcalDeadCellBoundaryEnergyFilter = cms.Path(EcalDeadCellBoundaryEnergyFilter)
+  //Flag_goodVertices = cms.Path(primaryVertexFilter)
+  //Flag_trackingFailureFilter = cms.Path(goodVertices + trackingFailureFilter)
+  //Flag_eeBadScFilter = cms.Path(eeBadScFilter)
+  //Flag_ecalLaserCorrFilter = cms.Path(ecalLaserCorrFilter)
+  //Flag_trkPOGFilters = cms.Path(trkPOGFilters)
+  //Flag_chargedHadronTrackResolutionFilter = cms.Path(chargedHadronTrackResolutionFilter)
+  //Flag_muonBadTrackFilter = cms.Path(muonBadTrackFilter)
+  //# and the sub-filters
+  //Flag_trkPOG_manystripclus53X = cms.Path(~manystripclus53X)
+  //Flag_trkPOG_toomanystripclus53X = cms.Path(~toomanystripclus53X)
+  //Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)
+  
   edm::Handle<edm::TriggerResults> filterResults;
   iEvent.getByToken(filterResultsInputToken_, filterResults);
   if(filterResults.isValid())
@@ -161,55 +180,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     //    << std::endl;
     //}
 
-    // CSC Beam Halo Tight
-    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHaloFilter");
-    if(index < filterNames.size())
-      *passbeamhalofiltertight.get() = filterResults->accept(index);
-
-    // Tracking failure filter
-    index = filterNames.triggerIndex("Flag_trackingFailureFilter");
-    if(index < filterNames.size())
-      *passTrackingFailureFilter.get() = filterResults->accept(index);
-
-    // ECAL dead cell filter
-    index = filterNames.triggerIndex("Flag_EcalDeadCellTriggerPrimitiveFilter");
-    if(index < filterNames.size())
-      *passEcalDeadCellTriggerPrimitiveFilter.get() = filterResults->accept(index);
-
-
-    //Ecal masked cell and calo boundary filter ( https://twiki.cern.ch/twiki/bin/view/CMS/SusyEcalMaskedCellSummary )
-    //XXX: FIXME? Not run in MiniAOD
-
-    // Tracking POG filters: ManyStripClus53X
-    index = filterNames.triggerIndex("Flag_trkPOG_manystripclus53X");
-    if(index < filterNames.size())
-      *passManyStripClus53X.get() = filterResults->accept(index);
-
-    // Tracking POG filters: TooManyStripClus53X
-    index = filterNames.triggerIndex("Flag_trkPOG_toomanystripclus53X");
-    if(index < filterNames.size())
-      *passTooManyStripClus53X.get() = filterResults->accept(index);
-    
-    // Tracking POG filters: LogErrorTooManyClusters
-    index = filterNames.triggerIndex("Flag_trkPOG_logErrorTooManyClusters");
-    if(index < filterNames.size())
-      *passLogErrorTooManyClusters.get() = filterResults->accept(index);
-
-    // Bad EE Supercrystal Filter  
-    index = filterNames.triggerIndex("Flag_eeBadScFilter");
-    if(index < filterNames.size())
-      *passBadEESupercrystalFilter.get() = filterResults->accept(index);
-
-    // large ECAL laser correction filter
-    index = filterNames.triggerIndex("Flag_ecalLaserCorrFilter");
-    if(index < filterNames.size())
-      *passEcalLaserCorrFilter.get() = filterResults->accept(index);
-
-    // Good Primary Vertex Part
-    index = filterNames.triggerIndex("Flag_goodVertices");
-    if(index < filterNames.size())
-      *isprimaryvertex.get() = filterResults->accept(index);
-
     // Hcal Noise Part (HBHE)
     index = filterNames.triggerIndex("Flag_HBHENoiseFilter");
     if(index < filterNames.size())
@@ -220,10 +190,90 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if(index < filterNames.size())
       *passhbhenoiseisofilter.get() = filterResults->accept(index);
 
+    // CSC Beam Halo Tight
+    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHaloFilter");
+    if(index < filterNames.size())
+      *passbeamhalofiltertight.get() = filterResults->accept(index);
+
+    // CSC Tight Halo Trk Mu Unveto filter
+    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHaloTrkMuUnvetoFilter");
+    if(index < filterNames.size())
+      *passtightHaloTrkMuUnvetoFilter.get() = filterResults->accept(index);
+
+    //  CSC Beam Halo 2015 Tight filter
+    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHalo2015Filter");
+    if(index < filterNames.size())
+      *passbeamhalo2015filtertight.get() = filterResults->accept(index);
+
+    //HCAL Strip Halo filter
+    unsigned int index = filterNames.triggerIndex("Flag_HcalStripHaloFilter");
+    if(index < filterNames.size())
+      *passhcalStripHaloFilter.get() = filterResults->accept(index);
+
     // Hcal Laser Event Filter
     index = filterNames.triggerIndex("Flag_hcalLaserEventFilter");
     if(index < filterNames.size())
-      *passHcalLaserEventFilter.get() = filterResults->accept(index);
+      *passhcalLaserEventFilter.get() = filterResults->accept(index);
+
+    //Ecal dead cell and calo boundary filter
+    index = filterNames.triggerIndex("Flag_EcalDeadCellTriggerPrimitiveFilter");
+    if(index < filterNames.size())
+      *passecalDeadCellTriggerPrimitiveFilter.get() = filterResults->accept(index);
+
+    // ECAL dead cell filter
+    index = filterNames.triggerIndex("Flag_EcalDeadCellBoundaryEnergyFilter");
+    if(index < filterNames.size())
+      *passecalDeadCellBoundaryEnergyFilter.get() = filterResults->accept(index);
+
+    // Good Primary Vertex filter
+    index = filterNames.triggerIndex("Flag_goodVertices");
+    if(index < filterNames.size())
+      *isprimaryvertex.get() = filterResults->accept(index);
+
+    // Tracking failure filter
+    index = filterNames.triggerIndex("Flag_trackingFailureFilter");
+    if(index < filterNames.size())
+      *passtrackingFailureFilter.get() = filterResults->accept(index);
+
+    // Bad EE Supercrystal Filter  
+    index = filterNames.triggerIndex("Flag_eeBadScFilter");
+    if(index < filterNames.size())
+      *passbadEESupercrystalFilter.get() = filterResults->accept(index);
+
+    // large ECAL laser correction filter
+    index = filterNames.triggerIndex("Flag_ecalLaserCorrFilter");
+    if(index < filterNames.size())
+      *passecalLaserCorrFilter.get() = filterResults->accept(index);
+
+    // Tracking POG filters
+    index = filterNames.triggerIndex("Flag_trkPOGFilters");
+    if(index < filterNames.size())
+      *passtrkPOGFilters.get() = filterResults->accept(index);
+
+    // Charged Hadron Track Resolution filter
+    index = filterNames.triggerIndex("Flag_chargedHadronTrackResolutionFilter");
+    if(index < filterNames.size())
+      *passchargedHadronTrackResolutionFilter.get() = filterResults->accept(index);
+
+    // Muon Bad Track filter
+    index = filterNames.triggerIndex("Flag_muonBadTrackFilter");
+    if(index < filterNames.size())
+      *passmuonBadTrackFilter.get() = filterResults->accept(index);
+
+    // Tracking POG filters: ManyStripClus53X
+    index = filterNames.triggerIndex("Flag_trkPOG_manystripclus53X");
+    if(index < filterNames.size())
+      *passmanyStripClus53X.get() = filterResults->accept(index);
+
+    // Tracking POG filters: TooManyStripClus53X
+    index = filterNames.triggerIndex("Flag_trkPOG_toomanystripclus53X");
+    if(index < filterNames.size())
+      *passtooManyStripClus53X.get() = filterResults->accept(index);
+    
+    // Tracking POG filters: LogErrorTooManyClusters
+    index = filterNames.triggerIndex("Flag_trkPOG_logErrorTooManyClusters");
+    if(index < filterNames.size())
+      *passlogErrorTooManyClusters.get() = filterResults->accept(index);
 
   } else {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the filterResultsInputTag";
@@ -238,17 +288,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(isprimaryvertex,"isPrimaryVertex");
   iEvent.put(passhbhenoisefilter,"passHBHENoiseFilter");
   iEvent.put(passhbhenoiseisofilter,"passHBHENoiseIsoFilter");
-  iEvent.put(passHcalLaserEventFilter,"passHcalLaserEventFilter");
   iEvent.put(passbeamhalofiltertight,"passBeamHaloFilterTight");
-  iEvent.put(istrackingfailure, "isTrackingFailure");
+  iEvent.put(passtightHaloTrkMuUnvetoFilter,"passTightHaloTrkMuUnvetoFilter");
+  iEvent.put(passbeamhalo2015filtertight,"passBeamHalo2015FilterTight");
+  iEvent.put(passhcalStripHaloFilter,"passHcalStripHaloFilter");
+  iEvent.put(passhcalLaserEventFilter,"passHcalLaserEventFilter");
+  iEvent.put(passecalDeadCellTriggerPrimitiveFilter,"passEcalDeadCellTriggerPrimitiveFilter");
+  iEvent.put(passecalDeadCellBoundaryEnergyFilter,"passEcalDeadCellBoundaryEnergyFilter");
   //
-  iEvent.put(passEcalDeadCellTriggerPrimitiveFilter,"passEcalDeadCellTriggerPrimitiveFilter");
-  iEvent.put(passTrackingFailureFilter,"passTrackingFailureFilter");
-  iEvent.put(passBadEESupercrystalFilter, "passBadEESupercrystalFilter");
-  iEvent.put(passEcalLaserCorrFilter, "passEcalLaserCorrFilter");
+  iEvent.put(passtrackingFailureFilter,"passTrackingFailureFilter");
+  iEvent.put(passbadEESupercrystalFilter, "passBadEESupercrystalFilter");
+  iEvent.put(passecalLaserCorrFilter, "passEcalLaserCorrFilter");
   // 
-  iEvent.put(passLogErrorTooManyClusters,"passLogErrorTooManyClusters");
-  iEvent.put(passManyStripClus53X       ,"passManyStripClus53X");
-  iEvent.put(passTooManyStripClus53X    ,"passTooManyStripClus53X");
+  iEvent.put(passtrkPOGFilters,"passTrkPOGFilters");
+  iEvent.put(passchargedHadronTrackResolutionFilter,"passChargedHadronTrackResolutionFilter");
+  iEvent.put(passmuonBadTrackFilter,"passMuonBadTrackFilter");
+  iEvent.put(passmanyStripClus53X       ,"passManyStripClus53X");
+  iEvent.put(passtooManyStripClus53X    ,"passTooManyStripClus53X");
+  iEvent.put(passlogErrorTooManyClusters,"passLogErrorTooManyClusters");
   
 }

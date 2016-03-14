@@ -16,8 +16,6 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
  private:
   void produce( edm::Event &, const edm::EventSetup & );
   edm::EDGetTokenT<L1GlobalTriggerReadoutRecord>  l1InputToken_;
-  //edm::EDGetTokenT<>   vtxInputToken_;
-  //edm::EDGetTokenT<>  hcalNoiseInputToken_;
   edm::EDGetTokenT<edm::TriggerResults>  filterResultsInputToken_;
 
 };

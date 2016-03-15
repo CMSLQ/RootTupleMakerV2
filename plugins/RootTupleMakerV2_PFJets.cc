@@ -11,7 +11,7 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
   readJERuncertainty (iConfig.getParameter<bool>   ("ReadJERuncertainty")),
   //
-  vtxInputToken_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag")))
+  vtxInputToken_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag"))),
   jerUncPath (iConfig.getParameter<std::string>("JERUncertainty")),
   jer_from_gt (iConfig.getParameter<bool>      ("ReadJERFromGT")),
   jer_resolutions_file (iConfig.getParameter<edm::FileInPath>  ("JERResolutionsFile")),

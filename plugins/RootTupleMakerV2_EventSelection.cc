@@ -181,7 +181,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     //}
 
     // Hcal Noise Part (HBHE)
-    index = filterNames.triggerIndex("Flag_HBHENoiseFilter");
+    unsigned int index = filterNames.triggerIndex("Flag_HBHENoiseFilter");
     if(index < filterNames.size())
       *passhbhenoisefilter.get() = filterResults->accept(index);
 
@@ -191,22 +191,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       *passhbhenoiseisofilter.get() = filterResults->accept(index);
 
     // CSC Beam Halo Tight
-    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHaloFilter");
+    index = filterNames.triggerIndex("Flag_CSCTightHaloFilter");
     if(index < filterNames.size())
       *passbeamhalofiltertight.get() = filterResults->accept(index);
 
     // CSC Tight Halo Trk Mu Unveto filter
-    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHaloTrkMuUnvetoFilter");
+    index = filterNames.triggerIndex("Flag_CSCTightHaloTrkMuUnvetoFilter");
     if(index < filterNames.size())
       *passtightHaloTrkMuUnvetoFilter.get() = filterResults->accept(index);
 
     //  CSC Beam Halo 2015 Tight filter
-    unsigned int index = filterNames.triggerIndex("Flag_CSCTightHalo2015Filter");
+    index = filterNames.triggerIndex("Flag_CSCTightHalo2015Filter");
     if(index < filterNames.size())
       *passbeamhalo2015filtertight.get() = filterResults->accept(index);
 
     //HCAL Strip Halo filter
-    unsigned int index = filterNames.triggerIndex("Flag_HcalStripHaloFilter");
+    index = filterNames.triggerIndex("Flag_HcalStripHaloFilter");
     if(index < filterNames.size())
       *passhcalStripHaloFilter.get() = filterResults->accept(index);
 

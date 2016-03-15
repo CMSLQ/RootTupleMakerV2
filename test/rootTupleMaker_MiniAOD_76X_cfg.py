@@ -450,19 +450,19 @@ process.LJFilter.customfilterEMuTauJet2012 = True
 #----------------------------------------------------------------------------------------------------
 # PDF weights
 #----------------------------------------------------------------------------------------------------
-
-#process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-#	# Fix POWHEG if buggy (this PDF set will also appear on output,
-#	# so only two more PDF sets can be added in PdfSetNames if not "")
-#	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
-#       # GenTag = cms.untracked.InputTag("genParticles"),
-#	PdfInfoTag = cms.untracked.InputTag("generator"),
-#	PdfSetNames = cms.untracked.vstring(
-#            "CT10.LHgrid" , 
-#            "MSTW2008nlo68cl.LHgrid",
-#            #"NNPDF20_100.LHgrid"#DMM FIXME couldn't find this file in /cvmfs/cms.cern.ch/slc6_amd64_gcc491/cms/cmssw/CMSSW_7_4_4/src/PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt
-#	)
-#)
+#To get PDF weights from PYTHIA and POWHEG we need this, why isn't it working?
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+	# Fix POWHEG if buggy (this PDF set will also appear on output,
+	# so only two more PDF sets can be added in PdfSetNames if not "")
+	# FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
+        # GenTag = cms.untracked.InputTag("genParticles"),
+	PdfInfoTag = cms.untracked.InputTag("generator"),
+	PdfSetNames = cms.untracked.vstring(
+            "CT10.LHgrid" , 
+            "MMHT2014nlo68cl.LHgrid",
+            "NNPDF30_nlo_as_0118.LHgrid",
+	)
+)
 
 #----------------------------------------------------------------------------------------------------
 # Define the output tree for RootTupleMakerV2

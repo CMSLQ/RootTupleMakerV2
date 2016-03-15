@@ -14,7 +14,7 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   genEvtInfoInputToken_(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("GenEventInfoInputTag"))),
   storePDFWeights(iConfig.getParameter<bool>("StorePDFWeights")),
   pdfCTEQWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFCTEQWeightsInputTag"))),
-  pdfMSTWWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFMSTWWeightsInputTag"))),
+  pdfMMTHWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFMMTHWeightsInputTag"))),
   pdfNNPDFWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFNNPDFWeightsInputTag"))),
   pileupInfoSrcToken_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupInfo"))),
   LHERunInfoToken_(consumes<LHERunInfoProduct>(iConfig.getParameter<edm::InputTag>("LHERunInfoProductInputTag"))),
@@ -23,7 +23,7 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   produces <unsigned int> ( "ProcessID" );
   produces <double>       ( "PtHat" );
   produces <std::vector<double> > ( "PDFCTEQWeights" );
-  produces <std::vector<double> > ( "PDFMSTWWeights" );
+  produces <std::vector<double> > ( "PDFMMTHWeights" );
   produces <std::vector<double> > ( "PDFNNPDFWeights" );
   produces <std::vector<double> > ( "ScaleWeights" );
   produces <double> ( "amcNLOWeight" );
@@ -80,7 +80,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<unsigned int >         processID   ( new unsigned int() );
   std::auto_ptr<double >               ptHat ( new double() );
   std::auto_ptr<std::vector<double> >  pdfCTEQWeights  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pdfMSTWWeights  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pdfMMTHWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pdfNNPDFWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scaleWeights  ( new std::vector<double>()  );
   std::auto_ptr<double>  amcNLOweight  ( new double()  );
@@ -119,11 +119,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if( storePDFWeights ) {
 
       edm::Handle<std::vector<double> > pdfCTEQWeightsHandle;
-      edm::Handle<std::vector<double> > pdfMSTWWeightsHandle;
+      edm::Handle<std::vector<double> > pdfMMTHWeightsHandle;
       edm::Handle<std::vector<double> > pdfNNPDFWeightsHandle;
 
       iEvent.getByToken(pdfCTEQWeightsInputToken_, pdfCTEQWeightsHandle);
-      iEvent.getByToken(pdfMSTWWeightsInputToken_, pdfMSTWWeightsHandle);
+      iEvent.getByToken(pdfMMTHWeightsInputToken_, pdfMMTHWeightsHandle);
       iEvent.getByToken(pdfNNPDFWeightsInputToken_, pdfNNPDFWeightsHandle);
 
       if( pdfCTEQWeightsHandle.isValid() ) {
@@ -133,11 +133,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfCTEQWeightsInputToken_";
       }
 
-      if( pdfMSTWWeightsHandle.isValid() ) {
-        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfMSTWWeightsInputToken_";
-        *pdfMSTWWeights.get() = *pdfMSTWWeightsHandle;
+      if( pdfMMTHWeightsHandle.isValid() ) {
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfMMTHWeightsInputToken_";
+        *pdfMMTHWeights.get() = *pdfMMTHWeightsHandle;
       } else {
-        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfMSTWWeightsInputToken_";
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfMMTHWeightsInputToken_";
       }
 
       if( pdfNNPDFWeightsHandle.isValid() ) {
@@ -208,7 +208,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( processID, "ProcessID" );
   iEvent.put( ptHat, "PtHat" );
   iEvent.put( pdfCTEQWeights, "PDFCTEQWeights" );
-  iEvent.put( pdfMSTWWeights, "PDFMSTWWeights" );
+  iEvent.put( pdfMMTHWeights, "PDFMMTHWeights" );
   iEvent.put( pdfNNPDFWeights, "PDFNNPDFWeights" );
   iEvent.put( scaleWeights, "ScaleWeights" );
   iEvent.put( amcNLOweight, "amcNLOWeight" );

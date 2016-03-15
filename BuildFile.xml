@@ -4,6 +4,7 @@
 <use name="CommonTools/UtilAlgos"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="DataFormats/Common"/>
+<use name="DataFormats/JetReco"/>
 <use name="RecoEcal/EgammaClusterAlgos"/>
 <use name="RecoEgamma/EgammaTools"/>
 <use name="RecoEgamma/EgammaIsolationAlgos"/>
@@ -14,7 +15,7 @@
 <use name="MagneticField/Engine"/>
 <use name="MagneticField/Records"/>
 <use name="PhysicsTools/PatUtils"/>
-<use name="JetMETCorrections/Objects"/>
+<use name="JetMETCorrections/Modules"/>
 <use name="EgammaAnalysis/ElectronTools"/>
 <use name="lhapdf"/>
 <use name="rootrflx"/>

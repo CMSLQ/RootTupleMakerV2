@@ -1,35 +1,22 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_PFJets.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/EventSetup.h"
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-#include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
-#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
-#include "FWCore/Framework/interface/ESHandle.h"
-#include "RecoJets/JetProducers/interface/PileupJetIdAlgo.h"
-#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
   jetInputToken_ (consumes<std::vector<pat::Jet> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
   inputTag (iConfig.getParameter<edm::InputTag>("InputTag")),//fixme using old way to find PUPPI, is this a problem?
-  //FIXME TODO later
-  //inputTagSmearedUp  (iConfig.getParameter<edm::InputTag>("InputTagSmearedUp"  )),
-  //inputTagSmearedDown(iConfig.getParameter<edm::InputTag>("InputTagSmearedDown")),
-  //inputTagScaledUp   (iConfig.getParameter<edm::InputTag>("InputTagScaledUp"   )),
-  //inputTagScaledDown (iConfig.getParameter<edm::InputTag>("InputTagScaledDown" )),
   prefix  (iConfig.getParameter<std::string>  ("Prefix")),
   suffix  (iConfig.getParameter<std::string>  ("Suffix")),
   mvaPileupIDname  (iConfig.getParameter<std::string>  ("MVAPileupIDName")),
   maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
-  //FIXME TODO possibly later
-  jecUncPath(iConfig.getParameter<std::string>("JECUncertainty")),
+  jecUncPath (iConfig.getParameter<std::string>("JECUncertainty")),
   readJECuncertainty (iConfig.getParameter<bool>   ("ReadJECuncertainty")),
+  readJERuncertainty (iConfig.getParameter<bool>   ("ReadJERuncertainty")),
   //
   vtxInputToken_ (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("VertexInputTag")))
+  jerUncPath (iConfig.getParameter<std::string>("JERUncertainty")),
+  jer_from_gt (iConfig.getParameter<bool>      ("ReadJERFromGT")),
+  jer_resolutions_file (iConfig.getParameter<edm::FileInPath>  ("JERResolutionsFile")),
+  jer_scale_factors_file (iConfig.getParameter<edm::FileInPath>("JERScaleFactorsFile")),
+  rhoToken (consumes<double>(iConfig.getParameter<edm::InputTag>("RhoCollection")))
 {
   if(upperCase(inputTag.label()).find(upperCase("PUPPI")) != std::string::npos)
     isPuppiJetColl = true;
@@ -55,6 +42,10 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<double> > ( prefix + "L3AbsJEC" + suffix );
   produces <std::vector<double> > ( prefix + "L2RelJEC" + suffix );
   produces <std::vector<double> > ( prefix + "L1FastJetJEC" + suffix );
+  produces <std::vector<double> > ( prefix + "JERRes" + suffix );
+  produces <std::vector<double> > ( prefix + "JERResSF" + suffix );
+  produces <std::vector<double> > ( prefix + "JERResSFUp" + suffix );
+  produces <std::vector<double> > ( prefix + "JERResSFDown" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
   produces <std::vector<double> > ( prefix + "ChargedEmEnergyFraction"  + suffix );
   produces <std::vector<double> > ( prefix + "ChargedHadronEnergyFraction"  + suffix );
@@ -150,6 +141,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  l2relJEC_vec ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  l1fastjetJEC_vec ( new std::vector<double>()  );
   // std::auto_ptr<std::vector<double> >  l1offsetJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  jerRes_vec ( new std::vector<double>() );
+  std::auto_ptr<std::vector<double> >  jerResSF_vec ( new std::vector<double>() );
+  std::auto_ptr<std::vector<double> >  jerResSFup_vec ( new std::vector<double>() );
+  std::auto_ptr<std::vector<double> >  jerResSFdown_vec ( new std::vector<double>() );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<double> >  chargedEmEnergyFraction  ( new std::vector<double>()  ) ;
   std::auto_ptr<std::vector<double> >  chargedHadronEnergyFraction  ( new std::vector<double>()  ) ;
@@ -209,15 +204,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
   //-----------------------------------------------------------------
 
-
   //JEC Uncertainties
-
+  // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties
   *hasJetWithBadUnc.get() = false;
   JetCorrectionUncertainty *jecUnc = 0;
   if(readJECuncertainty)
     {
-      //(See https://hypernews.cern.ch/HyperNews/CMS/get/JetMET/1075/1.html
-      // and https://hypernews.cern.ch/HyperNews/CMS/get/physTools/2367/1.html)
       // handle the jet corrector parameters collection
       edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
       // get the jet corrector parameters collection from the global tag
@@ -227,26 +219,35 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // instantiate the jec uncertainty object
       jecUnc = new JetCorrectionUncertainty(JetCorPar);
     }
-
+  //JER Uncertainties
+  // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution
+  // Access jet resolution and scale factor from the condition database
+  // or from text files
+  JME::JetResolution resolution;
+  JME::JetResolutionScaleFactor res_sf;
+  if (readJERuncertainty)
+    {
+      // Two differents way to create a class instance
+      if (jer_from_gt)
+	{
+	  // First way, using the get() static method
+	  resolution = JME::JetResolution::get(iSetup, jerUncPath);
+	  res_sf = JME::JetResolutionScaleFactor::get(iSetup, jerUncPath);
+	}
+      else
+	{
+	  // Second way, using the constructor
+	  resolution = JME::JetResolution(jer_resolutions_file.fullPath());
+	  res_sf = JME::JetResolutionScaleFactor(jer_scale_factors_file.fullPath());
+	  edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Reading scale factors from: " << jer_scale_factors_file;
+	}// get the factors from the global tag or from test file
+    }
+  // need rho for JER
+  edm::Handle<double> rho;
+  iEvent.getByToken(rhoToken, rho);
+  
   edm::Handle<std::vector<pat::Jet> > jets;
   iEvent.getByToken(jetInputToken_, jets);
-
-  // edm::Handle<std::vector<pat::Jet> > jetsL1Offset;
-  // iEvent.getByLabel(inputTagL1Offset, jetsL1Offset);
-
-  // FIXME TODO later
-  //edm::Handle<std::vector<pat::Jet> > jetsSmearedUp;
-  //iEvent.getByLabel(inputTagSmearedUp, jetsSmearedUp);
-  //std::vector<pat::Jet>::const_iterator it_smearedUp;
-  //edm::Handle<std::vector<pat::Jet> > jetsSmearedDown;
-  //iEvent.getByLabel(inputTagSmearedDown, jetsSmearedDown);
-  //std::vector<pat::Jet>::const_iterator it_smearedDown;
-  //edm::Handle<std::vector<pat::Jet> > jetsScaledUp;
-  //iEvent.getByLabel(inputTagScaledUp, jetsScaledUp);
-  //std::vector<pat::Jet>::const_iterator it_scaledUp;
-  //edm::Handle<std::vector<pat::Jet> > jetsScaledDown;
-  //iEvent.getByLabel(inputTagScaledDown, jetsScaledDown);
-  //std::vector<pat::Jet>::const_iterator it_scaledDown;
 	
   edm::Handle<reco::VertexCollection> primaryVertices;
   iEvent.getByToken(vtxInputToken_,primaryVertices);
@@ -283,13 +284,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      jecUnc->setJetPt( it->pt() );
 	    }
 
-
 	  // Status of JEC
 	  //std::cout << "PF: currentJECLevel(): " << it->currentJECLevel() << std::endl;
 	  //std::cout << "PF: currentJECSet(): " << it->currentJECSet() << std::endl;
 	  //-------------------
-
-
+	  
 	  // Vertex association
 
 	  int bestVtxIndex3Ddist = -1;
@@ -492,47 +491,59 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  phi->push_back( it->phi() );
 	  pt->push_back( it->pt() );
 
-	  //FIXME TODO later
-	  //if ( !iEvent.isRealData() ) { 
-	  //  if ( jetsSmearedUp.isValid() ){
-	  //    it_smearedUp = jetsSmearedUp -> begin() + ijet;
-	  //    ptSmearedUp -> push_back ( it_smearedUp -> pt() );
-	  //    energySmearedUp -> push_back ( it_smearedUp -> energy() );
-	  //  }
-	  //  
-	  //  if ( jetsSmearedDown.isValid() ){
-	  //    it_smearedDown = jetsSmearedDown -> begin() + ijet;
-	  //    ptSmearedDown -> push_back ( it_smearedDown -> pt() );
-	  //    energySmearedDown -> push_back ( it_smearedDown -> energy() );
-	  //  }
-	  //  
-	  //  if ( jetsScaledUp.isValid() ){
-	  //    it_scaledUp = jetsScaledUp -> begin() + ijet;
-	  //    ptScaledUp -> push_back ( it_scaledUp -> pt() );
-	  //    energyScaledUp -> push_back ( it_scaledUp -> energy() );
-	  //  }
-	  //  
-	  //  if ( jetsScaledDown.isValid() ){
-	  //    it_scaledDown = jetsScaledDown -> begin() + ijet;
-	  //    ptScaledDown -> push_back ( it_scaledDown -> pt() );
-	  //    energyScaledDown -> push_back ( it_scaledDown -> energy() );
-	  //  }
-	  //}
-	  //
-	  //else { 
-	  //  ptSmearedUp       -> push_back ( it -> pt()     );
-	  //  energySmearedUp   -> push_back ( it -> energy() );
-	  //  ptSmearedDown     -> push_back ( it -> pt()     );
-	  //  energySmearedDown -> push_back ( it -> energy() );
-	  //  ptScaledUp        -> push_back ( it -> pt()     );
-	  //  energyScaledUp    -> push_back ( it -> energy() );
-	  //  ptScaledDown      -> push_back ( it -> pt()     );
-	  //  energyScaledDown  -> push_back ( it -> energy() );
-	  //}
-
+	  
+	  // JER
+	  if(readJERuncertainty)
+	    {
+	      // JER
+	      // create a JetParameters object
+	      // You *must* now in advance which variables are needed for getting the resolution. For the moment, only pt and eta are needed, but this will
+	      // probably change in the future when PU dependency is added. Please keep an eye on the twiki page:
+	      //     https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution
+	      JME::JetParameters jetParameters;
+	      jetParameters.setJetPt(it->pt());
+	      jetParameters.setJetEta(it->eta());
+	      jetParameters.setRho(*rho);
+	      // get resolution
+	      float jetRes = resolution.getResolution(jetParameters);
+	      // We do the same thing to access the scale factor
+	      float jetResScaleFactor = res_sf.getScaleFactor(jetParameters);
+	      // Access up and down variation of the scale factor
+	      float jetResScaleFactorUp = res_sf.getScaleFactor(jetParameters, Variation::UP);
+	      float jetResScaleFactorDown = res_sf.getScaleFactor(jetParameters, Variation::DOWN);
+	      
+	      //// JER smearing: https://twiki.cern.ch/twiki/bin/viewauth/CMS/JetResolution#Smearing_procedures
+	      // requires matching to gen jet, so just store the info needed to do the smearing here
+	      //if ( !iEvent.isRealData() ) { 
+	      //  // make the collections
+	      //}
+	      //else { 
+	      //  ptSmearedUp       -> push_back ( it -> pt()     );
+	      //  energySmearedUp   -> push_back ( it -> energy() );
+	      //  ptSmearedDown     -> push_back ( it -> pt()     );
+	      //  energySmearedDown -> push_back ( it -> energy() );
+	      //  ptScaledUp        -> push_back ( it -> pt()     );
+	      //  energyScaledUp    -> push_back ( it -> energy() );
+	      //  ptScaledDown      -> push_back ( it -> pt()     );
+	      //  energyScaledDown  -> push_back ( it -> energy() );
+	      //}
+	      jerRes_vec->push_back(jetRes);
+	      jerResSF_vec->push_back(jetResScaleFactor);
+	      jerResSFup_vec->push_back(jetResScaleFactorUp);
+	      jerResSFdown_vec->push_back(jetResScaleFactorDown);
+	    }
+	  else
+	    {
+	      jerRes_vec->push_back(-999);
+	      jerResSF_vec->push_back(-999);
+	      jerResSFup_vec->push_back(-999);
+	      jerResSFdown_vec->push_back(-999);
+	    }
+	  
 	  pt_raw->push_back( it->correctedJet("Uncorrected").pt() );
 	  energy->push_back( it->energy() );
 	  energy_raw->push_back( it->correctedJet("Uncorrected").energy() );
+	  //JEC
 	  //// test
 	  //std::cout << "inside module with label: " << inputTag.label() << std::endl;
 	  //for(std::vector<std::string>::const_iterator jecItr = it->availableJECSets().begin();
@@ -545,7 +556,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  //  std::cout << std::endl;
 	  //}
 	  //// end test
-	  l2l3resJEC_vec->push_back( it->pt()/it->correctedJet("L3Absolute").pt() );
+	  l2l3resJEC_vec->push_back( it->correctedJet("L2L3Residual").pt()/it->correctedJet("L3Absolute").pt() );//FIXME do we really want these as ratios to each other? Does L3Absolute e.g. contain L2Relative already? If not they are useless...
 	  l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
 	  // puppi appears to have no L1FastJet correction available for 2012D PromptReco-v3
 	  if(!isPuppiJetColl)
@@ -568,6 +579,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  else {
 	    jecUnc_vec->push_back( -999 );
 	  }
+
 	  partonFlavour->push_back( it->partonFlavour() );
 	  chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
 	  chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
@@ -709,6 +721,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( l3absJEC_vec, prefix + "L3AbsJEC" + suffix );
   iEvent.put( l2relJEC_vec, prefix + "L2RelJEC" + suffix );
   iEvent.put( l1fastjetJEC_vec, prefix + "L1FastJetJEC" + suffix );
+  iEvent.put( jerRes_vec, prefix + "JERRes" + suffix );
+  iEvent.put( jerResSF_vec, prefix + "JERResSF" + suffix );
+  iEvent.put( jerResSFup_vec, prefix + "JERResSFUp" + suffix );
+  iEvent.put( jerResSFdown_vec, prefix + "JERResSFDown" + suffix );
   iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );
   iEvent.put( chargedEmEnergyFraction,  prefix + "ChargedEmEnergyFraction"  + suffix );
   iEvent.put( chargedHadronEnergyFraction,  prefix + "ChargedHadronEnergyFraction"  + suffix );

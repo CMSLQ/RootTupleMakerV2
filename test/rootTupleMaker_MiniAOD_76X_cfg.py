@@ -187,13 +187,13 @@ process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12' # (25ns, Data2015v1 PU
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 # Events to process
-process.maxEvents.input = 10
+process.maxEvents.input = -1
 
 # Input files
 process.source.fileNames = [
     # specified by InputList.txt
     # LQToUE-M550
-    '/store/mc/RunIIFall15MiniAODv1/LQToUE_M-550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/106D05E3-96A3-E511-8BB2-02163E016451.root',
+    #'/store/mc/RunIIFall15MiniAODv1/LQToUE_M-550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/106D05E3-96A3-E511-8BB2-02163E016451.root',
     '/store/mc/RunIIFall15MiniAODv1/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/DA82E787-46A6-E511-A34F-002590200ABC.root'
     ]
 
@@ -354,7 +354,7 @@ process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.Inpu
 #                  b-tagging and pileup jet id information are embedded.
 #                  Links are provided to the constituent PF candidates. 
 #Rebuild AK5 jets
-process.load('Leptoquarks.RootTupleMakerV2.ak5pfjets_cfi')
+#process.load('Leptoquarks.RootTupleMakerV2.ak5pfjets_cfi')
 ## b-tag discriminators
 #bTagDiscriminators = [
 #  'pfTrackCountingHighEffBJetTags',
@@ -367,24 +367,24 @@ process.load('Leptoquarks.RootTupleMakerV2.ak5pfjets_cfi')
 #  'pfCombinedInclusiveSecondaryVertexV2BJetTags',
 #  'pfCombinedMVABJetTags'
 #  ]
-bTagDiscriminatorsAK5 = [
-  #'pfCombinedInclusiveSecondaryVertexV2BJetTags'
-  'None' # SIC: couldn't get AK5 jets to work otherwise
-]
-from PhysicsTools.PatAlgos.tools.jetTools import *
-addJetCollection(process,
-                 labelName = 'AK5PF',
-                 jetSource = cms.InputTag('ak5PFJets'),
-                 pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
-                 pfCandidates = cms.InputTag('packedPFCandidates'),
-                 svSource = cms.InputTag('slimmedSecondaryVertices'),
-                 btagDiscriminators = bTagDiscriminatorsAK5,
-                 jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-                 genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
-                 genParticles = cms.InputTag('prunedGenParticles'),
-                 algo = 'AK',
-                 rParam = 0.5,
-)
+#bTagDiscriminatorsAK5 = [
+#  #'pfCombinedInclusiveSecondaryVertexV2BJetTags'
+#  'None' # SIC: couldn't get AK5 jets to work otherwise
+#]
+#from PhysicsTools.PatAlgos.tools.jetTools import *
+#addJetCollection(process,
+#                 labelName = 'AK5PF',
+#                 jetSource = cms.InputTag('ak5PFJets'),
+#                 pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
+#                 pfCandidates = cms.InputTag('packedPFCandidates'),
+#                 svSource = cms.InputTag('slimmedSecondaryVertices'),
+#                 btagDiscriminators = bTagDiscriminatorsAK5,
+#                 jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+#                 genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
+#                 genParticles = cms.InputTag('prunedGenParticles'),
+#                 algo = 'AK',
+#                 rParam = 0.5,
+#)
 #addJetCollection(process,
 #                 labelName = 'AK5PFCHS',
 #                 jetSource = cms.InputTag('ak5PFJetsCHS'),
@@ -408,30 +408,30 @@ addJetCollection(process,
 ## needed when using btagInfos?
 ##process.jetTracksAssociatorAtVertexAK5.tracks = 'unpackedTracksAndVertices'
 ##process.jetTracksAssociatorAtVertexAK5.pvSrc = 'offlineSlimmedPrimaryVertices'
-from PhysicsTools.PatAlgos.tools.pfTools import *
+#from PhysicsTools.PatAlgos.tools.pfTools import *
 ## Adapt primary vertex collection
-adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
-process.ak5PatJetSequence = cms.Sequence(
-    process.patJetCorrFactorsAK5PF*
-    process.patJetCorrFactorsAK5PFCHS*
-    process.patJetPartons*
-    process.patJetPartonMatchAK5PF*
-    process.patJetPartonMatchAK5PFCHS*
-    process.patJetFlavourAssociationAK5PF*
-    process.patJetFlavourAssociationAK5PFCHS*
-    process.patJetGenJetMatchAK5PF*
-    process.patJetGenJetMatchAK5PFCHS*
-    process.pfImpactParameterTagInfosAK5PF*
-    process.pfImpactParameterTagInfosAK5PFCHS*
-    process.pfInclusiveSecondaryVertexFinderTagInfosAK5PF*
-    process.pfInclusiveSecondaryVertexFinderTagInfosAK5PFCHS*
-    process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PF*
-    process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PFCHS*
-    process.patJetsAK5PF*
-    process.patJetsAK5PFCHS*
-    process.selectedPatJetsAK5PF*
-    process.selectedPatJetsAK5PFCHS
-)
+#adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
+#process.ak5PatJetSequence = cms.Sequence(
+#    process.patJetCorrFactorsAK5PF*
+#    #process.patJetCorrFactorsAK5PFCHS*
+#    process.patJetPartons*
+#    process.patJetPartonMatchAK5PF*
+#    #process.patJetPartonMatchAK5PFCHS*
+#    process.patJetFlavourAssociationAK5PF*
+#    #process.patJetFlavourAssociationAK5PFCHS*
+#    process.patJetGenJetMatchAK5PF*
+#    #process.patJetGenJetMatchAK5PFCHS*
+#    #process.pfImpactParameterTagInfosAK5PF* #FIXME 'Process' object has no attribute 'pfImpactParameterTagInfosAK5PF'
+#    #process.pfImpactParameterTagInfosAK5PFCHS*
+#    #process.pfInclusiveSecondaryVertexFinderTagInfosAK5PF* #FIXME
+#    #process.pfInclusiveSecondaryVertexFinderTagInfosAK5PFCHS*
+#    #process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PF*#FIXME
+#    #process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PFCHS*
+#    process.patJetsAK5PF*
+#    #process.patJetsAK5PFCHS*
+#    process.selectedPatJetsAK5PF#*
+#    #process.selectedPatJetsAK5PFCHS
+#)
 #process.out.outputCommands += ['keep *_ak5GenJets_*_EX',
 #                               'keep *_ak5PFJets_*_EX',
 #                               'keep *_ak5PFJetsCHS_*_EX', ]
@@ -450,15 +450,15 @@ jecUncFileMC='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_UncertaintySo
 #dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
 
 # Get JER from text files
-process.rootTuplePFJetsAK5.ReadJERFromGT = False
+#process.rootTuplePFJetsAK5.ReadJERFromGT = False
 #process.rootTuplePFJetsAK5CHS.ReadJERFromGT = False
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = False
 process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = False
-process.rootTuplePFJetsAK5.JERResolutionsFile = jerResFile
+#process.rootTuplePFJetsAK5.JERResolutionsFile = jerResFile
 #process.rootTuplePFJetsAK5CHS.JERResolutionsFile = jerResFile
 process.rootTuplePFJetsAK4CHS.JERResolutionsFile = jerResFile
 process.rootTuplePFJetsAK4Puppi.JERResolutionsFile = jerResFile
-process.rootTuplePFJetsAK5.JERScaleFactorsFile = jerScaleFactorsFile
+#process.rootTuplePFJetsAK5.JERScaleFactorsFile = jerScaleFactorsFile
 #process.rootTuplePFJetsAK5CHS.JERScaleFactorsFile = jerScaleFactorsFile
 process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile = jerScaleFactorsFile
 process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFile

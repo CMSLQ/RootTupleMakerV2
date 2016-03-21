@@ -24,6 +24,7 @@
 <use name="GeneratorInterface/LHEInterface"/>
 <use name="FWCore/ServiceRegistry"/>
 <use name="FWCore/Utilities"/>
+<use name="JetMETCorrections/Modules"/>
 
 <flags EdmPlugin="1"/>
 <library name="LeptoquarksRootTupleMakerV2Plugins" file="*.cc"/>

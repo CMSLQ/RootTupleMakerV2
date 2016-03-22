@@ -8,6 +8,9 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GtFdlWord.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 
 class RootTupleMakerV2_EventSelection : public edm::EDProducer {
  public:

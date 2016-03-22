@@ -1,12 +1,9 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_EventSelection.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "FWCore/Common/interface/TriggerNames.h"
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
   l1InputToken_(consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
   filterResultsInputToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag")))
-		       {
+{
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
   produces <bool> ("isBSCMinBias");

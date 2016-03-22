@@ -17,7 +17,7 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   pdfMMTHWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFMMTHWeightsInputTag"))),
   pdfNNPDFWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFNNPDFWeightsInputTag"))),
   pileupInfoSrcToken_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupInfo"))),
-  LHERunInfoToken_(consumes<LHERunInfoProduct>(iConfig.getParameter<edm::InputTag>("LHERunInfoProductInputTag"))),
+  LHERunInfoToken_(consumes<LHERunInfoProduct, edm::InRun >(iConfig.getParameter<edm::InputTag>("LHERunInfoProductInputTag"))),
   LHEEventProductToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductInputTag")))
 {
   produces <unsigned int> ( "ProcessID" );

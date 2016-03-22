@@ -556,7 +556,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  //  std::cout << std::endl;
 	  //}
 	  //// end test
-	  l2l3resJEC_vec->push_back( it->correctedJet("L2L3Residual").pt()/it->correctedJet("L3Absolute").pt() );//FIXME do we really want these as ratios to each other? Does L3Absolute e.g. contain L2Relative already? If not they are useless...
+	  if(iEvent.isRealData())
+	    l2l3resJEC_vec->push_back( it->correctedJet("L2L3Residual").pt()/it->correctedJet("L3Absolute").pt() );//FIXME do we really want these as ratios to each other? Does L3Absolute e.g. contain L2Relative already? If not they are useless...
+	  else
+	    l2l3resJEC_vec->push_back( 1.0 );
 	  l3absJEC_vec->push_back( it->correctedJet("L3Absolute").pt()/it->correctedJet("L2Relative").pt() );
 	  // puppi appears to have no L1FastJet correction available for 2012D PromptReco-v3
 	  if(!isPuppiJetColl)

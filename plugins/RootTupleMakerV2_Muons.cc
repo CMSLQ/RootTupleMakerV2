@@ -435,7 +435,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 
 	  // HLT Single Iso Muon trigger matching
-	  const pat::TriggerObjectStandAloneCollection matchesSingleIsoMu = it->triggerObjectMatchesByPath("HLT_IsoMu24_eta2p1_v*");
+	  const pat::TriggerObjectStandAloneCollection matchesSingleIsoMu = it->triggerObjectMatchesByPath("HLT_IsoMu27_v*");
 	  if (matchesSingleIsoMu.size() > 0)
 	    {
 	      HLTSingleIsoMuonMatched  -> push_back ( true ) ;

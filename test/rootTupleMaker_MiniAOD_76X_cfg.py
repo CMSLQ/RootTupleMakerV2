@@ -28,16 +28,6 @@ else:
 #process.load('Configuration.StandardSequences.Services_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff')
-process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
-        calibratedPatElectrons = cms.PSet(
-        initialSeed = cms.untracked.uint32(1),
-        engineName = cms.untracked.string('TRandom3')
-        ),
-        calibratedElectrons = cms.PSet(
-        initialSeed = cms.untracked.uint32(1),
-        engineName = cms.untracked.string('TRandom3')
-        ),
-)
 
 # Change process name
 process._Process__name="ROOTTUPLEMAKERV2"
@@ -48,7 +38,7 @@ process.options.allowUnscheduled = cms.untracked.bool(False)
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
 # the size of the output by prescaling the report of the event number
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.MessageLogger.cerr.default.limit = 10
 process.MessageLogger.threshold = cms.untracked.string('DEBUG')
 process.MessageLogger.categories.extend(["GetManyWithoutRegistration","GetByLabelWithoutRegistration"])
@@ -62,9 +52,6 @@ process.MessageLogger.cerr.GetManyWithoutRegistration = _messageSettings
 process.MessageLogger.cerr.GetByLabelWithoutRegistration = _messageSettings
 #################################################################
 
-# We should be using PFIso by default in newer CMSSW
-# see: PhysicsTools/PatAlgos/python/producersLayer1/electronProducer_cff.py
-
 #----------------------------------------------------------------------------------------------------
 # Load our RootTupleMakerV2 modules
 #----------------------------------------------------------------------------------------------------
@@ -74,7 +61,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 #----------------------------------------------------------------------------------------------------
 # Output ROOT file
 #----------------------------------------------------------------------------------------------------
-# Output ROOT file
+
 process.TFileService = cms.Service("TFileService",
     #fileName = cms.string( "file_m650.root" )
     fileName = cms.string( "file_data.root" )
@@ -92,8 +79,8 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # MC
 process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12' # (25ns, Data2015v1 PU profile)
 # Data
-#process.GlobalTag.globaltag = '74X_dataRun2_v2'
-#process.GlobalTag.globaltag = '74X_dataRun2_reMiniAOD_v0'
+#process.GlobalTag.globaltag = '76X_dataRun2_v15'
+#process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
@@ -125,11 +112,9 @@ from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 #process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # Define which IDs we want to produce
-# Each of these two example IDs contains all four standard
-# cut-based ID working points
+# Each of these two example IDs contains all four standard cut-based ID working points
 my_id_modules = []
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV51_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
 #Add them to the VID producer
@@ -137,7 +122,7 @@ for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 # XXX NB, must be the same as input collection used for electron ntuplizer
 process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
-process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag
+process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag#FIXME do we need this?
 
 #----------------------------------------------------------------------------------------------------
 # Turn on trigger matching
@@ -170,41 +155,6 @@ process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 # MET filters
 # https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
 #----------------------------------------------------------------------------------------------------
-# SIC: A number of filters are run by default:
-#Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilter)
-#Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
-#Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
-#Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
-#Flag_goodVertices = cms.Path(goodVertices)
-#Flag_trackingFailureFilter = cms.Path(goodVertices + trackingFailureFilter)
-#Flag_eeBadScFilter = cms.Path(eeBadScFilter)
-#Flag_ecalLaserCorrFilter = cms.Path(ecalLaserCorrFilter)
-#Flag_trkPOGFilters = cms.Path(trkPOGFilters)
-#Flag_trkPOG_manystripclus53X = cms.Path(manystripclus53X)
-#Flag_trkPOG_toomanystripclus53X = cms.Path(toomanystripclus53X)
-#Flag_trkPOG_logErrorTooManyClusters = cms.Path(logErrorTooManyClusters)
-# See: https://github.com/cms-sw/cmssw/blob/CMSSW_7_2_X/PhysicsTools/PatAlgos/python/slimming/metFilterPaths_cff.py
-# They are stored in edm::TriggerResults of the PAT process, and can be checked the same way as HLT paths.
-# As per https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#early_data_issues_for_the_septem
-#  For jamboree, use:
-#  - Flag_HBHENoiseFilter: needs to be re-run manually as below
-#  - Flag_HBHENoiseIsoFilter: needs to be re-run manually as below
-#  - Flag_CSCTightHaloFilter: will need to be replaced with run2 version (use txt files)
-#  - Flag_goodVertices 
-#  - Flag_eeBadScFilter (use txt files for one bad SC; 3 others are tagged by this flag)
-# HCAL_Noise_Filter
-#process.load('CommonTools.RecoAlgos.HBHENoiseFilterResultProducer_cfi')
-#process.HBHENoiseFilterResultProducer.minZeros = cms.int32(99999)
-#process.HBHENoiseFilterResultProducer.IgnoreTS4TS5ifJetInLowBVRegion=cms.bool(False) 
-#process.HBHENoiseFilterResultProducer.defaultDecision = cms.string("HBHENoiseFilterResultRun2Loose")
-#process.ApplyBaselineHBHENoiseFilter = cms.EDFilter('BooleanFlagFilter',
-#   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHENoiseFilterResult'),
-#   reverseDecision = cms.bool(False)
-#)
-#process.ApplyBaselineHBHEIsoNoiseFilter = cms.EDFilter('BooleanFlagFilter',
-#   inputLabel = cms.InputTag('HBHENoiseFilterResultProducer','HBHEIsoNoiseFilterResult'),
-#   reverseDecision = cms.bool(False)
-#)
 
 #----------------------------------------------------------------------------------------------------
 # Use default MiniAOD Taus
@@ -555,7 +505,7 @@ for shift in allowedShifts:
           )
           setattr(process,modName,module)
           process.rootNTupleNewMETs *= getattr(process,modName)
-#process.schedule.append(process.rootNTupleNewMETs)
+#process.schedule.append(process.rootNTupleNewMETs)#FIXME do we need this?
 
 
 #----------------------------------------------------------------------------------------------------

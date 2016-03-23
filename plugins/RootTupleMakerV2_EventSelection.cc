@@ -16,7 +16,6 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passTightHaloTrkMuUnvetoFilter");
   produces <bool> ("passBeamHalo2015FilterTight");
   produces <bool> ("passHcalStripHaloFilter");
-  produces <bool> ("passHcalLaserEventFilter");
   //
   produces <bool> ("passEcalDeadCellTriggerPrimitiveFilter");
   produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
@@ -24,9 +23,12 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passBadEESupercrystalFilter");
   produces <bool> ("passEcalLaserCorrFilter");
   // 
-  produces <bool> ("passLogErrorTooManyClusters");
+  produces <bool> ("passTrkPOGFilters");
+  produces <bool> ("passChargedHadronTrackResolutionFilter");
+  produces <bool> ("passMuonBadTrackFilter");
   produces <bool> ("passManyStripClus53X"       );
   produces <bool> ("passTooManyStripClus53X"    );
+  produces <bool> ("passLogErrorTooManyClusters");
 }
 
 void RootTupleMakerV2_EventSelection::

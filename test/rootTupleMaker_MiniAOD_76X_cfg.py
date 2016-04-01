@@ -26,6 +26,16 @@ else:
 
 #process.load('PhysicsTools.PatAlgos.patSequences_cff')
 #process.load('Configuration.StandardSequences.Services_cff')
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+    calibratedPatElectrons = cms.PSet(
+      initialSeed = cms.untracked.uint32(1),
+      engineName = cms.untracked.string('TRandom3')
+      ),
+    calibratedElectrons = cms.PSet(
+      initialSeed = cms.untracked.uint32(1),
+      engineName = cms.untracked.string('TRandom3')
+      ),
+)
 process.load('JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff')
 process.load('JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff')
 
@@ -98,34 +108,6 @@ process.source.fileNames = [
     #'/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root'
 ]
 
-# HEEP 5.1/6.0
-# Also load Egamma cut-based ID in new VID framework while we're at it
-# See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
-#   and for HEEP: https://hypernews.cern.ch/HyperNews/CMS/get/egamma/1519/2/1/1/1.html
-# Set up everything that is needed to compute electron IDs and
-# add the ValueMaps with ID decisions into the event data stream
-#
-# Load tools and function definitions
-#from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-#process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
-#process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
-#from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
-from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-#process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
-switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
-# Define which IDs we want to produce
-# Each of these two example IDs contains all four standard cut-based ID working points
-my_id_modules = []
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
-#Add them to the VID producer
-for idmod in my_id_modules:
-  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-# XXX NB, must be the same as input collection used for electron ntuplizer
-process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
-process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag#FIXME do we need this?
-
 #----------------------------------------------------------------------------------------------------
 # Turn on trigger matching
 #----------------------------------------------------------------------------------------------------
@@ -134,14 +116,16 @@ process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.Inpu
 # To access, see: https://hypernews.cern.ch/HyperNews/CMS/get/physTools/3286/1/2.html
 # This is based off of the hypernews post
 # FIXME check that we match to the paths we want while we're updating the cpp code
-from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTrigger
-# need to load it into the process, or else it won't run
-process.unpackedPatTrigger = unpackedPatTrigger.clone()
+#from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTrigger
+## need to load it into the process, or else it won't run
+#process.unpackedPatTrigger = unpackedPatTrigger.clone()
+process.load('PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi')
 
 process.cleanElectronTriggerMatchHLTSingleElectron.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTSingleElectronWP85.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTElectronJetJet.matched = 'unpackedPatTrigger'
+process.cleanMuonTriggerMatchHLTMuon.matched = 'unpackedPatTrigger'
 process.cleanMuonTriggerMatchHLTSingleMuon.matched = 'unpackedPatTrigger'
 process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
 process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
@@ -194,6 +178,41 @@ process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 #process.analysisPatElectrons.finalCut = cms.string('userInt("HEEPId") < 0.5')
 #process.cleanPatCandidates.replace ( process.cleanPatElectrons, process.cleanPatElectrons + process.analysisPatElectrons )
 # FIXME
+
+# need the egamma smearing for 76X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMSmearer
+process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
+correctionType = "Prompt2015"
+process.calibratedPatElectrons.isMC = varOptions.isMC
+# ntuplize this corrected electron collection
+process.rootTupleElectrons.InputTag = cms.InputTag('calibratedPatElectrons','')
+# HEEP 5.1/6.0
+# Also load Egamma cut-based ID in new VID framework while we're at it
+# See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
+#   and for HEEP: https://hypernews.cern.ch/HyperNews/CMS/get/egamma/1519/2/1/1/1.html
+# Set up everything that is needed to compute electron IDs and
+# add the ValueMaps with ID decisions into the event data stream
+#
+# Load tools and function definitions
+#from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+#process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
+#process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
+#from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+#process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
+switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
+# Define which IDs we want to produce
+# Each of these two example IDs contains all four standard cut-based ID working points
+my_id_modules = []
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
+#Add them to the VID producer
+for idmod in my_id_modules:
+  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+# XXX NB, must be the same as input collection used for electron ntuplizer
+process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
+process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag#FIXME do we need this?
+
 
 #----------------------------------------------------------------------------------------------------
 # Add MVA electron ID
@@ -644,17 +663,15 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 # to see Event content
 #process.load('FWCore.Modules.printContent_cfi')
 
-process.prereqs = cms.Path(
+process.p = cms.Path(
     # L+J Filter
     process.LJFilter*  
     # supporting producers
     #process.ak5PFJetsSequence*
     #process.ak5PatJetSequence*
     process.unpackedPatTrigger*
-    process.egmGsfElectronIDs
-)
-
-process.p = cms.Path(
+    process.calibratedPatElectrons*
+    process.egmGsfElectronIDs*
     # Put everything into the tree
     process.rootTupleEvent*
     process.rootTupleEventSelection*
@@ -716,8 +733,5 @@ process.p = cms.Path(
 # Delete predefined Endpath (needed for running with CRAB)
 del process.out
 del process.outpath
-
-process.schedule = cms.Schedule(process.prereqs,process.p)#,process.DUMP)
-#process.schedule = cms.Schedule(process.p,process.makeTree)
 
 #print process.dumpPython()

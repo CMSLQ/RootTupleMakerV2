@@ -91,9 +91,11 @@ process.maxEvents.input = 1000
 process.source.fileNames = [
     # specified by InputList.txt
     # LQToUE-M550
-    #'/store/mc/RunIIFall15MiniAODv1/LQToUE_M-550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/106D05E3-96A3-E511-8BB2-02163E016451.root',
-    #'/store/mc/RunIIFall15MiniAODv1/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/DA82E787-46A6-E511-A34F-002590200ABC.root'
-    '/store/mc/RunIIFall15MiniAODv2/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/AA32F756-7BB8-E511-96C5-001E672488A4.root'
+    '/store/mc/RunIIFall15MiniAODv2/LQToUE_ENuJJFilter_M-550_BetaHalf_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/20000/9CBC6301-61B8-E511-BC05-001E67398C5A.root'
+    # LQToCMu-M1000
+    #'/store/mc/RunIIFall15MiniAODv2/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/AA32F756-7BB8-E511-96C5-001E672488A4.root'
+    # Run2012D data
+    #'/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root'
 ]
 
 # HEEP 5.1/6.0
@@ -136,6 +138,7 @@ from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTri
 # need to load it into the process, or else it won't run
 process.unpackedPatTrigger = unpackedPatTrigger.clone()
 
+process.cleanElectronTriggerMatchHLTSingleElectron.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTSingleElectronWP85.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
 process.cleanElectronTriggerMatchHLTElectronJetJet.matched = 'unpackedPatTrigger'
@@ -144,8 +147,9 @@ process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
 process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
 
 #process.out.outputCommands += ['keep *_electronsTriggerMatchHLTSingleElectron_*_*',
-#                               'keep *_electronsTriggerMatchHLTSingleElectronWP80 _*_*',
-#                               'keep *_electronsTriggerMatchHLTDoubleElectron_*_*'      ]
+#                               'keep *_electronsTriggerMatchHLTSingleElectronWP85 _*_*',
+#                               'keep *_electronsTriggerMatchHLTDoubleElectron_*_*',
+#                               'keep *_electronsTriggerMatchHLTElectroJetJetn_*_*'      ]
 ## select the matching electrons and keep them
 #process.out.outputCommands += ['keep *_ electronsTriggeredHLTSingleElectron_*_*',
 #                               'keep *_ electronsTriggeredHLTSingleElectronWP80_*_*',

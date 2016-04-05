@@ -36,13 +36,6 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   
   produces <std::string> ("HLTKey");
 
-  /*
-  produces <std::map< std::string, bool > > ("HLTInsideDatasetDecisionMap"  );
-  produces <std::map< std::string, bool > > ("HLTOutsideDatasetDecisionMap" );
-  produces <std::map< std::string, int  > > ("HLTInsideDatasetPrescaleMap"  );
-  produces <std::map< std::string, int  > > ("HLTOutsideDatasetPrescaleMap" );
-  */
-
   produces <std::vector<std::string> > ("HLTInsideDatasetTriggerNames"      );
   produces <std::vector<std::string> > ("HLTOutsideDatasetTriggerNames"     );
   produces <std::vector<bool > >       ("HLTInsideDatasetTriggerDecisions"  );
@@ -52,9 +45,6 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
 
   produces <std::vector<int> > ( "L1PhysBits" );
   produces <std::vector<int> > ( "L1TechBits" );
-  // produces <std::vector<int> > ( "HLTBits" );
-  // produces <std::vector<int> > ( "HLTResults" );
-  // produces <std::vector<int> > ( "HLTPrescales" );
 }
 
 
@@ -164,6 +154,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	v_hlt_insideDataset_names->push_back ( names.triggerName(i) );
 	v_hlt_insideDataset_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));
 	v_hlt_insideDataset_decisions->push_back ( triggerResults->accept(i) );
+  std::cout << "Trigger INFO: name=" << names.triggerName(i) << "  prescale=" << hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)) << "  accept=" << triggerResults->accept(i) << std::endl;
       } else {
 	// (*m_hlt_outsideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
 	// (*m_hlt_outsideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));

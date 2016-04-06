@@ -195,7 +195,8 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring15MiniAODv2/DYJetsToLL_M-100to200_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/74X_mcRun2_asymptotic_v2-v1/60000/D461E72B-306D-E511-9457-90B11C04FE38.root'
     # Data files
     #'/store/data/Run2015C/SingleMuon/MINIAOD/PromptReco-v1/000/254/833/00000/220E01C3-104B-E511-837F-02163E015541.root'
-    'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
+    #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SingleMuon/MINIAOD/PromptReco-v3/000/256/630/00000/BCD78EF7-2B5F-E511-A3A3-02163E0170B5.root'
+    '/store/data/Run2015D/SingleElectron/MINIAOD/PromptReco-v4/000/258/159/00000/0EC56452-186C-E511-8158-02163E0146D5.root'
     #'root://cms-xrd-global.cern.ch//store/data/Run2015D/SinglePhoton/MINIAOD/05Oct2015-v1/10000/006B6A67-B26F-E511-8341-002590593902.root'
     # reHLT
     #'/store/group/phys_exotica/leptonsPlusJets/leptoquarks/13TeVSamples/ReHLT/7415/LQToUE_M-300_BetaOne_TuneCUETP8M1_13TeV-pythia8/LQ300_BetaOne_7415ReHLT/151124_100054/0000/outputPhysicsEGammaCommissioning_1.root'
@@ -390,7 +391,7 @@ addJetCollection(process,
                  pfCandidates = cms.InputTag('packedPFCandidates'),
                  svSource = cms.InputTag('slimmedSecondaryVertices'),
                  btagDiscriminators = bTagDiscriminatorsAK5,
-                 jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+                 jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None'),
                  genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
                  genParticles = cms.InputTag('prunedGenParticles'),
                  algo = 'AK',

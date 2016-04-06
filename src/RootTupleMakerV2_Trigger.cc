@@ -82,7 +82,7 @@ getDataSource() {
 
 
 void RootTupleMakerV2_Trigger::
-beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
+beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) {
 
   bool changed = true;
   if (hltConfig.init(iRun, iSetup, hltInputTag.process(), changed)) {
@@ -146,21 +146,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << hltInputTag;
 
     const edm::TriggerNames& names = iEvent.triggerNames(*triggerResults);
+    if(!hltConfig.inited()) {
+      throw edm::Exception(edm::errors::LogicError)
+          << " HLTConfigProvider was not initialized! Prescales will be wrong!"
+          << std::endl;
+    }
 
-    for (int i = 0; i < (int) triggerResults->size() ; ++i) { 
+    for (unsigned int i = 0; i < names.size() ; ++i) { 
       if (dataSource.empty() || std::find(dataSource.begin(), dataSource.end(), names.triggerName(i)) != dataSource.end()) {
-	// (*m_hlt_insideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
-	// (*m_hlt_insideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
-	v_hlt_insideDataset_names->push_back ( names.triggerName(i) );
-	v_hlt_insideDataset_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));
-	v_hlt_insideDataset_decisions->push_back ( triggerResults->accept(i) );
-  std::cout << "Trigger INFO: name=" << names.triggerName(i) << "  prescale=" << hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)) << "  accept=" << triggerResults->accept(i) << std::endl;
+        v_hlt_insideDataset_names->push_back ( names.triggerName(i) );
+        v_hlt_insideDataset_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));
+        v_hlt_insideDataset_decisions->push_back ( triggerResults->accept(i) );
       } else {
-	// (*m_hlt_outsideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
-	// (*m_hlt_outsideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
-	v_hlt_outsideDataset_names->push_back ( names.triggerName(i) );
-	v_hlt_outsideDataset_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));
-	v_hlt_outsideDataset_decisions->push_back ( triggerResults->accept(i) );
+        v_hlt_outsideDataset_names->push_back ( names.triggerName(i) );
+        v_hlt_outsideDataset_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));
+        v_hlt_outsideDataset_decisions->push_back ( triggerResults->accept(i) );
       }      
     }
     

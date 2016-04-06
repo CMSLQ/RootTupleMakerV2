@@ -12,12 +12,9 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
-  l1InputTag  (iConfig.getParameter<edm::InputTag>("L1InputTag")),
-  hltInputTag (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
-  l1InputToken_  (consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
-  hltInputToken_ (consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
+  l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
+  hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
-  hltPrescaleProvider_(iConfig, consumesCollector(), *this),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
   sourceType(NOT_APPLICABLE)
 {
@@ -39,13 +36,6 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   
   produces <std::string> ("HLTKey");
 
-  /*
-  produces <std::map< std::string, bool > > ("HLTInsideDatasetDecisionMap"  );
-  produces <std::map< std::string, bool > > ("HLTOutsideDatasetDecisionMap" );
-  produces <std::map< std::string, int  > > ("HLTInsideDatasetPrescaleMap"  );
-  produces <std::map< std::string, int  > > ("HLTOutsideDatasetPrescaleMap" );
-  */
-
   produces <std::vector<std::string> > ("HLTInsideDatasetTriggerNames"      );
   produces <std::vector<std::string> > ("HLTOutsideDatasetTriggerNames"     );
   produces <std::vector<bool > >       ("HLTInsideDatasetTriggerDecisions"  );
@@ -55,9 +45,6 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
 
   produces <std::vector<int> > ( "L1PhysBits" );
   produces <std::vector<int> > ( "L1TechBits" );
-  // produces <std::vector<int> > ( "HLTBits" );
-  // produces <std::vector<int> > ( "HLTResults" );
-  // produces <std::vector<int> > ( "HLTPrescales" );
 }
 
 
@@ -72,8 +59,6 @@ void RootTupleMakerV2_Trigger::
 getDataSource() {
   dataSource.clear();
   if (sourceType == NOT_APPLICABLE) return;
-
-  HLTConfigProvider const& hltConfig = hltPrescaleProvider_.hltConfigProvider();
   
   if (sourceType == STREAM) {
     unsigned int  index   = hltConfig.streamIndex(sourceName);
@@ -100,7 +85,7 @@ void RootTupleMakerV2_Trigger::
 beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
 
   bool changed = true;
-  if (hltPrescaleProvider_.init(iRun, iSetup, hltInputTag.process(), changed)) {
+  if (hltConfig.init(iRun, iSetup, hltInputTag.process(), changed)) {
     // if init returns TRUE, initialisation has succeeded!
     edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "HLT config with process name " << hltInputTag.process() << " successfully extracted";
   } else {
@@ -138,10 +123,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
-  iEvent.getByToken(l1InputToken_, l1GtReadoutRecord);
+  iEvent.getByLabel(l1InputTag, l1GtReadoutRecord);
 
   if(l1GtReadoutRecord.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1GtReadoutRecord;//fixme what to put here?
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1InputTag;
 
     for (unsigned int i = 0; i < NmaxL1AlgoBit; ++i) {
       l1physbits->push_back( l1GtReadoutRecord->decisionWord()[i] ? 1 : 0 );
@@ -150,32 +135,32 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       l1techbits->push_back( l1GtReadoutRecord->technicalTriggerWord()[i] ? 1 : 0 );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the l1GtReadoutRecord";
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << l1InputTag;
   }
 
   edm::Handle<edm::TriggerResults> triggerResults;
-  iEvent.getByToken(hltInputToken_, triggerResults);
+  iEvent.getByLabel(hltInputTag, triggerResults);
 
-  HLTConfigProvider const& hltConfig = hltPrescaleProvider_.hltConfigProvider();
 
   if(triggerResults.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << triggerResults;//fixme what to put here?
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << hltInputTag;
 
     const edm::TriggerNames& names = iEvent.triggerNames(*triggerResults);
 
     for (int i = 0; i < (int) triggerResults->size() ; ++i) { 
       if (dataSource.empty() || std::find(dataSource.begin(), dataSource.end(), names.triggerName(i)) != dataSource.end()) {
-        // (*m_hlt_insideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
-        // (*m_hlt_insideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
-        v_hlt_insideDataset_names->push_back ( names.triggerName(i) );
-        v_hlt_insideDataset_prescales->push_back ( hltPrescaleProvider_.prescaleValue(iEvent,iSetup,names.triggerName(i)));
-        v_hlt_insideDataset_decisions->push_back ( triggerResults->accept(i) );
+	// (*m_hlt_insideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
+	// (*m_hlt_insideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
+	v_hlt_insideDataset_names->push_back ( names.triggerName(i) );
+	v_hlt_insideDataset_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));
+	v_hlt_insideDataset_decisions->push_back ( triggerResults->accept(i) );
+  std::cout << "Trigger INFO: name=" << names.triggerName(i) << "  prescale=" << hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)) << "  accept=" << triggerResults->accept(i) << std::endl;
       } else {
-        // (*m_hlt_outsideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
-        // (*m_hlt_outsideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
-        v_hlt_outsideDataset_names->push_back ( names.triggerName(i) );
-        v_hlt_outsideDataset_prescales->push_back ( hltPrescaleProvider_.prescaleValue(iEvent,iSetup,names.triggerName(i)));
-        v_hlt_outsideDataset_decisions->push_back ( triggerResults->accept(i) );
+	// (*m_hlt_outsideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
+	// (*m_hlt_outsideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
+	v_hlt_outsideDataset_names->push_back ( names.triggerName(i) );
+	v_hlt_outsideDataset_prescales->push_back ( hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i)));
+	v_hlt_outsideDataset_decisions->push_back ( triggerResults->accept(i) );
       }      
     }
     
@@ -207,7 +192,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
     */
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product triggerResults";
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the product " << hltInputTag;
   }
   
   //-----------------------------------------------------------------

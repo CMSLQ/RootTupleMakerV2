@@ -87,10 +87,12 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 # MC
-process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12' # (25ns, Data2015v1 PU profile)
+if varOptions.isMC:
+  process.GlobalTag.globaltag = '76X_mcRun2_asymptotic_v12' # (25ns, Data2015v1 PU profile)
 # Data
 #process.GlobalTag.globaltag = '76X_dataRun2_v15'
-#process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
+else:
+  process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
@@ -101,11 +103,11 @@ process.maxEvents.input = 1000
 process.source.fileNames = [
     # specified by InputList.txt
     # LQToUE-M550
-    '/store/mc/RunIIFall15MiniAODv2/LQToUE_ENuJJFilter_M-550_BetaHalf_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/20000/9CBC6301-61B8-E511-BC05-001E67398C5A.root'
+    #'/store/mc/RunIIFall15MiniAODv2/LQToUE_ENuJJFilter_M-550_BetaHalf_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/20000/9CBC6301-61B8-E511-BC05-001E67398C5A.root'
     # LQToCMu-M1000
     #'/store/mc/RunIIFall15MiniAODv2/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/AA32F756-7BB8-E511-96C5-001E672488A4.root'
-    # Run2012D data
-    #'/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root'
+    # Run2015D data
+    '/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -634,8 +636,8 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleVertex_*_*',
         ## MET objects for analysis
         'keep *_rootTuplePFMET*_*_*',
-        # Trigger objects
-        #'keep *_rootTupleTrigger_*_*',
+        # Trigger stuff
+        'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
         # GEN objects
         'keep *_rootTupleGenEventInfo_*_*',
@@ -682,6 +684,7 @@ process.p = cms.Path(
     process.rootTuplePFJetsSequence*
     process.rootTuplePFMET*
     process.rootTupleTriggerObjects*
+    process.rootTupleTrigger*
     process.rootTupleGenEventInfo*
     process.rootTupleGenParticles*
     process.rootTupleGenJetsSequence*

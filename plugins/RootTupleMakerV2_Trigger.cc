@@ -12,8 +12,10 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
-  l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
-  hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
+  l1InputTag_ (iConfig.getParameter<edm::InputTag>("L1InputTag")),
+  hltInputTag_ (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
+  l1InputToken_ (consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
+  hltInputToken_ (consumes<edm::TriggerResults> (iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
   hltPrescaleProvider_(iConfig, consumesCollector(), *this),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
@@ -66,7 +68,7 @@ getDataSource() {
   if (sourceType == STREAM) {
     unsigned int  index   = hltConfig.streamIndex(sourceName);
     if (index >= hltConfig.streamNames().size()) {
-      edm::LogError( "RootTupleMakerV2_TriggerError" ) << "Streams in '" << hltInputTag.process() << "' HLT menu:";
+      edm::LogError( "RootTupleMakerV2_TriggerError" ) << "Streams in '" << hltInputTag_.process() << "' HLT menu:";
       printNames(hltConfig.streamNames());
       throw edm::Exception(edm::errors::Configuration) << "Stream with name '" << sourceName << "' does not exist." << std::endl;
     }
@@ -75,7 +77,7 @@ getDataSource() {
   else {
     unsigned int  index   = hltConfig.datasetIndex(sourceName);
     if (index >= hltConfig.datasetNames().size()) {
-      edm::LogError( "RootTupleMakerV2_TriggerError" ) << "Datasets in '" << hltInputTag.process() << "' HLT menu:";
+      edm::LogError( "RootTupleMakerV2_TriggerError" ) << "Datasets in '" << hltInputTag_.process() << "' HLT menu:";
       printNames(hltConfig.datasetNames());
       throw edm::Exception(edm::errors::Configuration) << "Dataset with name '" << sourceName << "' does not exist." << std::endl;
     }
@@ -88,13 +90,13 @@ void RootTupleMakerV2_Trigger::
 beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) {
 
   bool changed = true;
-  if (hltPrescaleProvider_.init(iRun, iSetup, hltInputTag.process(), changed)) {
+  if (hltPrescaleProvider_.init(iRun, iSetup, hltInputTag_.process(), changed)) {
     // if init returns TRUE, initialisation has succeeded!
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "HLT config with process name " << hltInputTag.process() << " successfully extracted";
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "HLT config with process name " << hltInputTag_.process() << " successfully extracted";
   } else {
     // if init returns FALSE, initialisation has NOT succeeded, which indicates a problem
     // with the file and/or code and needs to be investigated!
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! HLT config extraction with process name " << hltInputTag.process() << " failed";
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! HLT config extraction with process name " << hltInputTag_.process() << " failed";
     // In this case, all access methods will return empty values!
   }
 

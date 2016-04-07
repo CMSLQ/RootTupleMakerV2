@@ -9,13 +9,18 @@
 class RootTupleMakerV2_Trigger : public edm::EDProducer {
  public:
   explicit RootTupleMakerV2_Trigger(const edm::ParameterSet&);
+  ~RootTupleMakerV2_Trigger() {};
 
  private:
-  enum DataSource { NOT_APPLICABLE, STREAM, DATASET };
-  void produce( edm::Event &, const edm::EventSetup & );
-  void beginRun( edm::Run &, const edm::EventSetup & );
+  virtual void beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) override;
+  virtual void beginJob() {};
+  virtual void produce( edm::Event &, const edm::EventSetup & ) override;
+  virtual void endJob() {};
+
   void getDataSource() ;
   void printNames(const std::vector<std::string>& names);
+
+  enum DataSource { NOT_APPLICABLE, STREAM, DATASET };
   const edm::InputTag   l1InputTag;
   const edm::InputTag   hltInputTag;
   const edm::EDGetTokenT<L1GlobalTriggerReadoutRecord>   l1InputToken_;

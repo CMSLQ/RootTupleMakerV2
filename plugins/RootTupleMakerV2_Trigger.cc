@@ -12,10 +12,8 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
-  l1InputTag  (iConfig.getParameter<edm::InputTag>("L1InputTag")),
-  hltInputTag (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
-  l1InputToken_  (consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
-  hltInputToken_ (consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
+  l1InputTag(iConfig.getParameter<edm::InputTag>("L1InputTag")),
+  hltInputTag(iConfig.getParameter<edm::InputTag>("HLTInputTag")),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
   hltPrescaleProvider_(iConfig, consumesCollector(), *this),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
@@ -39,13 +37,6 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   
   produces <std::string> ("HLTKey");
 
-  /*
-  produces <std::map< std::string, bool > > ("HLTInsideDatasetDecisionMap"  );
-  produces <std::map< std::string, bool > > ("HLTOutsideDatasetDecisionMap" );
-  produces <std::map< std::string, int  > > ("HLTInsideDatasetPrescaleMap"  );
-  produces <std::map< std::string, int  > > ("HLTOutsideDatasetPrescaleMap" );
-  */
-
   produces <std::vector<std::string> > ("HLTInsideDatasetTriggerNames"      );
   produces <std::vector<std::string> > ("HLTOutsideDatasetTriggerNames"     );
   produces <std::vector<bool > >       ("HLTInsideDatasetTriggerDecisions"  );
@@ -55,9 +46,6 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
 
   produces <std::vector<int> > ( "L1PhysBits" );
   produces <std::vector<int> > ( "L1TechBits" );
-  // produces <std::vector<int> > ( "HLTBits" );
-  // produces <std::vector<int> > ( "HLTResults" );
-  // produces <std::vector<int> > ( "HLTPrescales" );
 }
 
 
@@ -97,7 +85,7 @@ getDataSource() {
 
 
 void RootTupleMakerV2_Trigger::
-beginRun(edm::Run& iRun, const edm::EventSetup& iSetup) {
+beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) {
 
   bool changed = true;
   if (hltPrescaleProvider_.init(iRun, iSetup, hltInputTag.process(), changed)) {
@@ -162,17 +150,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << triggerResults;//fixme what to put here?
 
     const edm::TriggerNames& names = iEvent.triggerNames(*triggerResults);
+    if(!hltConfig.inited()) {
+      throw edm::Exception(edm::errors::LogicError)
+          << " HLTConfigProvider was not initialized! Prescales will be wrong!"
+          << std::endl;
+    }
 
-    for (int i = 0; i < (int) triggerResults->size() ; ++i) { 
+    for (unsigned int i = 0; i < names.size() ; ++i) { 
       if (dataSource.empty() || std::find(dataSource.begin(), dataSource.end(), names.triggerName(i)) != dataSource.end()) {
-        // (*m_hlt_insideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
-        // (*m_hlt_insideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
         v_hlt_insideDataset_names->push_back ( names.triggerName(i) );
         v_hlt_insideDataset_prescales->push_back ( hltPrescaleProvider_.prescaleValue(iEvent,iSetup,names.triggerName(i)));
         v_hlt_insideDataset_decisions->push_back ( triggerResults->accept(i) );
       } else {
-        // (*m_hlt_outsideDataset_namesToDecisions)[names.triggerName(i)] = triggerResults->accept(i) ;
-        // (*m_hlt_outsideDataset_namesToPrescales)[names.triggerName(i)] = hltConfig.prescaleValue(iEvent,iSetup,names.triggerName(i));
         v_hlt_outsideDataset_names->push_back ( names.triggerName(i) );
         v_hlt_outsideDataset_prescales->push_back ( hltPrescaleProvider_.prescaleValue(iEvent,iSetup,names.triggerName(i)));
         v_hlt_outsideDataset_decisions->push_back ( triggerResults->accept(i) );

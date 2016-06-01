@@ -1,31 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 
-##----------------------------------------------------------------------------------------------------
-## CaloMET collections
-##----------------------------------------------------------------------------------------------------
-#
-## Raw CaloMET, no jet smearing
-#
-#rootTupleCaloMET = cms.EDProducer("RootTupleMakerV2_MET",
-#    InputTag = cms.InputTag('patMETsRawCalo'),
-#    Prefix = cms.string('Calo'),
-#    Suffix = cms.string(''),
-#    StoreUncorrectedMET = cms.bool(False),
-#    StoreMETSignificance = cms.bool(False),
-#    Uncertainty = cms.string('NoShift'),
-#    CorrectionLevel = cms.string('Calo'))
-#
-## Type1 CaloMET, no jet smearing
-#
-#rootTupleCaloMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
-#    InputTag = cms.InputTag('patMETs'),
-#    Prefix = cms.string('Calo'),
-#    Suffix = cms.string('Type1Cor'),
-#    StoreUncorrectedMET = cms.bool(True),
-#    StoreMETSignificance = cms.bool(False),
-#    Uncertainty = cms.string('NoShift'),
-#    CorrectionLevel = cms.string('Calo'))
-#
 #----------------------------------------------------------------------------------------------------
 # PFMET collections
 #----------------------------------------------------------------------------------------------------

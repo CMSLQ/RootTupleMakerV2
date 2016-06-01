@@ -1,0 +1,30 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/PluginManager"/>
+<use name="FWCore/ParameterSet"/>
+<use name="CommonTools/UtilAlgos"/>
+<use name="DataFormats/PatCandidates"/>
+<use name="DataFormats/Common"/>
+<use name="RecoEcal/EgammaClusterAlgos"/>
+<use name="RecoEgamma/EgammaTools"/>
+<use name="RecoEgamma/EgammaIsolationAlgos"/>
+<use name="CondFormats/L1TObjects"/>
+<use name="CondFormats/JetMETObjects"/>
+<use name="HLTrigger/HLTcore"/>
+<use name="L1Trigger/GlobalTriggerAnalyzer"/>
+<use name="MagneticField/Engine"/>
+<use name="MagneticField/Records"/>
+<use name="PhysicsTools/PatUtils"/>
+<use name="JetMETCorrections/Objects"/>
+<use name="EgammaAnalysis/ElectronTools"/>
+<use name="lhapdf"/>
+<use name="rootrflx"/>
+<use name="rootmath"/>
+
+<use name="SimDataFormats/GeneratorProducts"/>
+<use name="GeneratorInterface/LHEInterface"/>
+<use name="FWCore/ServiceRegistry"/>
+<use name="FWCore/Utilities"/>
+<use name="JetMETCorrections/Modules"/>
+
+<flags EdmPlugin="1"/>
+<library name="LeptoquarksRootTupleMakerV2Plugins" file="*.cc"/>

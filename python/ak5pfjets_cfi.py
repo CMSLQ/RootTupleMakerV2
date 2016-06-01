@@ -12,8 +12,15 @@ ak5GenJetsNoNu = ak5GenJets.clone(src = 'packedGenParticlesForJetsNoNu')
 ## Select charged hadron subtracted packed PF candidates
 pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV"))
 from RecoJets.JetProducers.ak5PFJets_cfi import ak5PFJets
-## Define AK5PFJetsCHS
+## Define ak5PFJetsCHS
 ak5PFJetsCHS = ak5PFJets.clone(src = 'pfCHS', doAreaFastjet = True)
-## Define AK5PFJets
+## Define ak5PFJets
 ak5PFJets = ak5PFJets.clone(src = 'packedPFCandidates')
 
+ak5PFJetsSequence = cms.Sequence(
+  packedGenParticlesForJetsNoNu*
+  ak5GenJetsNoNu*
+  pfCHS*
+  ak5PFJetsCHS*
+  ak5PFJets
+)

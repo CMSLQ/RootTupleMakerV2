@@ -12,6 +12,7 @@ rootTupleMuons = cms.EDProducer("RootTupleMakerV2_Muons",
     BeamSpotCorr = cms.bool(True),
     UseCocktailRefits = cms.bool(True),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    BeamSpotInputTag = cms.InputTag('offlineBeamSpot')
     #SingleMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleMuon"),
     #SingleIsoMuonTriggerMatch = cms.string ("cleanMuonTriggerMatchHLTSingleIsoMuon")
 )
@@ -75,6 +76,15 @@ muonsTriggerMatchAll = cms.EDProducer(
   )
 )
 
+rootTupleMuonsSequence = cms.Sequence(
+  cleanMuonTriggerMatchHLTMuon*
+  cleanMuonTriggerMatchHLTSingleMuon*
+  cleanMuonTriggerMatchHLTSingleIsoMuon*
+  muonsTriggerMatchHLTSingleMuon*
+  muonsTriggerMatchHLTSingleIsoMuon*
+  muonsTriggerMatchAll*
+  rootTupleMuons
+)
 
 
 # these will skim out (from the collections above with embedded matches) only the objects which have a trigger object match

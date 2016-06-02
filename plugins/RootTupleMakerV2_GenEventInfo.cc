@@ -200,7 +200,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	}
       	for (unsigned int i=315; i <= 365; i++) {
 	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
-	  pdfMSTWWeights->push_back(thisWeight);
+	  pdfMMTHWeights->push_back(thisWeight);
 	}
       	for (unsigned int i=392; i <= 444; i++) {
 	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 

@@ -8,19 +8,21 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("isBPTX0");
   produces <bool> ("isBSCMinBias");
   produces <bool> ("isBSCBeamHalo");
-  produces <bool> ("isPrimaryVertex");
+  produces <bool> ("passGoodVertices");
   produces <bool> ("passHBHENoiseFilter");
   produces <bool> ("passHBHENoiseIsoFilter");
   produces <bool> ("passHcalLaserEventFilter");
-  produces <bool> ("passBeamHaloFilterTight");
-  produces <bool> ("passTightHaloTrkMuUnvetoFilter");
-  produces <bool> ("passBeamHalo2015FilterTight");
+  produces <bool> ("passCSCTightHaloFilter");
+  produces <bool> ("passCSCTightHaloTrkMuUnvetoFilter");
+  produces <bool> ("passCSCTightHalo2015Filter");
+  produces <bool> ("passGlobalTightHalo2016Filter");
+  produces <bool> ("passGlobalSuperTightHalo2016Filter");
   produces <bool> ("passHcalStripHaloFilter");
   //
   produces <bool> ("passEcalDeadCellTriggerPrimitiveFilter");
   produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
   produces <bool> ("passTrackingFailureFilter");
-  produces <bool> ("passBadEESupercrystalFilter");
+  produces <bool> ("passEEBadScFilter");
   produces <bool> ("passEcalLaserCorrFilter");
   // 
   produces <bool> ("passTrkPOGFilters");
@@ -43,6 +45,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
   std::auto_ptr<bool> passtightHaloTrkMuUnvetoFilter( new bool() );
   std::auto_ptr<bool> passbeamhalo2015filtertight( new bool() );
+  std::auto_ptr<bool> passbeamhalo2016globalfiltertight( new bool() );
+  std::auto_ptr<bool> passbeamhalo2016globalfiltersupertight( new bool() );
   std::auto_ptr<bool> passhcalStripHaloFilter( new bool() );
   std::auto_ptr<bool> passhcalLaserEventFilter( new bool() );
   std::auto_ptr<bool> passecalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
@@ -68,6 +72,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passbeamhalofiltertight.get() = true;
   *passtightHaloTrkMuUnvetoFilter.get() = true;
   *passbeamhalo2015filtertight.get() = true;
+  *passbeamhalo2016globalfiltertight.get() = true;
+  *passbeamhalo2016globalfiltersupertight.get() = true;
   *passhcalStripHaloFilter.get() = true;  
   *passhcalLaserEventFilter.get() = true;
   *passecalDeadCellTriggerPrimitiveFilter.get() = true;
@@ -82,7 +88,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passmanyStripClus53X       .get() = true;
   *passtooManyStripClus53X    .get() = true;
   *passlogErrorTooManyClusters.get() = true;
-  
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
   iEvent.getByToken(l1InputToken_, l1GtReadoutRecord);
@@ -184,7 +189,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if(index < filterNames.size())
       *passhbhenoisefilter.get() = filterResults->accept(index);
 
-   // Hcal Noise Iso Part (HBHE)
+    // Hcal Noise Iso Part (HBHE)
     index = filterNames.triggerIndex("Flag_HBHENoiseIsoFilter");
     if(index < filterNames.size())
       *passhbhenoiseisofilter.get() = filterResults->accept(index);
@@ -203,6 +208,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     index = filterNames.triggerIndex("Flag_CSCTightHalo2015Filter");
     if(index < filterNames.size())
       *passbeamhalo2015filtertight.get() = filterResults->accept(index);
+
+    //  Global Tight Halo 2016 filter
+    index = filterNames.triggerIndex("Flag_globalTightHalo2016Filter");
+    if(index < filterNames.size())
+      *passbeamhalo2016globalfiltertight.get() = filterResults->accept(index);
+
+    //  Global Super Tight Halo 2016 filter
+    index = filterNames.triggerIndex("Flag_globalSuperTightHalo2016Filter");
+    if(index < filterNames.size())
+      *passbeamhalo2016globalfiltersupertight.get() = filterResults->accept(index);
 
     //HCAL Strip Halo filter
     index = filterNames.triggerIndex("Flag_HcalStripHaloFilter");
@@ -273,7 +288,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     index = filterNames.triggerIndex("Flag_trkPOG_logErrorTooManyClusters");
     if(index < filterNames.size())
       *passlogErrorTooManyClusters.get() = filterResults->accept(index);
-
+  
   } else {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the filterResultsInputTag";
   }
@@ -284,19 +299,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(isbptx0,"isBPTX0");
   iEvent.put(isbscminbias,"isBSCMinBias");
   iEvent.put(isbscbeamhalo,"isBSCBeamHalo");
-  iEvent.put(isprimaryvertex,"isPrimaryVertex");
+  iEvent.put(isprimaryvertex,"passGoodVertices");
   iEvent.put(passhbhenoisefilter,"passHBHENoiseFilter");
   iEvent.put(passhbhenoiseisofilter,"passHBHENoiseIsoFilter");
-  iEvent.put(passbeamhalofiltertight,"passBeamHaloFilterTight");
-  iEvent.put(passtightHaloTrkMuUnvetoFilter,"passTightHaloTrkMuUnvetoFilter");
-  iEvent.put(passbeamhalo2015filtertight,"passBeamHalo2015FilterTight");
+  iEvent.put(passbeamhalofiltertight,"passCSCTightHaloFilter");
+  iEvent.put(passtightHaloTrkMuUnvetoFilter,"passCSCTightHaloTrkMuUnvetoFilter");
+  iEvent.put(passbeamhalo2015filtertight,"passCSCTightHalo2015Filter");
+  iEvent.put(passbeamhalo2016globalfiltertight,"passGlobalTightHalo2016Filter");
+  iEvent.put(passbeamhalo2016globalfiltersupertight,"passGlobalSuperTightHalo2016Filter");
   iEvent.put(passhcalStripHaloFilter,"passHcalStripHaloFilter");
   iEvent.put(passhcalLaserEventFilter,"passHcalLaserEventFilter");
   iEvent.put(passecalDeadCellTriggerPrimitiveFilter,"passEcalDeadCellTriggerPrimitiveFilter");
   iEvent.put(passecalDeadCellBoundaryEnergyFilter,"passEcalDeadCellBoundaryEnergyFilter");
   //
   iEvent.put(passtrackingFailureFilter,"passTrackingFailureFilter");
-  iEvent.put(passbadEESupercrystalFilter, "passBadEESupercrystalFilter");
+  iEvent.put(passbadEESupercrystalFilter, "passEEBadScFilter");
   iEvent.put(passecalLaserCorrFilter, "passEcalLaserCorrFilter");
   // 
   iEvent.put(passtrkPOGFilters,"passTrkPOGFilters");
@@ -305,5 +322,4 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(passmanyStripClus53X       ,"passManyStripClus53X");
   iEvent.put(passtooManyStripClus53X    ,"passTooManyStripClus53X");
   iEvent.put(passlogErrorTooManyClusters,"passLogErrorTooManyClusters");
-  
 }

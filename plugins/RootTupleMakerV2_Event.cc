@@ -5,10 +5,12 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
   globalTagLabel_(iConfig.getParameter<std::string>("globalTag")),
   globalTagToken_(consumes<std::string>(iConfig.getParameter<std::string>("globalTag"))),
   fixedGridRhoAllToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoAllInputTag"))),
+  fixedGridRhoFastjetAllToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetAllInputTag"))),
   fixedGridRhoFastjetAllCaloToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetAllCaloInputTag"))),
+  fixedGridRhoFastjetCentralToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralInputTag"))),
   fixedGridRhoFastjetCentralCaloToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralCaloInputTag"))),
-  fixedGridRhoFastjetCentralChargedPileUpToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralChargedPileUpInputTag"))),
-  fixedGridRhoFastjetCentralNeutralToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralNeutralInputTag")))
+  fixedGridRhoFastjetCentralNeutralToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralNeutralInputTag"))),
+  fixedGridRhoFastjetCentralChargedPileUpToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("FixedGridRhoFastjetCentralChargedPileUpInputTag")))
 {
   //produces <std::string>  ("globalTag");
   //produces <std::string>  ("cmsswRelease");
@@ -20,10 +22,12 @@ RootTupleMakerV2_Event::RootTupleMakerV2_Event(const edm::ParameterSet& iConfig)
   produces <double>       ( "time"   );
   produces <bool>         ( "isData" );
   produces <double>       ( "fixedGridRhoAll"                         );
+  produces <double>       ( "fixedGridRhoFastjetAll"              );
   produces <double>       ( "fixedGridRhoFastjetAllCalo"              );
+  produces <double>       ( "fixedGridRhoFastjetCentral"          );
   produces <double>       ( "fixedGridRhoFastjetCentralCalo"          );
-  produces <double>       ( "fixedGridRhoFastjetCentralChargedPileUp" );
   produces <double>       ( "fixedGridRhoFastjetCentralNeutral"       );
+  produces <double>       ( "fixedGridRhoFastjetCentralChargedPileUp" );
 }
 
 void RootTupleMakerV2_Event::
@@ -52,21 +56,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByToken(fixedGridRhoAllToken_,fixedGridRhoAllH);
   std::auto_ptr<double> fixedGridRhoAll (new double(*fixedGridRhoAllH.product() ) );
 
+  edm::Handle<double> fixedGridRhoFastjetAllH;
+  iEvent.getByToken(fixedGridRhoFastjetAllToken_,fixedGridRhoFastjetAllH);
+  std::auto_ptr<double> fixedGridRhoFastjetAll (new double(*fixedGridRhoFastjetAllH.product() ) );
+
   edm::Handle<double> fixedGridRhoFastjetAllCaloH;
   iEvent.getByToken(fixedGridRhoFastjetAllCaloToken_,fixedGridRhoFastjetAllCaloH);
   std::auto_ptr<double> fixedGridRhoFastjetAllCalo (new double(*fixedGridRhoFastjetAllCaloH.product() ) );
+
+  edm::Handle<double> fixedGridRhoFastjetCentralH;
+  iEvent.getByToken(fixedGridRhoFastjetCentralToken_,fixedGridRhoFastjetCentralH);
+  std::auto_ptr<double> fixedGridRhoFastjetCentral (new double(*fixedGridRhoFastjetCentralH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralCaloH;
   iEvent.getByToken(fixedGridRhoFastjetCentralCaloToken_,fixedGridRhoFastjetCentralCaloH);
   std::auto_ptr<double> fixedGridRhoFastjetCentralCalo (new double(*fixedGridRhoFastjetCentralCaloH.product() ) );
 
-  edm::Handle<double> fixedGridRhoFastjetCentralChargedPileUpH;
-  iEvent.getByToken(fixedGridRhoFastjetCentralChargedPileUpToken_,fixedGridRhoFastjetCentralChargedPileUpH);
-  std::auto_ptr<double> fixedGridRhoFastjetCentralChargedPileUp (new double(*fixedGridRhoFastjetCentralChargedPileUpH.product() ) );
-
   edm::Handle<double> fixedGridRhoFastjetCentralNeutralH;
   iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken_,fixedGridRhoFastjetCentralNeutralH);
   std::auto_ptr<double> fixedGridRhoFastjetCentralNeutral (new double(*fixedGridRhoFastjetCentralNeutralH.product() ) );
+
+  edm::Handle<double> fixedGridRhoFastjetCentralChargedPileUpH;
+  iEvent.getByToken(fixedGridRhoFastjetCentralChargedPileUpToken_,fixedGridRhoFastjetCentralChargedPileUpH);
+  std::auto_ptr<double> fixedGridRhoFastjetCentralChargedPileUp (new double(*fixedGridRhoFastjetCentralChargedPileUpH.product() ) );
 
 
 
@@ -82,8 +94,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( time,  "time"  );
   iEvent.put( isdata,"isData");
   iEvent.put( fixedGridRhoAll,                         "fixedGridRhoAll"                         );
+  iEvent.put( fixedGridRhoFastjetAll,                  "fixedGridRhoFastjetAll"                  );
   iEvent.put( fixedGridRhoFastjetAllCalo,              "fixedGridRhoFastjetAllCalo"              );
+  iEvent.put( fixedGridRhoFastjetCentral,              "fixedGridRhoFastjetCentral"              );
   iEvent.put( fixedGridRhoFastjetCentralCalo,          "fixedGridRhoFastjetCentralCalo"          );
-  iEvent.put( fixedGridRhoFastjetCentralChargedPileUp, "fixedGridRhoFastjetCentralChargedPileUp" );
   iEvent.put( fixedGridRhoFastjetCentralNeutral,       "fixedGridRhoFastjetCentralNeutral"       );
+  iEvent.put( fixedGridRhoFastjetCentralChargedPileUp, "fixedGridRhoFastjetCentralChargedPileUp" );
 }

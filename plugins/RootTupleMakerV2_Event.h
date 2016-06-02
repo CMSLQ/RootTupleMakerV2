@@ -17,9 +17,10 @@ class RootTupleMakerV2_Event : public edm::EDProducer {
   const edm::EDGetTokenT<double> fixedGridRhoAllToken_;
   const edm::EDGetTokenT<double> fixedGridRhoFastjetAllToken_;
   const edm::EDGetTokenT<double> fixedGridRhoFastjetAllCaloToken_;
+  const edm::EDGetTokenT<double> fixedGridRhoFastjetCentralToken_;
   const edm::EDGetTokenT<double> fixedGridRhoFastjetCentralCaloToken_;
-  const edm::EDGetTokenT<double> fixedGridRhoFastjetCentralChargedPileUpToken_;
   const edm::EDGetTokenT<double> fixedGridRhoFastjetCentralNeutralToken_;
+  const edm::EDGetTokenT<double> fixedGridRhoFastjetCentralChargedPileUpToken_;
 
 };
 

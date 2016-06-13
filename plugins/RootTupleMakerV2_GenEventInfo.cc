@@ -129,14 +129,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if( pdfCTEQWeightsHandle.isValid() ) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfCTEQWeightsInputToken_";
         *pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
-	/*//for debugging to see what the weight variations are
-	std::vector<double> weights = (*pdfCTEQWeightsHandle);
-	std::cout << "Event weight for central PDF:" << weights[0] << std::endl;
-	unsigned int nmembers = weights.size();
-	for (unsigned int j=1; j<nmembers; j+=2) {
+	//for debugging to see what the weight variations are
+	/*
+	  std::vector<double> weights = (*pdfCTEQWeightsHandle);
+	  unsigned int nmembers = weights.size();	
+	  for (unsigned int j=0; j<nmembers; j+=2) {
+	  if(j==0){std::cout << "Event weight for PDF central value" << j << ": " << weights[j] << std::endl;j++;}
+	  else{
 	  std::cout << "Event weight for PDF variation +" << (j+1)/2 << ": " << weights[j] << std::endl;
 	  std::cout << "Event weight for PDF variation -" << (j+1)/2 << ": " << weights[j+1] << std::endl;
-	}
+	  }
+	  }
 	*/
       } else {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfCTEQWeightsInputToken_";

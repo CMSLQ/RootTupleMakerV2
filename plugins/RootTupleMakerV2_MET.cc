@@ -106,8 +106,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	}
       
       if ( store_uncorrected_MET ) {
-        // this will not work running in CMSSW_7_4_12+ on miniAOD v1
-        // see: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2015#ETmiss
         metuncorr->push_back( it->uncorPt() );
         metphiuncorr->push_back( it->uncorPhi() );
         sumetuncorr->push_back( it->uncorSumEt() );

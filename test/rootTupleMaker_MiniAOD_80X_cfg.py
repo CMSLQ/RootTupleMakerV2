@@ -44,6 +44,8 @@ process._Process__name="ROOTTUPLEMAKERV2"
 # Options and Output Report
 process.options.wantSummary = False
 process.options.allowUnscheduled = cms.untracked.bool(False)
+#Print the information about the execution of the modules, and the transitions (beginRun, etc.) they go through. For unscheduled mode debugging.
+#process.Tracer = cms.Service("Tracer")
 
 ############## IMPORTANT ########################################
 # If you run over many samples and you save the log, remember to reduce
@@ -74,7 +76,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 process.TFileService = cms.Service("TFileService",
     #fileName = cms.string( "file_m650.root" )
-    fileName = cms.string( "file_data.root" )
+    fileName = cms.string( "file_MG.root" )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -92,13 +94,13 @@ if varOptions.isMC:
 # Data
 #process.GlobalTag.globaltag = '76X_dataRun2_v15'
 else:
-  process.GlobalTag.globaltag = '76X_dataRun2_16Dec2015_v0'
+  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = 1000
 
 # Input files
 process.source.fileNames = [
@@ -110,8 +112,9 @@ process.source.fileNames = [
     # Run2015D data
     #'/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root'
 
+    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/30000/00AEB2F6-541B-E611-AF2A-0025905C42F2.root'
 
-  '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/30000/00AEB2F6-541B-E611-AF2A-0025905C42F2.root'
+  #'/store/mc/RunIISpring16MiniAODv2/LQLQToTopMu_M-1000_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/46EDE553-8624-E611-AFB2-00259073E380.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -123,33 +126,28 @@ process.source.fileNames = [
 # This is based off of the hypernews post
 # FIXME check that we match to the paths we want while we're updating the cpp code
 from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTrigger
-## need to load it into the process, or else it won't run
-process.unpackedPatTrigger = unpackedPatTrigger.clone()
 process.load('PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi')
-
-#fixme removing cause no trigger info?
-process.cleanElectronTriggerMatchHLTSingleElectron.matched = 'unpackedPatTrigger'
-process.cleanElectronTriggerMatchHLTSingleElectronWP85.matched = 'unpackedPatTrigger'
-process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
-process.cleanElectronTriggerMatchHLTElectronJetJet.matched = 'unpackedPatTrigger'
+###### need to load it into the process, or else it won't run
+process.unpackedPatTrigger = unpackedPatTrigger.clone()
+####
+#####fixme removing cause no trigger info?
+####process.cleanElectronTriggerMatchHLTSingleElectron.matched = 'unpackedPatTrigger'
+####process.cleanElectronTriggerMatchHLTSingleElectronWP85.matched = 'unpackedPatTrigger'
+####process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
+####process.cleanElectronTriggerMatchHLTElectronJetJet.matched = 'unpackedPatTrigger'
 process.cleanMuonTriggerMatchHLTMuon.matched = 'unpackedPatTrigger'
 process.cleanMuonTriggerMatchHLTSingleMuon.matched = 'unpackedPatTrigger'
 process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
-process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
-
-process.out.outputCommands += ['keep *_electronsTriggerMatchHLTSingleElectron_*_*',
-                               'keep *_electronsTriggerMatchHLTSingleElectronWP85 _*_*',
-                               'keep *_electronsTriggerMatchHLTDoubleElectron_*_*',
-                               'keep *_electronsTriggerMatchHLTElectroJetJetn_*_*'      ]
-# select the matching electrons and keep them
-process.out.outputCommands += ['keep *_ electronsTriggeredHLTSingleElectron_*_*',
-                               'keep *_ electronsTriggeredHLTSingleElectronWP80_*_*',
-                               'keep *_ electronsTriggeredHLTDoubleElectron_*_*' ]
-
-#----------------------------------------------------------------------------------------------------
-# MET filters
-# https://twiki.cern.ch/twiki/bin/view/CMS/MissingETOptionalFiltersRun2
-#----------------------------------------------------------------------------------------------------
+####process.pfjetTriggerMatchHLTEleJetJet.matched = 'unpackedPatTrigger'
+####
+####process.out.outputCommands += ['keep *_electronsTriggerMatchHLTSingleElectron_*_*',
+####                               'keep *_electronsTriggerMatchHLTSingleElectronWP85 _*_*',
+####                               'keep *_electronsTriggerMatchHLTDoubleElectron_*_*',
+####                               'keep *_electronsTriggerMatchHLTElectroJetJetn_*_*'      ]
+##### select the matching electrons and keep them
+####process.out.outputCommands += ['keep *_ electronsTriggeredHLTSingleElectron_*_*',
+####                               'keep *_ electronsTriggeredHLTSingleElectronWP80_*_*',
+####                               'keep *_ electronsTriggeredHLTDoubleElectron_*_*' ]
 
 #----------------------------------------------------------------------------------------------------
 # Use default MiniAOD Taus
@@ -187,11 +185,11 @@ process.out.outputCommands += ['keep *_ electronsTriggeredHLTSingleElectron_*_*'
 # FIXME
 
 # need the egamma smearing for 76X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMSmearer
-process.load('EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi')#fixme check this
-correctionType = "Prompt2015"
-process.calibratedPatElectrons.isMC = varOptions.isMC
+###process.load('EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi')#fixme check this
+###correctionType = "Prompt2015"
+###process.calibratedPatElectrons.isMC = varOptions.isMC
 # ntuplize this corrected electron collection
-process.rootTupleElectrons.InputTag = cms.InputTag('calibratedPatElectrons','')
+###process.rootTupleElectrons.InputTag = cms.InputTag('calibratedPatElectrons','')
 # HEEP 5.1/6.0
 # Also load Egamma cut-based ID in new VID framework while we're at it
 # See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
@@ -250,88 +248,6 @@ process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.Inpu
 #                  L1+L2+L3+residual corrections are applied;
 #                  b-tagging and pileup jet id information are embedded.
 #                  Links are provided to the constituent PF candidates. 
-# FIXME: Do we need to rebuild AK5 jets? Or can we stick with AK4?
-# AK4 will possibly have more support (for JECs, etc.)
-#process.load('Leptoquarks.RootTupleMakerV2.ak5pfjets_cfi')
-## b-tag discriminators
-#bTagDiscriminators = [
-#  'pfTrackCountingHighEffBJetTags',
-#  'pfTrackCountingHighPurBJetTags',
-#  'pfJetProbabilityBJetTags',
-#  'pfJetBProbabilityBJetTags',
-#  'pfSimpleSecondaryVertexHighEffBJetTags',
-#  'pfSimpleSecondaryVertexHighPurBJetTags',
-#  'pfCombinedSecondaryVertexV2BJetTags',
-#  'pfCombinedInclusiveSecondaryVertexV2BJetTags',
-#  'pfCombinedMVABJetTags'
-#  ]
-#bTagDiscriminatorsAK5 = [
-#    'pfCombinedInclusiveSecondaryVertexV2BJetTags'
-#]
-#from PhysicsTools.PatAlgos.tools.jetTools import addJetCollection
-#addJetCollection(process,
-#                 labelName = 'AK5PF',
-#                 jetSource = cms.InputTag('ak5PFJets'),
-#                 pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
-#                 pfCandidates = cms.InputTag('packedPFCandidates'),
-#                 svSource = cms.InputTag('slimmedSecondaryVertices'),
-#                 btagDiscriminators = bTagDiscriminatorsAK5,
-#                 jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-#                 genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
-#                 genParticles = cms.InputTag('prunedGenParticles'),
-#                 algo = 'AK',
-#                 rParam = 0.5,
-#)
-#addJetCollection(process,
-#                 labelName = 'AK5PFCHS',
-#                 jetSource = cms.InputTag('ak5PFJetsCHS'),
-#                 pvSource = cms.InputTag('offlineSlimmedPrimaryVertices'),
-#                 pfCandidates = cms.InputTag('packedPFCandidates'),
-#                 svSource = cms.InputTag('slimmedSecondaryVertices'),
-#                 btagDiscriminators = bTagDiscriminatorsAK5,
-#                 jetCorrections = ('AK5PF', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
-#                 genJetCollection = cms.InputTag('ak5GenJetsNoNu'),
-#                 genParticles = cms.InputTag('prunedGenParticles'),
-#                 algo = 'AK',
-#                 rParam = 0.5,
-#)
-#process.patJetsAK5.userData.userFloats.src = [] # start with empty list of user floats
-#process.selectedPatJetsAK5PFCHS.cut = cms.string("pt > 10")
-#process.patJetGenJetMatchAK5.matched =  'slimmedGenJets'
-#process.patJetPartonMatchAK5.matched = 'prunedGenParticles'
-#process.patJetPartons.particles = 'prunedGenParticles'
-#process.patJetPartonsLegacy.src = 'prunedGenParticles'
-#process.patJetCorrFactorsAK5.primaryVertices = 'offlineSlimmedPrimaryVertices'
-## needed when using btagInfos?
-##process.jetTracksAssociatorAtVertexAK5.tracks = 'unpackedTracksAndVertices'
-##process.jetTracksAssociatorAtVertexAK5.pvSrc = 'offlineSlimmedPrimaryVertices'
-#from PhysicsTools.PatAlgos.tools.pfTools import *
-## Adapt primary vertex collection
-#adaptPVs(process, pvCollection=cms.InputTag('offlineSlimmedPrimaryVertices'))
-#process.ak5PatJetSequence = cms.Sequence(
-#    process.patJetCorrFactorsAK5PF*
-#    process.patJetCorrFactorsAK5PFCHS*
-#    process.patJetPartons*
-#    process.patJetPartonMatchAK5PF*
-#    process.patJetPartonMatchAK5PFCHS*
-#    process.patJetFlavourAssociationAK5PF*
-#    process.patJetFlavourAssociationAK5PFCHS*
-#    process.patJetGenJetMatchAK5PF*
-#    process.patJetGenJetMatchAK5PFCHS*
-#    process.pfImpactParameterTagInfosAK5PF*
-#    process.pfImpactParameterTagInfosAK5PFCHS*
-#    process.pfInclusiveSecondaryVertexFinderTagInfosAK5PF*
-#    process.pfInclusiveSecondaryVertexFinderTagInfosAK5PFCHS*
-#    process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PF*
-#    process.pfCombinedInclusiveSecondaryVertexV2BJetTagsAK5PFCHS*
-#    process.patJetsAK5PF*
-#    process.patJetsAK5PFCHS*
-#    process.selectedPatJetsAK5PF*
-#    process.selectedPatJetsAK5PFCHS
-#)
-#process.out.outputCommands += ['keep *_ak5GenJets_*_EX',
-#                               'keep *_ak5PFJets_*_EX',
-#                               'keep *_ak5PFJetsCHS_*_EX', ]
 
 
 #----------------------------------------------------------------------------------------------------
@@ -348,19 +264,13 @@ jecUncFileMC='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_UncertaintySo
 #dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
 
 # Get JER from text files
-#process.rootTuplePFJetsAK5.ReadJERFromGT = False
-#process.rootTuplePFJetsAK5CHS.ReadJERFromGT = False
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = False
 process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = False
-#process.rootTuplePFJetsAK5.JERResolutionsFile = jerResFile
-#process.rootTuplePFJetsAK5CHS.JERResolutionsFile = jerResFile
 process.rootTuplePFJetsAK4CHS.JERResolutionsFile = jerResFile
 process.rootTuplePFJetsAK4Puppi.JERResolutionsFile = jerResFile
-#process.rootTuplePFJetsAK5.JERScaleFactorsFile = jerScaleFactorsFile
-#process.rootTuplePFJetsAK5CHS.JERScaleFactorsFile = jerScaleFactorsFile
 process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile = jerScaleFactorsFile
 process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFile
-# XXX NB: These files are wrong for AK4Puppi and AK5, so they won't have proper scale factors.
+# XXX NB: These files are wrong for AK4Puppi so it won't have proper scale factors.
 
 ## load JES/etc.from local db file, and into global tag
 #jetDBFile = 'sqlite:'+dbJetMCDBFile if varOptions.isMC else 'sqlite:'+dbJetDataDBFile
@@ -440,20 +350,20 @@ process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFile
 ## https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#METSysTools
 ##----------------------------------------------------------------------------------------------------
 postfix = 'Recorrected'
-from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD, runMETCorrectionsAndUncertainties
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
 #default configuration for miniAOD reprocessing
 #for a full met computation, remove the pfCandColl input
 runMetCorAndUncFromMiniAOD(process,
                            jetCollUnskimmed='slimmedJets',
-                           #jetCollection='slimmedJets',
+                           #jetColl='slimmedJets',
                            isData=not varOptions.isMC,
-                           electronColl=cms.InputTag('slimmedElectrons'),
+                           #electronColl=cms.InputTag('slimmedElectrons'),
                            #repro74X=True,
                            jecUncFile=myJecUncFile,
-                           postfix=postfix
+                           postfix=postfix                           
 )
-process.applyCorrections = cms.Path()
+#process.applyCorrections = cms.Path()
 #if varOptions.isMC: process.applyCorrections += process.genMetExtractor
 #process.applyCorrections += getattr(process,'patPFMet{0}'.format(postfix))
 #process.applyCorrections += process.patJetCorrFactorsReapplyJEC
@@ -464,106 +374,92 @@ process.applyCorrections = cms.Path()
 
 # ntuplize the newly-corrected MET
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
-process.rootTuplePFMETType1Cor.InputTag = 'slimmedMETs'+postfix
+process.rootTuplePFMETType1Cor.InputTag = cms.InputTag('slimmedMETs'+postfix)
 process.rootTuplePFMETType1CorNotRecorrected.Suffix = 'Type1CorNotRecorrected'
 
-# ntuplize the new MET shifts
-process.rootNTupleNewMETs = cms.Path()
-allowedShifts = ['jres','jes','mes','ees','tes','ues']
-allowedSigns = ['+','-']
-signMap = {
-    '+' : 'Up',
-    '-' : 'Down',
-}
-collMap = {
-    # TODO
-    #'jres' : {'Jets'     : 'shiftedPatJetRes{sign}{postfix}'},
-    'jres' : {},
-    'jes'  : {'Jets'     : 'shiftedPatJetEn{sign}{postfix}'},
-    'mes'  : {'Muons'    : 'shiftedPatMuonEn{sign}{postfix}'},
-    'ees'  : {'Electrons': 'shiftedPatElectronEn{sign}{postfix}'},
-    'tes'  : {'Taus'     : 'shiftedPatTauEn{sign}{postfix}'},
-    'ues'  : {},
-    'pes'  : {},
-    }
-metMap = {
-  'jres' : 'patPFMetT1JetRes{sign}{postfix}',
-  'jes'  : 'patPFMetT1JetEn{sign}{postfix}',
-  'mes'  : 'patPFMetT1MuonEn{sign}{postfix}',
-  'ees'  : 'patPFMetT1ElectronEn{sign}{postfix}',
-  'tes'  : 'patPFMetT1TauEn{sign}{postfix}',
-  'ues'  : 'patPFMetT1UnclusteredEn{sign}{postfix}',
-  'pes'  : '',
-}
-#mettypes = ['CaloMET','CaloMETType1Cor','PFMET','PFMETType1Cor','PFMETType01Cor','PFMETType01XYCor','PFMETPuppi','PFMETPuppiType1Cor']
-mettypes = ['PFMETType1Cor']
-for shift in allowedShifts:
-    for sign in allowedSigns:
-      # FIXME TODO
-        ## embed shifted objects
-        #for coll in collMap[shift]:
-        #    modName = '{shift}{sign}{coll}Embedding'.format(shift=shift,sign=signMap[sign],coll=coll)
-        #    pluginName = 'MiniAODShifted{coll}Embedder'.format(coll=coll[:-1])
-        #    dName = coll.lower()
-        #    srcName = fs_daughter_inputs[dName]
-        #    shiftSrcName = collMap[shift][coll].format(sign=signMap[sign],postfix=postfix)
-        #    label = '{shift}{sign}{coll}'.format(shift=shift,sign=signMap[sign],coll=coll)
-        #    module = cms.EDProducer(
-        #        pluginName,
-        #        src = cms.InputTag(srcName),
-        #        shiftSrc = cms.InputTag(shiftSrcName),
-        #        label = cms.string(label),
-        #    )
-        #    setattr(process,modName,module)
-        #    fs_daughter_inputs[dName] = modName
-        #    #process.embedShifts *= getattr(process,shiftSrcName)
-        #    process.embedShifts *= getattr(process,modName)
-        # embed shifted met
-        for mettype in mettypes:
-          modName = 'rootTuple{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
-          metName = metMap[shift].format(sign=signMap[sign],postfix=postfix)
-          prefix = '{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
-          suffix = ''
-          module = cms.EDProducer(
-              'RootTupleMakerV2_MET',
-              InputTag = cms.InputTag(metName),
-              Prefix = cms.string(prefix),
-              Suffix = cms.string(suffix),
-              StoreUncorrectedMET = cms.bool(False), # this won't work either
-              StoreMETSignificance = cms.bool(False),
-              Uncertainty = cms.string('NoShift'),
-              CorrectionLevel = cms.string('NoCorrection'), # call pt(), etc., instead of shiftedPt()
-          )
-          setattr(process,modName,module)
-          process.rootNTupleNewMETs *= getattr(process,modName)
-#process.schedule.append(process.rootNTupleNewMETs)#FIXME do we need this?
+process.rootTuplePFMETType1CorTest = process.rootTuplePFMETType1Cor.clone()
+process.rootTuplePFMETType1CorTest.InputTag = cms.InputTag('slimmedMETs'+postfix)
+process.rootTuplePFMETType1CorTest.Suffix = 'Type1CorTest'
 
-
-#----------------------------------------------------------------------------------------------------
-# Available pat::MET collections for analysis
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2015#ETmiss
-#----------------------------------------------------------------------------------------------------
-
-#----------------------------------------------------------------------------------------------------
+###### ntuplize the new MET shifts
+#####process.rootNTupleNewMETs = cms.Path()
+#####allowedShifts = ['jres','jes','mes','ees','tes','ues']
+#####allowedSigns = ['+','-']
+#####signMap = {
+#####    '+' : 'Up',
+#####    '-' : 'Down',
+#####}
+#####collMap = {
+#####    # TODO
+#####    #'jres' : {'Jets'     : 'shiftedPatJetRes{sign}{postfix}'},
+#####    'jres' : {},
+#####    'jes'  : {'Jets'     : 'shiftedPatJetEn{sign}{postfix}'},
+#####    'mes'  : {'Muons'    : 'shiftedPatMuonEn{sign}{postfix}'},
+#####    'ees'  : {'Electrons': 'shiftedPatElectronEn{sign}{postfix}'},
+#####    'tes'  : {'Taus'     : 'shiftedPatTauEn{sign}{postfix}'},
+#####    'ues'  : {},
+#####    'pes'  : {},
+#####    }
+#####metMap = {
+#####  'jres' : 'patPFMetT1JetRes{sign}{postfix}',
+#####  'jes'  : 'patPFMetT1JetEn{sign}{postfix}',
+#####  'mes'  : 'patPFMetT1MuonEn{sign}{postfix}',
+#####  'ees'  : 'patPFMetT1ElectronEn{sign}{postfix}',
+#####  'tes'  : 'patPFMetT1TauEn{sign}{postfix}',
+#####  'ues'  : 'patPFMetT1UnclusteredEn{sign}{postfix}',
+#####  'pes'  : '',
+#####}
+######mettypes = ['CaloMET','CaloMETType1Cor','PFMET','PFMETType1Cor','PFMETType01Cor','PFMETType01XYCor','PFMETPuppi','PFMETPuppiType1Cor']
+######mettypes = ['PFMETType1Cor','PFMETPuppi']
+#####mettypes = ['PFMETType1Cor']
+#####for shift in allowedShifts:
+#####    for sign in allowedSigns:
+#####      # FIXME TODO
+#####        ## embed shifted objects
+#####        #for coll in collMap[shift]:
+#####        #    modName = '{shift}{sign}{coll}Embedding'.format(shift=shift,sign=signMap[sign],coll=coll)
+#####        #    pluginName = 'MiniAODShifted{coll}Embedder'.format(coll=coll[:-1])
+#####        #    dName = coll.lower()
+#####        #    srcName = fs_daughter_inputs[dName]
+#####        #    shiftSrcName = collMap[shift][coll].format(sign=signMap[sign],postfix=postfix)
+#####        #    label = '{shift}{sign}{coll}'.format(shift=shift,sign=signMap[sign],coll=coll)
+#####        #    module = cms.EDProducer(
+#####        #        pluginName,
+#####        #        src = cms.InputTag(srcName),
+#####        #        shiftSrc = cms.InputTag(shiftSrcName),
+#####        #        label = cms.string(label),
+#####        #    )
+#####        #    setattr(process,modName,module)
+#####        #    fs_daughter_inputs[dName] = modName
+#####        #    #process.embedShifts *= getattr(process,shiftSrcName)
+#####        #    process.embedShifts *= getattr(process,modName)
+#####        # embed shifted met
+#####        for mettype in mettypes:
+#####          modName = 'rootTuple{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
+#####          metName = metMap[shift].format(sign=signMap[sign],postfix=postfix)
+#####          prefix = '{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
+#####          suffix = ''
+#####          module = cms.EDProducer(
+#####              'RootTupleMakerV2_MET',
+#####              InputTag = cms.InputTag(metName),
+#####              Prefix = cms.string(prefix),
+#####              Suffix = cms.string(suffix),
+#####              StoreUncorrectedMET = cms.bool(False), # this won't work either
+#####              StoreMETSignificance = cms.bool(False),
+#####              Uncertainty = cms.string('NoShift'),
+#####              CorrectionLevel = cms.string('NoCorrection'), # call pt(), etc., instead of shiftedPt()
+#####          )
+#####          setattr(process,modName,module)
+#####          process.rootNTupleNewMETs *= getattr(process,modName)
+######process.schedule.append(process.rootNTupleNewMETs)#FIXME do we need this?
+#####
+######----------------------------------------------------------------------------------------------------
 # This is MC, so analyze the smeared PFJets by default
 # But smearing should be done by default in MiniAOD ?
 #----------------------------------------------------------------------------------------------------
 # SIC FIXME TODO
 # analyze the default jet collection in MiniAOD (AK4PFJetsCHS)
 #process.rootTuplePFJets.InputTag = cms.InputTag('slimmedJets')
-# analyze the remade AK5 PFJets (we also have the AK5PFJetsCHS available)
-#process.rootTuplePFJets.InputTag = 'patJetsAK5'
-#process.rootTuplePFJets.InputTag = 'pfjetTriggerMatchEmbedderHLTEleJetJet'
-#process.pfjetTriggerMatchHLTEleJetJet.src = 'patJetsAK5' # use for trigger matching
-#process.pfjetTriggerMatchEmbedderHLTEleJetJet.src = 'patJetsAK5' # also use for trigger match embedding
-
-#process.rootTuplePFJets.InputTag = 'pfjetTriggerMatchEmbedderHLTEleJetJet'
-#process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJetsAK5PF')
-#process.rootTuplePFJets.InputTagSmearedUp   = cms.InputTag('smearedAnalysisPatJetsAK5PFresUp')                                 
-#process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('smearedAnalysisPatJetsAK5PFresDown')                                 
-#process.rootTuplePFJets.InputTagScaledUp    = cms.InputTag('shiftedAnalysisPatJetsAK5PFenUpForCorrMEt')                                 
-#process.rootTuplePFJets.InputTagScaledDown  = cms.InputTag('shiftedAnalysisPatJetsAK5PFenDownForCorrMEt')     
-
 #----------------------------------------------------------------------------------------------------
 # Set Lepton-Gen Matching Parameters
 #----------------------------------------------------------------------------------------------------
@@ -608,18 +504,19 @@ process.LJFilter.customfilterEMuTauJet2012 = True
 # PDF weights
 #----------------------------------------------------------------------------------------------------
 
-#process.pdfWeights = cms.EDProducer("PdfWeightProducer",
-#	# Fix POWHEG if buggy (this PDF set will also appear on output,
-#	# so only two more PDF sets can be added in PdfSetNames if not "")
-#	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
-#       # GenTag = cms.untracked.InputTag("genParticles"),
-#	PdfInfoTag = cms.untracked.InputTag("generator"),
-#	PdfSetNames = cms.untracked.vstring(
-#            "CT10.LHgrid" , 
-#            "MSTW2008nlo68cl.LHgrid",
-#            #"NNPDF20_100.LHgrid"#DMM FIXME couldn't find this file in /cvmfs/cms.cern.ch/slc6_amd64_gcc491/cms/cmssw/CMSSW_7_4_4/src/PhysicsTools/PatUtils/data/Summer13_V1_DATA_UncertaintySources_AK5PF.txt
-#	)
-#)
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+	# Fix POWHEG if buggy (this PDF set will also appear on output,
+	# so only two more PDF sets can be added in PdfSetNames if not "")
+	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
+       # GenTag = cms.untracked.InputTag("genParticles"),
+	PdfInfoTag = cms.untracked.InputTag("generator"),
+	PdfSetNames = cms.untracked.vstring(
+            #"PDF4LHC15" ,
+            "CT10nlo.LHgrid" , 
+            "MMHT2014lo68cl.LHgrid",
+            "NNPDF30_nlo_as_0118.LHgrid"
+	)
+)
 
 #----------------------------------------------------------------------------------------------------
 # Define the output tree for RootTupleMakerV2
@@ -642,6 +539,7 @@ process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
         'keep *_rootTupleVertex_*_*',
         ## MET objects for analysis
         'keep *_rootTuplePFMET*_*_*',
+        'keep *_slimmedMETs_*_Recorrected',
         # Trigger stuff
         'keep *_rootTupleTrigger_*_*',
         'keep *_rootTupleTriggerObjects_*_*',
@@ -672,23 +570,25 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 #process.load('FWCore.Modules.printContent_cfi')
 
 process.p = cms.Path(
-    # L+J Filter
+    ## L+J Filter
     process.LJFilter*  
+    process.pdfWeights*
     # supporting producers
-    #process.ak5PFJetsSequence*
-    #process.ak5PatJetSequence*
     process.unpackedPatTrigger*
     #process.calibratedPatElectrons*
-  #  process.egmGsfElectronIDs*
-    # Put everything into the tree
+    #process.egmGsfElectronIDs*
+    ## Put everything into the tree
     process.rootTupleEvent*
     process.rootTupleEventSelection*
     process.rootTuplePFCandidates*
-   # process.rootTupleElectronsSequence*
+    #process.rootTupleElectronsSequence*
     process.rootTupleMuonsSequence*
     process.rootTupleVertex*
     process.rootTuplePFJetsSequence*
-    process.rootTuplePFMET*
+    #process.rootNTuplePFMET*
+    process.rootTuplePFMETSequence*
+    process.rootTuplePFMETType1CorNotRecorrected*
+    process.rootTuplePFMETType1CorTest*
     process.rootTupleTriggerObjects*
     process.rootTupleTrigger*
     process.rootTupleGenEventInfo*

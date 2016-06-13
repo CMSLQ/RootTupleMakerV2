@@ -6,10 +6,10 @@ import FWCore.ParameterSet.Config as cms
 
 # Raw PFMET, no jet smearing
 
-rootTuplePFMET = cms.EDProducer("RootTupleMakerV2_MET",
+rootTuplePFMETRaw = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETs'),
     Prefix = cms.string('PF'),
-    Suffix = cms.string(''),
+    Suffix = cms.string('Raw'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
@@ -49,21 +49,21 @@ rootTuplePFMETType01XYCor = cms.EDProducer("RootTupleMakerV2_MET",
     CorrectionLevel = cms.string('Type01XY')                                       
 )
 
-# Raw PFMET, no jet smearing
-rootTuplePFMETPuppi = cms.EDProducer("RootTupleMakerV2_MET",
+# Raw PuppiMET, no jet smearing
+rootTuplePFMETPuppiRaw = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETsPuppi'),
-    Prefix = cms.string('PF'),
-    Suffix = cms.string('Puppi'),
+    Prefix = cms.string('Puppi'),
+    Suffix = cms.string('Raw'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
     CorrectionLevel = cms.string('Raw'))
 
-# Type1 PFMET, with jet smearing
+# Type1 PuppiMET, with jet smearing
 rootTuplePFMETPuppiType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
     InputTag = cms.InputTag('slimmedMETsPuppi'),
-    Prefix = cms.string('PF'),
-    Suffix = cms.string('PuppiType1Cor'),
+    Prefix = cms.string('Puppi'),
+    Suffix = cms.string('Type1Cor'),
     StoreUncorrectedMET = cms.bool(False),
     StoreMETSignificance = cms.bool(False),
     Uncertainty = cms.string('NoShift'),
@@ -205,3 +205,25 @@ rootTuplePFMETType01XYCorJetEnDown      = cms.EDProducer("RootTupleMakerV2_MET",
     Uncertainty = cms.string('JetEnDown'),
     CorrectionLevel = cms.string('Type1'))
 
+rootTuplePFMETSequence = cms.Sequence(
+    rootTuplePFMETRaw*
+    rootTuplePFMETType1Cor*
+    rootTuplePFMETType01Cor*
+    rootTuplePFMETType01XYCor*
+    rootTuplePFMETPuppiRaw*
+    rootTuplePFMETPuppiType1Cor*
+    rootTuplePFMETType01XYCorUnclusteredUp*
+    rootTuplePFMETType01XYCorUnclusteredDown*
+    rootTuplePFMETType01XYCorElectronEnUp*
+    rootTuplePFMETType01XYCorElectronEnDown*
+    rootTuplePFMETType01XYCorMuonEnUp*
+    rootTuplePFMETType01XYCorMuonEnDown*
+    rootTuplePFMETType01XYCorTauEnUp*
+    rootTuplePFMETType01XYCorTauEnDown*
+    rootTuplePFMETType01XYCorJetResUp*
+    rootTuplePFMETType01XYCorJetResDown*
+    rootTuplePFMETType01XYCorJetEnUp*
+    rootTuplePFMETType01XYCorJetEnDown
+)
+
+    

@@ -413,9 +413,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // http://cmslxr.fnal.gov/lxr/source/PhysicsTools/PatExamples/plugins/PatTriggerAnalyzer.cc
 	  //------------------------------------------------------------------------
 
-	  // DMM FIXME: update for Run II triggers needed
-	  // SIC: we've embedded matches to selected HLT paths in the python with the PATTriggerMatchEmbedder.
-	  //      now just ask if we have a match to whichever HLT path in the object
+	  //We've embedded matches to selected HLT paths in the python with the PATTriggerMatchEmbedder.
+	  //now just ask if we have a match to whichever HLT path in the object
 			
 	  // HLT Single Muon trigger matching
 	  const pat::TriggerObjectStandAloneCollection matchesSingleMu = it->triggerObjectMatchesByPath("HLT_Mu45_eta2p1_v*");
@@ -525,7 +524,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    {
 	      if ( it->isGlobalMuon())	
 		{
-		  //DMM FIXME - refits don't work in 7_2, will be added later
 		  int refit_id = -999;
 				
 		  // -----------------------------------------------------------------------------------------------------------------------------------------//

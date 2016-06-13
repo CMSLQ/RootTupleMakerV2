@@ -82,9 +82,11 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   //produces <std::vector<double> > ( prefix + "SoftMuonByIP3dBTag" + suffix );             
   produces <std::vector<double> > ( prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
   produces <std::vector<double> > ( prefix + "CombinedMVABTag" + suffix );
+  produces <std::vector<double> > ( prefix + "CombinedCvsLJetTags" + suffix );
+  produces <std::vector<double> > ( prefix + "CombinedCvsBJetTags" + suffix );
   produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);
   produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);
-  // for non-PUPPI jets, MiniAOD v2, we get the MVA pileup ID discriminator
+  // for non-PUPPI jets, we get the MVA pileup ID discriminator
   if(!isPuppiJetColl)
     produces <std::vector<double> >    ( prefix + "PileupMVA" + suffix);
   produces <std::vector<double> > ( prefix + "BestVertexTrackAssociationFactor" + suffix );
@@ -182,6 +184,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //std::auto_ptr<std::vector<double> >  softMuonByIP3dBTag                   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  combinedInclusiveSecondaryVertexBTag ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  combinedMVABTag                      ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  combinedCvsLJetTag                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  combinedCvsBJetTag                   ( new std::vector<double>()  );
 	
   std::auto_ptr<std::vector<int> >  passLooseID  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );
@@ -606,27 +610,28 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  hfHadronMultiplicity->push_back( it->HFHadronMultiplicity() );
 	  hfEMMultiplicity->push_back( it->HFEMMultiplicity() );
 	  nConstituents->push_back( it->numberOfDaughters() ); // same as it->getPFConstituents().size()
-	  trackCountingHighEffBTag->push_back( it->bDiscriminator("pfTrackCountingHighEffBJetTags") );
-	  trackCountingHighPurBTag->push_back( it->bDiscriminator("pfTrackCountingHighPurBJetTags") );
-	  simpleSecondaryVertexHighEffBTag->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighEffBJetTags") );
-	  simpleSecondaryVertexHighPurBTag->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighPurBJetTags") );
-	  jetProbabilityBTag->push_back( it->bDiscriminator("pfJetProbabilityBJetTags") );
-	  jetBProbabilityBTag->push_back( it->bDiscriminator("pfJetBProbabilityBJetTags") );
+	  trackCountingHighEffBTag            ->push_back( it->bDiscriminator("pfTrackCountingHighEffBJetTags") );
+	  trackCountingHighPurBTag            ->push_back( it->bDiscriminator("pfTrackCountingHighPurBJetTags") );
+	  simpleSecondaryVertexHighEffBTag    ->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighEffBJetTags") );
+	  simpleSecondaryVertexHighPurBTag    ->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighPurBJetTags") );
+	  jetProbabilityBTag                  ->push_back( it->bDiscriminator("pfJetProbabilityBJetTags") );
+	  jetBProbabilityBTag                 ->push_back( it->bDiscriminator("pfJetBProbabilityBJetTags") );
 	  combinedSecondaryVertexBTag         ->push_back( it->bDiscriminator("pfCombinedSecondaryVertexV2BJetTags") );
+	  combinedInclusiveSecondaryVertexBTag->push_back( it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") );
+	  combinedMVABTag                     ->push_back( it->bDiscriminator("pfCombinedMVAV2BJetTags") );
+	  combinedCvsLJetTag                  ->push_back( it->bDiscriminator("pfCombinedCvsLJetTags") );
+	  combinedCvsBJetTag                  ->push_back( it->bDiscriminator("pfCombinedCvsBJetTags") );
 	  //combinedSecondaryVertexMVABTag      ->push_back( it->bDiscriminator("combinedSecondaryVertexMVABJetTags") );
 	  //softElectronByPtBTag                ->push_back( it->bDiscriminator("softElectronByPtBJetTags") );                
 	  //softElectronByIP3dBTag              ->push_back( it->bDiscriminator("softElectronByIP3dBJetTags") );
 	  //softMuonBTag                        ->push_back( it->bDiscriminator("softMuonBJetTags") );
 	  //softMuonByPtBTag                    ->push_back( it->bDiscriminator("softMuonByPtBJetTags") );                
 	  //softMuonByIP3dBTag                  ->push_back( it->bDiscriminator("softMuonByIP3dBJetTags") );
-	  combinedInclusiveSecondaryVertexBTag->push_back( it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") );
-	  combinedMVABTag                     ->push_back( it->bDiscriminator("pfCombinedMVABJetTags") );
 	  passLooseID->push_back( passjetLoose );
 	  passTightID->push_back( passjetTight );
-	  //// XXX SIC FIXME PU JET ID
 	  //// JET Pileup MVA
-	  //if(!isPuppiJetColl)
-	  //  jetpileup_mva->push_back(it->userFloat(mvaPileupIDname));
+	  if(!isPuppiJetColl)
+	    jetpileup_mva->push_back(it->userFloat(mvaPileupIDname));
 
 	  // 			//////////////////////////////////////////////////////////////////// 
 	  // 			if( fabs(it->eta()) > 3) 
@@ -764,6 +769,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //iEvent.put( softMuonByIP3dBTag                  ,prefix + "SoftMuonByIP3dBTag" + suffix );            
   iEvent.put( combinedInclusiveSecondaryVertexBTag,prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
   iEvent.put( combinedMVABTag                     ,prefix + "CombinedMVABTag" + suffix ) ;
+  iEvent.put( combinedCvsLJetTag                  ,prefix + "CombinedCvsLJetTags" + suffix ) ;
+  iEvent.put( combinedCvsBJetTag                  ,prefix + "CombinedCvsBJetTags" + suffix ) ;
   iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);
   iEvent.put( passTightID, prefix + "PassTightID" + suffix);
 	

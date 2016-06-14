@@ -501,7 +501,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    {
 	      // JER
 	      // create a JetParameters object
-	      // You *must* now in advance which variables are needed for getting the resolution. For the moment, only pt and eta are needed, but this will
+	      // You *must* know in advance which variables are needed for getting the resolution. For the moment, only pt and eta are needed, but this will
 	      // probably change in the future when PU dependency is added. Please keep an eye on the twiki page:
 	      //     https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution
 	      JME::JetParameters jetParameters;

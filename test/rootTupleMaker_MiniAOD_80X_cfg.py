@@ -253,12 +253,15 @@ process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.Inpu
 #----------------------------------------------------------------------------------------------------
 # JER and JEC
 #----------------------------------------------------------------------------------------------------
-jerResFile = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'
-jerScaleFactorsFile = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_DATAMCSF_AK4PFchs.txt'
+#jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'
+jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFchs.txt'
+jerResFilePuppi          = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFPuppi.txt'
+jerScaleFactorsFile      = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_DATAMCSF_AK4PFchs.txt'
+jerScaleFactorsFilePuppi = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_DATAMCSF_AK4PFchs.txt'
 # JEC from text files
 # stored in 'data' directory, they should be available in the CMSSW_SEARCH_PATH
-jecUncFileData='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_DATA_UncertaintySources_AK4PFchs.txt'
-jecUncFileMC='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_UncertaintySources_AK4PFchs.txt'
+jecUncFileData           ='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_DATA_UncertaintySources_AK4PFchs.txt'
+jecUncFileMC             ='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_UncertaintySources_AK4PFchs.txt'
 
 #dbJetMCDBFile = 'Summer15_25nsV6_MC.db'
 #dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
@@ -267,9 +270,9 @@ jecUncFileMC='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_UncertaintySo
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = False
 process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = False
 process.rootTuplePFJetsAK4CHS.JERResolutionsFile = jerResFile
-process.rootTuplePFJetsAK4Puppi.JERResolutionsFile = jerResFile
+process.rootTuplePFJetsAK4Puppi.JERResolutionsFile = jerResFilePuppi
 process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile = jerScaleFactorsFile
-process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFile
+process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 # XXX NB: These files are wrong for AK4Puppi so it won't have proper scale factors.
 
 ## load JES/etc.from local db file, and into global tag
@@ -381,85 +384,80 @@ process.rootTuplePFMETType1CorTest = process.rootTuplePFMETType1Cor.clone()
 process.rootTuplePFMETType1CorTest.InputTag = cms.InputTag('slimmedMETs'+postfix)
 process.rootTuplePFMETType1CorTest.Suffix = 'Type1CorTest'
 
-###### ntuplize the new MET shifts
-#####process.rootNTupleNewMETs = cms.Path()
-#####allowedShifts = ['jres','jes','mes','ees','tes','ues']
-#####allowedSigns = ['+','-']
-#####signMap = {
-#####    '+' : 'Up',
-#####    '-' : 'Down',
-#####}
-#####collMap = {
-#####    # TODO
-#####    #'jres' : {'Jets'     : 'shiftedPatJetRes{sign}{postfix}'},
-#####    'jres' : {},
-#####    'jes'  : {'Jets'     : 'shiftedPatJetEn{sign}{postfix}'},
-#####    'mes'  : {'Muons'    : 'shiftedPatMuonEn{sign}{postfix}'},
-#####    'ees'  : {'Electrons': 'shiftedPatElectronEn{sign}{postfix}'},
-#####    'tes'  : {'Taus'     : 'shiftedPatTauEn{sign}{postfix}'},
-#####    'ues'  : {},
-#####    'pes'  : {},
-#####    }
-#####metMap = {
-#####  'jres' : 'patPFMetT1JetRes{sign}{postfix}',
-#####  'jes'  : 'patPFMetT1JetEn{sign}{postfix}',
-#####  'mes'  : 'patPFMetT1MuonEn{sign}{postfix}',
-#####  'ees'  : 'patPFMetT1ElectronEn{sign}{postfix}',
-#####  'tes'  : 'patPFMetT1TauEn{sign}{postfix}',
-#####  'ues'  : 'patPFMetT1UnclusteredEn{sign}{postfix}',
-#####  'pes'  : '',
-#####}
-######mettypes = ['CaloMET','CaloMETType1Cor','PFMET','PFMETType1Cor','PFMETType01Cor','PFMETType01XYCor','PFMETPuppi','PFMETPuppiType1Cor']
-######mettypes = ['PFMETType1Cor','PFMETPuppi']
-#####mettypes = ['PFMETType1Cor']
-#####for shift in allowedShifts:
-#####    for sign in allowedSigns:
-#####      # FIXME TODO
-#####        ## embed shifted objects
-#####        #for coll in collMap[shift]:
-#####        #    modName = '{shift}{sign}{coll}Embedding'.format(shift=shift,sign=signMap[sign],coll=coll)
-#####        #    pluginName = 'MiniAODShifted{coll}Embedder'.format(coll=coll[:-1])
-#####        #    dName = coll.lower()
-#####        #    srcName = fs_daughter_inputs[dName]
-#####        #    shiftSrcName = collMap[shift][coll].format(sign=signMap[sign],postfix=postfix)
-#####        #    label = '{shift}{sign}{coll}'.format(shift=shift,sign=signMap[sign],coll=coll)
-#####        #    module = cms.EDProducer(
-#####        #        pluginName,
-#####        #        src = cms.InputTag(srcName),
-#####        #        shiftSrc = cms.InputTag(shiftSrcName),
-#####        #        label = cms.string(label),
-#####        #    )
-#####        #    setattr(process,modName,module)
-#####        #    fs_daughter_inputs[dName] = modName
-#####        #    #process.embedShifts *= getattr(process,shiftSrcName)
-#####        #    process.embedShifts *= getattr(process,modName)
-#####        # embed shifted met
-#####        for mettype in mettypes:
-#####          modName = 'rootTuple{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
-#####          metName = metMap[shift].format(sign=signMap[sign],postfix=postfix)
-#####          prefix = '{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
-#####          suffix = ''
-#####          module = cms.EDProducer(
-#####              'RootTupleMakerV2_MET',
-#####              InputTag = cms.InputTag(metName),
-#####              Prefix = cms.string(prefix),
-#####              Suffix = cms.string(suffix),
-#####              StoreUncorrectedMET = cms.bool(False), # this won't work either
-#####              StoreMETSignificance = cms.bool(False),
-#####              Uncertainty = cms.string('NoShift'),
-#####              CorrectionLevel = cms.string('NoCorrection'), # call pt(), etc., instead of shiftedPt()
-#####          )
-#####          setattr(process,modName,module)
-#####          process.rootNTupleNewMETs *= getattr(process,modName)
-######process.schedule.append(process.rootNTupleNewMETs)#FIXME do we need this?
-#####
-######----------------------------------------------------------------------------------------------------
+# ntuplize the new MET shifts
+process.rootNTupleNewMETs = cms.Path()
+allowedShifts = ['jres','jes','mes','ees','tes','ues']
+allowedSigns = ['+','-']
+signMap = {
+    '+' : 'Up',
+    '-' : 'Down',
+}
+collMap = {
+    # TODO
+    #'jres' : {'Jets'     : 'shiftedPatJetRes{sign}{postfix}'},
+    'jres' : {},
+    'jes'  : {'Jets'     : 'shiftedPatJetEn{sign}{postfix}'},
+    'mes'  : {'Muons'    : 'shiftedPatMuonEn{sign}{postfix}'},
+    'ees'  : {'Electrons': 'shiftedPatElectronEn{sign}{postfix}'},
+    'tes'  : {'Taus'     : 'shiftedPatTauEn{sign}{postfix}'},
+    'ues'  : {},
+    'pes'  : {},
+    }
+metMap = {
+  'jres' : 'patPFMetT1JetRes{sign}{postfix}',
+  'jes'  : 'patPFMetT1JetEn{sign}{postfix}',
+  'mes'  : 'patPFMetT1MuonEn{sign}{postfix}',
+  'ees'  : 'patPFMetT1ElectronEn{sign}{postfix}',
+  'tes'  : 'patPFMetT1TauEn{sign}{postfix}',
+  'ues'  : 'patPFMetT1UnclusteredEn{sign}{postfix}',
+  'pes'  : '',
+}
+#mettypes = ['CaloMET','CaloMETType1Cor','PFMET','PFMETType1Cor','PFMETType01Cor','PFMETType01XYCor','PFMETPuppi','PFMETPuppiType1Cor']
+mettypes = ['PFMETType1Cor','PFMETPuppiType1Cor']
+for shift in allowedShifts:
+    for sign in allowedSigns:
+      # FIXME TODO
+        ## embed shifted objects
+        #for coll in collMap[shift]:
+        #    modName = '{shift}{sign}{coll}Embedding'.format(shift=shift,sign=signMap[sign],coll=coll)
+        #    pluginName = 'MiniAODShifted{coll}Embedder'.format(coll=coll[:-1])
+        #    dName = coll.lower()
+        #    srcName = fs_daughter_inputs[dName]
+        #    shiftSrcName = collMap[shift][coll].format(sign=signMap[sign],postfix=postfix)
+        #    label = '{shift}{sign}{coll}'.format(shift=shift,sign=signMap[sign],coll=coll)
+        #    module = cms.EDProducer(
+        #        pluginName,
+        #        src = cms.InputTag(srcName),
+        #        shiftSrc = cms.InputTag(shiftSrcName),
+        #        label = cms.string(label),
+        #    )
+        #    setattr(process,modName,module)
+        #    fs_daughter_inputs[dName] = modName
+        #    #process.embedShifts *= getattr(process,shiftSrcName)
+        #    process.embedShifts *= getattr(process,modName)
+        # embed shifted met
+        for mettype in mettypes:
+          modName = 'rootTuple{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
+          metName = metMap[shift].format(sign=signMap[sign],postfix=postfix)
+          prefix = '{mettype}{shift}{sign}'.format(mettype=mettype,shift=shift,sign=signMap[sign])
+          suffix = ''
+          module = cms.EDProducer(
+              'RootTupleMakerV2_MET',
+              InputTag = cms.InputTag(metName),
+              Prefix = cms.string(prefix),
+              Suffix = cms.string(suffix),
+              StoreUncorrectedMET = cms.bool(False), # this won't work either
+              StoreMETSignificance = cms.bool(False),
+              Uncertainty = cms.string('NoShift'),
+              CorrectionLevel = cms.string('NoCorrection'), # call pt(), etc., instead of shiftedPt()
+          )
+          setattr(process,modName,module)
+          process.rootNTupleNewMETs *= getattr(process,modName)
+#process.schedule.append(process.rootNTupleNewMETs)#FIXME do we need this?
+
+#----------------------------------------------------------------------------------------------------
 # This is MC, so analyze the smeared PFJets by default
 # But smearing should be done by default in MiniAOD ?
-#----------------------------------------------------------------------------------------------------
-# SIC FIXME TODO
-# analyze the default jet collection in MiniAOD (AK4PFJetsCHS)
-#process.rootTuplePFJets.InputTag = cms.InputTag('slimmedJets')
 #----------------------------------------------------------------------------------------------------
 # Set Lepton-Gen Matching Parameters
 #----------------------------------------------------------------------------------------------------

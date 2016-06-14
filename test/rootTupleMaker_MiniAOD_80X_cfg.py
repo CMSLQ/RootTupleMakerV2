@@ -130,7 +130,7 @@ process.load('PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi')
 ###### need to load it into the process, or else it won't run
 process.unpackedPatTrigger = unpackedPatTrigger.clone()
 ####
-#####fixme removing cause no trigger info?
+#####fixme removing because no trigger info?
 ####process.cleanElectronTriggerMatchHLTSingleElectron.matched = 'unpackedPatTrigger'
 ####process.cleanElectronTriggerMatchHLTSingleElectronWP85.matched = 'unpackedPatTrigger'
 ####process.cleanElectronTriggerMatchHLTDoubleElectron.matched = 'unpackedPatTrigger'
@@ -149,42 +149,7 @@ process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
 ####                               'keep *_ electronsTriggeredHLTSingleElectronWP80_*_*',
 ####                               'keep *_ electronsTriggeredHLTDoubleElectron_*_*' ]
 
-#----------------------------------------------------------------------------------------------------
-# Use default MiniAOD Taus
-# Use default MiniAOD Tau IDs
-#----------------------------------------------------------------------------------------------------
-
-#----------------------------------------------------------------------------------------------------
-# Make analysisPatTaus and add them to the cleanPatCandidates sequence
-#----------------------------------------------------------------------------------------------------
-#process.analysisPatTaus = process.cleanPatTaus.clone()
-#process.analysisPatTaus.preselection = cms.string(
-#    'tauID("decayModeFinding") > 0.5 &'
-#    ' tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits") > 0.5 &'
-#    ' tauID("againstMuonLoose3") > 0.5 &'
-#    ' tauID("againstElectronLooseMVA3") > 0.5'
-#)
-#process.analysisPatTaus.finalCut = cms.string('pt > 20. & abs(eta) < 2.3')
-#process.cleanPatCandidates.replace ( process.cleanPatTaus, process.cleanPatTaus + process.analysisPatTaus )
-# FIXME
-
-#----------------------------------------------------------------------------------------------------
-# Make analysisPatMuons and add them to the cleanPatCandidates sequence
-#----------------------------------------------------------------------------------------------------
-#process.analysisPatMuons = process.cleanPatMuons.clone()
-#process.analysisPatMuons.finalCut = cms.string("isGlobalMuon & muonID('GlobalMuonPromptTight') & pt > 20")
-#process.cleanPatCandidates.replace ( process.cleanPatMuons, process.cleanPatMuons + process.analysisPatMuons )
-#FIXME
-
-#----------------------------------------------------------------------------------------------------
-# Make analysisPatElectrons and add them to the cleanPatCandidates sequence
-#----------------------------------------------------------------------------------------------------
-#process.analysisPatElectrons = process.cleanPatElectrons.clone()
-#process.analysisPatElectrons.finalCut = cms.string('userInt("HEEPId") < 0.5')
-#process.cleanPatCandidates.replace ( process.cleanPatElectrons, process.cleanPatElectrons + process.analysisPatElectrons )
-# FIXME
-
-# need the egamma smearing for 76X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMSmearer
+# Need the egamma smearing for 76X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMSmearer
 ###process.load('EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi')#fixme check this
 ###correctionType = "Prompt2015"
 ###process.calibratedPatElectrons.isMC = varOptions.isMC
@@ -331,21 +296,22 @@ process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
  
 # Apply jet energy corrections:
 #   https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#CorrPatJets
+#   https://github.com/cms-sw/cmssw/blob/CMSSW_8_0_X/PhysicsTools/PatAlgos/test/patTuple_updateJets_fromMiniAOD_cfg.py
 # This should load them from the global tag
-#fixme removed for now
-#from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFactorsUpdated
-#process.patJetCorrFactorsReapplyJEC = patJetCorrFactorsUpdated.clone(
-#  src = cms.InputTag("slimmedJets"),
-#  levels = ['L1FastJet', 
-#        'L2Relative', 
-#        'L3Absolute',
-#        'L2L3Residuals'],#Do we need / can we have this here?
-#  payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
-#from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated
-#process.patJetsReapplyJEC = patJetsUpdated.clone(
-#  jetSource = cms.InputTag("slimmedJets"),
-#  jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
-#)
+from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+
+if varOptions.isMC : 
+  updateJetCollection(
+    process,
+    jetSource = cms.InputTag('slimmedJets'),
+    jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+  )
+else : 
+  updateJetCollection(
+    process,
+    jetSource = cms.InputTag('slimmedJets'),
+    jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None'),
+  )
 
 ##----------------------------------------------------------------------------------------------------
 ## MET Re-Corrections and Uncertainties
@@ -475,7 +441,6 @@ process.load("Leptoquarks.RootTupleMakerV2.leptonGenMatching_cfi")
 #----------------------------------------------------------------------------------------------------
 # Lepton + Jets filter
 #----------------------------------------------------------------------------------------------------
-
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 
 #### Shared Muon/Electron/Tau Skim
@@ -484,19 +449,22 @@ process.LJFilter.muLabel   = cms.InputTag("slimmedMuons")
 process.LJFilter.elecLabel = cms.InputTag("slimmedElectrons")
 process.LJFilter.jetLabel  = cms.InputTag("slimmedJets")
 process.LJFilter
-process.LJFilter.muPT     = 10.0
+process.LJFilter.muPT     = 12.0
 process.LJFilter.electronsMin = 0
-process.LJFilter.elecPT       = 15.0
+process.LJFilter.elecPT       = 12.0
 process.LJFilter.tausMin = 0
-process.LJFilter.tauPT   = 15.0
+process.LJFilter.tauPT   = 12.0
 process.LJFilter.jetsMin = 0
-process.LJFilter.jetPT   = 15.0
+process.LJFilter.jetPT   = 12.0
 process.LJFilter.counteitherleptontype = True
-process.LJFilter.customfilterEMuTauJet2012 = True
+process.LJFilter.customfilterEMuTauJet2012 = False
+process.LJFilter.customfilterEMuTauJet2016 = True
+process.LJFilter.debug = False
 # -- WARNING :
-# "customfilterEMuTauJet2012" configuration is hard-coded.
+# "customfilterEMuTauJet2012" and "customfilterEMuTauJet2016" configurations are hard-coded.
 # (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc )
 # "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
+# "customfilterEMuTauJet2016" is the desired mode of operation for the Lepton+Jets Filter in 2016.
 
 #----------------------------------------------------------------------------------------------------
 # PDF weights

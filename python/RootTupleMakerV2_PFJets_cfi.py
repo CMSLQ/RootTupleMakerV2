@@ -1,49 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 
-#rootTuplePFJetsAK5 = cms.EDProducer("RootTupleMakerV2_PFJets",
-#    InputTag = cms.InputTag('selectedPatJetsAK5PF'),
-#    #InputTag = cms.InputTag('pfjetTriggerMatchEmbedderHLTEleJetJet'),
-#    ## InputTagL1Offset    = cms.InputTag('selectedPatJetsAK5PFL1Offset'),
-#    #InputTagSmearedUp   = cms.InputTag('smearedPatJetsAK5PFresUp'),                                 
-#    #InputTagSmearedDown = cms.InputTag('smearedPatJetsAK5PFresDown'),                                 
-#    #InputTagScaledUp    = cms.InputTag('shiftedPatJetsAK5PFenUpForCorrMEt'),                                 
-#    #InputTagScaledDown  = cms.InputTag('shiftedPatJetsAK5PFenDownForCorrMEt'),                                 
-#    MVAPileupIDName = cms.string('pileupJetId:fullDiscriminant'),
-#    Prefix = cms.string('PFJet'),
-#    Suffix = cms.string('AK5'),
-#    MaxSize = cms.uint32(30),
-#    JECUncertainty = cms.string('AK5PF'),
-#    ReadJECuncertainty = cms.bool(False),
-#    ReadJERuncertainty = cms.bool(False),
-#    JERUncertainty = cms.string('AK5PF'),
-#    ReadJERFromGT = cms.bool(True),
-#    RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-#    JERResolutionsFile = cms.FileInPath(''),#FIXME why empty?
-#    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
-#    VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
-#)
-#rootTuplePFJetsAK5CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
-#    InputTag = cms.InputTag('selectedPatJetsAK5PFCHS'),
-#    #InputTag = cms.InputTag('pfjetTriggerMatchEmbedderHLTEleJetJet'),
-#    ## InputTagL1Offset    = cms.InputTag('selectedPatJetsAK5PFL1Offset'),
-#    #InputTagSmearedUp   = cms.InputTag('smearedPatJetsAK5PFresUp'),                                 
-#    #InputTagSmearedDown = cms.InputTag('smearedPatJetsAK5PFresDown'),                                 
-#    #InputTagScaledUp    = cms.InputTag('shiftedPatJetsAK5PFenUpForCorrMEt'),                                 
-#    #InputTagScaledDown  = cms.InputTag('shiftedPatJetsAK5PFenDownForCorrMEt'),                                 
-#    MVAPileupIDName = cms.string('pileupJetId:fullDiscriminant'),
-#    Prefix = cms.string('PFJet'),
-#    Suffix = cms.string('AK5CHS'),
-#    MaxSize = cms.uint32(30),
-#    JECUncertainty = cms.string('AK5PF'),
-#    ReadJECuncertainty = cms.bool(True),
-#    JERUncertainty = cms.string('AK5PF'),
-#    ReadJERFromGT = cms.bool(True),
-#    RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-#    JERResolutionsFile = cms.FileInPath('Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'),
-#    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
-#    VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
-#)
-
 rootTuplePFJetsAK4CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
     InputTag = cms.InputTag('slimmedJets'),
     #InputTag = cms.InputTag('pfjetTriggerMatchEmbedderHLTEleJetJet'),
@@ -62,7 +18,7 @@ rootTuplePFJetsAK4CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
     JERUncertainty = cms.string('AK4PFchs'),
     ReadJERFromGT = cms.bool(True),
     RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-    JERResolutionsFile = cms.FileInPath('Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'),
+    JERResolutionsFile = cms.FileInPath('Spring16_25nsV1_MC_PtResolution_AK4PFchs.txt'),
     JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
@@ -84,7 +40,7 @@ rootTuplePFJetsAK4Puppi = cms.EDProducer("RootTupleMakerV2_PFJets",
     JERUncertainty = cms.string('AK4PFPuppi'),
     ReadJERFromGT = cms.bool(True),
     RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-    JERResolutionsFile = cms.FileInPath('Summer15_25nsV6_MC_PtResolution_AK4PFPuppi.txt'),
+    JERResolutionsFile = cms.FileInPath('Spring16_25nsV1_MC_PtResolution_AK4PFPuppi.txt'),
     JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFPuppi.txt'),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
@@ -117,8 +73,6 @@ pfjetTriggerMatchEmbedderHLTEleJetJet = cms.EDProducer(
 rootTuplePFJetsSequence = cms.Sequence(
   pfjetTriggerMatchHLTEleJetJet*
   pfjetTriggerMatchEmbedderHLTEleJetJet*
-  #rootTuplePFJetsAK5*
-  #rootTuplePFJetsAK5CHS*
   rootTuplePFJetsAK4CHS*
   rootTuplePFJetsAK4Puppi
 )

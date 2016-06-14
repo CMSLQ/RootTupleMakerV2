@@ -33,9 +33,6 @@ class RootTupleMakerV2_PFJets : public edm::EDProducer {
   void produce( edm::Event &, const edm::EventSetup & );
   const edm::EDGetTokenT<std::vector<pat::Jet> >   jetInputToken_;
   const edm::InputTag   inputTag;
-  //const edm::EDGetTokenT<edm::InputTag>   inputTokenL1Offset_;
-  //const edm::EDGetTokenT<edm::InputTag>   inputTokenSmearedUp_, inputTokenSmearedDown_;
-  //const edm::EDGetTokenT<edm::InputTag> inputTokenScaledUp_, inputTokenScaledDown_;	
   const std::string     prefix,suffix,mvaPileupIDname;
   const unsigned int    maxSize;
   const std::string     jecUncPath; 

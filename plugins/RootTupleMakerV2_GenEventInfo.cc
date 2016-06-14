@@ -128,18 +128,25 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       if( pdfCTEQWeightsHandle.isValid() ) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfCTEQWeightsInputToken_";
-        *pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
+        //*pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
+	//Instead of the above line, have to divide by central value - if 0, set to 1
+	std::vector<double> weights = (*pdfCTEQWeightsHandle);
+	std::vector<double> reWeightsCTEQ;
+	unsigned int nmembers = weights.size();	
+	for (unsigned int i=0; i<nmembers; i++) {
+	  if(weights[0]!=0)reWeightsCTEQ.push_back(weights[i]/weights[0]);
+	  else reWeightsCTEQ.push_back(1.0);
+	}
+        *pdfCTEQWeights.get() = reWeightsCTEQ;
 	//for debugging to see what the weight variations are
 	/*
-	  std::vector<double> weights = (*pdfCTEQWeightsHandle);
-	  unsigned int nmembers = weights.size();	
-	  for (unsigned int j=0; j<nmembers; j+=2) {
+	for (unsigned int j=0; j<nmembers; j+=2) {
 	  if(j==0){std::cout << "Event weight for PDF central value" << j << ": " << weights[j] << std::endl;j++;}
 	  else{
-	  std::cout << "Event weight for PDF variation +" << (j+1)/2 << ": " << weights[j] << std::endl;
-	  std::cout << "Event weight for PDF variation -" << (j+1)/2 << ": " << weights[j+1] << std::endl;
+	    std::cout << "Event weight for PDF variation +" << (j+1)/2 << ": " << weights[j] << std::endl;
+	    std::cout << "Event weight for PDF variation -" << (j+1)/2 << ": " << weights[j+1] << std::endl;
 	  }
-	  }
+	}
 	*/
       } else {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfCTEQWeightsInputToken_";
@@ -147,7 +154,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       if( pdfMMTHWeightsHandle.isValid() ) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfMMTHWeightsInputToken_";
-        *pdfMMTHWeights.get() = *pdfMMTHWeightsHandle;
+        //*pdfMMTHWeights.get() = *pdfMMTHWeightsHandle;
+	//Instead of the above line, have to divide by central value - if 0, set to 1
+	std::vector<double> weights = (*pdfMMTHWeightsHandle);
+	std::vector<double> reWeightsMMTH;
+	unsigned int nmembers = weights.size();	
+	for (unsigned int i=0; i<nmembers; i++) {
+	  if(weights[0]!=0)reWeightsMMTH.push_back(weights[i]/weights[0]);
+	  else reWeightsMMTH.push_back(1.0);
+	}
+        *pdfMMTHWeights.get() = reWeightsMMTH;
       } else {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfMMTHWeightsInputToken_";
       }
@@ -155,7 +171,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if( pdfNNPDFWeightsHandle.isValid() ) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfNNPDFWeightsInputToken_";
 
-        *pdfNNPDFWeights.get() = *pdfNNPDFWeightsHandle;
+        //*pdfNNPDFWeights.get() = *pdfNNPDFWeightsHandle;
+	//Instead of the above line, have to divide by central value - if 0, set to 1
+	std::vector<double> weights = (*pdfNNPDFWeightsHandle);
+	std::vector<double> reWeightsNNPDF;
+	unsigned int nmembers = weights.size();	
+	for (unsigned int i=0; i<nmembers; i++) {
+	  if(weights[0]!=0)reWeightsNNPDF.push_back(weights[i]/weights[0]);
+	  else reWeightsNNPDF.push_back(1.0);
+	}
+        *pdfNNPDFWeights.get() = reWeightsNNPDF;
       } else {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfNNPDFWeightsInputToken_";
       }

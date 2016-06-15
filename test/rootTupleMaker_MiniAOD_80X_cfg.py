@@ -91,8 +91,6 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # MC
 if varOptions.isMC:
   process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
-# Data
-#process.GlobalTag.globaltag = '76X_dataRun2_v15'
 else:
   process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
 # feed it into the ntuple

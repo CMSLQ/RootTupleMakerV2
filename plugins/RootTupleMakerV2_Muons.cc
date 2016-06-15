@@ -28,6 +28,10 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   beamSpotToken_ (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag")))
 {
   produces <bool>                 ( "hasVeryForwardPFMuon" );
+  produces <std::vector<bool> >   ( prefix + "isLooseMuon"             + suffix );
+  produces <std::vector<bool> >   ( prefix + "isMediumMuon"            + suffix );
+  produces <std::vector<bool> >   ( prefix + "isTightMuon"             + suffix );
+  produces <std::vector<bool> >   ( prefix + "isHighPtMuon"            + suffix );
   produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
   produces <std::vector<double> > ( prefix + "Phi"                     + suffix );
   produces <std::vector<double> > ( prefix + "Pt"                      + suffix );
@@ -156,6 +160,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   std::auto_ptr<bool>                  hasVeryForwardPFMuon    ( new bool() );
+  std::auto_ptr<std::vector<bool> >    isLooseMuon             ( new std::vector<bool>()    );
+  std::auto_ptr<std::vector<bool> >    isMediumMuon            ( new std::vector<bool>()    );
+  std::auto_ptr<std::vector<bool> >    isTightMuon             ( new std::vector<bool>()    );
+  std::auto_ptr<std::vector<bool> >    isHighPtMuon            ( new std::vector<bool>()    );
   std::auto_ptr<std::vector<double> >  eta                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt                      ( new std::vector<double>()  );
@@ -450,6 +458,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      HLTSingleIsoMuonMatchPhi -> push_back ( -999. );
 	    }
 
+	  reco::VertexCollection::const_iterator v_it_muId=primaryVertices->begin();
+	  isLooseMuon->push_back(  it->isLooseMuon()  );
+	  isMediumMuon->push_back( it->isMediumMuon() );
+	  isTightMuon->push_back(  it->isTightMuon(*v_it_muId)  );
+	  isHighPtMuon->push_back( it->isHighPtMuon(*v_it_muId) );
+
 	  eta->push_back( it->eta() );
 	  phi->push_back( it->phi() );
 	  pt ->push_back( it->pt()  );
@@ -714,6 +728,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( hasVeryForwardPFMuon, "hasVeryForwardPFMuon" );
+  iEvent.put( isLooseMuon,                prefix + "isLooseMuon"                 + suffix );
+  iEvent.put( isMediumMuon,               prefix + "isMediumMuon"                + suffix );
+  iEvent.put( isTightMuon,                prefix + "isTightMuon"                 + suffix );
+  iEvent.put( isHighPtMuon,               prefix + "isHighPtMuon"                + suffix );
   iEvent.put( eta,                        prefix + "Eta"                         + suffix );
   iEvent.put( phi,                        prefix + "Phi"                         + suffix );
   iEvent.put( pt,                         prefix + "Pt"                          + suffix );

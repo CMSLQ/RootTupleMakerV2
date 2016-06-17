@@ -316,7 +316,7 @@ else :
 ## https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription
 ## https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#METSysTools
 ##----------------------------------------------------------------------------------------------------
-postfix = 'Recorrected'
+postfix = "Recorrected"
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
 #default configuration for miniAOD reprocessing
@@ -341,12 +341,8 @@ runMetCorAndUncFromMiniAOD(process,
 
 # ntuplize the newly-corrected MET
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
-process.rootTuplePFMETType1Cor.InputTag = cms.InputTag('slimmedMETs'+postfix)
+#process.rootTuplePFMETType1Cor.InputTag = cms.InputTag('slimmedMETs'+postfix) #fixme wait for JetMET to make this work with txt file
 process.rootTuplePFMETType1CorNotRecorrected.Suffix = 'Type1CorNotRecorrected'
-
-process.rootTuplePFMETType1CorTest = process.rootTuplePFMETType1Cor.clone()
-process.rootTuplePFMETType1CorTest.InputTag = cms.InputTag('slimmedMETs'+postfix)
-process.rootTuplePFMETType1CorTest.Suffix = 'Type1CorTest'
 
 # ntuplize the new MET shifts
 process.rootNTupleNewMETs = cms.Path()
@@ -552,7 +548,6 @@ process.p = cms.Path(
     #process.rootNTuplePFMET*
     process.rootTuplePFMETSequence*
     process.rootTuplePFMETType1CorNotRecorrected*
-    process.rootTuplePFMETType1CorTest*
     process.rootTupleTriggerObjects*
     process.rootTupleTrigger*
     process.rootTupleGenEventInfo*

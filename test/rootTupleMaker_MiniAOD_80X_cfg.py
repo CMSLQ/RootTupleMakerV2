@@ -90,9 +90,9 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 # MC
 if varOptions.isMC:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2_v1'
 else:
-  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v8'
+  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
@@ -310,6 +310,11 @@ else :
     jetSource = cms.InputTag('slimmedJets'),
     jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), 'None'),
   )
+process.rootTuplePFJetsAK4CHS.InputTag = cms.InputTag('updatedPatJets')
+process.schedule = cms.Schedule()
+process.applyCorrections = cms.Path()
+process.applyCorrections += process.patJetCorrFactors
+process.applyCorrections += process.updatedPatJets
 
 ##----------------------------------------------------------------------------------------------------
 ## MET Re-Corrections and Uncertainties
@@ -318,11 +323,13 @@ else :
 ##----------------------------------------------------------------------------------------------------
 postfix = "Recorrected"
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
-myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
+#myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
+myJecUncFile = '' # take from global tag
 #default configuration for miniAOD reprocessing
 #for a full met computation, remove the pfCandColl input
 runMetCorAndUncFromMiniAOD(process,
-                           jetCollUnskimmed='slimmedJets',
+                           #jetCollUnskimmed='slimmedJets',
+                           jetCollUnskimmed='updatedPatJets',
                            #jetColl='slimmedJets',
                            isData=not varOptions.isMC,
                            #electronColl=cms.InputTag('slimmedElectrons'),
@@ -330,14 +337,26 @@ runMetCorAndUncFromMiniAOD(process,
                            jecUncFile=myJecUncFile,
                            postfix=postfix                           
 )
-#process.applyCorrections = cms.Path()
-#if varOptions.isMC: process.applyCorrections += process.genMetExtractor
+#if varOptions.isMC:
+#  process.applyCorrections += getattr(process,'genMetExtractor{0}'.format(postfix))
+#process.applyCorrections += getattr(process,'patJetCorrFactorsReapplyJEC{0}'.format(postfix))
+##process.applyCorrections += process.patJets
+##process.applyCorrections += getattr(process,'selectedPatJets{0}'.format(postfix))
+#process.applyCorrections += getattr(process,'jetSelectorForMet{0}'.format(postfix))
+#process.applyCorrections += getattr(process,'cleanedPatJets{0}'.format(postfix))
+#process.applyCorrections += getattr(process,'pfMet{0}'.format(postfix))
 #process.applyCorrections += getattr(process,'patPFMet{0}'.format(postfix))
-#process.applyCorrections += process.patJetCorrFactorsReapplyJEC
-#process.applyCorrections += process.patJets
 #process.applyCorrections += getattr(process,'patPFMetT1Txy{0}'.format(postfix))
 #process.applyCorrections += getattr(process,'patPFMetT1{0}'.format(postfix))
 #process.applyCorrections += getattr(process,'patPFMetTxy{0}'.format(postfix))
+process.applyCorrections += getattr(process,'fullPatMetSequence{0}'.format(postfix))
+process.schedule.append(process.applyCorrections)
+# hacks to fix patPFMETCorrections_cff (used by runMETCorrectionsAndUncertainties)
+process.patSmearedJets.src = cms.InputTag('updatedPatJets')
+process.selectedPatJetsForMetT1T2Corr.src = cms.InputTag('updatedPatJets')
+process.selectedPatJetsForMetT1T2CorrRecorrected.src = cms.InputTag('updatedPatJets')
+process.selectedPatJetsForMetT2Corr.src = cms.InputTag('updatedPatJets')
+process.selectedPatJetsForMetT2CorrRecorrected.src = cms.InputTag('updatedPatJets')
 
 # ntuplize the newly-corrected MET
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
@@ -412,8 +431,13 @@ for shift in allowedShifts:
               CorrectionLevel = cms.string('NoCorrection'), # call pt(), etc., instead of shiftedPt()
           )
           setattr(process,modName,module)
+          # add shifted MET module
+          process.rootNTupleNewMETs *= getattr(process,metName)
           process.rootNTupleNewMETs *= getattr(process,modName)
 #process.schedule.append(process.rootNTupleNewMETs)#FIXME do we need this?
+process.metPath = cms.Path()
+process.metPath += getattr(process,'fullPatMetSequence{0}'.format(postfix))
+process.schedule.append(process.metPath)
 
 #----------------------------------------------------------------------------------------------------
 # This is MC, so analyze the smeared PFJets by default

@@ -28,10 +28,10 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   beamSpotToken_ (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag")))
 {
   produces <bool>                 ( "hasVeryForwardPFMuon" );
-  produces <std::vector<bool> >   ( prefix + "isLooseMuon"             + suffix );
-  produces <std::vector<bool> >   ( prefix + "isMediumMuon"            + suffix );
-  produces <std::vector<bool> >   ( prefix + "isTightMuon"             + suffix );
-  produces <std::vector<bool> >   ( prefix + "isHighPtMuon"            + suffix );
+  produces <std::vector<bool> >   ( prefix + "IsLooseMuon"             + suffix );
+  produces <std::vector<bool> >   ( prefix + "IsMediumMuon"            + suffix );
+  produces <std::vector<bool> >   ( prefix + "IsTightMuon"             + suffix );
+  produces <std::vector<bool> >   ( prefix + "IsHighPtMuon"            + suffix );
   produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
   produces <std::vector<double> > ( prefix + "Phi"                     + suffix );
   produces <std::vector<double> > ( prefix + "Pt"                      + suffix );
@@ -65,6 +65,8 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "TrkVz"                   + suffix );
   produces <std::vector<double> > ( prefix + "TrackChi2"               + suffix );
   produces <std::vector<double> > ( prefix + "GlobalChi2"              + suffix );
+  produces <std::vector<double> > ( prefix + "CombinedQualityChi2LocalPosition" + suffix );
+  produces <std::vector<double> > ( prefix + "CombinedQualityTrkKink"  + suffix );
   produces <std::vector<double> > ( prefix + "TrkIso"                  + suffix );
   produces <std::vector<double> > ( prefix + "TrackerIsoSumPT"         + suffix );
   produces <std::vector<double> > ( prefix + "EcalIso"                 + suffix );
@@ -72,6 +74,7 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<double> > ( prefix + "HOIso"                   + suffix );
   produces <std::vector<double> > ( prefix + "EcalVetoIso"             + suffix );
   produces <std::vector<double> > ( prefix + "HcalVetoIso"             + suffix );
+  produces <std::vector<double> > ( prefix + "SegmentCompatibility"    + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03ChargedHadron"   + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03ChargedParticle" + suffix );
   produces <std::vector<double> > ( prefix + "PFIsoR03NeutralHadron"   + suffix );
@@ -198,6 +201,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  trkVz                   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trackChi2               ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  globalChi2              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  combinedQualityChi2LocalPosition ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  combinedQualityTrkKink  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIso                  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trackerIsoSumPT         ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ecalIso                 ( new std::vector<double>()  );
@@ -205,6 +210,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  hoIso                   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ecalVetoIso             ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  hcalVetoIso             ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  segmentCompatibility    ( new std::vector<double>()  );
   //
   std::auto_ptr<std::vector<double> >  pfisor03chargedhadron   ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pfisor03chargedparticle ( new std::vector<double>()  );
@@ -517,6 +523,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      globalChi2        ->push_back( -1 );
 	    }
 
+	  combinedQualityChi2LocalPosition->push_back(it->combinedQuality().chi2LocalPosition);
+	  combinedQualityTrkKink->push_back(it->combinedQuality().trkKink);
+
 	  trkPixelHits->push_back(it->track()->hitPattern().numberOfValidPixelHits());
 
 	  segmentMatches  ->push_back(it->numberOfMatches());
@@ -668,6 +677,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  ecalVetoIso    ->push_back( it->isolationR03().emVetoEt  );
 	  hcalVetoIso    ->push_back( it->isolationR03().hadVetoEt );
 	  //
+	  segmentCompatibility -> push_back(it->segmentCompatibility());
+	  //
 	  // Adding PF isolation for 2012..
 	  //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId
 	  //The PF based isolation can be accessed by the reco::Muon using the following methods
@@ -728,10 +739,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( hasVeryForwardPFMuon, "hasVeryForwardPFMuon" );
-  iEvent.put( isLooseMuon,                prefix + "isLooseMuon"                 + suffix );
-  iEvent.put( isMediumMuon,               prefix + "isMediumMuon"                + suffix );
-  iEvent.put( isTightMuon,                prefix + "isTightMuon"                 + suffix );
-  iEvent.put( isHighPtMuon,               prefix + "isHighPtMuon"                + suffix );
+  iEvent.put( isLooseMuon,                prefix + "IsLooseMuon"                 + suffix );
+  iEvent.put( isMediumMuon,               prefix + "IsMediumMuon"                + suffix );
+  iEvent.put( isTightMuon,                prefix + "IsTightMuon"                 + suffix );
+  iEvent.put( isHighPtMuon,               prefix + "IsHighPtMuon"                + suffix );
   iEvent.put( eta,                        prefix + "Eta"                         + suffix );
   iEvent.put( phi,                        prefix + "Phi"                         + suffix );
   iEvent.put( pt,                         prefix + "Pt"                          + suffix );
@@ -765,6 +776,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( trkVz,                      prefix + "TrkVz"                       + suffix );
   iEvent.put( trackChi2,                  prefix + "TrackChi2"                   + suffix );
   iEvent.put( globalChi2,                 prefix + "GlobalChi2"                  + suffix );
+  iEvent.put( combinedQualityChi2LocalPosition, prefix + "CombinedQualityChi2LocalPosition" + suffix );
+  iEvent.put( combinedQualityTrkKink,     prefix + "CombinedQualityTrkKink"      + suffix );
   iEvent.put( trkIso,                     prefix + "TrkIso"                      + suffix );
   iEvent.put( trackerIsoSumPT,            prefix + "TrackerIsoSumPT"             + suffix );
   iEvent.put( ecalIso,                    prefix + "EcalIso"                     + suffix );
@@ -772,6 +785,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( hoIso,                      prefix + "HOIso"                       + suffix );
   iEvent.put( ecalVetoIso,                prefix + "EcalVetoIso"                 + suffix );
   iEvent.put( hcalVetoIso,                prefix + "HcalVetoIso"                 + suffix );
+  iEvent.put( segmentCompatibility,       prefix + "SegmentCompatibility"        + suffix );
   iEvent.put( pfisor03chargedhadron,      prefix + "PFIsoR03ChargedHadron"       + suffix );
   iEvent.put( pfisor03chargedparticle,    prefix + "PFIsoR03ChargedParticle"     + suffix );
   iEvent.put( pfisor03neutralhadron,      prefix + "PFIsoR03NeutralHadron"       + suffix );

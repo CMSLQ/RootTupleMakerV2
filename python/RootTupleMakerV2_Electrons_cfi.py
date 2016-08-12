@@ -52,7 +52,7 @@ cleanElectronTriggerMatchHLTSingleElectron = cms.EDProducer(
 cleanElectronTriggerMatchHLTSingleElectronWP85 = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( 'slimmedElectrons' )
-, matched = cms.InputTag( 'patTrigger' )          
+, matched = cms.InputTag( 'unpackedPatTrigger' )          
 , matchedCuts = cms.string( 'type( "TriggerPhoton" ) && path( "HLT_Ele32_eta2p1_WP85_Gsf_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
@@ -62,7 +62,7 @@ cleanElectronTriggerMatchHLTSingleElectronWP85 = cms.EDProducer(
 cleanElectronTriggerMatchHLTDoubleElectron = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( 'slimmedElectrons' )
-, matched = cms.InputTag( 'patTrigger' ) 
+, matched = cms.InputTag( 'unpackedPatTrigger' ) 
 , matchedCuts = cms.string( 'type( "TriggerCluster" ) && path( "HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object
@@ -72,7 +72,7 @@ cleanElectronTriggerMatchHLTDoubleElectron = cms.EDProducer(
 cleanElectronTriggerMatchHLTElectronJetJet = cms.EDProducer(
   "PATTriggerMatcherDRLessByR"
 , src     = cms.InputTag( 'slimmedElectrons' )
-, matched = cms.InputTag( 'patTrigger' ) 
+, matched = cms.InputTag( 'unpackedPatTrigger' ) 
 , matchedCuts = cms.string( 'path( "HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*" )' )
 , maxDeltaR = cms.double( 0.5 )
 , resolveAmbiguities    = cms.bool( True  )        # only one match per trigger object

@@ -16,6 +16,7 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   pdfCTEQWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFCTEQWeightsInputTag"))),
   pdfMMTHWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFMMTHWeightsInputTag"))),
   pdfNNPDFWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFNNPDFWeightsInputTag"))),
+  pdfPDF4LHCWeightsInputToken_(consumes<std::vector<double> >(iConfig.getParameter<edm::InputTag>("PDFPDF4LHCWeightsInputTag"))),
   pileupInfoSrcToken_(consumes<std::vector<PileupSummaryInfo> >(iConfig.getParameter<edm::InputTag>("pileupInfo"))),
   LHERunInfoToken_(consumes<LHERunInfoProduct, edm::InRun >(iConfig.getParameter<edm::InputTag>("LHERunInfoProductInputTag"))),
   LHEEventProductToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductInputTag")))
@@ -25,6 +26,7 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   produces <std::vector<double> > ( "PDFCTEQWeights" );
   produces <std::vector<double> > ( "PDFMMTHWeights" );
   produces <std::vector<double> > ( "PDFNNPDFWeights" );
+  produces <std::vector<double> > ( "PDFPDF4LHCWeights" );
   produces <std::vector<double> > ( "ScaleWeights" );
   produces <double> ( "amcNLOWeight" );
   produces <std::vector<int> > ( "PileUpInteractions");
@@ -68,7 +70,8 @@ endRun(edm::Run const& iRun, edm::EventSetup const&) {
 	edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") <<"LHE File tag: " << iter->tag() << std::endl;
 	std::vector<std::string> lines = iter->lines();
 	for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
-	  edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << lines.at(iLine);
+	  //edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << lines.at(iLine);
+	  std::cout << lines.at(iLine);
 	}
       }
     }
@@ -82,6 +85,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  pdfCTEQWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pdfMMTHWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pdfNNPDFWeights  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  pdfPDF4LHCWeights  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scaleWeights  ( new std::vector<double>()  );
   std::auto_ptr<double>  amcNLOweight  ( new double()  );
   std::auto_ptr<std::vector<int >  >   Number_interactions  ( new std::vector<int>() );
@@ -121,10 +125,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       edm::Handle<std::vector<double> > pdfCTEQWeightsHandle;
       edm::Handle<std::vector<double> > pdfMMTHWeightsHandle;
       edm::Handle<std::vector<double> > pdfNNPDFWeightsHandle;
+      edm::Handle<std::vector<double> > pdfPDF4LHCWeightsHandle;
 
       iEvent.getByToken(pdfCTEQWeightsInputToken_, pdfCTEQWeightsHandle);
       iEvent.getByToken(pdfMMTHWeightsInputToken_, pdfMMTHWeightsHandle);
       iEvent.getByToken(pdfNNPDFWeightsInputToken_, pdfNNPDFWeightsHandle);
+      iEvent.getByToken(pdfPDF4LHCWeightsInputToken_, pdfPDF4LHCWeightsHandle);
 
       if( pdfCTEQWeightsHandle.isValid() ) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfCTEQWeightsInputToken_";
@@ -184,6 +190,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       } else {
         edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfNNPDFWeightsInputToken_";
       }
+     
+      if( pdfPDF4LHCWeightsHandle.isValid() ) {
+        edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfPDF4LHCWeightsInputToken_";
+
+        //*pdfPDF4LHCWeights.get() = *pdfPDF4LHCWeightsHandle;
+	//Instead of the above line, have to divide by central value - if 0, set to 1
+	std::vector<double> weights = (*pdfPDF4LHCWeightsHandle);
+	std::vector<double> reWeightsPDF4LHC;
+	unsigned int nmembers = weights.size();	
+	for (unsigned int i=0; i<nmembers; i++) {
+	  if(weights[0]!=0)reWeightsPDF4LHC.push_back(weights[i]/weights[0]);
+	  else reWeightsPDF4LHC.push_back(1.0);
+	}
+        *pdfPDF4LHCWeights.get() = reWeightsPDF4LHC;
+      } else {
+        edm::LogError("RootTupleMakerV2_GenEventInfoError") << "Error! Can't get the pdfPDF4LHCWeightsInputToken_";
+      }
       
     }
     // PileupSummary Part
@@ -234,6 +257,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
 	  pdfCTEQWeights->push_back(thisWeight);
 	}
+      	for (unsigned int i=392; i <= 444; i++) {//fixme todo: MG samples don't currently have PDF4LHC - will they be added?
+	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
+	  pdfPDF4LHCWeights->push_back(thisWeight);
+	}
 	
       	EvtHandle->weights()[0].wgt < 0 ? *amcNLOweight.get()=-1. : *amcNLOweight.get()=1.;
       
@@ -249,7 +276,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 		if(iWeight<=8)std::cout << " scaleWeight[" << iWeight << "] = " << theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()) << std::endl<<std::endl<<std::endl;
 		}
 		}
-      	*/
+	*/
       }
     }
   }
@@ -261,6 +288,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pdfCTEQWeights, "PDFCTEQWeights" );
   iEvent.put( pdfMMTHWeights, "PDFMMTHWeights" );
   iEvent.put( pdfNNPDFWeights, "PDFNNPDFWeights" );
+  iEvent.put( pdfPDF4LHCWeights, "PDFPDF4LHCWeights" );
   iEvent.put( scaleWeights, "ScaleWeights" );
   iEvent.put( amcNLOweight, "amcNLOWeight" );
   iEvent.put( Number_interactions,   "PileUpInteractions"   );

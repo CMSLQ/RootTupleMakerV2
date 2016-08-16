@@ -87,8 +87,12 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);
   produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);
   // for non-PUPPI jets, we get the MVA pileup ID discriminator
-  if(!isPuppiJetColl)
+  if(!isPuppiJetColl){
     produces <std::vector<double> >    ( prefix + "PileupMVA" + suffix);
+    produces <std::vector<int> >      ( prefix + "PileupMVApassesLoose"  + suffix);
+    produces <std::vector<int> >      ( prefix + "PileupMVApassesMedium" + suffix);
+    produces <std::vector<int> >      ( prefix + "PileupMVApassesTight"  + suffix);
+  }
   produces <std::vector<double> > ( prefix + "BestVertexTrackAssociationFactor" + suffix );
   produces <std::vector<int> >    ( prefix + "BestVertexTrackAssociationIndex" + suffix);
   produces <std::vector<double> > ( prefix + "ClosestVertexWeighted3DSeparation" + suffix );
@@ -191,6 +195,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );
 
   std::auto_ptr<std::vector<double> >  jetpileup_mva  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<int> >  jetpileup_mva_passesLoose  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >  jetpileup_mva_passesMedium ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >  jetpileup_mva_passesTight  ( new std::vector<int>()  );
 
   std::auto_ptr <std::vector<double> >  bestVertexTrackAssociationFactor  ( new std::vector<double>()  );
   std::auto_ptr <std::vector<int> >     bestVertexTrackAssociationIndex   ( new std::vector<int>()  );
@@ -629,9 +636,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  //softMuonByIP3dBTag                  ->push_back( it->bDiscriminator("softMuonByIP3dBJetTags") );
 	  passLooseID->push_back( passjetLoose );
 	  passTightID->push_back( passjetTight );
-	  //// JET Pileup MVA
-	  if(!isPuppiJetColl)
+	  //// JET Pileup1 MVA
+	  if(!isPuppiJetColl){
 	    jetpileup_mva->push_back(it->userFloat(mvaPileupIDname));
+	    std::string idName = "pileupJetId:fullId";
+	    jetpileup_mva_passesLoose ->push_back(bool(it->userInt(idName) & (1 << 2)));
+	    jetpileup_mva_passesMedium->push_back(bool(it->userInt(idName) & (1 << 1)));
+	    jetpileup_mva_passesTight ->push_back(bool(it->userInt(idName) & (1 << 0)));
+	    //std::cout<<"Passes loose: "<<bool(it->userInt(idName) & (1 << 2))<< " medium: "<<bool(it->userInt(idName) & (1 << 1))<< " tight: "<<bool(it->userInt(idName) & (1 << 0))<<std::endl;
+	  }
 
 	  // 			//////////////////////////////////////////////////////////////////// 
 	  // 			if( fabs(it->eta()) > 3) 
@@ -774,9 +787,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);
   iEvent.put( passTightID, prefix + "PassTightID" + suffix);
 	
-  if(!isPuppiJetColl)
+  if(!isPuppiJetColl){
     iEvent.put( jetpileup_mva, prefix + "PileupMVA" + suffix);
-
+    iEvent.put( jetpileup_mva_passesLoose,  prefix + "PileupMVApassesLoose"  + suffix);
+    iEvent.put( jetpileup_mva_passesMedium, prefix + "PileupMVApassesMedium" + suffix);
+    iEvent.put( jetpileup_mva_passesTight,  prefix + "PileupMVApassesTight"  + suffix);
+  }
   iEvent.put(betaStar       , prefix + "BetaStar"        + suffix ) ;
   iEvent.put(betaStarClassic, prefix + "BetaStarClassic" + suffix ) ;
   iEvent.put(beta           , prefix + "Beta"            + suffix ) ;

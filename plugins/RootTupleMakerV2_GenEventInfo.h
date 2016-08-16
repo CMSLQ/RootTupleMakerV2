@@ -26,6 +26,7 @@ class RootTupleMakerV2_GenEventInfo : public edm::EDProducer {
   const edm::EDGetTokenT<std::vector<double> > pdfCTEQWeightsInputToken_;
   const edm::EDGetTokenT<std::vector<double> > pdfMMTHWeightsInputToken_;
   const edm::EDGetTokenT<std::vector<double> > pdfNNPDFWeightsInputToken_;
+  const edm::EDGetTokenT<std::vector<double> > pdfPDF4LHCWeightsInputToken_;
   const edm::EDGetTokenT<std::vector<PileupSummaryInfo> >   pileupInfoSrcToken_;
   const edm::EDGetTokenT<LHERunInfoProduct>    LHERunInfoToken_;
   const edm::EDGetTokenT<LHEEventProduct>      LHEEventProductToken_;

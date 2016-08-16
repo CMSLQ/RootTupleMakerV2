@@ -109,9 +109,9 @@ process.source.fileNames = [
     # Run2015D data
     #'/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root'
 
-    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/30000/00AEB2F6-541B-E611-AF2A-0025905C42F2.root'
-
-    '/store/mc/RunIISpring16MiniAODv2/LQLQToTopMu_M-1000_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/46EDE553-8624-E611-AFB2-00259073E380.root'
+    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/30000/00AEB2F6-541B-E611-AF2A-0025905C42F2.root'
+    #'/store/mc/RunIISpring16MiniAODv2/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/DA6AE5C6-151B-E611-9EEF-782BCB536A50.root'
+    #'/store/mc/RunIISpring16MiniAODv2/LQLQToTopMu_M-1000_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/46EDE553-8624-E611-AFB2-00259073E380.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -505,13 +505,13 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 	# Fix POWHEG if buggy (this PDF set will also appear on output,
 	# so only two more PDF sets can be added in PdfSetNames if not "")
 	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
-       # GenTag = cms.untracked.InputTag("genParticles"),
+        #GenTag = cms.untracked.InputTag("genParticles"),
 	PdfInfoTag = cms.untracked.InputTag("generator"),
 	PdfSetNames = cms.untracked.vstring(
-            #"PDF4LHC15" ,
+            "PDF4LHC15_nlo_100.LHgrid" ,
             "CT10nlo.LHgrid" , 
-            "MMHT2014lo68cl.LHgrid",
-            "NNPDF30_nlo_as_0118.LHgrid"
+            "MMHT2014nlo68cl.LHgrid",
+            #"NNPDF30_nlo_as_0118.LHgrid"
 	)
 )
 

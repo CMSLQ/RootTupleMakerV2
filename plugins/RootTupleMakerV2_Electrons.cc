@@ -28,7 +28,12 @@
 #include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
 #include "DataFormats/RecoCandidate/interface/IsoDepositVetos.h"
 #include "DataFormats/PatCandidates/interface/Isolation.h"
+#include "DataFormats/GeometryVector/interface/Vector3DBase.h"
 
+#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
+#include "TrackingTools/Records/interface/TransientTrackRecord.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "TrackingTools/IPTools/interface/IPTools.h"
 
 //------------------------------------------------------------------------
 // Constructor
@@ -48,6 +53,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   eleMediumIdCutFlowResultMapToken_ (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleMediumIdCutFlowResultMap"))),
   eleTightIdCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleTightIdCutFlowResultMap"))),
   eleHEEPIdCutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdCutFlowResultMap"))),
+  beamSpotInputToken_          (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), 
   electronIso                  (iConfig.getParameter<double>       ("ElectronIso"              )),
   muonPt                       (iConfig.getParameter<double>       ("MuonPt"                   )),
   muonIso                      (iConfig.getParameter<double>       ("MuonIso"                  )),
@@ -424,6 +430,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   // Tracks -- SIC note: no tracks in MiniAOD
 
+  // track builder
+  edm::ESHandle<TransientTrackBuilder> trackBuilder;
+  iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",trackBuilder);
+
   // DCS information -- no longer needed
 
   // Primary vertices
@@ -432,6 +442,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByToken(vtxInputToken_,primaryVertices);
 
   // Beamspot information
+  edm::Handle<reco::BeamSpot> beamSpotHandle;
+  iEvent.getByToken(beamSpotInputToken_, beamSpotHandle);
+  bool beamSpotValid = false;
 
   // Photon conversion information -- no longer needed; take what's embedded in pat::Electron
 
@@ -694,17 +707,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if(primaryVertices.isValid()) {
         edm::LogInfo("RootTupleMakerV2_ElectronsInfo") << "Total # Primary Vertices: " << primaryVertices->size();
 
-	int i_vertex = 0;
+        int i_vertex = 0;
         for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it ) {
 
           double distXY = it->gsfTrack()->dxy(v_it->position());
           double distZ = it->gsfTrack()->dz(v_it->position());
           double dist3D = sqrt(pow(distXY,2) + pow(distZ,2));
 
-	  if ( i_vertex == 0 ) { 
-	    vtx0DistXY_ = distXY;
-	    vtx0DistZ_  = distZ ;
-	  }
+          if ( i_vertex == 0 ) { 
+            vtx0DistXY_ = distXY;
+            vtx0DistZ_  = distZ ;
+          }
 
           if( dist3D<minVtxDist3D ) {
             minVtxDist3D = dist3D;
@@ -713,10 +726,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
             vtxDistZ_ = distZ;
           }
 
-	  i_vertex++;
+          i_vertex++;
         }
       } else {
         edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the vertex collection";
+      }
+
+      if(beamSpotHandle.isValid()) {
+        beamSpotValid = true;
+      } else {
+        edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the beamspot";
       }
 
       //------------------------------------------------------------------------ 
@@ -863,12 +882,25 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       vtx0DistZ                -> push_back( vtx0DistZ_ );
       primaryVertexDXY         -> push_back( fabs( it->dB() ) );      
       primaryVertexDXYError    -> push_back( fabs( it->edB() ) );
-      beamspotDXY              -> push_back( fabs( it->dB (pat::Electron::BS2D) ) );
-      beamspotDXYError         -> push_back( fabs( it->edB(pat::Electron::BS2D) ) );
-      //FIXME: beamspot error always == 1
+      if(beamSpotValid)
+      {
+        beamspotDXY              -> push_back( fabs( it->dB (pat::Electron::BS2D) ) );
+        // recalculate the beamspotDXYError, since beamspot is always marked as invalid in PatElectronProducer
+        // code taken from PatElectronProducer
+        reco::TransientTrack tt = trackBuilder->build(it->gsfTrack());
+        reco::Vertex vBeamspot(beamSpotHandle->position(),beamSpotHandle->covariance3D());
+        std::pair<bool,Measurement1D> result =
+          IPTools::signedTransverseImpactParameter(tt,GlobalVector(it->gsfTrack()->px(),it->gsfTrack()->py(),it->gsfTrack()->pz()),
+              vBeamspot);
+        beamspotDXYError         -> push_back( fabs(result.second.error()) );
+      }
+      else
+      {
+        beamspotDXY              -> push_back( -999 );
+        beamspotDXYError         -> push_back( -999 );
+      }
 			       
       // Track information     
-      			       
       trackVx                  -> push_back( it->gsfTrack()->vx() );
       trackVy                  -> push_back( it->gsfTrack()->vy() );
       trackVz                  -> push_back( it->gsfTrack()->vz() );

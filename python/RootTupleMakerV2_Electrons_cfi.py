@@ -12,6 +12,7 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     MuonIso = cms.double(0.05),
     MuonID = cms.string('GlobalMuonPromptTight'),
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    BeamSpotInputTag = cms.InputTag('offlineBeamSpot'),
     LikelihoodInputTag = cms.InputTag('egammaIDLikelihood') ,
     # rho for HEEP. See e.g. https://github.com/cms-sw/cmssw/blob/CMSSW_7_5_X/RecoEgamma/ElectronIdentification/python/Identification/heepElectronID_HEEPV50_CSA14_startup_cff.py
     RhoInputTag = cms.InputTag('fixedGridRhoFastjetAll'),

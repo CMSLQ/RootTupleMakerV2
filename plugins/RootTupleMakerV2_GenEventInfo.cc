@@ -58,24 +58,28 @@ endRun(edm::Run const& iRun, edm::EventSetup const&) {
   // /DYJetsToLL_M-5to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM 
   // /WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM
 
+  /*
+  //To read out LHE info, e.g. for PDF sets
+  
   edm::Handle<LHERunInfoProduct> run; 
   typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator; 
   iRun.getByToken(LHERunInfoToken_, run );
-
+  
   if (run.isValid()){
-    LHERunInfoProduct myLHERunInfoProduct = *(run.product());
-
-    for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
-      if ( (iter->tag().compare("initrwgt") ==0) ){
-	edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") <<"LHE File tag: " << iter->tag() << std::endl;
-	std::vector<std::string> lines = iter->lines();
-	for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
-	  //edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << lines.at(iLine);
-	  std::cout << lines.at(iLine);
-	}
-      }
-    }
+  LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+  
+  for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
+  if ( (iter->tag().compare("initrwgt") ==0) ){
+  edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") <<"LHE File tag: " << iter->tag() << std::endl;
+  std::vector<std::string> lines = iter->lines();
+  for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
+  //edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << lines.at(iLine);
+  std::cout << lines.at(iLine);
   }
+  }
+  }
+  }
+  */
 }
 void RootTupleMakerV2_GenEventInfo::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {

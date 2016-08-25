@@ -4,7 +4,7 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+#include "DataFormats/L1TGlobal/interface/GlobalAlgBlk.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 
 
@@ -12,9 +12,8 @@ unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;
 
 RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iConfig) :
-  l1InputTag_ (iConfig.getParameter<edm::InputTag>("L1InputTag")),
   hltInputTag_ (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
-  l1InputToken_ (consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
+  l1uGTInputToken_ (consumes<GlobalAlgBlkBxCollection>(iConfig.getParameter<edm::InputTag>("L1uGTInputTag"))),
   hltInputToken_ (consumes<edm::TriggerResults> (iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
   hltPrescaleProvider_(iConfig, consumesCollector(), *this),
@@ -46,8 +45,9 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   produces <std::vector<int> >         ("HLTInsideDatasetTriggerPrescales"  );
   produces <std::vector<int> >         ("HLTOutsideDatasetTriggerPrescales" );
 
-  produces <std::vector<int> > ( "L1PhysBits" );
-  produces <std::vector<int> > ( "L1TechBits" );
+  produces <std::vector<int> > ( "L1Bits" );
+  //produces <std::vector<int> > ( "L1PhysBits" );
+  //produces <std::vector<int> > ( "L1TechBits" );
 }
 
 
@@ -106,8 +106,9 @@ beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) {
 void RootTupleMakerV2_Trigger::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<int> >  l1physbits   ( new std::vector<int>() );
-  std::auto_ptr<std::vector<int> >  l1techbits   ( new std::vector<int>() );
+  std::auto_ptr<std::vector<int> >  l1bits   ( new std::vector<int>() );
+  //std::auto_ptr<std::vector<int> >  l1physbits   ( new std::vector<int>() );
+  //std::auto_ptr<std::vector<int> >  l1techbits   ( new std::vector<int>() );
   // std::auto_ptr<std::vector<int> >  hltbits      ( new std::vector<int>() );
   // std::auto_ptr<std::vector<int> >  hltresults   ( new std::vector<int>() );
   // std::auto_ptr<std::vector<int> >  hltprescales ( new std::vector<int>() );
@@ -127,20 +128,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   */
 
   //-----------------------------------------------------------------
-  edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
-  iEvent.getByToken(l1InputToken_, l1GtReadoutRecord);
+  edm::Handle<GlobalAlgBlkBxCollection> l1uGtGlobalAlgBlockBXColl;
+  iEvent.getByToken(l1uGTInputToken_, l1uGtGlobalAlgBlockBXColl);
 
-  if(l1GtReadoutRecord.isValid()) {
-    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1GtReadoutRecord;//fixme what to put here?
-
-    for (unsigned int i = 0; i < NmaxL1AlgoBit; ++i) {
-      l1physbits->push_back( l1GtReadoutRecord->decisionWord()[i] ? 1 : 0 );
-    }
-    for (unsigned int i = 0; i < NmaxL1TechBit; ++i) {
-      l1techbits->push_back( l1GtReadoutRecord->technicalTriggerWord()[i] ? 1 : 0 );
+  if(l1uGtGlobalAlgBlockBXColl.isValid()) {
+    edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1uGtGlobalAlgBlockBXColl;
+    GlobalAlgBlk alg = l1uGtGlobalAlgBlockBXColl->at(0,0); // look at BX==0
+    // below will work in later CMSSWs
+    //const std::vector<bool> finalDecisions = alg.getAlgoDecisionFinal();
+    //for(std::vector<bool>::const_iterator bitItr = finalDecisions.begin(); bitItr != finalDecisions.end(); ++bitItr) {
+    //  l1bits->push_back( *bitItr ? 1 : 0 );
+    //}
+    for(int algBit=0; algBit<300; algBit++) {
+      l1bits->push_back( alg.getAlgoDecisionFinal(algBit) ? 1 : 0 );
     }
   } else {
-    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the l1GtReadoutRecord";
+    edm::LogError("RootTupleMakerV2_TriggerError") << "Error! Can't get the GlobalAlgBlkBxCollection!";
   }
 
   edm::Handle<edm::TriggerResults> triggerResults;
@@ -203,8 +206,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( l1physbits, "L1PhysBits" );
-  iEvent.put( l1techbits, "L1TechBits" );
+  iEvent.put( l1bits, "L1Bits" );
+  //iEvent.put( l1physbits, "L1PhysBits" );
+  //iEvent.put( l1techbits, "L1TechBits" );
   // iEvent.put( hltbits,    "HLTBits" );
   // iEvent.put( hltresults, "HLTResults" );
   // iEvent.put( hltprescales, "HLTPrescales" );

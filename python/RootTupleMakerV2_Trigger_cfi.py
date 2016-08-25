@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 rootTupleTrigger = cms.EDProducer("RootTupleMakerV2_Trigger",
-    L1InputTag  = cms.InputTag('gtDigis'),
+    L1uGTInputTag = cms.InputTag('gtStage2Digis'),
     HLTInputTag = cms.InputTag('TriggerResults','','HLT'),
     SourceName  = cms.string(""),
 

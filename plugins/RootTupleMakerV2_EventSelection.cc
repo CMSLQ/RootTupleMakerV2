@@ -92,6 +92,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
   iEvent.getByToken(l1InputToken_, l1GtReadoutRecord);
 
+  /*
   // Technical Trigger Part
   if(l1GtReadoutRecord.isValid()) {
     edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Successfully obtained l1InputTag";
@@ -114,11 +115,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
          ((l1GtReadoutRecord->technicalTriggerWord()[42] && !l1GtReadoutRecord->technicalTriggerWord()[43]) ||
           (l1GtReadoutRecord->technicalTriggerWord()[43] && !l1GtReadoutRecord->technicalTriggerWord()[42])) )
       *isbscbeamhalo.get() = true;
-
+      
   } else {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the l1InputTag";
   }
-
+  */
 
   //XXX FIXME There are no tracks in MiniAOD
   //// Scraping Events Part

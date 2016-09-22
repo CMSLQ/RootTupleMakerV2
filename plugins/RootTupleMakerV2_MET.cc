@@ -78,14 +78,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       bool applyCorrection = true;
       if(corLevel=="Raw")                level = pat::MET::Raw;
       else if(corLevel=="Type1")         level = pat::MET::Type1;
-      else if(corLevel=="Type01")        level = pat::MET::Type1;
-      else if(corLevel=="TypeXY")        level = pat::MET::Type1;
-      else if(corLevel=="Type1XY")       level = pat::MET::Type1;
-      else if(corLevel=="Type01XY")      level = pat::MET::Type1;
-      else if(corLevel=="Type1Smear")    level = pat::MET::Type1;
-      else if(corLevel=="Type01Smear")   level = pat::MET::Type1;
-      else if(corLevel=="Type1SmearXY")  level = pat::MET::Type1;
-      else if(corLevel=="Type01SmearXY") level = pat::MET::Type1;
+      else if(corLevel=="Type01")        level = pat::MET::Type01;
+      else if(corLevel=="TypeXY")        level = pat::MET::TypeXY;
+      else if(corLevel=="Type1XY")       level = pat::MET::Type1XY;
+      else if(corLevel=="Type01XY")      level = pat::MET::Type01XY;//dont wan't to use 01XY because it overcorrects
+      else if(corLevel=="Type1Smear")    level = pat::MET::Type1Smear;
+      else if(corLevel=="Type01Smear")   level = pat::MET::Type01Smear;
+      else if(corLevel=="Type1SmearXY")  level = pat::MET::Type1SmearXY;
+      else if(corLevel=="Type01SmearXY") level = pat::MET::Type01SmearXY;
       else if(corLevel=="RawCalo")       level = pat::MET::RawCalo;
       // this is our adhoc way of not running the shiftedPt, shiftedPhi, shiftedSumEt on the recorrected MET collections
       //  (which we don't want to do because they aren't filled, so accessing them causes a seg fault)

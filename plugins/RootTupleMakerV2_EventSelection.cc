@@ -2,7 +2,9 @@
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
   l1InputToken_(consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
-  filterResultsInputToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag")))
+  filterResultsInputToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag"))),
+  BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
+  BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter")))
 {
   produces <bool> ("isPhysDeclared");
   produces <bool> ("isBPTX0");
@@ -18,6 +20,9 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   produces <bool> ("passGlobalTightHalo2016Filter");
   produces <bool> ("passGlobalSuperTightHalo2016Filter");
   produces <bool> ("passHcalStripHaloFilter");
+  //
+  produces <bool> ("passBadPFMuonFilter");
+  produces <bool> ("passBadChargedCandidateFilter");
   //
   produces <bool> ("passEcalDeadCellTriggerPrimitiveFilter");
   produces <bool> ("passEcalDeadCellBoundaryEnergyFilter");
@@ -48,6 +53,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> passbeamhalo2016globalfiltertight( new bool() );
   std::auto_ptr<bool> passbeamhalo2016globalfiltersupertight( new bool() );
   std::auto_ptr<bool> passhcalStripHaloFilter( new bool() );
+  std::auto_ptr<bool> passbadpfmuonFilter( new bool() );
+  std::auto_ptr<bool> passbadchargedcandidateFilter( new bool() );
   std::auto_ptr<bool> passhcalLaserEventFilter( new bool() );
   std::auto_ptr<bool> passecalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
   std::auto_ptr<bool> passecalDeadCellBoundaryEnergyFilter( new bool() );
@@ -75,6 +82,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passbeamhalo2016globalfiltertight.get() = true;
   *passbeamhalo2016globalfiltersupertight.get() = true;
   *passhcalStripHaloFilter.get() = true;  
+  *passbadpfmuonFilter.get() = true;
+  *passbadchargedcandidateFilter.get() = true;
   *passhcalLaserEventFilter.get() = true;
   *passecalDeadCellTriggerPrimitiveFilter.get() = true;
   *passecalDeadCellBoundaryEnergyFilter.get() = true;
@@ -119,55 +128,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the l1InputTag";
   }
 
-
-  //XXX FIXME There are no tracks in MiniAOD
-  //// Scraping Events Part
-  //edm::Handle<reco::TrackCollection> tracks;
-  //iEvent.getByLabel(trkInputTag,tracks);
-  //if(tracks.isValid()) {
-  //  edm::LogInfo("RootTupleMakerV2_EventSelectionInfo") << "Total # Tracks: " << tracks->size();
-  //
-  //  int numhighpurity = 0;
-  //  double fraction = 1.;
-  //  reco::TrackBase::TrackQuality trackQuality = reco::TrackBase::qualityByName("highPurity");
-  //
-  //  if( tracks->size() > numTracks ){
-  //    for( reco::TrackCollection::const_iterator it=tracks->begin(); it!=tracks->end(); ++it ) {
-  //      if( it->quality(trackQuality) ) numhighpurity++;
-  //    }
-  //    fraction = (double)numhighpurity/(double)tracks->size();
-  //    if( fraction < hpTrackThreshold ) *isbeamscraping.get() = true;
-  //  }
-  //} else {
-  //  edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the product " << trkInputTag;
-  //}
-
-  // These filters are now run in MiniAOD and saved as an edm::TriggerResults of the PAT process
-  // See: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2015
-  // List of filters: https://github.com/cms-sw/cmssw/blob/CMSSW_7_6_X/PhysicsTools/PatAlgos/python/slimming/metFilterPaths_cff.py
-  // combination of all filters:
-  //  Flag_METFilters
-  //# individual filters
-  //Flag_HBHENoiseFilter = cms.Path(HBHENoiseFilterResultProducer * HBHENoiseFilter)
-  //Flag_HBHENoiseIsoFilter = cms.Path(HBHENoiseFilterResultProducer * HBHENoiseIsoFilter)
-  //Flag_CSCTightHaloFilter = cms.Path(CSCTightHaloFilter)
-  //Flag_CSCTightHaloTrkMuUnvetoFilter = cms.Path(CSCTightHaloTrkMuUnvetoFilter)
-  //Flag_CSCTightHalo2015Filter = cms.Path(CSCTightHalo2015Filter)
-  //Flag_HcalStripHaloFilter = cms.Path(HcalStripHaloFilter)
-  //Flag_hcalLaserEventFilter = cms.Path(hcalLaserEventFilter)
-  //Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(EcalDeadCellTriggerPrimitiveFilter)
-  //Flag_EcalDeadCellBoundaryEnergyFilter = cms.Path(EcalDeadCellBoundaryEnergyFilter)
-  //Flag_goodVertices = cms.Path(primaryVertexFilter)
-  //Flag_trackingFailureFilter = cms.Path(goodVertices + trackingFailureFilter)
-  //Flag_eeBadScFilter = cms.Path(eeBadScFilter)
-  //Flag_ecalLaserCorrFilter = cms.Path(ecalLaserCorrFilter)
-  //Flag_trkPOGFilters = cms.Path(trkPOGFilters)
-  //Flag_chargedHadronTrackResolutionFilter = cms.Path(chargedHadronTrackResolutionFilter)
-  //Flag_muonBadTrackFilter = cms.Path(muonBadTrackFilter)
-  //# and the sub-filters
-  //Flag_trkPOG_manystripclus53X = cms.Path(~manystripclus53X)
-  //Flag_trkPOG_toomanystripclus53X = cms.Path(~toomanystripclus53X)
-  //Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)
   
   edm::Handle<edm::TriggerResults> filterResults;
   iEvent.getByToken(filterResultsInputToken_, filterResults);
@@ -293,6 +253,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the filterResultsInputTag";
   }
 
+  edm::Handle<bool> ifilterbadChCand;
+  iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
+  *passbadchargedcandidateFilter.get() = *ifilterbadChCand;
+  edm::Handle<bool> ifilterbadPFMuon;
+  iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
+  *passbadpfmuonFilter.get() = *ifilterbadPFMuon;
 
   //-----------------------------------------------------------------
   iEvent.put(isphysdeclared,"isPhysDeclared");
@@ -315,7 +281,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put(passtrackingFailureFilter,"passTrackingFailureFilter");
   iEvent.put(passbadEESupercrystalFilter, "passEEBadScFilter");
   iEvent.put(passecalLaserCorrFilter, "passEcalLaserCorrFilter");
-  // 
+  //
+  iEvent.put(passbadpfmuonFilter, "passBadPFMuonFilter");
+  iEvent.put(passbadchargedcandidateFilter, "passBadChargedCandidateFilter");
+  //
   iEvent.put(passtrkPOGFilters,"passTrkPOGFilters");
   iEvent.put(passchargedHadronTrackResolutionFilter,"passChargedHadronTrackResolutionFilter");
   iEvent.put(passmuonBadTrackFilter,"passMuonBadTrackFilter");

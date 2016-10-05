@@ -11,7 +11,7 @@ rootTuplePFMETRaw = cms.EDProducer("RootTupleMakerV2_MET",
     Prefix = cms.string('PF'),
     Suffix = cms.string('Raw'),
     StoreUncorrectedMET = cms.bool(False),
-    StoreMETSignificance = cms.bool(False),
+    StoreMETSignificance = cms.bool(True),
     Uncertainty = cms.string('NoShift'),
     CorrectionLevel = cms.string('Raw'))
 
@@ -22,7 +22,7 @@ rootTuplePFMETType1Cor = cms.EDProducer("RootTupleMakerV2_MET",
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1Cor'),
     StoreUncorrectedMET = cms.bool(False),
-    StoreMETSignificance = cms.bool(False),
+    StoreMETSignificance = cms.bool(True),
     Uncertainty = cms.string('NoShift'),
     CorrectionLevel = cms.string('Type1'))
 
@@ -44,7 +44,7 @@ rootTuplePFMETType1XYCor = cms.EDProducer("RootTupleMakerV2_MET",
     Prefix = cms.string('PF'),
     Suffix = cms.string('Type1XYCor'),
     StoreUncorrectedMET = cms.bool(False),
-    StoreMETSignificance = cms.bool(False),
+    StoreMETSignificance = cms.bool(True),
     Uncertainty = cms.string('NoShift'),
     CorrectionLevel = cms.string('Type1XY')) 
 

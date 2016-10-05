@@ -129,6 +129,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the l1InputTag";
   }
   
+  */
+
   edm::Handle<edm::TriggerResults> filterResults;
   iEvent.getByToken(filterResultsInputToken_, filterResults);
   if(filterResults.isValid())

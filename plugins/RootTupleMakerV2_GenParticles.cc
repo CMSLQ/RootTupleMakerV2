@@ -30,6 +30,7 @@ RootTupleMakerV2_GenParticles::RootTupleMakerV2_GenParticles(const edm::Paramete
   produces <std::vector<double> > ( prefix + "TauVisiblePt" + suffix );
   produces <std::vector<double> > ( prefix + "TauVisibleEta"+ suffix );
   produces <std::vector<double> > ( prefix + "TauVisiblePhi"+ suffix );
+  produces <double>               ( prefix + "TopPtWeight"  + suffix );
 }
 
 void RootTupleMakerV2_GenParticles::
@@ -55,6 +56,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  tauvisiblept  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  tauvisibleeta ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  tauvisiblephi ( new std::vector<double>()  );
+  std::auto_ptr<double >               topptweight ( new double() );
+  *topptweight.get() = 1.0;
   // not kept in ntuple
   std::auto_ptr<std::vector<int> >     indexInGenPColl( new std::vector<int>()  );
   
@@ -65,6 +68,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if( genParticles.isValid() ) {
       edm::LogInfo("RootTupleMakerV2_GenParticlesInfo") << "Total # GenParticles: " << genParticles->size();
 
+      int nTops = 0;
+      float topPt1 = -1;
+      float topPt2 = -1;
       for( reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); ++it ) {
         // exit from loop when you reach the required number of GenParticles
         if(eta->size() >= maxSize)
@@ -77,6 +83,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // skip pythia8 "partons in preparation of hadronization process"
         // details here: http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
         if(it->status() >= 71 && it->status()<=79) continue;
+
+        // keep for topptreweight below
+        // see: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
+        if(isTop(&(*it)) && it->status()==62) {
+          nTops++;
+          if(topPt1<0)
+            topPt1 = it->pt();
+          else
+            topPt2 = it->pt();
+        }
 
         if(fabs(it->pdgId())==42)
           edm::LogInfo("RootTupleMakerV2_GenParticlesInfo") << "LQ found with status: " << it->status();
@@ -140,6 +156,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         //motherIndex->push_back( idx );
         motherIndex->push_back( indexInKeptGenPColl );
       }
+      // for topptreweight
+      if(nTops==2)
+        *topptweight.get() = sqrt(exp(0.156-0.00137*topPt1)*exp(0.156-0.00137*topPt2));
     } else {
       edm::LogError("RootTupleMakerV2_GenParticlesError") << "Error! Can't get the genPartInputToken_";
     }
@@ -166,6 +185,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( tauvisiblept, prefix + "TauVisiblePt" + suffix );
   iEvent.put( tauvisibleeta,prefix + "TauVisibleEta"+ suffix );
   iEvent.put( tauvisiblephi,prefix + "TauVisiblePhi"+ suffix );
+  iEvent.put( topptweight  ,prefix + "TopPtWeight"  + suffix );
 }
 
 
@@ -216,6 +236,10 @@ void RootTupleMakerV2_GenParticles::findDaughters(const reco::GenParticle* mothe
 
 bool RootTupleMakerV2_GenParticles::isNeutrino(const reco::GenParticle* daughter){
   return ( TMath::Abs(daughter->pdgId()) == 12 || TMath::Abs(daughter->pdgId()) == 14 || TMath::Abs(daughter->pdgId()) == 16 );
+}
+
+bool RootTupleMakerV2_GenParticles::isTop(const reco::GenParticle* particle){
+  return ( TMath::Abs(particle->pdgId()) == 6 );
 }
 
 void RootTupleMakerV2_GenParticles::countDecayProducts(const reco::GenParticle* genParticle,

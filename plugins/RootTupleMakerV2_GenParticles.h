@@ -16,6 +16,7 @@ class RootTupleMakerV2_GenParticles : public edm::EDProducer {
   reco::Candidate::LorentzVector getInvisMomentum(const std::vector<const reco::GenParticle*>& , int );
   void  findDaughters(const reco::GenParticle*, std::vector<const reco::GenParticle*>&, int = -1);
   bool  isNeutrino(const reco::GenParticle*);
+  bool  isTop(const reco::GenParticle*);
   int   getGenTauDecayMode(const reco::GenParticle*);
   void  countDecayProducts(const reco::GenParticle*,int&,int&,int&,int&,int&,int&,int&,int&);
 

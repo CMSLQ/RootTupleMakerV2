@@ -234,28 +234,30 @@ process.schedule.append(process.electronSupportPath)
 #----------------------------------------------------------------------------------------------------
 # JER and JEC
 #----------------------------------------------------------------------------------------------------
-#jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'
-jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt'
-jerResFilePuppi          = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_PtResolution_AK4PFPuppi.txt'
-jerScaleFactorsFile      = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt'
-jerScaleFactorsFilePuppi = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_SF_AK4PFPuppi.txt'
-# JEC from text files
-# stored in 'data' directory, they should be available in the CMSSW_SEARCH_PATH
-jecUncFileData           ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt'
-jecUncFileDataPuppi      ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFPuppi.txt'
-jecUncFileMC             ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt'
-jecUncFileMCPuppi        ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_Uncertainty_AK4PFPuppi.txt'
+## JER from text files
+#jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt'
+#jerResFilePuppi          = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_PtResolution_AK4PFPuppi.txt'
+#jerScaleFactorsFile      = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt'
+#jerScaleFactorsFilePuppi = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_SF_AK4PFPuppi.txt'
+## JEC from text files
+## stored in 'data' directory, they should be available in the CMSSW_SEARCH_PATH
+#jecUncFileData           ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt'
+#jecUncFileDataPuppi      ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFPuppi.txt'
+#jecUncFileMC             ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt'
+#jecUncFileMCPuppi        ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_Uncertainty_AK4PFPuppi.txt'
+# Load JER from text files into ntuplizer
+#process.rootTuplePFJetsAK4CHS.JERResolutionsFile    = jerResFile
+#process.rootTuplePFJetsAK4Puppi.JERResolutionsFile  = jerResFilePuppi
+#process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile   = jerScaleFactorsFile
+#process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 
+# Loading  JEC/JER from local DB file
 #dbJetMCDBFile = 'Summer15_25nsV6_MC.db'
 #dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
 
-# Get JER from text files
-process.rootTuplePFJetsAK4CHS.ReadJERFromGT = False
-process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = False
-process.rootTuplePFJetsAK4CHS.JERResolutionsFile    = jerResFile
-process.rootTuplePFJetsAK4Puppi.JERResolutionsFile  = jerResFilePuppi
-process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile   = jerScaleFactorsFile
-process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
+# Use JER from GR
+process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True
+process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = True
 
 ## load JES/etc.from local db file, and into global tag
 #jetDBFile = 'sqlite:'+dbJetMCDBFile if varOptions.isMC else 'sqlite:'+dbJetDataDBFile
@@ -344,15 +346,14 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 #myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
 myJecUncFile = '' # take from global tag
 #default configuration for miniAOD reprocessing
-#for a full met computation, remove the pfCandColl input
 runMetCorAndUncFromMiniAOD(process,
                            #jetCollUnskimmed='slimmedJets',
-                           jetCollUnskimmed='updatedPatJets',
+                           #jetCollUnskimmed='updatedPatJets',
                            #jetColl='slimmedJets',
                            isData=not varOptions.isMC,
                            #electronColl=cms.InputTag('slimmedElectrons'),
                            #repro74X=True,
-                           jecUncFile=myJecUncFile,
+                           #jecUncFile=myJecUncFile,
                            postfix=postfix                           
 )
 if varOptions.isMC:
@@ -372,6 +373,10 @@ process.applyCorrections += getattr(process,'patPFMetT1{0}'.format(postfix))
 process.applyCorrections += getattr(process,'patPFMetT1Txy{0}'.format(postfix))
 process.applyCorrections += getattr(process,'patPFMetTxy{0}'.format(postfix))
 process.schedule.append(process.applyCorrections)
+# now schedule the MET corrections
+process.metCorAndUncPath = cms.Path()
+process.metCorAndUncPath += getattr(process,'fullPatMetSequence{0}'.format(postfix))
+process.schedule.append(process.metCorAndUncPath)
 # hacks to fix patPFMETCorrections_cff (used by runMETCorrectionsAndUncertainties)
 process.patSmearedJets.src = cms.InputTag('updatedPatJets')
 process.selectedPatJetsForMetT1T2Corr.src = cms.InputTag('updatedPatJets')

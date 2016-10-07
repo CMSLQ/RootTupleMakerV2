@@ -237,22 +237,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   JME::JetResolution resolution;
   JME::JetResolutionScaleFactor res_sf;
   if (readJERuncertainty)
+  {
+    // Two differents way to create a class instance
+    if (jer_from_gt)
     {
-      // Two differents way to create a class instance
-      if (jer_from_gt)
-	{
-	  // First way, using the get() static method
-	  resolution = JME::JetResolution::get(iSetup, jerUncPath);
-	  res_sf = JME::JetResolutionScaleFactor::get(iSetup, jerUncPath);
-	}
-      else
-	{
-	  // Second way, using the constructor
-	  resolution = JME::JetResolution(jer_resolutions_file.fullPath());
-	  res_sf = JME::JetResolutionScaleFactor(jer_scale_factors_file.fullPath());
-	  edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Reading scale factors from: " << jer_scale_factors_file;
-	}// get the factors from the global tag or from test file
+      // First way, using the get() static method
+      resolution = JME::JetResolution::get(iSetup, jerUncPath);
+      res_sf = JME::JetResolutionScaleFactor::get(iSetup, jecUncPath); //same label as jecUncPath
     }
+    else
+    {
+      // Second way, using the constructor
+      resolution = JME::JetResolution(jer_resolutions_file.fullPath());
+      res_sf = JME::JetResolutionScaleFactor(jer_scale_factors_file.fullPath());
+      edm::LogInfo("RootTupleMakerV2_PFJetsInfo") << "Reading scale factors from: " << jer_scale_factors_file;
+    }// get the factors from the global tag or from test file
+  }
   // need rho for JER
   edm::Handle<double> rho;
   iEvent.getByToken(rhoToken, rho);

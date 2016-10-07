@@ -15,11 +15,11 @@ rootTuplePFJetsAK4CHS = cms.EDProducer("RootTupleMakerV2_PFJets",
     JECUncertainty = cms.string('AK4PFchs'),
     ReadJECuncertainty = cms.bool(True),
     ReadJERuncertainty = cms.bool(True),
-    JERUncertainty = cms.string('AK4PFchs'),
+    JERUncertainty = cms.string('AK4PFchs_pt'),
     ReadJERFromGT = cms.bool(True),
     RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-    JERResolutionsFile = cms.FileInPath('Spring16_25nsV1_MC_PtResolution_AK4PFchs.txt'),
-    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFchs.txt'),
+    JERResolutionsFile = cms.FileInPath('Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFchs.txt'),
+    JERScaleFactorsFile = cms.FileInPath('Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFchs.txt'), #wrong but just a placeholder (must point to existing file)
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
 rootTuplePFJetsAK4Puppi = cms.EDProducer("RootTupleMakerV2_PFJets",
@@ -37,11 +37,11 @@ rootTuplePFJetsAK4Puppi = cms.EDProducer("RootTupleMakerV2_PFJets",
     JECUncertainty = cms.string('AK4PFPuppi'),
     ReadJECuncertainty = cms.bool(False),
     ReadJERuncertainty = cms.bool(False),
-    JERUncertainty = cms.string('AK4PFPuppi'),
+    JERUncertainty = cms.string('AK4PFPuppi_pt'),
     ReadJERFromGT = cms.bool(True),
     RhoCollection = cms.InputTag('fixedGridRhoFastjetAll'),
-    JERResolutionsFile = cms.FileInPath('Spring16_25nsV1_MC_PtResolution_AK4PFPuppi.txt'),
-    JERScaleFactorsFile = cms.FileInPath('Summer15_25nsV6_MC_JER_SF_AK4PFPuppi.txt'),
+    JERResolutionsFile = cms.FileInPath('Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFPuppi.txt'),
+    JERScaleFactorsFile = cms.FileInPath('Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFchs.txt'), #wrong but just a placeholder (must point to existing file)
     VertexInputTag = cms.InputTag('offlineSlimmedPrimaryVertices')
 )
 

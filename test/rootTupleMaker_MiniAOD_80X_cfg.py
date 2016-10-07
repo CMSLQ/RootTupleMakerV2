@@ -112,8 +112,8 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/30000/00AEB2F6-541B-E611-AF2A-0025905C42F2.root'
     #'/store/mc/RunIISpring16MiniAODv2/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/DA6AE5C6-151B-E611-9EEF-782BCB536A50.root'
     #'/store/mc/RunIISpring16MiniAODv2/LQLQToTopMu_M-1000_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/46EDE553-8624-E611-AFB2-00259073E380.root'
-    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_Pt-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/80000/82E9F815-F958-E611-968C-00266CFF0234.root'
-    'file:/afs/cern.ch/user/s/scooper/work/private/cmssw/8011/TestRootNTuplizerRecipe/src/LQToUE_M-1000_BetaOne-RunIISpring16MiniAODv2.root'
+    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_Pt-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/80000/82E9F815-F958-E611-968C-00266CFF0234.root'
+    #'file:/afs/cern.ch/user/s/scooper/work/private/cmssw/8011/TestRootNTuplizerRecipe/src/LQToUE_M-1000_BetaOne-RunIISpring16MiniAODv2.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -235,14 +235,16 @@ process.schedule.append(process.electronSupportPath)
 # JER and JEC
 #----------------------------------------------------------------------------------------------------
 #jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_MC_PtResolution_AK4PFchs.txt'
-jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFchs.txt'
-jerResFilePuppi          = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV1_MC_PtResolution_AK4PFPuppi.txt'
-jerScaleFactorsFile      = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_DATAMCSF_AK4PFchs.txt'
-jerScaleFactorsFilePuppi = 'Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV6_DATAMCSF_AK4PFchs.txt'
+jerResFile               = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt'
+jerResFilePuppi          = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_PtResolution_AK4PFPuppi.txt'
+jerScaleFactorsFile      = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt'
+jerScaleFactorsFilePuppi = 'Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_SF_AK4PFPuppi.txt'
 # JEC from text files
 # stored in 'data' directory, they should be available in the CMSSW_SEARCH_PATH
-jecUncFileData           ='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_DATA_UncertaintySources_AK4PFchs.txt'
-jecUncFileMC             ='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_UncertaintySources_AK4PFchs.txt'
+jecUncFileData           ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt'
+jecUncFileDataPuppi      ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFPuppi.txt'
+jecUncFileMC             ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt'
+jecUncFileMCPuppi        ='Leptoquarks/RootTupleMakerV2/data/Spring16_25nsV6_MC_Uncertainty_AK4PFPuppi.txt'
 
 #dbJetMCDBFile = 'Summer15_25nsV6_MC.db'
 #dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
@@ -250,11 +252,10 @@ jecUncFileMC             ='Leptoquarks/RootTupleMakerV2/data/Summer15_25nsV7_MC_
 # Get JER from text files
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = False
 process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = False
-process.rootTuplePFJetsAK4CHS.JERResolutionsFile = jerResFile
-process.rootTuplePFJetsAK4Puppi.JERResolutionsFile = jerResFilePuppi
-process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile = jerScaleFactorsFile
+process.rootTuplePFJetsAK4CHS.JERResolutionsFile    = jerResFile
+process.rootTuplePFJetsAK4Puppi.JERResolutionsFile  = jerResFilePuppi
+process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile   = jerScaleFactorsFile
 process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
-# XXX NB: These files are wrong for AK4Puppi so it won't have proper scale factors.
 
 ## load JES/etc.from local db file, and into global tag
 #jetDBFile = 'sqlite:'+dbJetMCDBFile if varOptions.isMC else 'sqlite:'+dbJetDataDBFile

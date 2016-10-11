@@ -388,8 +388,13 @@ getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).srcPFlow = cms.InputTag('p
 
 # ntuplize the newly-corrected MET
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
-#process.rootTuplePFMETType1Cor.InputTag = cms.InputTag('slimmedMETs'+postfix) #fixme wait for JetMET to make this work with txt file
 process.rootTuplePFMETType1CorNotRecorrected.Suffix = 'Type1CorNotRecorrected'
+process.rootTuplePFMETType1XYCorNotRecorrected = process.rootTuplePFMETType1XYCor.clone()
+process.rootTuplePFMETType1XYCorNotRecorrected.Suffix = 'Type1XYCorNotRecorrected'
+process.rootTuplePFMETType1Cor.InputTag = cms.InputTag('slimmedMETs'+postfix)
+process.rootTuplePFMETType01Cor.InputTag = cms.InputTag('slimmedMETs'+postfix)
+process.rootTuplePFMETType1XYCor.InputTag = cms.InputTag('slimmedMETs'+postfix)
+process.rootTuplePFMETType01XYCor.InputTag = cms.InputTag('slimmedMETs'+postfix)
 
 # ntuplize the new MET shifts
 process.rootNTupleNewMETs = cms.Path()
@@ -420,7 +425,7 @@ metMap = {
   'pes'  : '',
 }
 #mettypes = ['CaloMET','CaloMETType1Cor','PFMET','PFMETType1Cor','PFMETType01Cor','PFMETType01XYCor','PFMETPuppi','PFMETPuppiType1Cor']
-mettypes = ['PFMETType1Cor','PFMETPuppiType1Cor']
+mettypes = ['PFMETType1XYCor','PFMETPuppiType1Cor']
 for shift in allowedShifts:
     for sign in allowedSigns:
       # FIXME TODO

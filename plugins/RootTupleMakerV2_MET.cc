@@ -116,8 +116,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	double sigmaX2= it->getSignificanceMatrix()(0,0);
 	double sigmaY2= it->getSignificanceMatrix()(1,1);
 	double significance = -1;
-	//if(sigmaX2<1.e10 && sigmaY2<1.e10) 
-	significance = it->metSignificance();
+	if(sigmaX2<1.e10 && sigmaY2<1.e10) 
+	  significance = it->metSignificance();
 	//--
 
 	metsig->push_back( significance );

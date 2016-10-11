@@ -128,9 +128,9 @@ from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTri
 process.load('PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi')
 ###### need to load it into the process, or else it won't run
 process.unpackedPatTrigger = unpackedPatTrigger.clone()
-process.unpackedPatTrigger.triggerResults = 'TriggerResults::HLT2'
-process.rootTupleTriggerObjects.TriggerBitsTag = 'TriggerResults::HLT2'
-process.rootTupleTrigger.HLTInputTag = 'TriggerResults::HLT2'
+#process.unpackedPatTrigger.triggerResults = 'TriggerResults::HLT2'
+#process.rootTupleTriggerObjects.TriggerBitsTag = 'TriggerResults::HLT2'
+#process.rootTupleTrigger.HLTInputTag = 'TriggerResults::HLT2'
 process.rootTupleEventSelection.L1InputTag  = 'gtStage2Digis'
 ####
 #####fixme removing because no trigger info?

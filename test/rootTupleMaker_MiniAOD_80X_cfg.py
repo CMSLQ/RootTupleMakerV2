@@ -99,7 +99,7 @@ process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 
 # Events to process
-process.maxEvents.input = -1
+process.maxEvents.input = 100
 
 # Input files
 process.source.fileNames = [

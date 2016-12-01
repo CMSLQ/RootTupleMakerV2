@@ -91,13 +91,15 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 if varOptions.isMC:
   process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2_v1'
 else:
-  process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'
+  #process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'#for 2016 H Prompt
+  process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v4'# for 23Sep ReReco (2016B-G)
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
+process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = -1
 
 # Input files
 process.source.fileNames = [
@@ -112,8 +114,12 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/30000/00AEB2F6-541B-E611-AF2A-0025905C42F2.root'
     #'/store/mc/RunIISpring16MiniAODv2/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/DA6AE5C6-151B-E611-9EEF-782BCB536A50.root'
     #'/store/mc/RunIISpring16MiniAODv2/LQLQToTopMu_M-1000_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/46EDE553-8624-E611-AFB2-00259073E380.root'
-    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_Pt-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/80000/82E9F815-F958-E611-968C-00266CFF0234.root'
+    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_Pt-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/80000/82E9F815-F958-E611-968C-00266CFF0234.root'
     #'file:/afs/cern.ch/user/s/scooper/work/private/cmssw/8011/TestRootNTuplizerRecipe/src/LQToUE_M-1000_BetaOne-RunIISpring16MiniAODv2.root'
+    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/0A23534F-F638-E611-8ED1-782BCB78621D.root'
+    #'/store/data/Run2016G/SingleMuon/MINIAOD/PromptReco-v1/000/278/820/00000/1C7D6E1E-6564-E611-B75B-FA163EDC3FC8.root'
+  #'/store/mc/RunIISpring16MiniAODv2/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/70000/0468BB7B-D53F-E611-8647-0CC47A0093EC.root'',
+    '/store/mc/RunIISpring16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/premix_withHLT_80X_mcRun2_asymptotic_v14-v1/00000/042D62D1-C597-E611-8FA4-549F3525B9A0.root'                                                                
 ]
 
 #----------------------------------------------------------------------------------------------------

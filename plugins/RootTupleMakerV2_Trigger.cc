@@ -15,6 +15,7 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   hltInputTag_ (iConfig.getParameter<edm::InputTag>("HLTInputTag")),
   l1uGTInputToken_ (consumes<GlobalAlgBlkBxCollection>(iConfig.getParameter<edm::InputTag>("L1uGTInputTag"))),
   hltInputToken_ (consumes<edm::TriggerResults> (iConfig.getParameter<edm::InputTag>("HLTInputTag"))),
+  packedTrigPrescalesToken_ (consumes<pat::PackedTriggerPrescales> (iConfig.getParameter<edm::InputTag>("PackedPrescalesInputTag"))),
   hltPathsOfInterest(iConfig.getParameter<std::vector<std::string> > ("HLTPathsOfInterest")),
   hltPrescaleProvider_(iConfig, consumesCollector(), *this),
   sourceName(iConfig.getParameter<std::string>  ("SourceName")),
@@ -44,8 +45,11 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   produces <std::vector<bool > >       ("HLTOutsideDatasetTriggerDecisions" );
   produces <std::vector<int> >         ("HLTInsideDatasetTriggerPrescales"  );
   produces <std::vector<int> >         ("HLTOutsideDatasetTriggerPrescales" );
+  produces <std::vector<int> >         ("HLTInsideDatasetTriggerPackedPrescales"  );
+  produces <std::vector<int> >         ("HLTOutsideDatasetTriggerPackedPrescales" );
 
   produces <std::vector<int> > ( "L1Bits" );
+  produces <std::vector<int> > ( "L1PrescaleColumn" );
   //produces <std::vector<int> > ( "L1PhysBits" );
   //produces <std::vector<int> > ( "L1TechBits" );
 }
@@ -107,6 +111,7 @@ void RootTupleMakerV2_Trigger::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<std::vector<int> >  l1bits   ( new std::vector<int>() );
+  std::auto_ptr<std::vector<int> >  l1prescaleColumn   ( new std::vector<int>() );
   //std::auto_ptr<std::vector<int> >  l1physbits   ( new std::vector<int>() );
   //std::auto_ptr<std::vector<int> >  l1techbits   ( new std::vector<int>() );
   // std::auto_ptr<std::vector<int> >  hltbits      ( new std::vector<int>() );
@@ -119,6 +124,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector < bool > >        v_hlt_outsideDataset_decisions        (new std::vector<bool>         ());
   std::auto_ptr<std::vector < int > >         v_hlt_insideDataset_prescales         (new std::vector<int>          ());
   std::auto_ptr<std::vector < int > >         v_hlt_outsideDataset_prescales        (new std::vector<int>          ());
+  std::auto_ptr<std::vector < int > >         v_hlt_insideDataset_packedPrescales   (new std::vector<int>          ());
+  std::auto_ptr<std::vector < int > >         v_hlt_outsideDataset_packedPrescales  (new std::vector<int>          ());
 
   /*
   std::auto_ptr<std::map<std::string,bool > > m_hlt_insideDataset_namesToDecisions  (new std::map<std::string,bool>());
@@ -134,6 +141,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   if(l1uGtGlobalAlgBlockBXColl.isValid()) {
     edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1uGtGlobalAlgBlockBXColl;
     GlobalAlgBlk alg = l1uGtGlobalAlgBlockBXColl->at(0,0); // look at BX==0
+    int column = l1uGtGlobalAlgBlockBXColl->at(0, 0).getPreScColumn();
+    l1prescaleColumn->push_back(column);
     // below will work in later CMSSWs
     //const std::vector<bool> finalDecisions = alg.getAlgoDecisionFinal();
     //for(std::vector<bool>::const_iterator bitItr = finalDecisions.begin(); bitItr != finalDecisions.end(); ++bitItr) {
@@ -148,6 +157,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   edm::Handle<edm::TriggerResults> triggerResults;
   iEvent.getByToken(hltInputToken_, triggerResults);
+
+  edm::Handle<pat::PackedTriggerPrescales> trigPrescales;
+  iEvent.getByToken(packedTrigPrescalesToken_,trigPrescales);
 
   HLTConfigProvider const& hltConfig = hltPrescaleProvider_.hltConfigProvider();
 
@@ -166,10 +178,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         v_hlt_insideDataset_names->push_back ( names.triggerName(i) );
         v_hlt_insideDataset_prescales->push_back ( hltPrescaleProvider_.prescaleValue(iEvent,iSetup,names.triggerName(i)));
         v_hlt_insideDataset_decisions->push_back ( triggerResults->accept(i) );
+        v_hlt_insideDataset_packedPrescales->push_back( trigPrescales->getPrescaleForIndex(i) );
       } else {
         v_hlt_outsideDataset_names->push_back ( names.triggerName(i) );
         v_hlt_outsideDataset_prescales->push_back ( hltPrescaleProvider_.prescaleValue(iEvent,iSetup,names.triggerName(i)));
         v_hlt_outsideDataset_decisions->push_back ( triggerResults->accept(i) );
+        v_hlt_outsideDataset_packedPrescales->push_back( trigPrescales->getPrescaleForIndex(i) );
       }      
     }
     
@@ -207,6 +221,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-----------------------------------------------------------------
   // put vectors in the event
   iEvent.put( l1bits, "L1Bits" );
+  iEvent.put( l1prescaleColumn, "L1PrescaleColumn" );
   //iEvent.put( l1physbits, "L1PhysBits" );
   //iEvent.put( l1techbits, "L1TechBits" );
   // iEvent.put( hltbits,    "HLTBits" );
@@ -228,6 +243,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put ( v_hlt_outsideDataset_decisions , "HLTOutsideDatasetTriggerDecisions" ) ;
   iEvent.put ( v_hlt_insideDataset_prescales  , "HLTInsideDatasetTriggerPrescales"  ) ;
   iEvent.put ( v_hlt_outsideDataset_prescales , "HLTOutsideDatasetTriggerPrescales" ) ;
+  iEvent.put ( v_hlt_insideDataset_packedPrescales  , "HLTInsideDatasetTriggerPackedPrescales"  ) ;
+  iEvent.put ( v_hlt_outsideDataset_packedPrescales , "HLTOutsideDatasetTriggerPackedPrescales" ) ;
 
   
 }

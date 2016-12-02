@@ -5,6 +5,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
+#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 
 class RootTupleMakerV2_Trigger : public edm::EDProducer {
  public:
@@ -24,6 +25,7 @@ class RootTupleMakerV2_Trigger : public edm::EDProducer {
   const edm::InputTag   hltInputTag_;
   const edm::EDGetTokenT<GlobalAlgBlkBxCollection> l1uGTInputToken_;
   const edm::EDGetTokenT<edm::TriggerResults>   hltInputToken_;
+  const edm::EDGetTokenT<pat::PackedTriggerPrescales> packedTrigPrescalesToken_;
   const std::vector<std::string> hltPathsOfInterest;
   HLTPrescaleProvider hltPrescaleProvider_;
 

@@ -53,6 +53,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   eleMediumIdCutFlowResultMapToken_ (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleMediumIdCutFlowResultMap"))),
   eleTightIdCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleTightIdCutFlowResultMap"))),
   eleHEEPIdCutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdCutFlowResultMap"))),
+  heep70trkIsolMapToken_ (consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("heep70trkIsolMap"))),
   beamSpotInputToken_          (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), 
   electronIso                  (iConfig.getParameter<double>       ("ElectronIso"              )),
   muonPt                       (iConfig.getParameter<double>       ("MuonPt"                   )),
@@ -177,6 +178,9 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "HcalIsoD1DR03"            + suffix );
   produces <std::vector<double> > ( prefix + "HcalIsoD2DR03"            + suffix );
   produces <std::vector<double> > ( prefix + "TrkIsoDR03"               + suffix );
+
+  // Isolation for HEEP v7.0
+  produces <std::vector<double> > ( prefix + "Heep70TrkIso"             + suffix );
 				        
   // Conversion variables					        
 								        
@@ -361,6 +365,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  hcalIsoD2DR03             ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  trkIsoDR03                ( new std::vector<double>()  );
 
+  // Isolation HEEP v7.0
+  std::auto_ptr<std::vector<double> >  heep70TrkIso              ( new std::vector<double>()  );
+
   // Conversion variables
 
   std::auto_ptr<std::vector<int> >     missingHits               ( new std::vector<int>   ()  );
@@ -482,6 +489,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > tight_id_cutflow_data;
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > heep_id_cutflow_data;
+  edm::Handle<edm::ValueMap<float> > heep70trkIsolMapHandle;
   iEvent.getByToken(electronVetoIdMapToken_,veto_id_decisions);
   iEvent.getByToken(electronLooseIdMapToken_,loose_id_decisions);
   iEvent.getByToken(electronMediumIdMapToken_,medium_id_decisions);
@@ -492,6 +500,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByToken(eleMediumIdCutFlowResultMapToken_,medium_id_cutflow_data);
   iEvent.getByToken(eleTightIdCutFlowResultMapToken_,tight_id_cutflow_data);
   iEvent.getByToken(eleHEEPIdCutFlowResultMapToken_,heep_id_cutflow_data);
+  iEvent.getByToken(heep70trkIsolMapToken_,heep70trkIsolMapHandle);
 
   //------------------------------------------------------------------------
   // Get magnetic field (need this for photon conversion information)
@@ -844,6 +853,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hcalIsoD2DR03            -> push_back( it->dr03HcalDepth2TowerSumEt() );
       trkIsoDR03               -> push_back( it->dr03TkSumPt() );
 
+      // Isolation HEEP v7.0
+      if(!heep70trkIsolMapHandle.isValid())
+        edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get the HEEP7.0 track isolation value map";
+      else
+        heep70TrkIso        -> push_back((*heep70trkIsolMapHandle)[ elPtr ]);
+
+
       // Isolation variables: particle flow
       // methods from reco::GsfElectron; should be filled with dR 0.3 values from isolation value maps, e.g., gedElPFIsoValueCharged03
       // See http://cmslxr.fnal.gov/source/RecoEgamma/EgammaElectronProducers/python/gedGsfElectronFinalizer_cfi.py?v=CMSSW_7_2_3
@@ -1016,6 +1032,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( hcalIsoD2DR03           , prefix + "HcalIsoD2DR03"            + suffix );
   iEvent.put( trkIsoDR03              , prefix + "TrkIsoDR03"               + suffix );
 
+  // Isolation HEEP 7.0
+  iEvent.put ( heep70TrkIso           , prefix + "Heep70TrkIso"             + suffix );
   // Isolation variables: particle flow
 
   iEvent.put( pfChargedHadronIso03    , prefix + "PFChargedHadronIso03"     + suffix );

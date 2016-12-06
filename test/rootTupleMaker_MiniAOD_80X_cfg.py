@@ -99,7 +99,7 @@ process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 
 # Events to process
-process.maxEvents.input = 100
+process.maxEvents.input = 500
 
 # Input files
 process.source.fileNames = [
@@ -119,7 +119,10 @@ process.source.fileNames = [
     #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/0A23534F-F638-E611-8ED1-782BCB78621D.root'
     #'/store/data/Run2016G/SingleMuon/MINIAOD/PromptReco-v1/000/278/820/00000/1C7D6E1E-6564-E611-B75B-FA163EDC3FC8.root'
   #'/store/mc/RunIISpring16MiniAODv2/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/70000/0468BB7B-D53F-E611-8647-0CC47A0093EC.root'',
-    '/store/mc/RunIISpring16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/premix_withHLT_80X_mcRun2_asymptotic_v14-v1/00000/042D62D1-C597-E611-8FA4-549F3525B9A0.root'                                                                
+    #'/store/mc/RunIISpring16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/premix_withHLT_80X_mcRun2_asymptotic_v14-v1/00000/042D62D1-C597-E611-8FA4-549F3525B9A0.root'                                                                
+
+    # sep23 rereco
+    '/store/data/Run2016B/SingleElectron/MINIAOD/23Sep2016-v3/00000/00099863-E799-E611-A876-141877343E6D.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -161,7 +164,7 @@ process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
 process.schedule = cms.Schedule()
 # Need the egamma smearing for 80X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMSmearer
 process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
-correctionType = "80Xapproval"
+correctionType = "Full2016_v1"
 process.calibratedPatElectrons.isMC = varOptions.isMC
 process.selectedElectrons = cms.EDFilter(
   "PATElectronSelector",
@@ -191,18 +194,22 @@ switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 my_id_modules = []
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
 #Add them to the VID producer
 for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 # XXX NB, must be the same as input collection used for electron ntuplizer
 process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
+process.heepIDVarValueMaps.elesMiniAOD  = process.rootTupleElectrons.InputTag
+process.electronRegressionValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag
 process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag#FIXME do we need this?
 
 process.electronSupportPath = cms.Path()
 process.electronSupportPath += process.selectedElectrons
 process.electronSupportPath += process.calibratedPatElectrons
-process.electronSupportPath += process.egmGsfElectronIDs
+#process.electronSupportPath += process.egmGsfElectronIDs
+process.electronSupportPath += process.egmGsfElectronIDSequence
 process.schedule.append(process.electronSupportPath)
 
 

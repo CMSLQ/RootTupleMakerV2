@@ -28,6 +28,7 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
   edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleMediumIdCutFlowResultMapToken_;
   edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleTightIdCutFlowResultMapToken_;
   edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> > eleHEEPIdCutFlowResultMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<float> > heep70trkIsolMapToken_;
   edm::EDGetTokenT<reco::BeamSpot> beamSpotInputToken_;
   const double          electronIso, muonPt, muonIso;
   const std::string     muonID;

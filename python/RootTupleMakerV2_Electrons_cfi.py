@@ -29,7 +29,9 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     eleLooseIdCutFlowResultMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose"),
     eleMediumIdCutFlowResultMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium"),
     eleTightIdCutFlowResultMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-tight"),
-    eleHEEPIdCutFlowResultMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
+    eleHEEPIdCutFlowResultMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
+    # new HEEP 7.0 track isolation
+    heep70trkIsolMap = cms.InputTag("heepIDVarValueMaps","eleTrkPtIso"),
 )
 
 # Trigger matching

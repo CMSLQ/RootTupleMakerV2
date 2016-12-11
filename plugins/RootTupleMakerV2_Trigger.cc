@@ -49,7 +49,7 @@ RootTupleMakerV2_Trigger::RootTupleMakerV2_Trigger(const edm::ParameterSet& iCon
   produces <std::vector<int> >         ("HLTOutsideDatasetTriggerPackedPrescales" );
 
   produces <std::vector<int> > ( "L1Bits" );
-  produces <std::vector<int> > ( "L1PrescaleColumn" );
+  produces <int> ( "L1PrescaleColumn" );
   //produces <std::vector<int> > ( "L1PhysBits" );
   //produces <std::vector<int> > ( "L1TechBits" );
 }
@@ -111,7 +111,8 @@ void RootTupleMakerV2_Trigger::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<std::vector<int> >  l1bits   ( new std::vector<int>() );
-  std::auto_ptr<std::vector<int> >  l1prescaleColumn   ( new std::vector<int>() );
+  std::auto_ptr<int> l1prescaleColumn  (new int);
+  *l1prescaleColumn.get() = -999;
   //std::auto_ptr<std::vector<int> >  l1physbits   ( new std::vector<int>() );
   //std::auto_ptr<std::vector<int> >  l1techbits   ( new std::vector<int>() );
   // std::auto_ptr<std::vector<int> >  hltbits      ( new std::vector<int>() );
@@ -142,7 +143,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     edm::LogInfo("RootTupleMakerV2_TriggerInfo") << "Successfully obtained " << l1uGtGlobalAlgBlockBXColl;
     GlobalAlgBlk alg = l1uGtGlobalAlgBlockBXColl->at(0,0); // look at BX==0
     int column = l1uGtGlobalAlgBlockBXColl->at(0, 0).getPreScColumn();
-    l1prescaleColumn->push_back(column);
+    *l1prescaleColumn.get() = column;
     // below will work in later CMSSWs
     //const std::vector<bool> finalDecisions = alg.getAlgoDecisionFinal();
     //for(std::vector<bool>::const_iterator bitItr = finalDecisions.begin(); bitItr != finalDecisions.end(); ++bitItr) {

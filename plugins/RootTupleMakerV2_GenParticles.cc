@@ -158,7 +158,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
       // for topptreweight
       if(nTops==2)
-        *topptweight.get() = sqrt(exp(0.156-0.00137*topPt1)*exp(0.156-0.00137*topPt2));
+        *topptweight.get() = sqrt(exp(0.0615-0.0005*topPt1)*exp(0.0615-0.0005*topPt2));
     } else {
       edm::LogError("RootTupleMakerV2_GenParticlesError") << "Error! Can't get the genPartInputToken_";
     }

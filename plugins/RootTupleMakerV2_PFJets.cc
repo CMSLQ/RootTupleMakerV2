@@ -26,6 +26,7 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
+  produces <std::vector<double> > ( prefix + "Mt" + suffix );
   produces <std::vector<double> > ( prefix + "SmearedUpPt" + suffix );
   produces <std::vector<double> > ( prefix + "SmearedDownPt" + suffix );
   produces <std::vector<double> > ( prefix + "ScaledUpPt" + suffix );
@@ -130,6 +131,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  mt  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ptSmearedUp  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ptSmearedDown  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ptScaledUp  ( new std::vector<double>()  );
@@ -501,7 +503,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  eta->push_back( it->eta() );
 	  phi->push_back( it->phi() );
 	  pt->push_back( it->pt() );
-
+	  mt->push_back( it->mt() );
 	  
 	  // JER
 	  if(readJERuncertainty)
@@ -726,6 +728,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
+  iEvent.put( mt, prefix + "Mt" + suffix );
   iEvent.put( ptSmearedUp, prefix + "SmearedUpPt" + suffix );
   iEvent.put( ptSmearedDown, prefix + "SmearedDownPt" + suffix );
   iEvent.put( ptScaledUp, prefix + "ScaledUpPt" + suffix );

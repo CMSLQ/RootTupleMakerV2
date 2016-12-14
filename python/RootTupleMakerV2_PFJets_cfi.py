@@ -71,9 +71,9 @@ pfjetTriggerMatchEmbedderHLTEleJetJet = cms.EDProducer(
 )
 
 rootTuplePFJetsSequence = cms.Sequence(
-  pfjetTriggerMatchHLTEleJetJet*
-  pfjetTriggerMatchEmbedderHLTEleJetJet*
-  rootTuplePFJetsAK4CHS*
-  rootTuplePFJetsAK4Puppi
+  pfjetTriggerMatchHLTEleJetJet
+  *pfjetTriggerMatchEmbedderHLTEleJetJet
+  *rootTuplePFJetsAK4CHS
+  #*rootTuplePFJetsAK4Puppi
 )
 

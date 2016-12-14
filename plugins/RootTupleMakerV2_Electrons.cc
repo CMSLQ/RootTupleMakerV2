@@ -107,9 +107,6 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
   produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDTight" + suffix );
   produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDHEEP"  + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigTight"      + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDTrigWP70"       + suffix );
-  produces <std::vector<bool> >    ( prefix + "PassEGammaIDEoP"            + suffix );
   produces <std::vector<float> >   ( prefix + "RhoIsoHEEP"                 + suffix );
 
   // Does this electron overlap with a muon?			        
@@ -295,9 +292,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMedium ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDTight  ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDHEEP   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<bool> >    passEGammaIDTrigTight     ( new std::vector<bool>   ()  );
-  std::auto_ptr<std::vector<bool> >    passEGammaIDTrigWP70      ( new std::vector<bool>   ()  );
-  std::auto_ptr<std::vector<bool> >    passEGammaIDEoP           ( new std::vector<bool>   ()  ); 
   std::auto_ptr<std::vector<float> >   rhoIsoHEEP                ( new std::vector<float>   ()  ); 
   
   // Does this electron overlap with a muon?
@@ -793,10 +787,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       cutFlowHashesEGammaIDHEEP  -> push_back (((*heep_id_cutflow_data)[ elPtr ]).cutFlowHash());
       //
       rhoIsoHEEP               -> push_back (rhoIso);
-      // XXX FIXME SIC: update with trigger updates?
-      //passEGammaIDTrigTight    -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, *it));
-      //passEGammaIDTrigWP70     -> push_back (EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70 , *it));
-      //passEGammaIDEoP          -> push_back (EgammaCutBasedEleId::PassEoverPCuts(*it));
 
       // Does this electron overlap with a muon?
       overlaps                 -> push_back( ovrlps );
@@ -961,9 +951,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( passEGammaIDLoose       , prefix + "PassEGammaIDLoose"        + suffix );
   iEvent.put( passEGammaIDMedium      , prefix + "PassEGammaIDMedium"       + suffix );
   iEvent.put( passEGammaIDTight       , prefix + "PassEGammaIDTight"        + suffix );
-  iEvent.put( passEGammaIDTrigTight   , prefix + "PassEGammaIDTrigTight"    + suffix );
-  iEvent.put( passEGammaIDTrigWP70    , prefix + "PassEGammaIDTrigWP70"     + suffix );
-  iEvent.put( passEGammaIDEoP         , prefix + "PassEGammaIDEoP"          + suffix );
   iEvent.put( passHEEPID              , prefix + "PassHEEPID"               + suffix );
   iEvent.put( cutFlowNamesEGammaIDVeto   , prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
   iEvent.put( cutFlowNamesEGammaIDLoose  , prefix + "CutFlowNamesEGammaIDLoose"  + suffix );

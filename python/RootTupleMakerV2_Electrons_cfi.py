@@ -32,6 +32,8 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     eleHEEPIdCutFlowResultMap = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
     # new HEEP 7.0 track isolation
     heep70trkIsolMap = cms.InputTag("heepIDVarValueMaps","eleTrkPtIso"),
+    EBReducedRecHitsInputTag = cms.InputTag("reducedEgamma:reducedEBRecHits"),
+    EEReducedRecHitsInputTag = cms.InputTag("reducedEgamma:reducedEERecHits"),
 )
 
 # Trigger matching

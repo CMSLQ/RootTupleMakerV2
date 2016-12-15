@@ -29,6 +29,7 @@
 #include "DataFormats/RecoCandidate/interface/IsoDepositVetos.h"
 #include "DataFormats/PatCandidates/interface/Isolation.h"
 #include "DataFormats/GeometryVector/interface/Vector3DBase.h"
+#include "DataFormats/EcalDetId/interface/EcalSubdetector.h"
 
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
@@ -53,8 +54,10 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   eleMediumIdCutFlowResultMapToken_ (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleMediumIdCutFlowResultMap"))),
   eleTightIdCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleTightIdCutFlowResultMap"))),
   eleHEEPIdCutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdCutFlowResultMap"))),
-  heep70trkIsolMapToken_ (consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("heep70trkIsolMap"))),
-  beamSpotInputToken_          (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), 
+  heep70trkIsolMapToken_            (consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("heep70trkIsolMap"))),
+  beamSpotInputToken_               (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), 
+  ebReducedRecHitsInputToken_       (consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EBReducedRecHitsInputTag"))),
+  eeReducedRecHitsInputToken_       (consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EEReducedRecHitsInputTag"))),
   electronIso                  (iConfig.getParameter<double>       ("ElectronIso"              )),
   muonPt                       (iConfig.getParameter<double>       ("MuonPt"                   )),
   muonIso                      (iConfig.getParameter<double>       ("MuonIso"                  )),
@@ -88,6 +91,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "SCPt"                     + suffix );
   produces <std::vector<double> > ( prefix + "SCRawEnergy"              + suffix );
   produces <std::vector<double> > ( prefix + "SCEnergy"                 + suffix );
+  produces <std::vector<double> > ( prefix + "SCSeedCryEnergy"          + suffix );
+  produces <std::vector<bool> >   ( prefix + "SCSeedCryIsBarrel"        + suffix );
 
   // ID information
   
@@ -274,6 +279,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  scPt                      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scRawEnergy               ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scEnergy                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scSeedCryEnergy           ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<bool> >    scSeedCryIsBarrel         ( new std::vector<bool>()  );
 
   // ID information
   std::auto_ptr<std::vector<int> >     passIds                   ( new std::vector<int>   ()  );
@@ -496,10 +503,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByToken(eleHEEPIdCutFlowResultMapToken_,heep_id_cutflow_data);
   iEvent.getByToken(heep70trkIsolMapToken_,heep70trkIsolMapHandle);
 
-  //------------------------------------------------------------------------
-  // Get magnetic field (need this for photon conversion information)
-  //  - Instead, use conversion information built into PAT/MiniAOD, so no need for this
-  //------------------------------------------------------------------------
+  bool ebRecHitsValid = false;
+  edm::Handle<EcalRecHitCollection> ebRecHitsHandle;
+  iEvent.getByToken(ebReducedRecHitsInputToken_, ebRecHitsHandle);
+  if(ebRecHitsHandle.isValid()) {
+    ebRecHitsValid = true;
+  } else {
+    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get EBReducedRecHits";
+  }
+  bool eeRecHitsValid = false;
+  edm::Handle<EcalRecHitCollection> eeRecHitsHandle;
+  iEvent.getByToken(eeReducedRecHitsInputToken_, eeRecHitsHandle);
+  if(eeRecHitsHandle.isValid()) {
+    eeRecHitsValid = true;
+  } else {
+    edm::LogError("RootTupleMakerV2_ElectronsError") << "Error! Can't get EEReducedRecHits";
+  }
+
 
   //------------------------------------------------------------------------
   // Loop over electrons (finally!)
@@ -765,6 +785,38 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       scRawEnergy              -> push_back( it->superCluster()->rawEnergy() );
       scEnergy                 -> push_back( it->superCluster()->energy() );
       eSuperClusterOverP       -> push_back( it->eSuperClusterOverP() );
+      // find seed cry of supercluster and get its energy out of the reduced rechit collection
+      DetId seedDetId = it->superCluster()->seed()->seed();
+      if(seedDetId.subdetId() == EcalBarrel) {
+        scSeedCryIsBarrel      -> push_back(true);
+        if(!ebRecHitsValid)
+          scSeedCryEnergy      -> push_back( -999 );
+        else {
+          auto rhItr =  ebRecHitsHandle->find(seedDetId);
+          if(rhItr != ebRecHitsHandle->end())
+            scSeedCryEnergy    -> push_back( rhItr->energy());
+          else
+            scSeedCryEnergy    -> push_back( -999 );
+        }
+      }
+      else if(seedDetId.subdetId() == EcalEndcap) {
+        scSeedCryIsBarrel      -> push_back(false);
+        if(!eeRecHitsValid)
+          scSeedCryEnergy      -> push_back( -999 );
+        else {
+          auto rhItr =  eeRecHitsHandle->find(seedDetId);
+          if(rhItr != eeRecHitsHandle->end())
+            scSeedCryEnergy    -> push_back( rhItr->energy());
+          else
+            scSeedCryEnergy    -> push_back( -999 );
+        }
+      }
+      ////
+      //std::cout << "Seed cry detId: " << seedDetId.rawId() << std::endl;
+      //for(auto rhItr2 = it->recHits()->begin(); rhItr2 != it->recHits()->end(); ++rhItr2 ) {
+      //  std::cout << "RecHit in Electron -- DetId: " << rhItr2->detid().rawId() << std::endl;
+      //}
+      ////
 
       // ID information
       passIds                  -> push_back( passId );
@@ -944,6 +996,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( scPt                    , prefix + "SCPt"                     + suffix );
   iEvent.put( scRawEnergy             , prefix + "SCRawEnergy"              + suffix );
   iEvent.put( scEnergy                , prefix + "SCEnergy"                 + suffix );
+  iEvent.put( scSeedCryEnergy         , prefix + "SCSeedCryEnergy"          + suffix );
+  iEvent.put( scSeedCryIsBarrel       , prefix + "SCSeedCryIsBarrel"        + suffix );
 
   // ID information 
   iEvent.put( passIds                 , prefix + "PassId"                   + suffix );

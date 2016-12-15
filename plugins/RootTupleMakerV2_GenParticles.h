@@ -5,7 +5,6 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 class RootTupleMakerV2_GenParticles : public edm::EDProducer {
  public:

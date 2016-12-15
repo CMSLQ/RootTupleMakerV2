@@ -1,5 +1,6 @@
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_PFJets.h"
 
+
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
   jetInputToken_ (consumes<std::vector<pat::Jet> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
   inputTag (iConfig.getParameter<edm::InputTag>("InputTag")),//fixme using old way to find PUPPI, is this a problem?
@@ -26,6 +27,7 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<double> > ( prefix + "Eta" + suffix );
   produces <std::vector<double> > ( prefix + "Phi" + suffix );
   produces <std::vector<double> > ( prefix + "Pt" + suffix );
+  produces <std::vector<double> > ( prefix + "Mt" + suffix );
   produces <std::vector<double> > ( prefix + "SmearedUpPt" + suffix );
   produces <std::vector<double> > ( prefix + "SmearedDownPt" + suffix );
   produces <std::vector<double> > ( prefix + "ScaledUpPt" + suffix );
@@ -92,6 +94,16 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
     produces <std::vector<int> >      ( prefix + "PileupMVApassesLoose"  + suffix);
     produces <std::vector<int> >      ( prefix + "PileupMVApassesMedium" + suffix);
     produces <std::vector<int> >      ( prefix + "PileupMVApassesTight"  + suffix);
+    produces <std::vector<double> >   (prefix + "VtxNtracks"  + suffix);
+    produces <std::vector<double> >   (prefix + "VtxMass"  + suffix);
+    produces <std::vector<double> >   (prefix + "VtxPx"  + suffix);
+    produces <std::vector<double> >   (prefix + "VtxPy"  + suffix);
+    produces <std::vector<double> >   (prefix + "Vtx3DVal"  + suffix);
+    produces <std::vector<double> >   (prefix + "Vtx3DSig"  + suffix);
+    produces <std::vector<double> >   (prefix + "LeadTrackPt"  + suffix);
+    produces <std::vector<double> >   (prefix + "SoftLepPt"  + suffix);
+    produces <std::vector<double> >   (prefix + "SoftLepRatio"  + suffix);
+    produces <std::vector<double> >   (prefix + "SoftLepDr"  + suffix);
   }
   produces <std::vector<double> > ( prefix + "BestVertexTrackAssociationFactor" + suffix );
   produces <std::vector<int> >    ( prefix + "BestVertexTrackAssociationIndex" + suffix);
@@ -130,6 +142,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  mt  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ptSmearedUp  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ptSmearedDown  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  ptScaledUp  ( new std::vector<double>()  );
@@ -198,6 +211,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<int> >  jetpileup_mva_passesLoose  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >  jetpileup_mva_passesMedium ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >  jetpileup_mva_passesTight  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<double> > vtxNtracks  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > vtxMass  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > vtxPx  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > vtxPy  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > vtx3DVal  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > vtx3DSig  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > leadTrackPt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > softLepPt  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > softLepRatio  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> > softLepDr  ( new std::vector<double>()  );
+
 
   std::auto_ptr <std::vector<double> >  bestVertexTrackAssociationFactor  ( new std::vector<double>()  );
   std::auto_ptr <std::vector<int> >     bestVertexTrackAssociationIndex   ( new std::vector<int>()  );
@@ -501,7 +525,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  eta->push_back( it->eta() );
 	  phi->push_back( it->phi() );
 	  pt->push_back( it->pt() );
-
+	  mt->push_back( it->mt() );
 	  
 	  // JER
 	  if(readJERuncertainty)
@@ -643,6 +667,43 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    jetpileup_mva_passesLoose ->push_back(bool(it->userInt(idName) & (1 << 2)));
 	    jetpileup_mva_passesMedium->push_back(bool(it->userInt(idName) & (1 << 1)));
 	    jetpileup_mva_passesTight ->push_back(bool(it->userInt(idName) & (1 << 0)));
+
+	    vtxNtracks->push_back(it->userFloat("vtxNtracks"));
+	    vtxMass->push_back(it->userFloat("vtxMass"));
+	    vtxPx->push_back(it->userFloat("vtxPx"));
+	    vtxPy->push_back(it->userFloat("vtxPy"));
+	    vtx3DVal->push_back(it->userFloat("vtx3DVal"));
+	    vtx3DSig->push_back(it->userFloat("vtx3DSig"));
+
+
+	    float leadTrackPt_ = 0, softLepPt_ = 0, softLepRatio_ = 0, softLepDr_ = 0;
+	    for ( unsigned k = 0; k < it->numberOfSourceCandidatePtrs(); ++k ) {
+	      reco::CandidatePtr pfJetConstituent = it->sourceCandidatePtr(k);
+	      
+	      const reco::Candidate* kcand = pfJetConstituent.get();
+	      const pat::PackedCandidate* lPack = dynamic_cast<const pat::PackedCandidate *>( kcand );
+	      //if ( !lPack ) throw cms::Exception( "NoPackedConstituent" ) << " For jet " << i << " failed to get constituent " << k << std::endl;
+	      float candPt = kcand->pt();
+	      float candDr = ROOT::Math::VectorUtil::DeltaR(kcand->p4(),it->p4());
+	      
+	      if(lPack->charge() != 0 && candPt > leadTrackPt_) leadTrackPt_ = candPt;
+	      
+	      if(abs(lPack->pdgId()) == 11 || abs(lPack->pdgId()) == 13) {
+		if(candPt > softLepPt_){
+		  softLepPt_ = candPt;
+		  softLepRatio_ = candPt/it->pt();
+		  softLepDr_ = candDr;
+		}
+	      }
+	    }
+             
+	    leadTrackPt->push_back(leadTrackPt_);
+	    softLepPt->push_back(softLepPt_);
+	    softLepRatio->push_back(softLepRatio_);
+	    softLepDr->push_back(softLepDr_);
+
+
+
 	    //std::cout<<"Passes loose: "<<bool(it->userInt(idName) & (1 << 2))<< " medium: "<<bool(it->userInt(idName) & (1 << 1))<< " tight: "<<bool(it->userInt(idName) & (1 << 0))<<std::endl;
 	  }
 
@@ -726,6 +787,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( eta, prefix + "Eta" + suffix );
   iEvent.put( phi, prefix + "Phi" + suffix );
   iEvent.put( pt, prefix + "Pt" + suffix );
+  iEvent.put( mt, prefix + "Mt" + suffix );
   iEvent.put( ptSmearedUp, prefix + "SmearedUpPt" + suffix );
   iEvent.put( ptSmearedDown, prefix + "SmearedDownPt" + suffix );
   iEvent.put( ptScaledUp, prefix + "ScaledUpPt" + suffix );
@@ -792,6 +854,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     iEvent.put( jetpileup_mva_passesLoose,  prefix + "PileupMVApassesLoose"  + suffix);
     iEvent.put( jetpileup_mva_passesMedium, prefix + "PileupMVApassesMedium" + suffix);
     iEvent.put( jetpileup_mva_passesTight,  prefix + "PileupMVApassesTight"  + suffix);
+    iEvent.put( vtxNtracks,  prefix + "VtxNtracks"  + suffix);
+    iEvent.put( vtxMass,  prefix + "VtxMass"  + suffix);
+    iEvent.put( vtxPx,  prefix + "VtxPx"  + suffix);
+    iEvent.put( vtxPy,  prefix + "VtxPy"  + suffix);
+    iEvent.put( vtx3DVal,  prefix + "Vtx3DVal"  + suffix);
+    iEvent.put( vtx3DSig,  prefix + "Vtx3DSig"  + suffix);
+    iEvent.put( leadTrackPt,  prefix + "LeadTrackPt"  + suffix);
+    iEvent.put( softLepPt,  prefix + "SoftLepPt"  + suffix);
+    iEvent.put( softLepRatio,  prefix + "SoftLepRatio"  + suffix);
+    iEvent.put( softLepDr,  prefix + "SoftLepDr"  + suffix);
   }
   iEvent.put(betaStar       , prefix + "BetaStar"        + suffix ) ;
   iEvent.put(betaStarClassic, prefix + "BetaStarClassic" + suffix ) ;

@@ -30,7 +30,18 @@ RootTupleMakerV2_GenParticles::RootTupleMakerV2_GenParticles(const edm::Paramete
   produces <std::vector<double> > ( prefix + "TauVisiblePt" + suffix );
   produces <std::vector<double> > ( prefix + "TauVisibleEta"+ suffix );
   produces <std::vector<double> > ( prefix + "TauVisiblePhi"+ suffix );
+  // some genstatusflags
+  // see: https://github.com/cms-sw/cmssw/blob/CMSSW_8_0_X/DataFormats/HepMCCandidate/interface/GenParticle.h
+  produces <std::vector<bool> >   ( prefix + "IsPromptFinalState"+ suffix );
+  produces <std::vector<bool> >   ( prefix + "IsPromptDecayed"+ suffix );
+  produces <std::vector<bool> >   ( prefix + "IsHardProcess"+ suffix );
+  produces <std::vector<bool> >   ( prefix + "FromHardProcessFinalState"+ suffix );
+  produces <std::vector<bool> >   ( prefix + "FromHardProcessDecayed"+ suffix );
+  produces <std::vector<bool> >   ( prefix + "IsLastCopy"+ suffix );
+  // Top Pt reweight
   produces <double>               ( prefix + "TopPtWeight"  + suffix );
+  // w/z system pt
+  produces <double>               ( prefix + "WorZSystemPt"  + suffix );
 }
 
 void RootTupleMakerV2_GenParticles::
@@ -56,8 +67,18 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  tauvisiblept  ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  tauvisibleeta ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  tauvisiblephi ( new std::vector<double>()  );
+  // some genstatusflags
+  std::auto_ptr<std::vector<bool> >    isPromptFinalState        ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >    isPromptDecayed           ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >    isHardProcess             ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >    fromHardProcessFinalState ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >    fromHardProcessDecayed    ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >    isLastCopy                ( new std::vector<bool>());
   std::auto_ptr<double >               topptweight ( new double() );
   *topptweight.get() = 1.0;
+  // w/z system Pt
+  std::auto_ptr<double >               worzsystempt ( new double() );
+  *worzsystempt.get() = -999;
   // not kept in ntuple
   std::auto_ptr<std::vector<int> >     indexInGenPColl( new std::vector<int>()  );
   
@@ -71,19 +92,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       int nTops = 0;
       float topPt1 = -1;
       float topPt2 = -1;
+      std::vector<LorentzVector> hardProcessLeptonLorentzVectors;
+      std::vector<float> wOrZGammaPts;
+      std::vector<bool> wOrZGammaIsHardProcess;
+      std::vector<bool> wOrZGammaIsLastCopy;
       for( reco::GenParticleCollection::const_iterator it = genParticles->begin(); it != genParticles->end(); ++it ) {
-        // exit from loop when you reach the required number of GenParticles
-        if(eta->size() >= maxSize)
-          break;
-
-        //skip LHC protons - pdgId=2212, extremely high eta, phi=0, energy ~= 6500
-        if(it->pdgId()==2212 && it->energy()>=6000) continue;
-        // actually let's skip any particle with huge eta
-        if(fabs(it->eta()) > 10) continue;
-        // skip pythia8 "partons in preparation of hadronization process"
-        // details here: http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
-        if(it->status() >= 71 && it->status()<=79) continue;
-
         // keep for topptreweight below
         // see: https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
         if(isTop(&(*it)) && it->status()==62) {
@@ -93,9 +106,32 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           else
             topPt2 = it->pt();
         }
+        // get the lorentzvectors for leptons
+        if(it->isHardProcess()) {
+          if(abs(it->pdgId())>=11 && abs(it->pdgId())<=18) // lepton
+            hardProcessLeptonLorentzVectors.push_back(it->p4());
+        }
+        if(abs(it->pdgId())>=22 && abs(it->pdgId())<=24) { // W/Z/gamma
+          wOrZGammaPts.push_back(it->pt());
+          wOrZGammaIsHardProcess.push_back(it->isHardProcess());
+          wOrZGammaIsLastCopy.push_back(it->isLastCopy());
+        }
 
-        if(fabs(it->pdgId())==42)
-          edm::LogInfo("RootTupleMakerV2_GenParticlesInfo") << "LQ found with status: " << it->status();
+        // don't store any more genparticles when we reach the limit
+        // but continue to look for W/Z/gamma and tops (above)
+        if(eta->size() >= maxSize)
+          continue;
+
+        //don't store LHC protons - pdgId=2212, extremely high eta, phi=0, energy ~= 6500
+        if(it->pdgId()==2212 && it->energy()>=6000) continue;
+        // actually let's not store any particle with huge eta
+        if(fabs(it->eta()) > 10) continue;
+        // don't store pythia8 "partons in preparation of hadronization process"
+        // details here: http://home.thep.lu.se/~torbjorn/pythia81html/ParticleProperties.html
+        if(it->status() >= 71 && it->status()<=79) continue;
+
+        //if(fabs(it->pdgId())==42)
+        //  edm::LogInfo("RootTupleMakerV2_GenParticlesInfo") << "LQ found with status: " << it->status();
 
         // fill in all the vectors
         eta->push_back( it->eta() );
@@ -114,6 +150,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         numDaught->push_back( it->numberOfDaughters() );
         status->push_back( it->status() );
         indexInGenPColl->push_back(std::distance(genParticles->begin(),it));
+        // some genstatus flags
+        isPromptFinalState        ->push_back(it->isPromptFinalState());
+        isPromptDecayed           ->push_back(it->isPromptDecayed());
+        isHardProcess             ->push_back(it->isHardProcess());
+        fromHardProcessFinalState ->push_back(it->fromHardProcessFinalState());
+        fromHardProcessDecayed    ->push_back(it->fromHardProcessDecayed());
+        isLastCopy                ->push_back(it->isLastCopy());
 
         // >>>>>>  if gen-particle is a tau, check decay mode and fill-in visible momentum parameters:
         int getGenTauDecayMode_ = 0; double tauVisPt  = -999.0; double tauVisEta = -999.0; double tauVisPhi = -999.0;
@@ -138,7 +181,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         tauvisiblept -> push_back( tauVisPt  );
         tauvisibleeta-> push_back( tauVisEta );
         tauvisiblephi-> push_back( tauVisPhi );
-        // <<<<<<
 
         int idx = -1;
         for( reco::GenParticleCollection::const_iterator mit = genParticles->begin(); mit != genParticles->end(); ++mit ) {
@@ -153,13 +195,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         std::vector<int>::iterator genPCollItr = std::find(indexInGenPColl->begin(),indexInGenPColl->end(),idx);
         if(genPCollItr != indexInGenPColl->end())
           indexInKeptGenPColl = std::distance(indexInGenPColl->begin(),genPCollItr);
-        //motherIndex->push_back( idx );
         motherIndex->push_back( indexInKeptGenPColl );
-      }
+      } // end of loop over genParticles
+
       // for topptreweight
       if(nTops==2)
         *topptweight.get() = sqrt(exp(0.156-0.00137*topPt1)*exp(0.156-0.00137*topPt2));
-    } else {
+
+      // for W/Z Pt
+      // we always have 2 hard process leptons in DY or W samples; in other samples we may not
+      if(hardProcessLeptonLorentzVectors.size()==2) {
+        *worzsystempt.get() = (hardProcessLeptonLorentzVectors[0].pt()+hardProcessLeptonLorentzVectors[1].pt());
+      }
+
+    } else { // invalid genParticles handle
       edm::LogError("RootTupleMakerV2_GenParticlesError") << "Error! Can't get the genPartInputToken_";
     }
   }
@@ -185,7 +234,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( tauvisiblept, prefix + "TauVisiblePt" + suffix );
   iEvent.put( tauvisibleeta,prefix + "TauVisibleEta"+ suffix );
   iEvent.put( tauvisiblephi,prefix + "TauVisiblePhi"+ suffix );
+  // gen status flags
+  iEvent.put(isPromptFinalState       ,prefix + "IsPromptFinalState"+ suffix );
+  iEvent.put(isPromptDecayed          ,prefix + "IsPromptDecayed"+ suffix );
+  iEvent.put(isHardProcess            ,prefix + "IsHardProcess"+ suffix );
+  iEvent.put(fromHardProcessFinalState,prefix + "FromHardProcessFinalState"+ suffix );
+  iEvent.put(fromHardProcessDecayed   ,prefix + "FromHardProcessDecayed"+ suffix );
+  iEvent.put(isLastCopy               ,prefix + "IsLastCopy"+ suffix );
   iEvent.put( topptweight  ,prefix + "TopPtWeight"  + suffix );
+  // W/Z system Pt
+  iEvent.put( worzsystempt ,prefix + "WorZSystemPt"  + suffix );
 }
 
 

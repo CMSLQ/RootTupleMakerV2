@@ -123,8 +123,9 @@ process.source.fileNames = [
 
     # sep23 rereco
     #'/store/data/Run2016B/SingleElectron/MINIAOD/23Sep2016-v3/00000/00099863-E799-E611-A876-141877343E6D.root'
+    'file:0077B9D8-1E9A-E611-963A-0CC47A57CCE8.root'
     # amcatnlo DYJ inclusive
-    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
+    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
     # amcatnlo WJets inclusive
     #'/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/00BC765D-BD3D-E611-9343-0025905C2CD2.root'
 ]
@@ -269,43 +270,41 @@ process.schedule.append(process.electronSupportPath)
 #process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 
 # Loading  JEC/JER from local DB file
-#dbJetMCDBFile = 'Summer15_25nsV6_MC.db'
-#dbJetDataDBFile = 'Summer15_25nsV6_DATA.db'
+# I don't like using the relative path that much
+dbJetMCDBFile = '../data/Spring16_23Sep2016V2_MC.db'
+dbJetDataDBFile = '../data/Spring16_23Sep2016AllV2_DATA.db'
 
 # Use JER from GR
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True
 process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = True
 
-## load JES/etc.from local db file, and into global tag
-#jetDBFile = 'sqlite:'+dbJetMCDBFile if varOptions.isMC else 'sqlite:'+dbJetDataDBFile
-#process.load("CondCore.DBCommon.CondDBCommon_cfi")
-#from CondCore.DBCommon.CondDBSetup_cfi import *
-## JEC
-#jecPSetDataAK4chs = cms.PSet(
-#    record = cms.string('JetCorrectionsRecord'),
-#    tag    = cms.string('JetCorrectorParametersCollection_Summer15_25nsV6_DATA_AK4PFchs'),
-#    label  = cms.untracked.string('AK4PFchs')
-#)
-#jecPSetMCAK4chs = cms.PSet(
-#    record = cms.string('JetCorrectionsRecord'),
-#    tag    = cms.string('JetCorrectorParametersCollection_Summer15_25nsV6_MC_AK4PFchs'),
-#    label  = cms.untracked.string('AK4PFchs')
-#)
-#process.jec = cms.ESSource("PoolDBESSource",
-#      DBParameters = cms.PSet(
-#        messageLevel = cms.untracked.int32(0)
-#        ),
-#      timetype = cms.string('runnumber'),
-#      toGet = cms.VPSet(
-#        jecPSetMCAK4chs if varOptions.isMC else jecPSetDataAK4chs
-#      ), 
-#       connect = cms.string(jetDBFile)
-#     # connect = cms.string('sqlite:Summer12_V7_DATA.db')
-#     # uncomment above tag lines and this comment to use MC JEC
-#     # connect = cms.string('sqlite:Summer12_V7_MC.db')
-#)
-### add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
-#process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+# load JES/etc.from local db file, and into global tag
+jetDBFile = 'sqlite:'+dbJetMCDBFile if varOptions.isMC else 'sqlite:'+dbJetDataDBFile
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+from CondCore.DBCommon.CondDBSetup_cfi import *
+# JEC
+jecPSetDataAK4chs = cms.PSet(
+    record = cms.string('JetCorrectionsRecord'),
+    tag    = cms.string('JetCorrectorParametersCollection_Spring16_23Sep2016AllV2_DATA_AK4PFchs'),
+    label  = cms.untracked.string('AK4PFchs')
+)
+jecPSetMCAK4chs = cms.PSet(
+    record = cms.string('JetCorrectionsRecord'),
+    tag    = cms.string('JetCorrectorParametersCollection_Spring16_23Sep2016V2_MC_AK4PFchs'),
+    label  = cms.untracked.string('AK4PFchs')
+)
+process.jec = cms.ESSource("PoolDBESSource",
+      DBParameters = cms.PSet(
+        messageLevel = cms.untracked.int32(0)
+        ),
+      timetype = cms.string('runnumber'),
+      toGet = cms.VPSet(
+        jecPSetMCAK4chs if varOptions.isMC else jecPSetDataAK4chs
+      ), 
+       connect = cms.string(jetDBFile)
+)
+## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
+process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 ## JER from local db
 #process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 #from CondCore.DBCommon.CondDBSetup_cfi import *
@@ -315,14 +314,14 @@ process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = True
 #            # Resolution
 #            cms.PSet(
 #                record = cms.string('JetResolutionRcd'),
-#                tag    = cms.string('JER_MC_PtResolution_Summer15_25nsV6_AK4PFchs'),
+#                tag    = cms.string('JER_MC_PtResolution_Spring16_25nsV6_AK4PFchs'),
 #                label  = cms.untracked.string('AK4PFchs')
 #                ),
 #
 #            # Scale factors
 #            cms.PSet(
 #                record = cms.string('JetResolutionScaleFactorRcd'),
-#                tag    = cms.string('JER_DATAMCSF_Summer15_25nsV6_AK4PFchs'),
+#                tag    = cms.string('JER_DATAMCSF_Spring16_25nsV6_AK4PFchs'),
 #                label  = cms.untracked.string('AK4PFchs')
 #                ),
 #        ),

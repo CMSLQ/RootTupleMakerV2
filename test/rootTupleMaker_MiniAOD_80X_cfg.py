@@ -270,16 +270,17 @@ process.schedule.append(process.electronSupportPath)
 #process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 
 # Loading  JEC/JER from local DB file
-# I don't like using the relative path that much
-dbJetMCDBFile = '../data/Spring16_23Sep2016V2_MC.db'
-dbJetDataDBFile = '../data/Spring16_23Sep2016AllV2_DATA.db'
+cmsswbase=os.environ['CMSSW_BASE']
+dbJetMCDBFile = '{0}/src/Leptoquarks/RootTupleMakerV2/data/Spring16_23Sep2016V2_MC.db'.format(cmsswbase)
+dbJetDataDBFile = '{0}/src/Leptoquarks/RootTupleMakerV2/data/Spring16_23Sep2016AllV2_DATA.db'.format(cmsswbase)
 
 # Use JER from GR
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True
 process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = True
 
 # load JES/etc.from local db file, and into global tag
-jetDBFile = 'sqlite:'+dbJetMCDBFile if varOptions.isMC else 'sqlite:'+dbJetDataDBFile
+jecDBPrefix='sqlite_file:'
+jetDBFile = jecDBPrefix+dbJetMCDBFile if varOptions.isMC else jecDBPrefix+dbJetDataDBFile
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 from CondCore.DBCommon.CondDBSetup_cfi import *
 # JEC

@@ -270,9 +270,8 @@ process.schedule.append(process.electronSupportPath)
 #process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 
 # Loading  JEC/JER from local DB file
-cmsswbase=os.environ['CMSSW_BASE']
-dbJetMCDBFile = '{0}/src/Leptoquarks/RootTupleMakerV2/data/Spring16_23Sep2016V2_MC.db'.format(cmsswbase)
-dbJetDataDBFile = '{0}/src/Leptoquarks/RootTupleMakerV2/data/Spring16_23Sep2016AllV2_DATA.db'.format(cmsswbase)
+dbJetMCDBFile = 'Spring16_23Sep2016V2_MC.db'
+dbJetDataDBFile = 'Spring16_23Sep2016AllV2_DATA.db'
 
 # Use JER from GR
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True

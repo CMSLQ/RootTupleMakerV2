@@ -89,7 +89,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 # MC
 if varOptions.isMC:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_miniAODv2_v1'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
 else:
   #process.GlobalTag.globaltag = '80X_dataRun2_Prompt_ICHEP16JEC_v0'#for 2016 H Prompt
   process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v4'# for 23Sep ReReco (2016B-G)
@@ -123,11 +123,20 @@ process.source.fileNames = [
 
     # sep23 rereco
     #'/store/data/Run2016B/SingleElectron/MINIAOD/23Sep2016-v3/00000/00099863-E799-E611-A876-141877343E6D.root'
-    'file:0077B9D8-1E9A-E611-963A-0CC47A57CCE8.root'
     # amcatnlo DYJ inclusive
     #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
     # amcatnlo WJets inclusive
     #'/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/00BC765D-BD3D-E611-9343-0025905C2CD2.root'
+    # signal
+    #'/store/mc/RunIISummer16MiniAODv2/LQToUE_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/70000/A2EFEEC6-16C8-E611-92C1-008CFA111354.root'
+    # amcatnlo DYJ inclusive
+    #'/store/mc/RunIISummer16MiniAODv2/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/002E68DE-22D0-E611-930C-0025905AA9F0.root'
+    # MG HT
+    #'/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/0073209B-97C9-E611-A6D0-008CFA5D2758.root'
+    # powhegv2-madspin-pythia8
+    #'/store/mc/RunIISummer16MiniAODv2/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/00688753-BCBD-E611-8B2F-001E67E71DDA.root'
+    # powheg-pythia8
+    '/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -142,9 +151,11 @@ from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTri
 process.load('PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi')
 ###### need to load it into the process, or else it won't run
 process.unpackedPatTrigger = unpackedPatTrigger.clone()
+## For reHLT samples
 #process.unpackedPatTrigger.triggerResults = 'TriggerResults::HLT2'
 #process.rootTupleTriggerObjects.TriggerBitsTag = 'TriggerResults::HLT2'
 #process.rootTupleTrigger.HLTInputTag = 'TriggerResults::HLT2'
+#
 process.rootTupleEventSelection.L1InputTag  = 'gtStage2Digis'
 ####
 #####fixme removing because no trigger info?
@@ -169,7 +180,6 @@ process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
 process.schedule = cms.Schedule()
 # Need the egamma smearing for 80X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMSmearer
 process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
-correctionType = "Full2016_v1"
 process.calibratedPatElectrons.isMC = varOptions.isMC
 process.selectedElectrons = cms.EDFilter(
   "PATElectronSelector",
@@ -270,8 +280,8 @@ process.schedule.append(process.electronSupportPath)
 #process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 
 # Loading  JEC/JER from local DB file
-dbJetMCDBFile = 'Spring16_23Sep2016V2_MC.db'
-dbJetDataDBFile = 'Spring16_23Sep2016AllV2_DATA.db'
+dbJetMCDBFile = 'Summer16_23Sep2016V3_MC.db'
+dbJetDataDBFile = 'Summer16_23Sep2016AllV3_DATA.db'
 
 # Use JER from GR
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True
@@ -285,12 +295,12 @@ from CondCore.DBCommon.CondDBSetup_cfi import *
 # JEC
 jecPSetDataAK4chs = cms.PSet(
     record = cms.string('JetCorrectionsRecord'),
-    tag    = cms.string('JetCorrectorParametersCollection_Spring16_23Sep2016AllV2_DATA_AK4PFchs'),
+    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016AllV3_DATA_AK4PFchs'),
     label  = cms.untracked.string('AK4PFchs')
 )
 jecPSetMCAK4chs = cms.PSet(
     record = cms.string('JetCorrectionsRecord'),
-    tag    = cms.string('JetCorrectorParametersCollection_Spring16_23Sep2016V2_MC_AK4PFchs'),
+    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016V3_MC_AK4PFchs'),
     label  = cms.untracked.string('AK4PFchs')
 )
 process.jec = cms.ESSource("PoolDBESSource",
@@ -538,13 +548,13 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
 	# Fix POWHEG if buggy (this PDF set will also appear on output,
 	# so only two more PDF sets can be added in PdfSetNames if not "")
 	#FixPOWHEG = cms.untracked.string("CT10.LHgrid"),
-        #GenTag = cms.untracked.InputTag("genParticles"),
+  GenTag = cms.untracked.InputTag("prunedGenParticles"),
 	PdfInfoTag = cms.untracked.InputTag("generator"),
 	PdfSetNames = cms.untracked.vstring(
             "PDF4LHC15_nlo_100.LHgrid" ,
             "CT10nlo.LHgrid" , 
             "MMHT2014nlo68cl.LHgrid",
-            #"NNPDF30_nlo_as_0118.LHgrid"
+            "NNPDF30_nlo_as_0118.LHgrid"
 	)
 )
 

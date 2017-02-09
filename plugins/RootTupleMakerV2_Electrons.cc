@@ -87,6 +87,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 								        
   produces <std::vector<double> > ( prefix + "ESuperClusterOverP"       + suffix );
   produces <std::vector<double> > ( prefix + "SCEta"                    + suffix );
+  produces <std::vector<double> > ( prefix + "SCSeedEta"                + suffix );
   produces <std::vector<double> > ( prefix + "SCPhi"                    + suffix );
   produces <std::vector<double> > ( prefix + "SCPt"                     + suffix );
   produces <std::vector<double> > ( prefix + "SCRawEnergy"              + suffix );
@@ -275,6 +276,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::auto_ptr<std::vector<double> >  eSuperClusterOverP        ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scEta                     ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<double> >  scSeedEta                 ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPhi                     ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scPt                      ( new std::vector<double>()  );
   std::auto_ptr<std::vector<double> >  scRawEnergy               ( new std::vector<double>()  );
@@ -780,6 +782,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // Supercluster kinematic variables
 
       scEta                    -> push_back( it->superCluster()->eta() );
+      scSeedEta                -> push_back( it->superCluster()->seed()->eta() );
       scPhi                    -> push_back( it->superCluster()->phi() );
       scPt                     -> push_back( it->superCluster()->energy()/cosh(it->superCluster()->eta()) );
       scRawEnergy              -> push_back( it->superCluster()->rawEnergy() );
@@ -992,6 +995,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   iEvent.put( eSuperClusterOverP      , prefix + "ESuperClusterOverP"       + suffix );
   iEvent.put( scEta                   , prefix + "SCEta"                    + suffix );
+  iEvent.put( scSeedEta               , prefix + "SCSeedEta"                + suffix );
   iEvent.put( scPhi                   , prefix + "SCPhi"                    + suffix );
   iEvent.put( scPt                    , prefix + "SCPt"                     + suffix );
   iEvent.put( scRawEnergy             , prefix + "SCRawEnergy"              + suffix );

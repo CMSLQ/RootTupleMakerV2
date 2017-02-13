@@ -143,7 +143,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  doExternalWeights=false;
 	}
       }
-
       if (doExternalWeights==true){
       edm::Handle<std::vector<double> > pdfCTEQWeightsHandle;
       edm::Handle<std::vector<double> > pdfMMTHWeightsHandle;
@@ -263,10 +262,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       	//WARNING: This assumes the first 9 weights are renormalization/factorization-related  This seems to be true for all Madgraph samples
 	//LHAPDF PDF set naming convention can be found here: https://lhapdf.hepforge.org/pdfsets.html
       	for (unsigned int i=0; i <= 8; i++) {
+	  //std::cout<<i<<"  "<<theWeight<<"  "<<EvtHandle->weights()[i].wgt<<"  "<<EvtHandle->originalXWGTUP()<<std::endl;
       		thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
 		scaleWeights->push_back(thisWeight);
       	}
-	//This is for MG PDF weights.  PYTHIA doesn't have externalLHEProducer, need to get them in a different way
+	//This is for PDF weights which are stored internally by the generator. Pythia and Powheg do not have them. MG has all of them, amc@NLO has only variations of the PDF set used to produce it.
       	
 	for (unsigned int i=9; i <= 109; i++) {
 	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
@@ -287,8 +287,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  pdfPDF4LHCWeights->push_back(thisWeight);
 	}
 	*/
-      	for (unsigned int i=9; i <= 109; i++) {//fixme todo: adding this for amc@nlo
+      	for (unsigned int i=9; i <= 109; i++) {//fixme todo: adding this for amc@nlo - needs to be updated manually if production PDF changes
 	  thisWeight = (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); //fixme todo: removed theWeight, was multiplying by a factor +-200000 in amc@NLO
+	  //std::cout<<i<<"  "<<theWeight<<"  "<<EvtHandle->weights()[i].wgt<<"  "<<EvtHandle->originalXWGTUP()<<std::endl;
+	  //EvtHandle->weights()[0].wgt < 0 ? 
 	  pdfAmcNLOWeights->push_back(thisWeight);
 	}
 	

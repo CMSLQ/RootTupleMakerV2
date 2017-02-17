@@ -247,6 +247,14 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<double> > ( prefix + "MatchedGenParticlePt"   + suffix );
   produces <std::vector<double> > ( prefix + "MatchedGenParticleEta"  + suffix );
   produces <std::vector<double> > ( prefix + "MatchedGenParticlePhi"  + suffix );
+
+  // for 03Feb2017 re-miniaod
+  produces <bool> ( prefix + "EGammaGSFixedDupECALClusters" + suffix );
+  produces <std::vector<uint32_t> > ( prefix + "EcalMultiAndGSGlobalRecHitEBHitsNotReplaced" + suffix );
+  edm::InputTag dupClustersTag("particleFlowEGammaGSFixed:dupECALClusters");
+  dupEcalClustersToken_ = consumes<bool>(dupClustersTag);
+  edm::InputTag ecalMultiTag("ecalMultiAndGSGlobalRecHitEB:hitsNotReplaced");
+  ecalMultiAndGSGlobalRecHitEBHitsNotReplacedToken_ = consumes<edm::EDCollection<DetId> >(ecalMultiTag);
 }
 
 //------------------------------------------------------------------------
@@ -434,6 +442,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<double> >  matchedGenParticleEta ( new std::vector<double>()   );
   std::auto_ptr<std::vector<double> >  matchedGenParticlePhi ( new std::vector<double>()   );
   
+  // for 03Feb2017 re-miniaod
+  std::auto_ptr<bool> eGammaGSFixedDupECALClusters ( new bool() );
+  std::auto_ptr<std::vector<uint32_t> > ecalMultiAndGSGlobalRecHitEBHitsNotReplaced ( new std::vector<uint32_t>() );
+
   //------------------------------------------------------------------------
   // Get handles for the event
   //------------------------------------------------------------------------
@@ -504,6 +516,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.getByToken(eleTightIdCutFlowResultMapToken_,tight_id_cutflow_data);
   iEvent.getByToken(eleHEEPIdCutFlowResultMapToken_,heep_id_cutflow_data);
   iEvent.getByToken(heep70trkIsolMapToken_,heep70trkIsolMapHandle);
+
+  // for 03Feb2017 re-miniaod
+  edm::Handle<bool> dupECALClustersHandle;
+  iEvent.getByToken(dupEcalClustersToken_, dupECALClustersHandle);
+  if(dupECALClustersHandle.isValid())
+    *eGammaGSFixedDupECALClusters.get() = *(dupECALClustersHandle.product());
+  //
+  edm::Handle<edm::EDCollection<DetId> > ecalMultiAndGSGlobalRecHitEBHitsNotReplacedHandle;
+  iEvent.getByToken(ecalMultiAndGSGlobalRecHitEBHitsNotReplacedToken_, ecalMultiAndGSGlobalRecHitEBHitsNotReplacedHandle);
+  if(ecalMultiAndGSGlobalRecHitEBHitsNotReplacedHandle.isValid()) {
+    for( auto it = ecalMultiAndGSGlobalRecHitEBHitsNotReplacedHandle->begin();
+        it != ecalMultiAndGSGlobalRecHitEBHitsNotReplacedHandle->end(); ++it)
+      ecalMultiAndGSGlobalRecHitEBHitsNotReplaced->push_back(*it);
+  }
+
 
   bool ebRecHitsValid = false;
   edm::Handle<EcalRecHitCollection> ebRecHitsHandle;
@@ -1152,5 +1179,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( matchedGenParticlePt ,   prefix + "MatchedGenParticlePt"      + suffix );
   iEvent.put( matchedGenParticleEta,   prefix + "MatchedGenParticleEta"     + suffix );
   iEvent.put( matchedGenParticlePhi,   prefix + "MatchedGenParticlePhi"     + suffix );
+
+  // for 03Feb2017 re-miniaod
+  iEvent.put ( eGammaGSFixedDupECALClusters, prefix + "EGammaGSFixedDupECALClusters"     + suffix );
+  iEvent.put ( ecalMultiAndGSGlobalRecHitEBHitsNotReplaced, prefix + "EcalMultiAndGSGlobalRecHitEBHitsNotReplaced"     + suffix );
 
 }

@@ -5,6 +5,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/Common/interface/EDCollection.h"
 #include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
@@ -33,6 +34,9 @@ class RootTupleMakerV2_Electrons : public edm::EDProducer {
   edm::EDGetTokenT<reco::BeamSpot> beamSpotInputToken_;
   edm::EDGetTokenT<EcalRecHitCollection> ebReducedRecHitsInputToken_;
   edm::EDGetTokenT<EcalRecHitCollection> eeReducedRecHitsInputToken_;
+  // for 03Feb2017 re-miniaod
+  edm::EDGetTokenT<bool> dupEcalClustersToken_;
+  edm::EDGetTokenT<edm::EDCollection<DetId> > ecalMultiAndGSGlobalRecHitEBHitsNotReplacedToken_;
   const double          electronIso, muonPt, muonIso;
   const std::string     muonID;
   const edm::InputTag   singleEleTriggerMatchTag, singleEleTriggerMatchWP80Tag, doubleEleTriggerMatchTag;

@@ -9,25 +9,25 @@ RootTupleMakerV2_GenJets::RootTupleMakerV2_GenJets(const edm::ParameterSet& iCon
     suffix  (iConfig.getParameter<std::string>  ("Suffix")),
     maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
 {
-  produces <std::vector<double> > ( prefix + "Eta" + suffix );
-  produces <std::vector<double> > ( prefix + "Phi" + suffix );
-  produces <std::vector<double> > ( prefix + "P" + suffix );
-  produces <std::vector<double> > ( prefix + "Pt" + suffix );
-  produces <std::vector<double> > ( prefix + "Energy" + suffix );
-  produces <std::vector<double> > ( prefix + "EMF" + suffix );
-  produces <std::vector<double> > ( prefix + "HADF" + suffix );
+  produces <std::vector<float> > ( prefix + "Eta" + suffix );
+  produces <std::vector<float> > ( prefix + "Phi" + suffix );
+  produces <std::vector<float> > ( prefix + "P" + suffix );
+  produces <std::vector<float> > ( prefix + "Pt" + suffix );
+  produces <std::vector<float> > ( prefix + "Energy" + suffix );
+  produces <std::vector<float> > ( prefix + "EMF" + suffix );
+  produces <std::vector<float> > ( prefix + "HADF" + suffix );
 }
 
 void RootTupleMakerV2_GenJets::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  p  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  emf  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hadf  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  p  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  emf  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  hadf  ( new std::vector<float>()  );
 
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {

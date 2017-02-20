@@ -12,37 +12,37 @@ RootTupleMakerV2_MET::RootTupleMakerV2_MET(const edm::ParameterSet& iConfig) :
     uncertainty (iConfig.getParameter<std::string>  ("Uncertainty")),
     corLevel       (iConfig.getParameter<std::string>  ("CorrectionLevel"))
 {
-  produces <std::vector<double> > ( prefix + "MET" + suffix );
-  produces <std::vector<double> > ( prefix + "METPhi" + suffix );
-  produces <std::vector<double> > ( prefix + "SumET" + suffix );
+  produces <std::vector<float> > ( prefix + "MET" + suffix );
+  produces <std::vector<float> > ( prefix + "METPhi" + suffix );
+  produces <std::vector<float> > ( prefix + "SumET" + suffix );
   if ( store_uncorrected_MET ) {
-    produces <std::vector<double> > ( prefix + "METUncorr" + suffix );
-    produces <std::vector<double> > ( prefix + "METPhiUncorr" + suffix );
-    produces <std::vector<double> > ( prefix + "SumETUncorr" + suffix );
+    produces <std::vector<float> > ( prefix + "METUncorr" + suffix );
+    produces <std::vector<float> > ( prefix + "METPhiUncorr" + suffix );
+    produces <std::vector<float> > ( prefix + "SumETUncorr" + suffix );
   }
   if ( store_MET_significance ) {
-    produces <std::vector<double> > ( prefix + "METSig" + suffix );
-    produces <std::vector<double> > ( prefix + "METSigMatrixDXX" + suffix );
-    produces <std::vector<double> > ( prefix + "METSigMatrixDXY" + suffix );
-    produces <std::vector<double> > ( prefix + "METSigMatrixDYX" + suffix );
-    produces <std::vector<double> > ( prefix + "METSigMatrixDYY" + suffix );
+    produces <std::vector<float> > ( prefix + "METSig" + suffix );
+    produces <std::vector<float> > ( prefix + "METSigMatrixDXX" + suffix );
+    produces <std::vector<float> > ( prefix + "METSigMatrixDXY" + suffix );
+    produces <std::vector<float> > ( prefix + "METSigMatrixDYX" + suffix );
+    produces <std::vector<float> > ( prefix + "METSigMatrixDYY" + suffix );
   }
 }
 
 void RootTupleMakerV2_MET::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  met  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  metphi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  sumet  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  metuncorr  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  metphiuncorr  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  sumetuncorr  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  metsig  ( new std::vector<double>()  );  
-  std::auto_ptr<std::vector<double> >  metsigmatrixdxx  ( new std::vector<double>()  );  
-  std::auto_ptr<std::vector<double> >  metsigmatrixdxy  ( new std::vector<double>()  );  
-  std::auto_ptr<std::vector<double> >  metsigmatrixdyx  ( new std::vector<double>()  );  
-  std::auto_ptr<std::vector<double> >  metsigmatrixdyy  ( new std::vector<double>()  );  
+  std::auto_ptr<std::vector<float> >  met  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  metphi  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  sumet  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  metuncorr  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  metphiuncorr  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  sumetuncorr  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  metsig  ( new std::vector<float>()  );  
+  std::auto_ptr<std::vector<float> >  metsigmatrixdxx  ( new std::vector<float>()  );  
+  std::auto_ptr<std::vector<float> >  metsigmatrixdxy  ( new std::vector<float>()  );  
+  std::auto_ptr<std::vector<float> >  metsigmatrixdyx  ( new std::vector<float>()  );  
+  std::auto_ptr<std::vector<float> >  metsigmatrixdyy  ( new std::vector<float>()  );  
 
   //-----------------------------------------------------------------
   edm::Handle<pat::METCollection> mets;
@@ -113,9 +113,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
       if ( store_MET_significance ) {
         //-- See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMETSignificance#Known_Issues
-	double sigmaX2= it->getSignificanceMatrix()(0,0);
-	double sigmaY2= it->getSignificanceMatrix()(1,1);
-	double significance = -1;
+	float sigmaX2= it->getSignificanceMatrix()(0,0);
+	float sigmaY2= it->getSignificanceMatrix()(1,1);
+	float significance = -1;
 	if(sigmaX2<1.e10 && sigmaY2<1.e10) 
 	  significance = it->metSignificance();
 	//--

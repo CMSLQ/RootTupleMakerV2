@@ -26,34 +26,34 @@ RootTupleMakerV2_CaloJets::RootTupleMakerV2_CaloJets(const edm::ParameterSet& iC
   //     applyResJEC (iConfig.getParameter<bool>     ("ApplyResidualJEC")),
   //     resJEC (iConfig.getParameter<std::string>   ("ResidualJEC"))
 {
-  produces <std::vector<double> > ( prefix + "Eta" + suffix );
-  produces <std::vector<double> > ( prefix + "Phi" + suffix );
-  produces <std::vector<double> > ( prefix + "Pt" + suffix );
-  produces <std::vector<double> > ( prefix + "PtRaw" + suffix );
-  produces <std::vector<double> > ( prefix + "Energy" + suffix );
-  produces <std::vector<double> > ( prefix + "EnergyRaw" + suffix );
-  produces <std::vector<double> > ( prefix + "JECUnc" + suffix );
-  produces <std::vector<double> > ( prefix + "L2L3ResJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "L3AbsJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "L2RelJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "L1FastJetJEC" + suffix );
-  // produces <std::vector<double> > ( prefix + "L1OffsetJEC" + suffix );
+  produces <std::vector<float> > ( prefix + "Eta" + suffix );
+  produces <std::vector<float> > ( prefix + "Phi" + suffix );
+  produces <std::vector<float> > ( prefix + "Pt" + suffix );
+  produces <std::vector<float> > ( prefix + "PtRaw" + suffix );
+  produces <std::vector<float> > ( prefix + "Energy" + suffix );
+  produces <std::vector<float> > ( prefix + "EnergyRaw" + suffix );
+  produces <std::vector<float> > ( prefix + "JECUnc" + suffix );
+  produces <std::vector<float> > ( prefix + "L2L3ResJEC" + suffix );
+  produces <std::vector<float> > ( prefix + "L3AbsJEC" + suffix );
+  produces <std::vector<float> > ( prefix + "L2RelJEC" + suffix );
+  produces <std::vector<float> > ( prefix + "L1FastJetJEC" + suffix );
+  // produces <std::vector<float> > ( prefix + "L1OffsetJEC" + suffix );
   produces <std::vector<int> >    ( prefix + "Overlaps" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
-  produces <std::vector<double> > ( prefix + "EMF" + suffix );
-  produces <std::vector<double> > ( prefix + "resEMF" + suffix );
-  produces <std::vector<double> > ( prefix + "HADF" + suffix );
+  produces <std::vector<float> > ( prefix + "EMF" + suffix );
+  produces <std::vector<float> > ( prefix + "resEMF" + suffix );
+  produces <std::vector<float> > ( prefix + "HADF" + suffix );
   produces <std::vector<int> >    ( prefix + "n90Hits" + suffix );
-  produces <std::vector<double> > ( prefix + "fHPD" + suffix );
-  produces <std::vector<double> > ( prefix + "fRBX" + suffix );
-  produces <std::vector<double> > ( prefix + "SigmaEta" + suffix );
-  produces <std::vector<double> > ( prefix + "SigmaPhi" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackCountingHighEffBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackCountingHighPurBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "JetProbabilityBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "JetBProbabilityBTag" + suffix );
+  produces <std::vector<float> > ( prefix + "fHPD" + suffix );
+  produces <std::vector<float> > ( prefix + "fRBX" + suffix );
+  produces <std::vector<float> > ( prefix + "SigmaEta" + suffix );
+  produces <std::vector<float> > ( prefix + "SigmaPhi" + suffix );
+  produces <std::vector<float> > ( prefix + "TrackCountingHighEffBTag" + suffix );
+  produces <std::vector<float> > ( prefix + "TrackCountingHighPurBTag" + suffix );
+  produces <std::vector<float> > ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  produces <std::vector<float> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  produces <std::vector<float> > ( prefix + "JetProbabilityBTag" + suffix );
+  produces <std::vector<float> > ( prefix + "JetBProbabilityBTag" + suffix );
   produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);
   produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);
 }
@@ -66,34 +66,34 @@ pat::strbitset ret = jetIDLoose.getBitTemplate();
 void RootTupleMakerV2_CaloJets::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt_raw  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy_raw ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  jecUnc_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l2l3resJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l3absJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l2relJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l1fastjetJEC_vec ( new std::vector<double>()  );
-  // std::auto_ptr<std::vector<double> >  l1offsetJEC_vec ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pt_raw  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  energy_raw ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  jecUnc_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  l2l3resJEC_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  l3absJEC_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  l2relJEC_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  l1fastjetJEC_vec ( new std::vector<float>()  );
+  // std::auto_ptr<std::vector<float> >  l1offsetJEC_vec ( new std::vector<float>()  );
   std::auto_ptr<std::vector<int> >     overlaps ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  emf  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  resEmf  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hadf  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >  emf  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  resEmf  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  hadf  ( new std::vector<float>()  );
   std::auto_ptr<std::vector<int> >     n90Hits  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  fHPD  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  fRBX  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  sigmaEta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  sigmaPhi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackCountingHighEffBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackCountingHighPurBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighEffBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  jetProbabilityBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >  fHPD  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  fRBX  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  sigmaEta  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  sigmaPhi  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackCountingHighEffBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackCountingHighPurBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  simpleSecondaryVertexHighEffBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  jetProbabilityBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  jetBProbabilityBTag  ( new std::vector<float>()  );
   std::auto_ptr<std::vector<int> >  passLooseID  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );
 
@@ -202,7 +202,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
       
       //OLD
-      //       double corr = 1.;
+      //       float corr = 1.;
       //       if( applyResJEC && iEvent.isRealData() ) {
       //         JEC->setJetEta( it->eta() );
       //         JEC->setJetPt( it->pt() ); // here you put the L2L3 Corrected jet pt

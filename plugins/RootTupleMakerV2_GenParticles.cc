@@ -10,26 +10,26 @@ RootTupleMakerV2_GenParticles::RootTupleMakerV2_GenParticles(const edm::Paramete
   suffix  (iConfig.getParameter<std::string>  ("Suffix")),
   maxSize (iConfig.getParameter<unsigned int> ("MaxSize"))
 {
-  produces <std::vector<double> > ( prefix + "Eta"          + suffix );
-  produces <std::vector<double> > ( prefix + "Phi"          + suffix );
-  produces <std::vector<double> > ( prefix + "P"            + suffix );
-  produces <std::vector<double> > ( prefix + "Px"           + suffix );
-  produces <std::vector<double> > ( prefix + "Py"           + suffix );
-  produces <std::vector<double> > ( prefix + "Pz"           + suffix );
-  produces <std::vector<double> > ( prefix + "Pt"           + suffix );
-  produces <std::vector<double> > ( prefix + "Energy"       + suffix );
-  produces <std::vector<double> > ( prefix + "Mass"         + suffix );
+  produces <std::vector<float> >  ( prefix + "Eta"          + suffix );
+  produces <std::vector<float> >  ( prefix + "Phi"          + suffix );
+  produces <std::vector<float> >  ( prefix + "P"            + suffix );
+  produces <std::vector<float> >  ( prefix + "Px"           + suffix );
+  produces <std::vector<float> >  ( prefix + "Py"           + suffix );
+  produces <std::vector<float> >  ( prefix + "Pz"           + suffix );
+  produces <std::vector<float> >  ( prefix + "Pt"           + suffix );
+  produces <std::vector<float> >  ( prefix + "Energy"       + suffix );
+  produces <std::vector<float> >  ( prefix + "Mass"         + suffix );
   produces <std::vector<int> >    ( prefix + "PdgId"        + suffix );
-  produces <std::vector<double> > ( prefix + "VX"           + suffix );
-  produces <std::vector<double> > ( prefix + "VY"           + suffix );
-  produces <std::vector<double> > ( prefix + "VZ"           + suffix );
+  produces <std::vector<float> >  ( prefix + "VX"           + suffix );
+  produces <std::vector<float> >  ( prefix + "VY"           + suffix );
+  produces <std::vector<float> >  ( prefix + "VZ"           + suffix );
   produces <std::vector<int> >    ( prefix + "NumDaught"    + suffix );
   produces <std::vector<int> >    ( prefix + "Status"       + suffix );
   produces <std::vector<int> >    ( prefix + "MotherIndex"  + suffix );
   produces <std::vector<int> >    ( prefix + "TauDecayMode" + suffix );
-  produces <std::vector<double> > ( prefix + "TauVisiblePt" + suffix );
-  produces <std::vector<double> > ( prefix + "TauVisibleEta"+ suffix );
-  produces <std::vector<double> > ( prefix + "TauVisiblePhi"+ suffix );
+  produces <std::vector<float> >  ( prefix + "TauVisiblePt" + suffix );
+  produces <std::vector<float> >  ( prefix + "TauVisibleEta"+ suffix );
+  produces <std::vector<float> >  ( prefix + "TauVisiblePhi"+ suffix );
   // some genstatusflags
   // see: https://github.com/cms-sw/cmssw/blob/CMSSW_8_0_X/DataFormats/HepMCCandidate/interface/GenParticle.h
   produces <std::vector<bool> >   ( prefix + "IsPromptFinalState"+ suffix );
@@ -39,45 +39,45 @@ RootTupleMakerV2_GenParticles::RootTupleMakerV2_GenParticles(const edm::Paramete
   produces <std::vector<bool> >   ( prefix + "FromHardProcessDecayed"+ suffix );
   produces <std::vector<bool> >   ( prefix + "IsLastCopy"+ suffix );
   // Top Pt reweight
-  produces <double>               ( prefix + "TopPtWeight"  + suffix );
+  produces <float>                ( prefix + "TopPtWeight"  + suffix );
   // w/z system pt
-  produces <double>               ( prefix + "WorZSystemPt"  + suffix );
+  produces <float>                ( prefix + "WorZSystemPt"  + suffix );
 }
 
 void RootTupleMakerV2_GenParticles::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  p    ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  px   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  py   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pz   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  mass  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     pdgId   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  vx  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  vy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  vz  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     numDaught  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     status     ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     motherIndex   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     taudecaymode  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  tauvisiblept  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  tauvisibleeta ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  tauvisiblephi ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  p    ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  px   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  py   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pz   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pt   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  mass  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<int> >    pdgId   ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<float> >  vx  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  vy  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  vz  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<int> >    numDaught  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >    status     ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >    motherIndex   ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >    taudecaymode  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<float> >  tauvisiblept  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  tauvisibleeta ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  tauvisiblephi ( new std::vector<float>()  );
   // some genstatusflags
-  std::auto_ptr<std::vector<bool> >    isPromptFinalState        ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >    isPromptDecayed           ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >    isHardProcess             ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >    fromHardProcessFinalState ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >    fromHardProcessDecayed    ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >    isLastCopy                ( new std::vector<bool>());
-  std::auto_ptr<double >               topptweight ( new double() );
+  std::auto_ptr<std::vector<bool> >   isPromptFinalState        ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >   isPromptDecayed           ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >   isHardProcess             ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >   fromHardProcessFinalState ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >   fromHardProcessDecayed    ( new std::vector<bool>());
+  std::auto_ptr<std::vector<bool> >   isLastCopy                ( new std::vector<bool>());
+  std::auto_ptr<float >               topptweight ( new float() );
   *topptweight.get() = 1.0;
   // w/z system Pt
-  std::auto_ptr<double >               worzsystempt ( new double() );
+  std::auto_ptr<float >               worzsystempt ( new float() );
   *worzsystempt.get() = -999;
   // not kept in ntuple
   std::auto_ptr<std::vector<int> >     indexInGenPColl( new std::vector<int>()  );
@@ -159,7 +159,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         isLastCopy                ->push_back(it->isLastCopy());
 
         // >>>>>>  if gen-particle is a tau, check decay mode and fill-in visible momentum parameters:
-        int getGenTauDecayMode_ = 0; double tauVisPt  = -999.0; double tauVisEta = -999.0; double tauVisPhi = -999.0;
+        int getGenTauDecayMode_ = 0; float tauVisPt  = -999.0; float tauVisEta = -999.0; float tauVisPhi = -999.0;
         if( abs(it->pdgId()) == 15 ){
           getGenTauDecayMode_ =  getGenTauDecayMode( & (*it) );
           if( getGenTauDecayMode_>0 ){//get visible momentum only if decay mode is determined

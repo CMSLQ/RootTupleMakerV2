@@ -14,23 +14,23 @@ RootTupleMakerV2_PFCandidates::RootTupleMakerV2_PFCandidates(const edm::Paramete
   pfcandInputToken_ (consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("PFCandInputTag"))),
   prefix  (iConfig.getParameter<std::string>  ("Prefix")),
   maxSize (iConfig.getParameter<unsigned int> ("MaxSize")),
-  DRmatch (iConfig.getParameter<double>       ("DRmatch"))
+  DRmatch (iConfig.getParameter<double>        ("DRmatch"))
 {
-  produces <std::vector<double> > ( prefix + "EtaLeptLink" + suffix );
-  produces <std::vector<double> > ( prefix + "PhiLeptLink" + suffix );
-  produces <std::vector<double> > ( prefix + "PtLeptLink" + suffix );
-  produces <std::vector<double> > ( prefix + "EnergyLeptLink" + suffix );
-  produces <std::vector<int> >    ( prefix + "ChargeLeptLink" + suffix );
+  produces <std::vector<float> > ( prefix + "EtaLeptLink" + suffix );
+  produces <std::vector<float> > ( prefix + "PhiLeptLink" + suffix );
+  produces <std::vector<float> > ( prefix + "PtLeptLink" + suffix );
+  produces <std::vector<float> > ( prefix + "EnergyLeptLink" + suffix );
+  produces <std::vector<int> >   ( prefix + "ChargeLeptLink" + suffix );
 }
 
 void RootTupleMakerV2_PFCandidates::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     charge  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<int> >    charge  ( new std::vector<int>()  );
 
   //-----------------------------------------------------------------
 

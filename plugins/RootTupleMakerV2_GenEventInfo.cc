@@ -21,21 +21,21 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   LHERunInfoToken_(consumes<LHERunInfoProduct, edm::InRun >(iConfig.getParameter<edm::InputTag>("LHERunInfoProductInputTag"))),
   LHEEventProductToken_(consumes<LHEEventProduct>(iConfig.getParameter<edm::InputTag>("LHEEventProductInputTag")))
 {
-  produces <unsigned int> ( "ProcessID" );
-  produces <double>       ( "PtHat" );
-  produces <std::vector<double> > ( "PDFCTEQWeights" );
-  produces <std::vector<double> > ( "PDFMMTHWeights" );
-  produces <std::vector<double> > ( "PDFNNPDFWeights" );
-  //produces <std::vector<double> > ( "PDFPDF4LHCWeights" );
-  produces <std::vector<double> > ( "PDFAmcNLOWeights" );
-  produces <std::vector<double> > ( "ScaleWeights" );
-  produces <double> ( "amcNLOWeight" );
-  produces <std::vector<int> > ( "PileUpInteractions");
-  produces <std::vector<int> > ( "PileUpOriginBX" ) ;
+  produces <unsigned int>        ( "ProcessID" );
+  produces <float>               ( "PtHat" );
+  produces <std::vector<float> > ( "PDFCTEQWeights" );
+  produces <std::vector<float> > ( "PDFMMTHWeights" );
+  produces <std::vector<float> > ( "PDFNNPDFWeights" );
+  //produces <std::vector<float> > ( "PDFPDF4LHCWeights" );
+  produces <std::vector<float> > ( "PDFAmcNLOWeights" );
+  produces <std::vector<float> > ( "ScaleWeights" );
+  produces <float>               ( "amcNLOWeight" );
+  produces <std::vector<int> >   ( "PileUpInteractions");
+  produces <std::vector<int> >   ( "PileUpOriginBX" ) ;
   produces <std::vector<float> > ( "PileUpInteractionsTrue" );
-  produces <double>       ( "Weight" );
-//   produces <double>       ( "AlphaQCD" );
-//   produces <double>       ( "AlphaQED" );
+  produces <float>               ( "Weight" );
+//   produces <float>       ( "AlphaQCD" );
+//   produces <float>       ( "AlphaQED" );
 }
 
 void RootTupleMakerV2_GenEventInfo::
@@ -86,21 +86,21 @@ endRun(edm::Run const& iRun, edm::EventSetup const&) {
 void RootTupleMakerV2_GenEventInfo::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<unsigned int >         processID   ( new unsigned int() );
-  std::auto_ptr<double >               ptHat ( new double() );
-  std::auto_ptr<std::vector<double> >  pdfCTEQWeights  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pdfMMTHWeights  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pdfNNPDFWeights  ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<double> >  pdfPDF4LHCWeights  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > pdfAmcNLOWeights (new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  scaleWeights  ( new std::vector<double>()  );
-  std::auto_ptr<double>  amcNLOweight  ( new double()  );
-  std::auto_ptr<std::vector<int >  >   Number_interactions  ( new std::vector<int>() );
-  std::auto_ptr<std::vector<float> >   trueNumberInteractions ( new std::vector<float>() );
-  std::auto_ptr<std::vector<int >  >   OriginBX( new std::vector<int>() );
-  std::auto_ptr<double >               weight ( new double() );
-//   std::auto_ptr<double >               alphaQCD ( new double() );
-//   std::auto_ptr<double >               alphaQED ( new double() );
+  std::auto_ptr<unsigned int >        processID   ( new unsigned int() );
+  std::auto_ptr<float >               ptHat ( new float() );
+  std::auto_ptr<std::vector<float> >  pdfCTEQWeights  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pdfMMTHWeights  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pdfNNPDFWeights  ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >  pdfPDF4LHCWeights  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pdfAmcNLOWeights (new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  scaleWeights  ( new std::vector<float>()  );
+  std::auto_ptr<float>                amcNLOweight  ( new float()  );
+  std::auto_ptr<std::vector<int >  >  Number_interactions  ( new std::vector<int>() );
+  std::auto_ptr<std::vector<float> >  trueNumberInteractions ( new std::vector<float>() );
+  std::auto_ptr<std::vector<int >  >  OriginBX( new std::vector<int>() );
+  std::auto_ptr<float >               weight ( new float() );
+//   std::auto_ptr<float >               alphaQCD ( new float() );
+//   std::auto_ptr<float >               alphaQED ( new float() );
 
   *processID.get() = 0;
   *ptHat.get() = 0.;
@@ -144,10 +144,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	}
       }
       if (doExternalWeights==true){
-      edm::Handle<std::vector<double> > pdfCTEQWeightsHandle;
-      edm::Handle<std::vector<double> > pdfMMTHWeightsHandle;
-      edm::Handle<std::vector<double> > pdfNNPDFWeightsHandle;
-      //edm::Handle<std::vector<double> > pdfPDF4LHCWeightsHandle;
+      edm::Handle<std::vector<float> > pdfCTEQWeightsHandle;
+      edm::Handle<std::vector<float> > pdfMMTHWeightsHandle;
+      edm::Handle<std::vector<float> > pdfNNPDFWeightsHandle;
+      //edm::Handle<std::vector<float> > pdfPDF4LHCWeightsHandle;
 
       iEvent.getByToken(pdfCTEQWeightsInputToken_, pdfCTEQWeightsHandle);
       iEvent.getByToken(pdfMMTHWeightsInputToken_, pdfMMTHWeightsHandle);
@@ -158,8 +158,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfCTEQWeightsInputToken_";
         // /*pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
 	//Instead of the above line, have to divide by central value - if 0, set to 1
-	std::vector<double> weights = (*pdfCTEQWeightsHandle);
-	std::vector<double> reWeightsCTEQ;
+	std::vector<float> weights = (*pdfCTEQWeightsHandle);
+	std::vector<float> reWeightsCTEQ;
 	unsigned int nmembers = weights.size();	
 	for (unsigned int i=0; i<nmembers; i++) {
 	  //std::cout<<i<<"  "<<weights[i]<<std::endl;
@@ -185,8 +185,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfMMTHWeightsInputToken_";
         //*pdfMMTHWeights.get() = *pdfMMTHWeightsHandle;
 	//Instead of the above line, have to divide by central value - if 0, set to 1
-	std::vector<double> weights = (*pdfMMTHWeightsHandle);
-	std::vector<double> reWeightsMMTH;
+	std::vector<float> weights = (*pdfMMTHWeightsHandle);
+	std::vector<float> reWeightsMMTH;
 	unsigned int nmembers = weights.size();	
 	for (unsigned int i=0; i<nmembers; i++) {
 	  if(weights[0]>1.e-4)reWeightsMMTH.push_back(weights[i]/weights[0]);
@@ -202,8 +202,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         //*pdfNNPDFWeights.get() = *pdfNNPDFWeightsHandle;
 	//Instead of the above line, have to divide by central value - if 0, set to 1
-	std::vector<double> weights = (*pdfNNPDFWeightsHandle);
-	std::vector<double> reWeightsNNPDF;
+	std::vector<float> weights = (*pdfNNPDFWeightsHandle);
+	std::vector<float> reWeightsNNPDF;
 	unsigned int nmembers = weights.size();	
 	for (unsigned int i=0; i<nmembers; i++) {
 	  //std::cout<<i<<"  "<<weights[i]<<std::endl;
@@ -220,8 +220,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         //*pdfPDF4LHCWeights.get() = *pdfPDF4LHCWeightsHandle;
 	//Instead of the above line, have to divide by central value - if 0, set to 1
-	std::vector<double> weights = (*pdfPDF4LHCWeightsHandle);
-	std::vector<double> reWeightsPDF4LHC;
+	std::vector<float> weights = (*pdfPDF4LHCWeightsHandle);
+	std::vector<float> reWeightsPDF4LHC;
 	unsigned int nmembers = weights.size();	
 	for (unsigned int i=0; i<nmembers; i++) {
 	  if(weights[0]!=0)reWeightsPDF4LHC.push_back(weights[i]/weights[0]);
@@ -255,8 +255,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //Powheg samples have valid EvtHandle but seg fault when trying to access weights, so skip if the weights vector is empty
       if (EvtHandle->weights().size()>0){
 
-      	double theWeight = genEvtInfo->weight();
-      	double thisWeight = -1.;
+      	float theWeight = genEvtInfo->weight();
+      	float thisWeight = -1.;
 	
       	//This follows the suggestion here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW#How_to_use_weights
       	//WARNING: This assumes the first 9 weights are renormalization/factorization-related  This seems to be true for all Madgraph samples

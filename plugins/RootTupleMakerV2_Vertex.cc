@@ -8,35 +8,35 @@ RootTupleMakerV2_Vertex::RootTupleMakerV2_Vertex(const edm::ParameterSet& iConfi
   prefix  (iConfig.getParameter<std::string>  ("Prefix")),
   suffix  (iConfig.getParameter<std::string>  ("Suffix"))
 {
-  produces <std::vector<double> > ( prefix + "X" + suffix );
-  produces <std::vector<double> > ( prefix + "Y" + suffix );
-  produces <std::vector<double> > ( prefix + "Z" + suffix );
-  produces <std::vector<double> > ( prefix + "XErr" + suffix );
-  produces <std::vector<double> > ( prefix + "YErr" + suffix );
-  produces <std::vector<double> > ( prefix + "ZErr" + suffix );
-  produces <std::vector<double> > ( prefix + "Rho" + suffix );
-  produces <std::vector<double> > ( prefix + "Chi2" + suffix );
-  produces <std::vector<double> > ( prefix + "NDF" + suffix );
-  produces <std::vector<int> >    ( prefix + "NTracks" + suffix );
-  produces <std::vector<int> >    ( prefix + "NTracksW05" + suffix );
-  produces <std::vector<bool> >   ( prefix + "IsFake" + suffix );
+  produces <std::vector<float> > ( prefix + "X" + suffix );
+  produces <std::vector<float> > ( prefix + "Y" + suffix );
+  produces <std::vector<float> > ( prefix + "Z" + suffix );
+  produces <std::vector<float> > ( prefix + "XErr" + suffix );
+  produces <std::vector<float> > ( prefix + "YErr" + suffix );
+  produces <std::vector<float> > ( prefix + "ZErr" + suffix );
+  produces <std::vector<float> > ( prefix + "Rho" + suffix );
+  produces <std::vector<float> > ( prefix + "Chi2" + suffix );
+  produces <std::vector<float> > ( prefix + "NDF" + suffix );
+  produces <std::vector<int> >   ( prefix + "NTracks" + suffix );
+  produces <std::vector<int> >   ( prefix + "NTracksW05" + suffix );
+  produces <std::vector<bool> >  ( prefix + "IsFake" + suffix );
 }
 
 void RootTupleMakerV2_Vertex::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  x  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  y  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  z  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  xErr  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  yErr  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  zErr  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  rho  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  chi2  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ndf  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >     ntracks  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >     ntracksw05  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<bool> >    isfake  ( new std::vector<bool>()  );
+  std::auto_ptr<std::vector<float> >  x  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  y  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  z  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  xErr  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  yErr  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  zErr  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  rho  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  chi2  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  ndf  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<int> >    ntracks  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >    ntracksw05  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<bool> >   isfake  ( new std::vector<bool>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::VertexCollection> primaryVertices;

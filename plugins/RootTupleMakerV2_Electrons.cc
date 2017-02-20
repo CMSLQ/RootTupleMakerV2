@@ -123,6 +123,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 
   // Is this ECAL driven? Or PFlow?  				        
   produces <std::vector<bool> >   ( prefix + "HasEcalDrivenSeed"        + suffix );
+  produces <std::vector<bool> >   ( prefix + "IsEcalDriven"             + suffix );
   produces <std::vector<bool> >   ( prefix + "HasTrackerDrivenSeed"     + suffix );
 
   // Charge consistency variables - Ferdinando Giordano
@@ -319,6 +320,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Is this ECAL driven? Or PFlow?  
   std::auto_ptr<std::vector<bool> >    hasEcalDrivenSeed         ( new std::vector<bool>  ()  );
+  std::auto_ptr<std::vector<bool> >    isEcalDriven              ( new std::vector<bool>  ()  );
   std::auto_ptr<std::vector<bool> >    hasTrackerDrivenSeed      ( new std::vector<bool>  ()  );
   
   // Charge consistency variables: Ferdinando Giordano
@@ -878,6 +880,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       
       // Is this ECAL driven? Or PFlow?  
       hasEcalDrivenSeed        -> push_back( it->ecalDrivenSeed() );
+      isEcalDriven             -> push_back( it->ecalDriven() );
       hasTrackerDrivenSeed     -> push_back( it->trackerDrivenSeed() );
 
       // Charge consistency variables - Ferdinando Giordano
@@ -1057,6 +1060,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   // Is this ECAL driven? Or PFlow?  				        
   iEvent.put( hasEcalDrivenSeed       , prefix + "HasEcalDrivenSeed"        + suffix );
+  iEvent.put( isEcalDriven            , prefix + "IsEcalDriven"             + suffix );
   iEvent.put( hasTrackerDrivenSeed    , prefix + "HasTrackerDrivenSeed"     + suffix );
 
   // Charge consistency variables - Ferdinando Giordano

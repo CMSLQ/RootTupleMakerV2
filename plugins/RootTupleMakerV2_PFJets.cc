@@ -24,41 +24,41 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   else
     isPuppiJetColl = false;
   produces <bool>                 ( prefix + "hasJetWithBadUnc" + suffix );
-  produces <std::vector<double> > ( prefix + "Eta" + suffix );
-  produces <std::vector<double> > ( prefix + "Phi" + suffix );
-  produces <std::vector<double> > ( prefix + "Pt" + suffix );
-  produces <std::vector<double> > ( prefix + "Mt" + suffix );
-  produces <std::vector<double> > ( prefix + "SmearedUpPt" + suffix );
-  produces <std::vector<double> > ( prefix + "SmearedDownPt" + suffix );
-  produces <std::vector<double> > ( prefix + "ScaledUpPt" + suffix );
-  produces <std::vector<double> > ( prefix + "ScaledDownPt" + suffix );
-  produces <std::vector<double> > ( prefix + "PtRaw" + suffix );
-  produces <std::vector<double> > ( prefix + "Energy" + suffix );
-  produces <std::vector<double> > ( prefix + "SmearedUpEnergy" + suffix );
-  produces <std::vector<double> > ( prefix + "SmearedDownEnergy" + suffix );
-  produces <std::vector<double> > ( prefix + "ScaledUpEnergy" + suffix );
-  produces <std::vector<double> > ( prefix + "ScaledDownEnergy" + suffix );
-  produces <std::vector<double> > ( prefix + "EnergyRaw" + suffix );
-  produces <std::vector<double> > ( prefix + "JECUnc" + suffix );
-  produces <std::vector<double> > ( prefix + "L2L3ResJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "L3AbsJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "L2RelJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "L1FastJetJEC" + suffix );
-  produces <std::vector<double> > ( prefix + "JERRes" + suffix );
-  produces <std::vector<double> > ( prefix + "JERResSF" + suffix );
-  produces <std::vector<double> > ( prefix + "JERResSFUp" + suffix );
-  produces <std::vector<double> > ( prefix + "JERResSFDown" + suffix );
+  produces <std::vector<float> >  ( prefix + "Eta" + suffix );
+  produces <std::vector<float> >  ( prefix + "Phi" + suffix );
+  produces <std::vector<float> >  ( prefix + "Pt" + suffix );
+  produces <std::vector<float> >  ( prefix + "Mt" + suffix );
+  produces <std::vector<float> >  ( prefix + "SmearedUpPt" + suffix );
+  produces <std::vector<float> >  ( prefix + "SmearedDownPt" + suffix );
+  produces <std::vector<float> >  ( prefix + "ScaledUpPt" + suffix );
+  produces <std::vector<float> >  ( prefix + "ScaledDownPt" + suffix );
+  produces <std::vector<float> >  ( prefix + "PtRaw" + suffix );
+  produces <std::vector<float> >  ( prefix + "Energy" + suffix );
+  produces <std::vector<float> >  ( prefix + "SmearedUpEnergy" + suffix );
+  produces <std::vector<float> >  ( prefix + "SmearedDownEnergy" + suffix );
+  produces <std::vector<float> >  ( prefix + "ScaledUpEnergy" + suffix );
+  produces <std::vector<float> >  ( prefix + "ScaledDownEnergy" + suffix );
+  produces <std::vector<float> >  ( prefix + "EnergyRaw" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUnc" + suffix );
+  produces <std::vector<float> >  ( prefix + "L2L3ResJEC" + suffix );
+  produces <std::vector<float> >  ( prefix + "L3AbsJEC" + suffix );
+  produces <std::vector<float> >  ( prefix + "L2RelJEC" + suffix );
+  produces <std::vector<float> >  ( prefix + "L1FastJetJEC" + suffix );
+  produces <std::vector<float> >  ( prefix + "JERRes" + suffix );
+  produces <std::vector<float> >  ( prefix + "JERResSF" + suffix );
+  produces <std::vector<float> >  ( prefix + "JERResSFUp" + suffix );
+  produces <std::vector<float> >  ( prefix + "JERResSFDown" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
-  produces <std::vector<double> > ( prefix + "ChargedEmEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "ChargedHadronEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "ChargedMuEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "ElectronEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "MuonEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "NeutralEmEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "NeutralHadronEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "PhotonEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "HFHadronEnergyFraction"  + suffix );
-  produces <std::vector<double> > ( prefix + "HFEMEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "ChargedEmEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "ChargedHadronEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "ChargedMuEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "ElectronEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "MuonEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "NeutralEmEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "NeutralHadronEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "PhotonEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "HFHadronEnergyFraction"  + suffix );
+  produces <std::vector<float> >  ( prefix + "HFEMEnergyFraction"  + suffix );
   produces <std::vector<int> >    ( prefix + "ChargedHadronMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "ChargedMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "ElectronMultiplicity"  + suffix );
@@ -69,54 +69,54 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<int> >    ( prefix + "HFHadronMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "HFEMMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "NConstituents"  + suffix );
-  produces <std::vector<double> > ( prefix + "TrackCountingHighEffBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "TrackCountingHighPurBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "JetProbabilityBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "JetBProbabilityBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "CombinedSecondaryVertexBTag" + suffix );    
-  //produces <std::vector<double> > ( prefix + "CombinedSecondaryVertexMVABTag" + suffix ); 
-  //produces <std::vector<double> > ( prefix + "SoftElectronByPtBTag" + suffix );           
-  //produces <std::vector<double> > ( prefix + "SoftElectronByIP3dBTag" + suffix );         
-  //produces <std::vector<double> > ( prefix + "SoftMuonBTag" + suffix );                   
-  //produces <std::vector<double> > ( prefix + "SoftMuonByPtBTag" + suffix );               
-  //produces <std::vector<double> > ( prefix + "SoftMuonByIP3dBTag" + suffix );             
-  produces <std::vector<double> > ( prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
-  produces <std::vector<double> > ( prefix + "CombinedMVABTag" + suffix );
-  produces <std::vector<double> > ( prefix + "CombinedCvsLJetTags" + suffix );
-  produces <std::vector<double> > ( prefix + "CombinedCvsBJetTags" + suffix );
+  produces <std::vector<float> >  ( prefix + "TrackCountingHighEffBTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "TrackCountingHighPurBTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "JetProbabilityBTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "JetBProbabilityBTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "CombinedSecondaryVertexBTag" + suffix );    
+  //produces <std::vector<float> >  ( prefix + "CombinedSecondaryVertexMVABTag" + suffix ); 
+  //produces <std::vector<float> >  ( prefix + "SoftElectronByPtBTag" + suffix );           
+  //produces <std::vector<float> >  ( prefix + "SoftElectronByIP3dBTag" + suffix );         
+  //produces <std::vector<float> >  ( prefix + "SoftMuonBTag" + suffix );                   
+  //produces <std::vector<float> >  ( prefix + "SoftMuonByPtBTag" + suffix );               
+  //produces <std::vector<float> >  ( prefix + "SoftMuonByIP3dBTag" + suffix );             
+  produces <std::vector<float> >  ( prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "CombinedMVABTag" + suffix );
+  produces <std::vector<float> >  ( prefix + "CombinedCvsLJetTags" + suffix );
+  produces <std::vector<float> >  ( prefix + "CombinedCvsBJetTags" + suffix );
   produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);
   produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);
   // for non-PUPPI jets, we get the MVA pileup ID discriminator
   if(!isPuppiJetColl){
-    produces <std::vector<double> >    ( prefix + "PileupMVA" + suffix);
-    produces <std::vector<int> >      ( prefix + "PileupMVApassesLoose"  + suffix);
-    produces <std::vector<int> >      ( prefix + "PileupMVApassesMedium" + suffix);
-    produces <std::vector<int> >      ( prefix + "PileupMVApassesTight"  + suffix);
-    produces <std::vector<double> >   (prefix + "VtxNtracks"  + suffix);
-    produces <std::vector<double> >   (prefix + "VtxMass"  + suffix);
-    produces <std::vector<double> >   (prefix + "VtxPx"  + suffix);
-    produces <std::vector<double> >   (prefix + "VtxPy"  + suffix);
-    produces <std::vector<double> >   (prefix + "Vtx3DVal"  + suffix);
-    produces <std::vector<double> >   (prefix + "Vtx3DSig"  + suffix);
-    produces <std::vector<double> >   (prefix + "LeadTrackPt"  + suffix);
-    produces <std::vector<double> >   (prefix + "SoftLepPt"  + suffix);
-    produces <std::vector<double> >   (prefix + "SoftLepRatio"  + suffix);
-    produces <std::vector<double> >   (prefix + "SoftLepDr"  + suffix);
+    produces <std::vector<float> >   ( prefix + "PileupMVA" + suffix);
+    produces <std::vector<int> >     ( prefix + "PileupMVApassesLoose"  + suffix);
+    produces <std::vector<int> >     ( prefix + "PileupMVApassesMedium" + suffix);
+    produces <std::vector<int> >     ( prefix + "PileupMVApassesTight"  + suffix);
+    produces <std::vector<float> >   (prefix + "VtxNtracks"  + suffix);
+    produces <std::vector<float> >   (prefix + "VtxMass"  + suffix);
+    produces <std::vector<float> >   (prefix + "VtxPx"  + suffix);
+    produces <std::vector<float> >   (prefix + "VtxPy"  + suffix);
+    produces <std::vector<float> >   (prefix + "Vtx3DVal"  + suffix);
+    produces <std::vector<float> >   (prefix + "Vtx3DSig"  + suffix);
+    produces <std::vector<float> >   (prefix + "LeadTrackPt"  + suffix);
+    produces <std::vector<float> >   (prefix + "SoftLepPt"  + suffix);
+    produces <std::vector<float> >   (prefix + "SoftLepRatio"  + suffix);
+    produces <std::vector<float> >   (prefix + "SoftLepDr"  + suffix);
   }
-  produces <std::vector<double> > ( prefix + "BestVertexTrackAssociationFactor" + suffix );
+  produces <std::vector<float> >  ( prefix + "BestVertexTrackAssociationFactor" + suffix );
   produces <std::vector<int> >    ( prefix + "BestVertexTrackAssociationIndex" + suffix);
-  produces <std::vector<double> > ( prefix + "ClosestVertexWeighted3DSeparation" + suffix );
-  produces <std::vector<double> > ( prefix + "ClosestVertexWeightedXYSeparation" + suffix );
-  produces <std::vector<double> > ( prefix + "ClosestVertexWeightedZSeparation" + suffix );
+  produces <std::vector<float> >  ( prefix + "ClosestVertexWeighted3DSeparation" + suffix );
+  produces <std::vector<float> >  ( prefix + "ClosestVertexWeightedXYSeparation" + suffix );
+  produces <std::vector<float> >  ( prefix + "ClosestVertexWeightedZSeparation" + suffix );
   produces <std::vector<int> >    ( prefix + "ClosestVertex3DIndex" + suffix);
   produces <std::vector<int> >    ( prefix + "ClosestVertexXYIndex" + suffix);
   produces <std::vector<int> >    ( prefix + "ClosestVertexZIndex" + suffix);
-  produces <std::vector<double> > ( prefix + "Beta" + suffix ) ;
-  produces <std::vector<double> > ( prefix + "BetaStar" + suffix ) ;
-  produces <std::vector<double> > ( prefix + "BetaClassic" + suffix ) ;
-  produces <std::vector<double> > ( prefix + "BetaStarClassic" + suffix ) ;
+  produces <std::vector<float> >  ( prefix + "Beta" + suffix ) ;
+  produces <std::vector<float> >  ( prefix + "BetaStar" + suffix ) ;
+  produces <std::vector<float> >  ( prefix + "BetaClassic" + suffix ) ;
+  produces <std::vector<float> >  ( prefix + "BetaStarClassic" + suffix ) ;
 }
 
 
@@ -139,42 +139,42 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   std::auto_ptr<bool>                  hasJetWithBadUnc ( new bool() );
-  std::auto_ptr<std::vector<double> >  eta  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  mt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ptSmearedUp  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ptSmearedDown  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ptScaledUp  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ptScaledDown  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energySmearedUp  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energySmearedDown  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energyScaledUp  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energyScaledDown  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt_raw  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy_raw ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  jecUnc_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l2l3resJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l3absJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l2relJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  l1fastjetJEC_vec ( new std::vector<double>()  );
-  // std::auto_ptr<std::vector<double> >  l1offsetJEC_vec ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  jerRes_vec ( new std::vector<double>() );
-  std::auto_ptr<std::vector<double> >  jerResSF_vec ( new std::vector<double>() );
-  std::auto_ptr<std::vector<double> >  jerResSFup_vec ( new std::vector<double>() );
-  std::auto_ptr<std::vector<double> >  jerResSFdown_vec ( new std::vector<double>() );
+  std::auto_ptr<std::vector<float> >   eta  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   phi  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   mt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ptSmearedUp  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ptSmearedDown  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ptScaledUp  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ptScaledDown  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   energySmearedUp  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   energySmearedDown  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   energyScaledUp  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   energyScaledDown  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pt_raw  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   energy  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   energy_raw ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   l2l3resJEC_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   l3absJEC_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   l2relJEC_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   l1fastjetJEC_vec ( new std::vector<float>()  );
+  // std::auto_ptr<std::vector<float> >   l1offsetJEC_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jerRes_vec ( new std::vector<float>() );
+  std::auto_ptr<std::vector<float> >   jerResSF_vec ( new std::vector<float>() );
+  std::auto_ptr<std::vector<float> >   jerResSFup_vec ( new std::vector<float>() );
+  std::auto_ptr<std::vector<float> >   jerResSFdown_vec ( new std::vector<float>() );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> >  chargedEmEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  chargedHadronEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  chargedMuEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  electronEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  muonEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  neutralEmEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  neutralHadronEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  photonEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  hfHadronEnergyFraction  ( new std::vector<double>()  ) ;
-  std::auto_ptr<std::vector<double> >  hfEMEnergyFraction  ( new std::vector<double>()  ) ;
+  std::auto_ptr<std::vector<float> >   chargedEmEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   chargedHadronEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   chargedMuEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   electronEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   muonEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   neutralEmEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   neutralHadronEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   photonEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   hfHadronEnergyFraction  ( new std::vector<float>()  ) ;
+  std::auto_ptr<std::vector<float> >   hfEMEnergyFraction  ( new std::vector<float>()  ) ;
   std::auto_ptr<std::vector<int> >     chargedHadronMultiplicity  ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     chargedMultiplicity  ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     electronMultiplicity  ( new std::vector<int>()  ) ;
@@ -185,57 +185,57 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<int> >     hfHadronMultiplicity ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     hfEMMultiplicity ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     nConstituents  ( new std::vector<int>()  ) ;
-  std::auto_ptr<std::vector<double> >  trackCountingHighEffBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackCountingHighPurBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighEffBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  simpleSecondaryVertexHighPurBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  jetProbabilityBTag  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  jetBProbabilityBTag  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   trackCountingHighEffBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trackCountingHighPurBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   simpleSecondaryVertexHighEffBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   simpleSecondaryVertexHighPurBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jetProbabilityBTag  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jetBProbabilityBTag  ( new std::vector<float>()  );
 
-  std::auto_ptr<std::vector<double> >  combinedSecondaryVertexBTag          ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<double> >  combinedSecondaryVertexMVABTag       ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<double> >  softElectronByPtBTag                 ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<double> >  softElectronByIP3dBTag               ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<double> >  softMuonBTag                         ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<double> >  softMuonByPtBTag                     ( new std::vector<double>()  );
-  //std::auto_ptr<std::vector<double> >  softMuonByIP3dBTag                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  combinedInclusiveSecondaryVertexBTag ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  combinedMVABTag                      ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  combinedCvsLJetTag                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  combinedCvsBJetTag                   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   combinedSecondaryVertexBTag          ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   combinedSecondaryVertexMVABTag       ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   softElectronByPtBTag                 ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   softElectronByIP3dBTag               ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   softMuonBTag                         ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   softMuonByPtBTag                     ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   softMuonByIP3dBTag                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   combinedInclusiveSecondaryVertexBTag ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   combinedMVABTag                      ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   combinedCvsLJetTag                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   combinedCvsBJetTag                   ( new std::vector<float>()  );
 	
-  std::auto_ptr<std::vector<int> >  passLooseID  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >  passTightID  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >   passLooseID  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >   passTightID  ( new std::vector<int>()  );
 
-  std::auto_ptr<std::vector<double> >  jetpileup_mva  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<int> >  jetpileup_mva_passesLoose  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >  jetpileup_mva_passesMedium ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >  jetpileup_mva_passesTight  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<double> > vtxNtracks  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > vtxMass  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > vtxPx  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > vtxPy  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > vtx3DVal  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > vtx3DSig  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > leadTrackPt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > softLepPt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > softLepRatio  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> > softLepDr  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> > jetpileup_mva  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<int> >   jetpileup_mva_passesLoose  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >   jetpileup_mva_passesMedium ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >   jetpileup_mva_passesTight  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<float> > vtxNtracks  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > vtxMass  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > vtxPx  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > vtxPy  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > vtx3DVal  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > vtx3DSig  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > leadTrackPt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > softLepPt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > softLepRatio  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> > softLepDr  ( new std::vector<float>()  );
 
 
-  std::auto_ptr <std::vector<double> >  bestVertexTrackAssociationFactor  ( new std::vector<double>()  );
+  std::auto_ptr <std::vector<float> >   bestVertexTrackAssociationFactor  ( new std::vector<float>()  );
   std::auto_ptr <std::vector<int> >     bestVertexTrackAssociationIndex   ( new std::vector<int>()  );
-  std::auto_ptr <std::vector<double> >  closestVertexWeighted3DSeparation  ( new std::vector<double>()  );
-  std::auto_ptr <std::vector<double> >  closestVertexWeightedXYSeparation  ( new std::vector<double>()  );
-  std::auto_ptr <std::vector<double> >  closestVertexWeightedZSeparation  ( new std::vector<double>()  );
+  std::auto_ptr <std::vector<float> >   closestVertexWeighted3DSeparation  ( new std::vector<float>()  );
+  std::auto_ptr <std::vector<float> >   closestVertexWeightedXYSeparation  ( new std::vector<float>()  );
+  std::auto_ptr <std::vector<float> >   closestVertexWeightedZSeparation  ( new std::vector<float>()  );
   std::auto_ptr <std::vector<int> >     closestVertex3DIndex            ( new std::vector<int>()  );
   std::auto_ptr <std::vector<int> >     closestVertexXYIndex           ( new std::vector<int>()  );
   std::auto_ptr <std::vector<int> >     closestVertexZIndex            ( new std::vector<int>()  );
 
-  std::auto_ptr <std::vector<double > > betaStar        ( new std::vector<double>());
-  std::auto_ptr <std::vector<double > > betaStarClassic ( new std::vector<double>());
-  std::auto_ptr <std::vector<double > > beta            ( new std::vector<double>());
-  std::auto_ptr <std::vector<double > > betaClassic     ( new std::vector<double>());
+  std::auto_ptr <std::vector<float > > betaStar        ( new std::vector<float>());
+  std::auto_ptr <std::vector<float > > betaStarClassic ( new std::vector<float>());
+  std::auto_ptr <std::vector<float > > beta            ( new std::vector<float>());
+  std::auto_ptr <std::vector<float > > betaClassic     ( new std::vector<float>());
 	
   //-----------------------------------------------------------------
 
@@ -332,10 +332,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  int bestVtxIndexSharedTracks = -1;
 
-	  double minVtxDist3D = 999999.;
-	  double minVtxDistXY = -99999.;
-	  double minVtxDistZ  = -99999.;
-	  double maxTrackAssocRatio = -9999.;
+	  float minVtxDist3D = 999999.;
+	  float minVtxDistXY = -99999.;
+	  float minVtxDistZ  = -99999.;
+	  float maxTrackAssocRatio = -9999.;
 
 	  // Loop on primary Vertices and jets and perform associations 
 
@@ -350,12 +350,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
 		{
 
-		  double sumweights = 0.0;
-		  double dist3Dweighted = 0.0;
-		  double distXYweighted = 0.0;
-		  double distZweighted = 0.0;
-		  double assocsumpttracks = 0.0;
-		  double trackassociationratio = 0.000001;
+		  float sumweights = 0.0;
+		  float dist3Dweighted = 0.0;
+		  float distXYweighted = 0.0;
+		  float distZweighted = 0.0;
+		  float assocsumpttracks = 0.0;
+		  float trackassociationratio = 0.000001;
 
 		  if ( v_it -> isFake() || v_it -> ndof() < 4 ) continue;
 		  if ( !found_lead_vertex ) { 
@@ -369,12 +369,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		    {
 		      if( jtIt->isNull() ) continue;
 		      const reco::Track *jtrack=jtIt->get();
-		      double trackptweight = jtrack->pt();
+		      float trackptweight = jtrack->pt();
 		      sumweights += trackptweight;
 
 		      // Weighted Distance Calculation
-		      double distXY= jtrack->dxy(v_it->position());
-		      double distZ = jtrack->dz(v_it->position());
+		      float distXY= jtrack->dxy(v_it->position());
+		      float distZ = jtrack->dz(v_it->position());
 		      dist3Dweighted = trackptweight*(sqrt(pow(distXY,2) + pow(distZ,2)));
 		      distXYweighted = trackptweight*distXY;
 		      distZweighted = trackptweight*distZ;
@@ -444,12 +444,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  //std::vector <reco::PFCandidatePtr>::iterator i_constituent   = constituents.begin();
 	  //std::vector <reco::PFCandidatePtr>::iterator end_constituent = constituents.end();
 	  int numberOfDaughters = it->numberOfDaughters();
-	  double sum_track_pt = 0.;
+	  float sum_track_pt = 0.;
 
-	  double jetBetaStar        = 0.0 ;
-	  double jetBetaStarClassic = 0.0 ;
-	  double jetBeta            = 0.0 ;
-	  double jetBetaClassic     = 0.0 ;
+	  float jetBetaStar        = 0.0 ;
+	  float jetBetaStarClassic = 0.0 ;
+	  float jetBeta            = 0.0 ;
+	  float jetBetaClassic     = 0.0 ;
 
 	  if ( found_lead_vertex ) { 
 	    for(int dau = 0; dau < numberOfDaughters; ++dau) {
@@ -458,7 +458,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      try { 
 		// constituent->pseudoTrack().pt() in MiniAOD (best we can have) is the same as constituent pt
 		//   so no need to make the pseudoTrack here
-		double track_pt = constituent->pt();
+		float track_pt = constituent->pt();
 		sum_track_pt += track_pt;
 
 		// If it's used in the fit of the primary vertex or associated to it, take it
@@ -603,7 +603,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      l1fastjetJEC_vec->push_back( it->correctedJet("L1FastJet").pt()/it->correctedJet("Uncorrected").pt() );
 	    }
 	  if(readJECuncertainty){ 
-	    double uncertainty = -999.;
+	    float uncertainty = -999.;
 	    try { 
 	      uncertainty = jecUnc->getUncertainty(true);
 	    } 
@@ -710,7 +710,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  // 			//////////////////////////////////////////////////////////////////// 
 	  // 			if( fabs(it->eta()) > 3) 
 	  // 			  {
-	  //  			    double SUM = it->chargedEmEnergyFraction() + it->chargedHadronEnergyFraction() + it->neutralEmEnergyFraction() + it->neutralHadronEnergyFraction() + it->chargedMuEnergyFraction() + it->HFHadronEnergyFraction() + it->HFEMEnergyFraction() ; 
+	  //  			    float SUM = it->chargedEmEnergyFraction() + it->chargedHadronEnergyFraction() + it->neutralEmEnergyFraction() + it->neutralHadronEnergyFraction() + it->chargedMuEnergyFraction() + it->HFHadronEnergyFraction() + it->HFEMEnergyFraction() ; 
 
 	  //  			    std::cout << "eta,chargedEmEnergy,chargedHadronEnergy,neutralEmEnergy,neutralHadronEnergy,chargedMuEnergy,HFHadronEnergy,HFEMEnergy,SUM: "  
 	  //  				      << it->eta() << " , "

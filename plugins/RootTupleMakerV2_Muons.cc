@@ -32,21 +32,21 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<bool> >   ( prefix + "IsMediumMuon"            + suffix );
   produces <std::vector<bool> >   ( prefix + "IsTightMuon"             + suffix );
   produces <std::vector<bool> >   ( prefix + "IsHighPtMuon"            + suffix );
-  produces <std::vector<double> > ( prefix + "Eta"                     + suffix );
-  produces <std::vector<double> > ( prefix + "Phi"                     + suffix );
-  produces <std::vector<double> > ( prefix + "Pt"                      + suffix );
-  produces <std::vector<double> > ( prefix + "EtaError"                + suffix );
-  produces <std::vector<double> > ( prefix + "PhiError"                + suffix );
-  produces <std::vector<double> > ( prefix + "PtError"                 + suffix );
-  produces <std::vector<double> > ( prefix + "TrkEta"                  + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPhi"                  + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPt"                   + suffix );
-  produces <std::vector<double> > ( prefix + "TrkEtaError"             + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPhiError"             + suffix );
-  produces <std::vector<double> > ( prefix + "TrkPtError"              + suffix );
-  produces <std::vector<double> > ( prefix + "QOverPError"             + suffix );
-  produces <std::vector<double> > ( prefix + "P"                       + suffix );
-  produces <std::vector<double> > ( prefix + "Energy"                  + suffix );
+  produces <std::vector<float> >  ( prefix + "Eta"                     + suffix );
+  produces <std::vector<float> >  ( prefix + "Phi"                     + suffix );
+  produces <std::vector<float> >  ( prefix + "Pt"                      + suffix );
+  produces <std::vector<float> >  ( prefix + "EtaError"                + suffix );
+  produces <std::vector<float> >  ( prefix + "PhiError"                + suffix );
+  produces <std::vector<float> >  ( prefix + "PtError"                 + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkEta"                  + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkPhi"                  + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkPt"                   + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkEtaError"             + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkPhiError"             + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkPtError"              + suffix );
+  produces <std::vector<float> >  ( prefix + "QOverPError"             + suffix );
+  produces <std::vector<float> >  ( prefix + "P"                       + suffix );
+  produces <std::vector<float> >  ( prefix + "Energy"                  + suffix );
   produces <std::vector<int> >    ( prefix + "Charge"                  + suffix );
   produces <std::vector<int> >    ( prefix + "TrkHits"                 + suffix );
   produces <std::vector<int> >    ( prefix + "TrkHitsTrackerOnly"      + suffix );
@@ -55,56 +55,56 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   produces <std::vector<int> >    ( prefix + "TrkPixelHits"            + suffix );
   produces <std::vector<int> >    ( prefix + "SegmentMatches"          + suffix );
   produces <std::vector<int> >    ( prefix + "StationMatches"          + suffix );
-  produces <std::vector<double> > ( prefix + "TrkValidFractionOfHits"  + suffix );
-  produces <std::vector<double> > ( prefix + "TrkD0"                   + suffix );
-  produces <std::vector<double> > ( prefix + "TrkD0Error"              + suffix );
-  produces <std::vector<double> > ( prefix + "TrkDz"                   + suffix );
-  produces <std::vector<double> > ( prefix + "TrkDzError"              + suffix );
-  produces <std::vector<double> > ( prefix + "TrkVx"                   + suffix );
-  produces <std::vector<double> > ( prefix + "TrkVy"                   + suffix );
-  produces <std::vector<double> > ( prefix + "TrkVz"                   + suffix );
-  produces <std::vector<double> > ( prefix + "TrackChi2"               + suffix );
-  produces <std::vector<double> > ( prefix + "GlobalChi2"              + suffix );
-  produces <std::vector<double> > ( prefix + "CombinedQualityChi2LocalPosition" + suffix );
-  produces <std::vector<double> > ( prefix + "CombinedQualityTrkKink"  + suffix );
-  produces <std::vector<double> > ( prefix + "TrkIso"                  + suffix );
-  produces <std::vector<double> > ( prefix + "TrackerIsoSumPT"         + suffix );
-  produces <std::vector<double> > ( prefix + "EcalIso"                 + suffix );
-  produces <std::vector<double> > ( prefix + "HcalIso"                 + suffix );
-  produces <std::vector<double> > ( prefix + "HOIso"                   + suffix );
-  produces <std::vector<double> > ( prefix + "EcalVetoIso"             + suffix );
-  produces <std::vector<double> > ( prefix + "HcalVetoIso"             + suffix );
-  produces <std::vector<double> > ( prefix + "SegmentCompatibility"    + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR03ChargedHadron"   + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR03ChargedParticle" + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR03NeutralHadron"   + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR03Photon"          + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR03NeutralHadronHT" + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR03PhotonHT"        + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR03PU"              + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR04ChargedHadron"   + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR04ChargedParticle" + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR04NeutralHadron"   + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR04Photon"          + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR04NeutralHadronHT" + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR04PhotonHT"        + suffix );
-  produces <std::vector<double> > ( prefix + "PFIsoR04PU"              + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkValidFractionOfHits"  + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkD0"                   + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkD0Error"              + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkDz"                   + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkDzError"              + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkVx"                   + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkVy"                   + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkVz"                   + suffix );
+  produces <std::vector<float> >  ( prefix + "TrackChi2"               + suffix );
+  produces <std::vector<float> >  ( prefix + "GlobalChi2"              + suffix );
+  produces <std::vector<float> >  ( prefix + "CombinedQualityChi2LocalPosition" + suffix );
+  produces <std::vector<float> >  ( prefix + "CombinedQualityTrkKink"  + suffix );
+  produces <std::vector<float> >  ( prefix + "TrkIso"                  + suffix );
+  produces <std::vector<float> >  ( prefix + "TrackerIsoSumPT"         + suffix );
+  produces <std::vector<float> >  ( prefix + "EcalIso"                 + suffix );
+  produces <std::vector<float> >  ( prefix + "HcalIso"                 + suffix );
+  produces <std::vector<float> >  ( prefix + "HOIso"                   + suffix );
+  produces <std::vector<float> >  ( prefix + "EcalVetoIso"             + suffix );
+  produces <std::vector<float> >  ( prefix + "HcalVetoIso"             + suffix );
+  produces <std::vector<float> >  ( prefix + "SegmentCompatibility"    + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR03ChargedHadron"   + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR03ChargedParticle" + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR03NeutralHadron"   + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR03Photon"          + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR03NeutralHadronHT" + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR03PhotonHT"        + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR03PU"              + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR04ChargedHadron"   + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR04ChargedParticle" + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR04NeutralHadron"   + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR04Photon"          + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR04NeutralHadronHT" + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR04PhotonHT"        + suffix );
+  produces <std::vector<float> >  ( prefix + "PFIsoR04PU"              + suffix );
   produces <std::vector<int> >    ( prefix + "PassID"                  + suffix );
   produces <std::vector<int> >    ( prefix + "VtxIndex"                + suffix );
-  produces <std::vector<double> > ( prefix + "VtxDistXY"               + suffix );
-  produces <std::vector<double> > ( prefix + "VtxDistZ"                + suffix );
+  produces <std::vector<float> >  ( prefix + "VtxDistXY"               + suffix );
+  produces <std::vector<float> >  ( prefix + "VtxDistZ"                + suffix );
   produces <std::vector<int> >    ( prefix + "BestTrackVtxIndex"      + suffix );
-  produces <std::vector<double> > ( prefix + "BestTrackVtxDistXY"     + suffix );
-  produces <std::vector<double> > ( prefix + "BestTrackVtxDistZ"      + suffix );
-  produces <std::vector<double> > ( prefix + "PrimaryVertexDXY"        + suffix );
-  produces <std::vector<double> > ( prefix + "PrimaryVertexDXYError"   + suffix );
-  produces <std::vector<double> > ( prefix + "BeamSpotDXY"             + suffix );
-  produces <std::vector<double> > ( prefix + "BeamSpotDXYError"        + suffix );
+  produces <std::vector<float> >  ( prefix + "BestTrackVtxDistXY"     + suffix );
+  produces <std::vector<float> >  ( prefix + "BestTrackVtxDistZ"      + suffix );
+  produces <std::vector<float> >  ( prefix + "PrimaryVertexDXY"        + suffix );
+  produces <std::vector<float> >  ( prefix + "PrimaryVertexDXYError"   + suffix );
+  produces <std::vector<float> >  ( prefix + "BeamSpotDXY"             + suffix );
+  produces <std::vector<float> >  ( prefix + "BeamSpotDXYError"        + suffix );
   produces <std::vector<int> >    ( prefix + "IsGlobal"                + suffix );
   produces <std::vector<int> >    ( prefix + "IsTracker"               + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticlePt"    + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticleEta"   + suffix );
-  produces <std::vector<double> > ( prefix + "MatchedGenParticlePhi"   + suffix );
+  produces <std::vector<float> >  ( prefix + "MatchedGenParticlePt"    + suffix );
+  produces <std::vector<float> >  ( prefix + "MatchedGenParticleEta"   + suffix );
+  produces <std::vector<float> >  ( prefix + "MatchedGenParticlePhi"   + suffix );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012
@@ -114,46 +114,46 @@ RootTupleMakerV2_Muons::RootTupleMakerV2_Muons(const edm::ParameterSet& iConfig)
   // Variables for trigger matching
   //  HLT Single Muon
   produces <std::vector<bool  > > ( prefix + "HLTSingleMuonMatched"      + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchPt"      + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchEta"     + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleMuonMatchPhi"     + suffix );
+  produces <std::vector<float> >  ( prefix + "HLTSingleMuonMatchPt"      + suffix );
+  produces <std::vector<float> >  ( prefix + "HLTSingleMuonMatchEta"     + suffix );
+  produces <std::vector<float> >  ( prefix + "HLTSingleMuonMatchPhi"     + suffix );
   //  HLT Single Iso Muon
   produces <std::vector<bool  > > ( prefix + "HLTSingleIsoMuonMatched"   + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleIsoMuonMatchPt"   + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleIsoMuonMatchEta"  + suffix );
-  produces <std::vector<double> > ( prefix + "HLTSingleIsoMuonMatchPhi"  + suffix );
+  produces <std::vector<float> >  ( prefix + "HLTSingleIsoMuonMatchPt"   + suffix );
+  produces <std::vector<float> >  ( prefix + "HLTSingleIsoMuonMatchEta"  + suffix );
+  produces <std::vector<float> >  ( prefix + "HLTSingleIsoMuonMatchPhi"  + suffix );
 
   //
   if ( useCocktailRefits )
     {
       produces <std::vector<int>    > ( prefix + "CocktailRefitID"                + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailEta"                    + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailPhi"                    + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailPt"                     + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailEtaError"               + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailPhiError"               + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailPtError"                + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailQOverPError"            + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailP"                      + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailEta"                    + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailPhi"                    + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailPt"                     + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailEtaError"               + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailPhiError"               + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailPtError"                + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailQOverPError"            + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailP"                      + suffix ) ;
       produces <std::vector<int   > > ( prefix + "CocktailCharge"                 + suffix ) ;
       produces <std::vector<int   > > ( prefix + "CocktailTrkHits"                + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailTrkValidFractionOfHits" + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailTrkD0"                  + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailTrkD0Error"             + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailTrkDz"                  + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailTrkDzError"             + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailGlobalChi2"             + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailTrkValidFractionOfHits" + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailTrkD0"                  + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailTrkD0Error"             + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailTrkDz"                  + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailTrkDzError"             + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailGlobalChi2"             + suffix ) ;
 
-      produces <std::vector<double> > ( prefix + "CocktailTrkVtxDXY"                 + suffix ) ;
-      produces <std::vector<double> > ( prefix + "CocktailTrkVtxDZ"                  + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailTrkVtxDXY"                 + suffix ) ;
+      produces <std::vector<float> >  ( prefix + "CocktailTrkVtxDZ"                  + suffix ) ;
       produces <std::vector<int> >    ( prefix + "CocktailTrkVtxIndex"               + suffix ) ;
 
     }
   /*
-  produces <std::vector<double> > ( prefix + "CosmicCompatibility"     + suffix );
-  produces <std::vector<double> > ( prefix + "TimeCompatibility"       + suffix );
-  produces <std::vector<double> > ( prefix + "BackToBackCompatibility" + suffix );
-  produces <std::vector<double> > ( prefix + "OverlapCompatibility"    + suffix );
+  produces <std::vector<float> > ( prefix + "CosmicCompatibility"     + suffix );
+  produces <std::vector<float> > ( prefix + "TimeCompatibility"       + suffix );
+  produces <std::vector<float> > ( prefix + "BackToBackCompatibility" + suffix );
+  produces <std::vector<float> > ( prefix + "OverlapCompatibility"    + suffix );
   */
 }
 
@@ -167,21 +167,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<bool> >    isMediumMuon            ( new std::vector<bool>()    );
   std::auto_ptr<std::vector<bool> >    isTightMuon             ( new std::vector<bool>()    );
   std::auto_ptr<std::vector<bool> >    isHighPtMuon            ( new std::vector<bool>()    );
-  std::auto_ptr<std::vector<double> >  eta                     ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phi                     ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pt                      ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  etaError                ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  phiError                ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ptError                 ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkEta                  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPhi                  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPt                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkEtaError             ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPhiError             ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkPtError              ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  qoverpError             ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  p                       ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  energy                  ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   eta                     ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   phi                     ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pt                      ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   etaError                ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   phiError                ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ptError                 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkEta                  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkPhi                  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkPt                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkEtaError             ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkPhiError             ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkPtError              ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   qoverpError             ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   p                       ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   energy                  ( new std::vector<float>()  );
   std::auto_ptr<std::vector<int> >     charge                  ( new std::vector<int>()     );
   std::auto_ptr<std::vector<int> >     trkHits                 ( new std::vector<int>()     );
   std::auto_ptr<std::vector<int> >     trkHitsTrackerOnly      ( new std::vector<int>()     );
@@ -191,57 +191,57 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<int> >     segmentMatches          ( new std::vector<int>()     );
   std::auto_ptr<std::vector<int> >     stationMatches          ( new std::vector<int>()     );
   std::auto_ptr<std::vector<int> >     Valid                   ( new std::vector<int>()     );
-  std::auto_ptr<std::vector<double> >  trkValidFractionOfHits  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkD0                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkD0Error              ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkDz                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkDzError              ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkVx                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkVy                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkVz                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackChi2               ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  globalChi2              ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  combinedQualityChi2LocalPosition ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  combinedQualityTrkKink  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trkIso                  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  trackerIsoSumPT         ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ecalIso                 ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalIso                 ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hoIso                   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ecalVetoIso             ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  hcalVetoIso             ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  segmentCompatibility    ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   trkValidFractionOfHits  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkD0                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkD0Error              ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkDz                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkDzError              ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkVx                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkVy                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkVz                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trackChi2               ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   globalChi2              ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   combinedQualityChi2LocalPosition ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   combinedQualityTrkKink  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trkIso                  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   trackerIsoSumPT         ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ecalIso                 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   hcalIso                 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   hoIso                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ecalVetoIso             ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   hcalVetoIso             ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   segmentCompatibility    ( new std::vector<float>()  );
   //
-  std::auto_ptr<std::vector<double> >  pfisor03chargedhadron   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor03chargedparticle ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor03neutralhadron   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor03photon          ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor03neutralhadronht ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor03photonht        ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor03pu              ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor04chargedhadron   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor04chargedparticle ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor04neutralhadron   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor04photon          ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor04neutralhadronht ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor04photonht        ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  pfisor04pu              ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   pfisor03chargedhadron   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor03chargedparticle ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor03neutralhadron   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor03photon          ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor03neutralhadronht ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor03photonht        ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor03pu              ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor04chargedhadron   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor04chargedparticle ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor04neutralhadron   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor04photon          ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor04neutralhadronht ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor04photonht        ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   pfisor04pu              ( new std::vector<float>()  );
   std::auto_ptr<std::vector<int> >     passID                  ( new std::vector<int>()     );
   std::auto_ptr<std::vector<int> >     vtxIndex                ( new std::vector<int>()     );
-  std::auto_ptr<std::vector<double> >  vtxDistXY               ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  vtxDistZ                ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   vtxDistXY               ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   vtxDistZ                ( new std::vector<float>()  );
   std::auto_ptr<std::vector<int> >     bestTrackVtxIndex       ( new std::vector<int>()     );
-  std::auto_ptr<std::vector<double> >  bestTrackVtxDistXY      ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  bestTrackVtxDistZ       ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  primaryVertexDXY        ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  primaryVertexDXYError   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  beamspotDXY             ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  beamspotDXYError        ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   bestTrackVtxDistXY      ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   bestTrackVtxDistZ       ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   primaryVertexDXY        ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   primaryVertexDXYError   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   beamspotDXY             ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   beamspotDXYError        ( new std::vector<float>()  );
   std::auto_ptr<std::vector<int> >     IsGlobal                ( new std::vector<int>()     );
   std::auto_ptr<std::vector<int> >     IsTracker               ( new std::vector<int>()     );
-  std::auto_ptr<std::vector<double> >  matchedgenparticlept    ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticleeta   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  matchedgenparticlephi   ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   matchedgenparticlept    ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   matchedgenparticleeta   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   matchedgenparticlephi   ( new std::vector<float>()  );
   //
   // New variables added based on CMSSW 52X recommendations for LooseMuon and TightMuon Definitions
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Basline_muon_selections_for_2012
@@ -250,43 +250,43 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //
   // Trigger matching variables
   std::auto_ptr<std::vector<bool  > >  HLTSingleMuonMatched     ( new std::vector<bool  >()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchPt     ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchEta    ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleMuonMatchPhi    ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   HLTSingleMuonMatchPt     ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   HLTSingleMuonMatchEta    ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   HLTSingleMuonMatchPhi    ( new std::vector<float>()  );
   std::auto_ptr<std::vector<bool  > >  HLTSingleIsoMuonMatched  ( new std::vector<bool  >()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleIsoMuonMatchPt  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleIsoMuonMatchEta ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  HLTSingleIsoMuonMatchPhi ( new std::vector<double>()  );
+  std::auto_ptr<std::vector<float> >   HLTSingleIsoMuonMatchPt  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   HLTSingleIsoMuonMatchEta ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   HLTSingleIsoMuonMatchPhi ( new std::vector<float>()  );
   //
   std::auto_ptr<std::vector<int   > >  ctRefitID    ( new std::vector<int   > () );
-  std::auto_ptr<std::vector<double> >  ctEta        ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctPhi        ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctPt         ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctEtaError   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ctPhiError   ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ctPtError    ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ctQoverpError( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  ctP          ( new std::vector<double> () );
+  std::auto_ptr<std::vector<float> >   ctEta        ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctPhi        ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctPt         ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctEtaError   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ctPhiError   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ctPtError    ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ctQoverpError( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   ctP          ( new std::vector<float> () );
   std::auto_ptr<std::vector<int   > >  ctCharge     ( new std::vector<int   > () );
   std::auto_ptr<std::vector<int   > >  ctTrkHits    ( new std::vector<int   > () );
-  std::auto_ptr<std::vector<double> >  ctTrkValidFractionOfHits ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctTrkD0      ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctTrkD0Error ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctTrkDz      ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctTrkDzError ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctGlobalChi2 ( new std::vector<double> () );
+  std::auto_ptr<std::vector<float> >   ctTrkValidFractionOfHits ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctTrkD0      ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctTrkD0Error ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctTrkDz      ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctTrkDzError ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctGlobalChi2 ( new std::vector<float> () );
 
-  std::auto_ptr<std::vector<double> >  ctTrkvtxDistXY      ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  ctTrkvtxDistZ      ( new std::vector<double> () );
-  std::auto_ptr<std::vector<int> >  ctTrkvtxIndex      ( new std::vector<int> () );
+  std::auto_ptr<std::vector<float> >   ctTrkvtxDistXY     ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >   ctTrkvtxDistZ      ( new std::vector<float> () );
+  std::auto_ptr<std::vector<int> >     ctTrkvtxIndex      ( new std::vector<int> () );
 
 
   //
   /*
-  std::auto_ptr<std::vector<double> >  cosmicCompatibility     ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  timeCompatibility       ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  backToBackCompatibility ( new std::vector<double> () );
-  std::auto_ptr<std::vector<double> >  overlapCompatibility    ( new std::vector<double> () );
+  std::auto_ptr<std::vector<float> >  cosmicCompatibility     ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >  timeCompatibility       ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >  backToBackCompatibility ( new std::vector<float> () );
+  std::auto_ptr<std::vector<float> >  overlapCompatibility    ( new std::vector<float> () );
   */
 
   //-----------------------------------------------------------------
@@ -334,9 +334,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  /// Gen Matching
 	  //FIXME DMM: Update for pythia8. should use status 23 I think for outgoing muons.  Currently miniAOD stores only status 1
 			
-	  double genparPt = -999.;
-	  double genparEta= -999.;
-	  double genparPhi= -999.;
+	  float genparPt = -999.;
+	  float genparEta= -999.;
+	  float genparPhi= -999.;
 			
 	  if ( !iEvent.isRealData() ){
 	    //it->genParticleRefs().size() should be 0 or 1
@@ -353,13 +353,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		else edm::LogError("RootTupleMakerV2_MuonsError") << "genParticleRef " << igen+1 << "/" << it->genParticleRefs().size() << " is null!";
 	      }
 	  }
-	  matchedgenparticlept     -> push_back ( (double)(genparPt) );
-	  matchedgenparticleeta    -> push_back ( (double)(genparEta) );
-	  matchedgenparticlephi    -> push_back ( (double)(genparPhi) );
+	  matchedgenparticlept     -> push_back ( (float)(genparPt) );
+	  matchedgenparticleeta    -> push_back ( (float)(genparEta) );
+	  matchedgenparticlephi    -> push_back ( (float)(genparPhi) );
 			
 	  /// Gen Matching
 
-	  double trkd0   = it->track()->d0();
+	  float trkd0   = it->track()->d0();
 
 	  if( beamSpotCorr && beamSpot.isValid() )
 	    {
@@ -370,15 +370,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  // Vertex association
 	  //-- using pat::muon::track()
-	  double minVtxDist3D = 9999.;
-	  int    vtxIndex_    = -1;
-	  double vtxDistXY_   = -9999.;
-	  double vtxDistZ_    = -9999.;
+	  float minVtxDist3D = 9999.;
+	  int   vtxIndex_    = -1;
+	  float vtxDistXY_   = -9999.;
+	  float vtxDistZ_    = -9999.;
 	  //-- using reco::muon::muonBestTrack() - 2012 recommendation
-	  double bt_minVtxDist3D = 9999.;
-	  int    bt_vtxIndex_    = -1;
-	  double bt_vtxDistXY_   = -9999.;
-	  double bt_vtxDistZ_    = -9999.;
+	  float bt_minVtxDist3D = 9999.;
+	  int   bt_vtxIndex_    = -1;
+	  float bt_vtxDistXY_   = -9999.;
+	  float bt_vtxDistZ_    = -9999.;
 
 	  if(primaryVertices.isValid())
 	    {
@@ -387,9 +387,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
 		{
 		  //-- using pat::muon::track()
-		  double distXY = it->track()->dxy(v_it->position());
-		  double distZ  = it->track()->dz(v_it->position());
-		  double dist3D = sqrt(pow(distXY,2) + pow(distZ,2));
+		  float distXY = it->track()->dxy(v_it->position());
+		  float distZ  = it->track()->dz(v_it->position());
+		  float dist3D = sqrt(pow(distXY,2) + pow(distZ,2));
 		  if( dist3D < minVtxDist3D )
 		    {
 		      minVtxDist3D = dist3D;
@@ -400,9 +400,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		  //-- using reco::muon::muonBestTrack() - 2012 recommendation
 		  if( (it->muonBestTrack()).isNonnull() )
 		    {
-		      double bt_distXY = it->muonBestTrack()->dxy(v_it->position());
-		      double bt_distZ  = it->muonBestTrack()->dz(v_it->position());
-		      double bt_dist3D = sqrt( pow(bt_distXY,2) + pow(bt_distZ,2) );
+		      float bt_distXY = it->muonBestTrack()->dxy(v_it->position());
+		      float bt_distZ  = it->muonBestTrack()->dz(v_it->position());
+		      float bt_dist3D = sqrt( pow(bt_distXY,2) + pow(bt_distZ,2) );
 		      if( bt_dist3D < bt_minVtxDist3D )
 			{
 			  bt_minVtxDist3D = bt_dist3D;
@@ -567,7 +567,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 			
 		  reco::TrackRef cocktail_track = it->tunePMuonBestTrack();
 
-		  double cttrkd0  = cocktail_track -> d0() ;
+		  float cttrkd0  = cocktail_track -> d0() ;
 		  if( beamSpotCorr && beamSpot.isValid() )
 		    cttrkd0 = -(cocktail_track->dxy( beamSpot->position()));
 				
@@ -593,21 +593,21 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 				
 				
 		  // Values will hold vertex distance information
-		  int    bct_vtxIndex_    = -1;
-		  double bct_vtxDistXY_   = -9999.;
-		  double bct_vtxDistZ_    = -9999.;
+		  int   bct_vtxIndex_    = -1;
+		  float bct_vtxDistXY_   = -9999.;
+		  float bct_vtxDistZ_    = -9999.;
 				
 				
 		  // Loop over primary vertices
 		  if(primaryVertices.isValid())
 		    {
-		      double bct_bestdist3D = 999999.;
+		      float bct_bestdist3D = 999999.;
 				    
 		      for( reco::VertexCollection::const_iterator v_it=primaryVertices->begin() ; v_it!=primaryVertices->end() ; ++v_it )
 			{
-			  double bct_distXY = cocktail_track->dxy(v_it->position());
-			  double bct_distZ  = cocktail_track->dz(v_it->position());
-			  double bct_dist3D = sqrt( pow(bct_distXY,2) + pow(bct_distZ,2) );
+			  float bct_distXY = cocktail_track->dxy(v_it->position());
+			  float bct_distZ  = cocktail_track->dz(v_it->position());
+			  float bct_dist3D = sqrt( pow(bct_distXY,2) + pow(bct_distZ,2) );
 					
 			  if( bct_dist3D < bct_bestdist3D )
 			    {

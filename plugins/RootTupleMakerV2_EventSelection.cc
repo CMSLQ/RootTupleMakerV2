@@ -22,6 +22,10 @@ RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::Para
   // 
   produces <bool> ("passChargedHadronTrackResolutionFilter");
   produces <bool> ("passMuonBadTrackFilter");
+  //
+  produces <bool> ("badMuonsFlag");
+  produces <bool> ("duplicateMuonsFlag");
+  produces <bool> ("noBadMuonsFlag");
 }
 
 void RootTupleMakerV2_EventSelection::
@@ -41,6 +45,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<bool> passbadEESupercrystalFilter ( new bool() ) ;
   std::auto_ptr<bool> passchargedHadronTrackResolutionFilter( new bool() );
   std::auto_ptr<bool> passmuonBadTrackFilter( new bool() );
+  std::auto_ptr<bool> flagBadMuons( new bool() );
+  std::auto_ptr<bool> flagDuplicateMuons( new bool() );
+  std::auto_ptr<bool> flagNoBadMuons( new bool() );
   
   *passhbhenoisefilter.get() = true;
   *passhbhenoiseisofilter.get() = true;
@@ -55,6 +62,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passbadEESupercrystalFilter.get()            = true;
   *passchargedHadronTrackResolutionFilter.get() = true;
   *passmuonBadTrackFilter.get() = true;
+  *flagBadMuons.get()       = false;
+  *flagDuplicateMuons.get() = false;
+  *flagNoBadMuons.get()     = true;
   //-----------------------------------------------------------------
   edm::Handle<L1GlobalTriggerReadoutRecord> l1GtReadoutRecord;
   iEvent.getByToken(l1InputToken_, l1GtReadoutRecord);
@@ -189,6 +199,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if(index < filterNames.size())
       *passmuonBadTrackFilter.get() = filterResults->accept(index);
 
+    // Muon Bad or Duplicate Flags
+    index = filterNames.triggerIndex("Flag_badMuons");
+    if(index < filterNames.size())
+      *flagBadMuons.get() = filterResults->accept(index);
+
+    index = filterNames.triggerIndex("Flag_duplicateMuons");
+    if(index < filterNames.size())
+      *flagDuplicateMuons.get() = filterResults->accept(index);
+
+    index = filterNames.triggerIndex("Flag_noBadMuons");
+    if(index < filterNames.size())
+      *flagNoBadMuons.get() = filterResults->accept(index);
+
+
   } else {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the filterResultsInputTag";
   }
@@ -217,4 +241,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //
   iEvent.put(passchargedHadronTrackResolutionFilter,"passChargedHadronTrackResolutionFilter");
   iEvent.put(passmuonBadTrackFilter,"passMuonBadTrackFilter");
+  iEvent.put(flagBadMuons,"badMuonsFlag");
+  iEvent.put(flagDuplicateMuons,"duplicateMuonsFlag");
+  iEvent.put(flagNoBadMuons,"noBadMuonsFlag");
 }

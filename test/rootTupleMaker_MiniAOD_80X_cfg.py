@@ -75,7 +75,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 
 process.TFileService = cms.Service("TFileService",
     #fileName = cms.string( "file_m650.root" )
-    fileName = cms.string( "file_data.root" )
+    fileName = cms.string( "file_ntuple.root" )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -552,7 +552,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
   GenTag = cms.untracked.InputTag("prunedGenParticles"),
 	PdfInfoTag = cms.untracked.InputTag("generator"),
 	PdfSetNames = cms.untracked.vstring(
-            "PDF4LHC15_nlo_100.LHgrid" ,
+            #"PDF4LHC15_nlo_100.LHgrid" ,
             "CT10nlo.LHgrid" , 
             "MMHT2014nlo68cl.LHgrid",
             "NNPDF30_nlo_as_0118.LHgrid"

@@ -130,14 +130,14 @@ process.source.fileNames = [
     # signal
     #'/store/mc/RunIISummer16MiniAODv2/LQToUE_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/70000/A2EFEEC6-16C8-E611-92C1-008CFA111354.root'
     # amcatnlo DYJ inclusive
-    #'/store/mc/RunIISummer16MiniAODv2/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/002E68DE-22D0-E611-930C-0025905AA9F0.root'
+    '/store/mc/RunIISummer16MiniAODv2/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/002E68DE-22D0-E611-930C-0025905AA9F0.root'
     # MG HT
     #'/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/0073209B-97C9-E611-A6D0-008CFA5D2758.root'
     # powhegv2-madspin-pythia8
     #'/store/mc/RunIISummer16MiniAODv2/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/00688753-BCBD-E611-8B2F-001E67E71DDA.root'
     # powheg-pythia8
     #'/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
-    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
+    #'/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
     #'/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
 ]
 
@@ -376,7 +376,6 @@ process.applyCorrections += process.updatedPatJets
 ## https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription
 ## https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#METSysTools
 ##----------------------------------------------------------------------------------------------------
-postfix = "Recorrected"
 from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
 #myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
 myJecUncFile = '' # take from global tag
@@ -387,10 +386,49 @@ runMetCorAndUncFromMiniAOD(process,
                            #jetColl='slimmedJets',
                            isData=not varOptions.isMC,
                            #electronColl=cms.InputTag('slimmedElectrons'),
-                           #repro74X=True,
                            #jecUncFile=myJecUncFile,
-                           postfix=postfix                           
 )
+postfixMuEGClean = "MuEGClean"
+# Now we make the e/g corrected MET on top of the bad muon corrected MET (on re-miniaod)
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/ReMiniAOD03Feb2017Notes#MET_Recipes
+if not varOptions.isMC:
+  from PhysicsTools.PatUtils.tools.corMETFromMuonAndEG import corMETFromMuonAndEG
+  corMETFromMuonAndEG(process,
+                   pfCandCollection="", #not needed                                                                                                                                \
+                   electronCollection="slimmedElectronsBeforeGSFix",
+                   photonCollection="slimmedPhotonsBeforeGSFix",
+                   corElectronCollection="calibratedPatElectrons",
+                   corPhotonCollection="slimmedPhotons",
+                   allMETEGCorrected=True,
+                   muCorrection=False,
+                   eGCorrection=True,
+                   runOnMiniAOD=True,
+                   postfix=postfixMuEGClean
+  )
+  #process.load('PhysicsTools.PatAlgos.slimming.slimmedMETs_cfi')
+  process.slimmedMETsMuEGClean = process.slimmedMETs.clone()
+  process.slimmedMETsMuEGClean.src = cms.InputTag("patPFMetT1MuEGClean")
+  process.slimmedMETsMuEGClean.rawVariation =  cms.InputTag("patPFMetRawMuEGClean")
+  process.slimmedMETsMuEGClean.t1Uncertainties = cms.InputTag("patPFMetT1MuEGClean")
+  del process.slimmedMETsMuEGClean.caloMET
+  process.egcorrMET = cms.Sequence(
+     process.cleanedPhotonsMuEGClean+process.cleanedCorPhotonsMuEGClean+
+     process.matchedPhotonsMuEGClean + process.matchedElectronsMuEGClean +
+     process.corMETPhotonMuEGClean+process.corMETElectronMuEGClean+
+     process.patPFMetT1MuEGClean+process.patPFMetRawMuEGClean+
+     process.patPFMetT1SmearMuEGClean+process.patPFMetT1TxyMuEGClean+
+     process.patPFMetTxyMuEGClean+process.patPFMetT1JetEnUpMuEGClean+
+     process.patPFMetT1JetResUpMuEGClean+process.patPFMetT1SmearJetResUpMuEGClean+
+     process.patPFMetT1ElectronEnUpMuEGClean+process.patPFMetT1PhotonEnUpMuEGClean+
+     process.patPFMetT1MuonEnUpMuEGClean+process.patPFMetT1TauEnUpMuEGClean+
+     process.patPFMetT1UnclusteredEnUpMuEGClean+process.patPFMetT1JetEnDownMuEGClean+
+     process.patPFMetT1JetResDownMuEGClean+process.patPFMetT1SmearJetResDownMuEGClean+
+     process.patPFMetT1ElectronEnDownMuEGClean+process.patPFMetT1PhotonEnDownMuEGClean+
+     process.patPFMetT1MuonEnDownMuEGClean+process.patPFMetT1TauEnDownMuEGClean+
+     process.patPFMetT1UnclusteredEnDownMuEGClean+process.slimmedMETsMuEGClean)
+  process.rootTuplePFMETSequence*=process.egcorrMET
+
+postfix=''
 if varOptions.isMC:
   process.applyCorrections += getattr(process,'genMetExtractor{0}'.format(postfix))
 process.applyCorrections += getattr(process,'patJetCorrFactorsReapplyJEC{0}'.format(postfix))
@@ -415,13 +453,15 @@ process.schedule.append(process.metCorAndUncPath)
 # hacks to fix patPFMETCorrections_cff (used by runMETCorrectionsAndUncertainties)
 process.patSmearedJets.src = cms.InputTag('updatedPatJets')
 process.selectedPatJetsForMetT1T2Corr.src = cms.InputTag('updatedPatJets')
-process.selectedPatJetsForMetT1T2CorrRecorrected.src = cms.InputTag('updatedPatJets')
+#process.selectedPatJetsForMetT1T2CorrRecorrected.src = cms.InputTag('updatedPatJets')
 process.selectedPatJetsForMetT2Corr.src = cms.InputTag('updatedPatJets')
-process.selectedPatJetsForMetT2CorrRecorrected.src = cms.InputTag('updatedPatJets')
+#process.selectedPatJetsForMetT2CorrRecorrected.src = cms.InputTag('updatedPatJets')
 getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
 getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).srcPFlow = cms.InputTag('packedPFCandidates')
 
 # ntuplize the newly-corrected MET
+if not varOptions.isMC:
+  postfix=postfixMuEGClean
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
 process.rootTuplePFMETType1CorNotRecorrected.Suffix = 'Type1CorNotRecorrected'
 process.rootTuplePFMETType1XYCorNotRecorrected = process.rootTuplePFMETType1XYCor.clone()

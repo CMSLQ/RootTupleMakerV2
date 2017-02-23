@@ -137,8 +137,8 @@ process.source.fileNames = [
     #'/store/mc/RunIISummer16MiniAODv2/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/00688753-BCBD-E611-8B2F-001E67E71DDA.root'
     # powheg-pythia8
     #'/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
-    #'/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
-  '/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
+    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
+    #'/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -180,8 +180,12 @@ process.cleanMuonTriggerMatchHLTSingleIsoMuon.matched = 'unpackedPatTrigger'
 ####                               'keep *_ electronsTriggeredHLTDoubleElectron_*_*' ]
 
 process.schedule = cms.Schedule()
-# Need the egamma smearing for 80X: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMSmearer
-process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
+# EGMRegression https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMRegression
+from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
+process = regressionWeights(process)
+process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
+# Need the egamma smearing for 80X: [https://twiki.cern.ch/twiki/bin/viewauth/CMS/EGMRegression#Consistent_EGMSmearer
+process.load('EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi')
 process.calibratedPatElectrons.isMC = varOptions.isMC
 process.selectedElectrons = cms.EDFilter(
   "PATElectronSelector",
@@ -189,6 +193,8 @@ process.selectedElectrons = cms.EDFilter(
   cut = cms.string("pt > 5 && abs(eta)<2.5")
 )
 process.calibratedPatElectrons.electrons = cms.InputTag('selectedElectrons')
+# Set the lines below to True or False depending if you are correcting the scale (data) or smearing the resolution (MC) 
+process.calibratedPatElectrons.isMC = varOptions.isMC
 # ntuplize this corrected electron collection
 process.rootTupleElectrons.InputTag = cms.InputTag('calibratedPatElectrons')
 # HEEP 5.1/6.0
@@ -223,6 +229,7 @@ process.electronRegressionValueMapProducer.srcMiniAOD = process.rootTupleElectro
 process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag#FIXME do we need this?
 
 process.electronSupportPath = cms.Path()
+process.electronSupportPath += process.regressionApplication
 process.electronSupportPath += process.selectedElectrons
 process.electronSupportPath += process.calibratedPatElectrons
 #process.electronSupportPath += process.egmGsfElectronIDs

@@ -89,7 +89,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 # MC
 if varOptions.isMC:
-  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6'
+  process.GlobalTag.globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v8'
 else:
   #process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v16' # for 03Feb2017 re-miniaod 2016 H Prompt
   process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'# for 03Feb2017 re-miniaod (2016B-G)
@@ -282,8 +282,8 @@ process.schedule.append(process.electronSupportPath)
 #process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 
 # Loading  JEC/JER from local DB file
-dbJetMCDBFile = 'Summer16_23Sep2016V3_MC.db'
-dbJetDataDBFile = 'Summer16_23Sep2016AllV3_DATA.db'
+dbJetMCDBFile = 'Summer16_23Sep2016V4_MC.db'
+dbJetDataDBFile = 'Summer16_23Sep2016AllV4_DATA.db'
 
 # Use JER from GR
 process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True
@@ -297,12 +297,12 @@ from CondCore.DBCommon.CondDBSetup_cfi import *
 # JEC
 jecPSetDataAK4chs = cms.PSet(
     record = cms.string('JetCorrectionsRecord'),
-    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016AllV3_DATA_AK4PFchs'),
+    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016AllV4_DATA_AK4PFchs'),
     label  = cms.untracked.string('AK4PFchs')
 )
 jecPSetMCAK4chs = cms.PSet(
     record = cms.string('JetCorrectionsRecord'),
-    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016V3_MC_AK4PFchs'),
+    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016V4_MC_AK4PFchs'),
     label  = cms.untracked.string('AK4PFchs')
 )
 process.jec = cms.ESSource("PoolDBESSource",
@@ -374,6 +374,34 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 #myJecUncFile = jecUncFileMC if varOptions.isMC else jecUncFileData
 myJecUncFile = '' # take from global tag
 #default configuration for miniAOD reprocessing
+
+#if varOptions.isMC == true:
+#  from MetTools.MetPhiCorrections.tools.multPhiCorr_Summer16_MC_DY_80X_sumPt_cfi import multPhiCorr_MC_DY_sumPT_80X as multPhiCorrParams_Txy_25ns
+#else :
+  from MetTools.MetPhiCorrections.tools.multPhiCorr_ReMiniAOD_Data_BCDEF_80X_sumPt_cfi import multPhiCorr_Data_BCDEF_80X as multPhiCorrParams_Txy_25ns #reMiniAOD B-F
+  #from MetTools.MetPhiCorrections.tools.multPhiCorr_ReMiniAOD_Data_GH_80X_sumPt_cfi import multPhiCorr_Data_GH_80X as multPhiCorrParams_Txy_25ns #reMiniAOD G-H
+
+#Do NOT remove the following line, it is used to insert the correct XY correction from the job creator
+#MetPhiCorrectionsInsertHere
+
+multPhiCorrParams_T0rtTxy_25ns     = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+multPhiCorrParams_T0rtT1Txy_25ns   = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+multPhiCorrParams_T0rtT1T2Txy_25ns = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+multPhiCorrParams_T0pcTxy_25ns     = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+multPhiCorrParams_T0pcT1Txy_25ns   = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+multPhiCorrParams_T0pcT1T2Txy_25ns = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+multPhiCorrParams_T1Txy_25ns       = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+multPhiCorrParams_T1T2Txy_25ns     = cms.VPSet( pset for pset in multPhiCorrParams_Txy_25ns)
+
+process.pfMEtMultShiftCorr2 = cms.EDProducer("MultShiftMETcorrInputProducer",
+    srcPFlow = cms.InputTag('packedPFCandidates', ''),
+    vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    parameters = multPhiCorrParams_Txy_25ns
+)
+#pfMEtSysShiftCorrSequence = cms.Sequence( pfMEtMultShiftCorr )
+#process.pfMEtMultShiftCorrPath = cms.Path()
+#process.pfMEtMultShiftCorrPath +=process.pfMEtMultShiftCorr
+#process.schedule.append(process.pfMEtMultShiftCorrPath)
 runMetCorAndUncFromMiniAOD(process,
                            #jetCollUnskimmed='slimmedJets',
                            #jetCollUnskimmed='updatedPatJets',
@@ -413,6 +441,8 @@ process.selectedPatJetsForMetT2Corr.src = cms.InputTag('updatedPatJets')
 process.selectedPatJetsForMetT2CorrRecorrected.src = cms.InputTag('updatedPatJets')
 getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
 getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).srcPFlow = cms.InputTag('packedPFCandidates')
+getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).parameters = multPhiCorrParams_Txy_25ns
+#cms.InputTag('packedPFCandidates')
 
 # ntuplize the newly-corrected MET
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
@@ -453,7 +483,8 @@ metMap = {
   'pes'  : '',
 }
 #mettypes = ['CaloMET','CaloMETType1Cor','PFMET','PFMETType1Cor','PFMETType01Cor','PFMETType01XYCor','PFMETPuppi','PFMETPuppiType1Cor']
-mettypes = ['PFMETType1XYCor','PFMETPuppiType1Cor']
+#mettypes = ['PFMETType1XYCor','PFMETPuppiType1Cor']
+mettypes = ['PFMETType1XYCor']
 for shift in allowedShifts:
     for sign in allowedSigns:
       # FIXME TODO
@@ -626,6 +657,7 @@ process.p = cms.Path(
     process.rootTupleVertex*
     process.rootTuplePFJetsSequence*
     #process.rootNTuplePFMET*
+    process.pfMEtMultShiftCorr2*
     process.rootTuplePFMETSequence*
     process.rootTuplePFMETType1CorNotRecorrected*
     process.rootTupleTriggerObjects*

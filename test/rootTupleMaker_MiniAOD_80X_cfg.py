@@ -130,7 +130,7 @@ process.source.fileNames = [
     # signal
     #'/store/mc/RunIISummer16MiniAODv2/LQToUE_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/70000/A2EFEEC6-16C8-E611-92C1-008CFA111354.root'
     # amcatnlo DYJ inclusive
-    '/store/mc/RunIISummer16MiniAODv2/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/002E68DE-22D0-E611-930C-0025905AA9F0.root'
+    #'/store/mc/RunIISummer16MiniAODv2/DYToLL_0J_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/100000/002E68DE-22D0-E611-930C-0025905AA9F0.root'
     # MG HT
     #'/store/mc/RunIISummer16MiniAODv2/DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/0073209B-97C9-E611-A6D0-008CFA5D2758.root'
     # powhegv2-madspin-pythia8
@@ -138,7 +138,7 @@ process.source.fileNames = [
     # powheg-pythia8
     #'/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
     #'/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
-    #'/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
+    '/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -381,9 +381,9 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 myJecUncFile = '' # take from global tag
 #default configuration for miniAOD reprocessing
 
-#if varOptions.isMC == true:
-#  from MetTools.MetPhiCorrections.tools.multPhiCorr_Summer16_MC_DY_80X_sumPt_cfi import multPhiCorr_MC_DY_sumPT_80X as multPhiCorrParams_Txy_25ns
-#else :
+if varOptions.isMC == true:
+  from MetTools.MetPhiCorrections.tools.multPhiCorr_Summer16_MC_DY_80X_sumPt_cfi import multPhiCorr_MC_DY_sumPT_80X as multPhiCorrParams_Txy_25ns
+else :
   from MetTools.MetPhiCorrections.tools.multPhiCorr_ReMiniAOD_Data_BCDEF_80X_sumPt_cfi import multPhiCorr_Data_BCDEF_80X as multPhiCorrParams_Txy_25ns #reMiniAOD B-F
   #from MetTools.MetPhiCorrections.tools.multPhiCorr_ReMiniAOD_Data_GH_80X_sumPt_cfi import multPhiCorr_Data_GH_80X as multPhiCorrParams_Txy_25ns #reMiniAOD G-H
 

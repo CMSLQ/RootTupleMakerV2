@@ -381,7 +381,7 @@ from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMet
 myJecUncFile = '' # take from global tag
 #default configuration for miniAOD reprocessing
 
-if varOptions.isMC == true:
+if varOptions.isMC == True:
   from MetTools.MetPhiCorrections.tools.multPhiCorr_Summer16_MC_DY_80X_sumPt_cfi import multPhiCorr_MC_DY_sumPT_80X as multPhiCorrParams_Txy_25ns
 else :
   from MetTools.MetPhiCorrections.tools.multPhiCorr_ReMiniAOD_Data_BCDEF_80X_sumPt_cfi import multPhiCorr_Data_BCDEF_80X as multPhiCorrParams_Txy_25ns #reMiniAOD B-F

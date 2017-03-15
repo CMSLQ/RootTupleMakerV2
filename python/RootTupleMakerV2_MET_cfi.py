@@ -350,23 +350,23 @@ rootTuplePFMETType1XYCorJetEnDown      = cms.EDProducer("RootTupleMakerV2_MET",
 rootTuplePFMETSequence = cms.Sequence(
     rootTuplePFMETRaw*
     rootTuplePFMETType1Cor*
-    rootTuplePFMETType01Cor*
+    #rootTuplePFMETType01Cor*
     rootTuplePFMETType1XYCor*
-    rootTuplePFMETType01XYCor*
+    #rootTuplePFMETType01XYCor*
     rootTuplePFMETPuppiRaw*
     rootTuplePFMETPuppiType1Cor*
-    rootTuplePFMETType1CorUnclusteredUp*
-    rootTuplePFMETType1CorUnclusteredDown*
-    rootTuplePFMETType1CorElectronEnUp*
-    rootTuplePFMETType1CorElectronEnDown*
-    rootTuplePFMETType1CorMuonEnUp*
-    rootTuplePFMETType1CorMuonEnDown*
-    rootTuplePFMETType1CorTauEnUp*
-    rootTuplePFMETType1CorTauEnDown*
-    rootTuplePFMETType1CorJetResUp*
-    rootTuplePFMETType1CorJetResDown*
-    rootTuplePFMETType1CorJetEnUp*
-    rootTuplePFMETType1CorJetEnDown*
+    #rootTuplePFMETType1CorUnclusteredUp*
+    #rootTuplePFMETType1CorUnclusteredDown*
+    #rootTuplePFMETType1CorElectronEnUp*
+    #rootTuplePFMETType1CorElectronEnDown*
+    #rootTuplePFMETType1CorMuonEnUp*
+    #rootTuplePFMETType1CorMuonEnDown*
+    #rootTuplePFMETType1CorTauEnUp*
+    #rootTuplePFMETType1CorTauEnDown*
+    #rootTuplePFMETType1CorJetResUp*
+    #rootTuplePFMETType1CorJetResDown*
+    #rootTuplePFMETType1CorJetEnUp*
+    #rootTuplePFMETType1CorJetEnDown*
     rootTuplePFMETType1XYCorUnclusteredUp*
     rootTuplePFMETType1XYCorUnclusteredDown*
     rootTuplePFMETType1XYCorElectronEnUp*

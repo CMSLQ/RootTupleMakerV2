@@ -144,9 +144,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	}
       }
       if (doExternalWeights==true){
-      edm::Handle<std::vector<float> > pdfCTEQWeightsHandle;
-      edm::Handle<std::vector<float> > pdfMMTHWeightsHandle;
-      edm::Handle<std::vector<float> > pdfNNPDFWeightsHandle;
+      edm::Handle<std::vector<double> > pdfCTEQWeightsHandle;
+      edm::Handle<std::vector<double> > pdfMMTHWeightsHandle;
+      edm::Handle<std::vector<double> > pdfNNPDFWeightsHandle;
       //edm::Handle<std::vector<float> > pdfPDF4LHCWeightsHandle;
 
       iEvent.getByToken(pdfCTEQWeightsInputToken_, pdfCTEQWeightsHandle);
@@ -158,7 +158,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfCTEQWeightsInputToken_";
         // /*pdfCTEQWeights.get() = *pdfCTEQWeightsHandle;
 	//Instead of the above line, have to divide by central value - if 0, set to 1
-	std::vector<float> weights = (*pdfCTEQWeightsHandle);
+	std::vector<double> weights = (*pdfCTEQWeightsHandle);
 	std::vector<float> reWeightsCTEQ;
 	unsigned int nmembers = weights.size();	
 	for (unsigned int i=0; i<nmembers; i++) {
@@ -185,7 +185,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         edm::LogInfo("RootTupleMakerV2_GenEventInfoInfo") << "Successfully obtained pdfMMTHWeightsInputToken_";
         //*pdfMMTHWeights.get() = *pdfMMTHWeightsHandle;
 	//Instead of the above line, have to divide by central value - if 0, set to 1
-	std::vector<float> weights = (*pdfMMTHWeightsHandle);
+	std::vector<double> weights = (*pdfMMTHWeightsHandle);
 	std::vector<float> reWeightsMMTH;
 	unsigned int nmembers = weights.size();	
 	for (unsigned int i=0; i<nmembers; i++) {
@@ -202,7 +202,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         //*pdfNNPDFWeights.get() = *pdfNNPDFWeightsHandle;
 	//Instead of the above line, have to divide by central value - if 0, set to 1
-	std::vector<float> weights = (*pdfNNPDFWeightsHandle);
+	std::vector<double> weights = (*pdfNNPDFWeightsHandle);
 	std::vector<float> reWeightsNNPDF;
 	unsigned int nmembers = weights.size();	
 	for (unsigned int i=0; i<nmembers; i++) {

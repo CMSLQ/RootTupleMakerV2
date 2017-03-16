@@ -104,25 +104,6 @@ process.maxEvents.input = 500
 # Input files
 process.source.fileNames = [
     # specified by InputList.txt
-    # LQToUE-M550
-    #'/store/mc/RunIIFall15MiniAODv2/LQToUE_ENuJJFilter_M-550_BetaHalf_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/20000/9CBC6301-61B8-E511-BC05-001E67398C5A.root'
-    # LQToCMu-M1000
-    #'/store/mc/RunIIFall15MiniAODv2/LQToCMu_M-1000_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/AA32F756-7BB8-E511-96C5-001E672488A4.root'
-    # Run2015D data
-    #'/store/data/Run2015D/SingleMuon/MINIAOD/16Dec2015-v1/10000/00006301-CAA8-E511-AD39-549F35AD8BC9.root'
-
-    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/30000/00AEB2F6-541B-E611-AF2A-0025905C42F2.root'
-    #'/store/mc/RunIISpring16MiniAODv2/ZZ_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/DA6AE5C6-151B-E611-9EEF-782BCB536A50.root'
-    #'/store/mc/RunIISpring16MiniAODv2/LQLQToTopMu_M-1000_TuneCUETP8M1_13TeV_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/46EDE553-8624-E611-AFB2-00259073E380.root'
-    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_Pt-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14_ext1-v1/80000/82E9F815-F958-E611-968C-00266CFF0234.root'
-    #'file:/afs/cern.ch/user/s/scooper/work/private/cmssw/8011/TestRootNTuplizerRecipe/src/LQToUE_M-1000_BetaOne-RunIISpring16MiniAODv2.root'
-    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/10000/0A23534F-F638-E611-8ED1-782BCB78621D.root'
-    #'/store/data/Run2016G/SingleMuon/MINIAOD/PromptReco-v1/000/278/820/00000/1C7D6E1E-6564-E611-B75B-FA163EDC3FC8.root'
-  #'/store/mc/RunIISpring16MiniAODv2/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/70000/0468BB7B-D53F-E611-8647-0CC47A0093EC.root'',
-    #'/store/mc/RunIISpring16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/premix_withHLT_80X_mcRun2_asymptotic_v14-v1/00000/042D62D1-C597-E611-8FA4-549F3525B9A0.root'                                                                
-
-    # sep23 rereco
-    #'/store/data/Run2016B/SingleElectron/MINIAOD/23Sep2016-v3/00000/00099863-E799-E611-A876-141877343E6D.root'
     # amcatnlo DYJ inclusive
     #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
     # amcatnlo WJets inclusive
@@ -136,9 +117,9 @@ process.source.fileNames = [
     # powhegv2-madspin-pythia8
     #'/store/mc/RunIISummer16MiniAODv2/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/00688753-BCBD-E611-8B2F-001E67E71DDA.root'
     # powheg-pythia8
-    #'/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
+    '/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
     #'/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
-    '/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
+    #'/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -153,11 +134,6 @@ from PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi import unpackedPatTri
 process.load('PhysicsTools.PatAlgos.slimming.unpackedPatTrigger_cfi')
 ###### need to load it into the process, or else it won't run
 process.unpackedPatTrigger = unpackedPatTrigger.clone()
-## For reHLT samples
-#process.unpackedPatTrigger.triggerResults = 'TriggerResults::HLT2'
-#process.rootTupleTriggerObjects.TriggerBitsTag = 'TriggerResults::HLT2'
-#process.rootTupleTrigger.HLTInputTag = 'TriggerResults::HLT2'
-#
 process.rootTupleEventSelection.L1InputTag  = 'gtStage2Digis'
 ####
 #####fixme removing because no trigger info?
@@ -197,20 +173,13 @@ process.calibratedPatElectrons.electrons = cms.InputTag('selectedElectrons')
 process.calibratedPatElectrons.isMC = varOptions.isMC
 # ntuplize this corrected electron collection
 process.rootTupleElectrons.InputTag = cms.InputTag('calibratedPatElectrons')
-# HEEP 5.1/6.0
+# HEEP 7
 # Also load Egamma cut-based ID in new VID framework while we're at it
 # See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
-#   and for HEEP: https://hypernews.cern.ch/HyperNews/CMS/get/egamma/1519/2/1/1/1.html
-# Set up everything that is needed to compute electron IDs and
-# add the ValueMaps with ID decisions into the event data stream
+#      https://twiki.cern.ch/twiki/bin/viewauth/CMS/HEEPElectronIdentificationRun2
 #
 # Load tools and function definitions
-#from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-#process.load("RecoEgamma.ElectronIdentification.egmGsfElectronIDs_cfi")
-#process.egmGsfElectronIDs.physicsObjectSrc = cms.InputTag('slimmedElectrons')
-#from PhysicsTools.SelectorUtils.centralIDRegistry import central_id_registry
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-#process.egmGsfElectronIDSequence = cms.Sequence(process.egmGsfElectronIDs)
 switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # Define which IDs we want to produce
 # Each of these two example IDs contains all four standard cut-based ID working points
@@ -232,41 +201,8 @@ process.electronSupportPath = cms.Path()
 process.electronSupportPath += process.regressionApplication
 process.electronSupportPath += process.selectedElectrons
 process.electronSupportPath += process.calibratedPatElectrons
-#process.electronSupportPath += process.egmGsfElectronIDs
 process.electronSupportPath += process.egmGsfElectronIDSequence
 process.schedule.append(process.electronSupportPath)
-
-
-#----------------------------------------------------------------------------------------------------
-# Add MVA electron ID
-#
-# MVA electron ID details on this twiki:
-# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2
-#
-#----------------------------------------------------------------------------------------------------
-#FIXME: Add the stuff to calculate this in the analyzer as per Hugues' example
-# See https://github.com/HuguesBrun/ExampleElectronMVAid/blob/master/plugins/ExampleElectronMVAid.cc
-
-#process.patConversions = cms.EDProducer("PATConversionProducer",
-#    electronSource = cms.InputTag("cleanPatElectrons")  
-#)
-# XXX FIXME still needed?
-
-#----------------------------------------------------------------------------------------------------
-# Add the PFJets
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
-# 
-# Recommended JEC for PFJets:
-# - L1FastJet : https://twiki.cern.ch/twiki/bin/view/CMS/JECAnalysesRecommendations#Corrections
-# - L2Relative: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-# - L3Absolute: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-#----------------------------------------------------------------------------------------------------
-#process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
-# MiniAOD default: ak4PFJetsCHS with Pt > 10 GeV
-#                  L1+L2+L3+residual corrections are applied;
-#                  b-tagging and pileup jet id information are embedded.
-#                  Links are provided to the constituent PF candidates. 
-
 
 #----------------------------------------------------------------------------------------------------
 # JER and JEC
@@ -370,6 +306,7 @@ process.rootTuplePFJetsAK4CHS.InputTag = cms.InputTag('updatedPatJets')
 process.applyCorrections = cms.Path()
 process.applyCorrections += process.patJetCorrFactors
 process.applyCorrections += process.updatedPatJets
+process.schedule.append(process.applyCorrections)
 
 ##----------------------------------------------------------------------------------------------------
 ## MET Re-Corrections and Uncertainties
@@ -417,6 +354,7 @@ runMetCorAndUncFromMiniAOD(process,
                            #jecUncFile=myJecUncFile,
 )
 postfixMuEGClean = "MuEGClean"
+postfixMuClean = 'MuClean'
 # Now we make the e/g corrected MET on top of the bad muon corrected MET (on re-miniaod)
 # https://twiki.cern.ch/twiki/bin/view/CMSPublic/ReMiniAOD03Feb2017Notes#MET_Recipes
 if not varOptions.isMC:
@@ -454,44 +392,65 @@ if not varOptions.isMC:
      process.patPFMetT1ElectronEnDownMuEGClean+process.patPFMetT1PhotonEnDownMuEGClean+
      process.patPFMetT1MuonEnDownMuEGClean+process.patPFMetT1TauEnDownMuEGClean+
      process.patPFMetT1UnclusteredEnDownMuEGClean+process.slimmedMETsMuEGClean)
-  process.rootTuplePFMETSequence*=process.egcorrMET
+  process.egCorrMETPath = cms.Path(process.egcorrMET)
+  # schedule the MET corrections first
+  process.metCorAndUncPath = cms.Path()
+  process.metCorAndUncPath += getattr(process,'fullPatMetSequence{0}'.format(''))
+  process.schedule.append(process.metCorAndUncPath)
+  process.schedule.append(process.egCorrMETPath)
+else: # is MC
+  # Now you are creating the bad muon corrected MET
+  process.load('RecoMET.METFilters.badGlobalMuonTaggersMiniAOD_cff')
+  process.badGlobalMuonTaggerMAOD.taggingMode = cms.bool(True)
+  process.cloneGlobalMuonTaggerMAOD.taggingMode = cms.bool(True)
+  from PhysicsTools.PatUtils.tools.muonRecoMitigation import muonRecoMitigation
 
-postfix=''
-if varOptions.isMC:
-  process.applyCorrections += getattr(process,'genMetExtractor{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patJetCorrFactorsReapplyJEC{0}'.format(postfix))
-#process.applyCorrections += process.patJets
-#process.applyCorrections += getattr(process,'selectedPatJets{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patJetsReapplyJEC{0}'.format(postfix))
-process.applyCorrections += getattr(process,'basicJetsForMet{0}'.format(postfix))
-process.applyCorrections += getattr(process,'jetSelectorForMet{0}'.format(postfix))
-process.applyCorrections += getattr(process,'cleanedPatJets{0}'.format(postfix))
-process.applyCorrections += getattr(process,'pfMet{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMet{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMetT1T2Corr{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMetTxyCorr{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMetT1{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMetT1Txy{0}'.format(postfix))
-process.applyCorrections += getattr(process,'patPFMetTxy{0}'.format(postfix))
-process.schedule.append(process.applyCorrections)
-# now schedule the MET corrections
-process.metCorAndUncPath = cms.Path()
-process.metCorAndUncPath += getattr(process,'fullPatMetSequence{0}'.format(postfix))
-process.schedule.append(process.metCorAndUncPath)
-# hacks to fix patPFMETCorrections_cff (used by runMETCorrectionsAndUncertainties)
-process.patSmearedJets.src = cms.InputTag('updatedPatJets')
-process.selectedPatJetsForMetT1T2Corr.src = cms.InputTag('updatedPatJets')
-#process.selectedPatJetsForMetT1T2CorrRecorrected.src = cms.InputTag('updatedPatJets')
-process.selectedPatJetsForMetT2Corr.src = cms.InputTag('updatedPatJets')
-#process.selectedPatJetsForMetT2CorrRecorrected.src = cms.InputTag('updatedPatJets')
-getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
-getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).srcPFlow = cms.InputTag('packedPFCandidates')
-getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).parameters = multPhiCorrParams_Txy_25ns
-#cms.InputTag('packedPFCandidates')
+  muonRecoMitigation(
+                     process = process,
+                     pfCandCollection = "packedPFCandidates", #input PF Candidate Collection
+                     runOnMiniAOD = True, #To determine if you are running on AOD or MiniAOD
+                     selection="", #You can use a custom selection for your bad muons. Leave empty if you would like to use the bad muon recipe definition.
+                     muonCollection="", #The muon collection name where your custom selection will be applied to. Leave empty if you would like to use the bad muon recipe definition.
+                     cleanCollName="cleanMuonsPFCandidates", #output pf candidate collection ame
+                     cleaningScheme="computeAllApplyClone", #Options are: "all", "computeAllApplyBad","computeAllApplyClone". Decides which (or both) bad muon collections to be used for MET cleaning coming from the bad muon recipe.
+                     #postfix=postfixMuClean #Use if you would like to add a post fix to your muon / pf collections
+                     postfix='' #Use if you would like to add a post fix to your muon / pf collections
+                     )
+
+  runMetCorAndUncFromMiniAOD(process,
+                         isData=not varOptions.isMC,
+                         pfCandColl="cleanMuonsPFCandidates",
+                         recoMetFromPFCs=True,
+                         postfix=postfixMuClean
+                         )
+
+  process.mucorMET = cms.Sequence(                     
+      process.badGlobalMuonTaggerMAOD *
+      process.cloneGlobalMuonTaggerMAOD *
+      #getattr(process,'cloneGlobalMuonTaggerMAOD{0}'.format(postfixMuClean)) *
+      #process.badMuons * # If you are using cleaning mode "all", uncomment this line
+      process.cleanMuonsPFCandidates *
+      #getattr(process,'cleanMuonsPFCandidates{0}'.format(postfixMuClean)) *
+      process.fullPatMetSequenceMuClean
+      )
+  process.mucorMETPath = cms.Path(process.mucorMET)
+  process.schedule.append(process.mucorMETPath)
+  # now schedule the MET corrections later
+  process.metCorAndUncPath = cms.Path()
+  process.metCorAndUncPath += getattr(process,'fullPatMetSequence{0}'.format(''))
+  process.schedule.append(process.metCorAndUncPath)
 
 # ntuplize the newly-corrected MET
 if not varOptions.isMC:
   postfix=postfixMuEGClean
+  getattr(process,'patPFMetTxyMuEGClean').vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
+  getattr(process,'patPFMetTxyMuEGClean').srcPFlow = cms.InputTag('packedPFCandidates')
+  getattr(process,'patPFMetTxyMuEGClean').parameters = multPhiCorrParams_Txy_25ns
+else:
+  postfix=postfixMuClean
+  getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
+  getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).srcPFlow = cms.InputTag('packedPFCandidates')
+  getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).parameters = multPhiCorrParams_Txy_25ns
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
 process.rootTuplePFMETType1CorNotRecorrected.Suffix = 'Type1CorNotRecorrected'
 process.rootTuplePFMETType1XYCorNotRecorrected = process.rootTuplePFMETType1XYCor.clone()

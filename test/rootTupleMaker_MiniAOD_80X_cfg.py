@@ -95,7 +95,7 @@ else:
   process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'# for 03Feb2017 re-miniaod (2016B-G)
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
-process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
+#process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
 
 
 # Events to process
@@ -117,8 +117,8 @@ process.source.fileNames = [
     # powhegv2-madspin-pythia8
     #'/store/mc/RunIISummer16MiniAODv2/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/00688753-BCBD-E611-8B2F-001E67E71DDA.root'
     # powheg-pythia8
-    '/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
-    #'/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
+    #'/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
+    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
     #'/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
 ]
 
@@ -224,42 +224,43 @@ process.schedule.append(process.electronSupportPath)
 #process.rootTuplePFJetsAK4CHS.JERScaleFactorsFile   = jerScaleFactorsFile
 #process.rootTuplePFJetsAK4Puppi.JERScaleFactorsFile = jerScaleFactorsFilePuppi
 
-# Loading  JEC/JER from local DB file
-dbJetMCDBFile = 'Summer16_23Sep2016V4_MC.db'
-dbJetDataDBFile = 'Summer16_23Sep2016AllV4_DATA.db'
-
-# Use JER from GR
-process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True
-process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = True
-
-# load JES/etc.from local db file, and into global tag
-jecDBPrefix='sqlite_file:'
-jetDBFile = jecDBPrefix+dbJetMCDBFile if varOptions.isMC else jecDBPrefix+dbJetDataDBFile
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-from CondCore.DBCommon.CondDBSetup_cfi import *
-# JEC
-jecPSetDataAK4chs = cms.PSet(
-    record = cms.string('JetCorrectionsRecord'),
-    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016AllV4_DATA_AK4PFchs'),
-    label  = cms.untracked.string('AK4PFchs')
-)
-jecPSetMCAK4chs = cms.PSet(
-    record = cms.string('JetCorrectionsRecord'),
-    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016V4_MC_AK4PFchs'),
-    label  = cms.untracked.string('AK4PFchs')
-)
-process.jec = cms.ESSource("PoolDBESSource",
-      DBParameters = cms.PSet(
-        messageLevel = cms.untracked.int32(0)
-        ),
-      timetype = cms.string('runnumber'),
-      toGet = cms.VPSet(
-        jecPSetMCAK4chs if varOptions.isMC else jecPSetDataAK4chs
-      ), 
-       connect = cms.string(jetDBFile)
-)
-## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
-process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+## Loading  JEC/JER from local DB file
+#dbJetMCDBFile = 'Summer16_23Sep2016V4_MC.db'
+#dbJetDataDBFile = 'Summer16_23Sep2016AllV4_DATA.db'
+#
+## Use JER from GR
+#process.rootTuplePFJetsAK4CHS.ReadJERFromGT = True
+#process.rootTuplePFJetsAK4Puppi.ReadJERFromGT = True
+#
+## load JES/etc.from local db file, and into global tag
+#jecDBPrefix='sqlite_file:'
+#jetDBFile = jecDBPrefix+dbJetMCDBFile if varOptions.isMC else jecDBPrefix+dbJetDataDBFile
+#process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#from CondCore.DBCommon.CondDBSetup_cfi import *
+## JEC
+#jecPSetDataAK4chs = cms.PSet(
+#    record = cms.string('JetCorrectionsRecord'),
+#    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016AllV4_DATA_AK4PFchs'),
+#    label  = cms.untracked.string('AK4PFchs')
+#)
+#jecPSetMCAK4chs = cms.PSet(
+#    record = cms.string('JetCorrectionsRecord'),
+#    tag    = cms.string('JetCorrectorParametersCollection_Summer16_23Sep2016V4_MC_AK4PFchs'),
+#    label  = cms.untracked.string('AK4PFchs')
+#)
+#process.jec = cms.ESSource("PoolDBESSource",
+#      DBParameters = cms.PSet(
+#        messageLevel = cms.untracked.int32(0)
+#        ),
+#      timetype = cms.string('runnumber'),
+#      toGet = cms.VPSet(
+#        jecPSetMCAK4chs if varOptions.isMC else jecPSetDataAK4chs
+#      ), 
+#       connect = cms.string(jetDBFile)
+#)
+### add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
+#process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
+#
 ## JER from local db
 #process.load("JetMETCorrections.Modules.JetResolutionESProducer_cfi")
 #from CondCore.DBCommon.CondDBSetup_cfi import *
@@ -443,13 +444,13 @@ else: # is MC
 # ntuplize the newly-corrected MET
 if not varOptions.isMC:
   postfix=postfixMuEGClean
-  getattr(process,'patPFMetTxyMuEGClean').vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
-  getattr(process,'patPFMetTxyMuEGClean').srcPFlow = cms.InputTag('packedPFCandidates')
+  #getattr(process,'patPFMetTxyMuEGClean').vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
+  #getattr(process,'patPFMetTxyMuEGClean').srcPFlow = cms.InputTag('packedPFCandidates')
   getattr(process,'patPFMetTxyMuEGClean').parameters = multPhiCorrParams_Txy_25ns
 else:
   postfix=postfixMuClean
-  getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
-  getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).srcPFlow = cms.InputTag('packedPFCandidates')
+  #getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).vertexCollection = cms.InputTag('offlineSlimmedPrimaryVertices')
+  #getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).srcPFlow = cms.InputTag('packedPFCandidates')
   getattr(process,'patPFMetTxyCorr{0}'.format(postfix)).parameters = multPhiCorrParams_Txy_25ns
 process.rootTuplePFMETType1CorNotRecorrected = process.rootTuplePFMETType1Cor.clone()
 process.rootTuplePFMETType1CorNotRecorrected.Suffix = 'Type1CorNotRecorrected'
@@ -542,14 +543,6 @@ for shift in allowedShifts:
 #----------------------------------------------------------------------------------------------------
 # XXX FIXME SIC: Needed? At least some matching is done by default in PAT/MiniAOD
 process.load("Leptoquarks.RootTupleMakerV2.leptonGenMatching_cfi")
-#process.patDefaultSequence.replace( process.electronMatch, process.elMatch )
-#process.patElectrons.genParticleMatch = cms.VInputTag( cms.InputTag("elMatch") )
-#process.patDefaultSequence.replace( process.muonMatch, process.muMatch )
-#process.patMuons.genParticleMatch = cms.VInputTag( cms.InputTag("muMatch") )
-#process.patDefaultSequence.replace( process.tauMatch, process.tauLepMatch )
-#process.patTaus.genParticleMatch = cms.VInputTag( cms.InputTag("tauLepMatch") )
-#process.patDefaultSequence.replace( process.tauGenJetMatch, process.tauJetMatch )
-#process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
 
 #----------------------------------------------------------------------------------------------------
 # Lepton + Jets filter

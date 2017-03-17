@@ -27,8 +27,9 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   produces <std::vector<float> > ( "PDFMMTHWeights" );
   produces <std::vector<float> > ( "PDFNNPDFWeights" );
   //produces <std::vector<float> > ( "PDFPDF4LHCWeights" );
-  produces <std::vector<float> > ( "PDFAmcNLOWeights" );
+  produces <std::vector<float> > ( "PDFNNPDFWeightsAMCNLO" );
   produces <std::vector<float> > ( "ScaleWeights" );
+  produces <std::vector<float> > ( "ScaleWeightsAMCNLO" );
   produces <float>               ( "amcNLOWeight" );
   produces <std::vector<int> >   ( "PileUpInteractions");
   produces <std::vector<int> >   ( "PileUpOriginBX" ) ;
@@ -92,8 +93,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<float> >  pdfMMTHWeights  ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  pdfNNPDFWeights  ( new std::vector<float>()  );
   //std::auto_ptr<std::vector<float> >  pdfPDF4LHCWeights  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pdfAmcNLOWeights (new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  pdfNNPDFWeightsAMCNLO (new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  scaleWeights  ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  scaleWeightsAMCNLO  ( new std::vector<float>()  );
   std::auto_ptr<float>                amcNLOweight  ( new float()  );
   std::auto_ptr<std::vector<int >  >  Number_interactions  ( new std::vector<int>() );
   std::auto_ptr<std::vector<float> >  trueNumberInteractions ( new std::vector<float>() );
@@ -265,12 +267,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  //std::cout<<i<<"  "<<theWeight<<"  "<<EvtHandle->weights()[i].wgt<<"  "<<EvtHandle->originalXWGTUP()<<std::endl;
       		thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
 		scaleWeights->push_back(thisWeight);
+      		thisWeight = (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); //fixme todo: removed theWeight, was multiplying by a factor +-200000 in amc@NLO
+		scaleWeightsAMCNLO->push_back(thisWeight);
       	}
 	//This is for PDF weights which are stored internally by the generator. Pythia and Powheg do not have them. MG has all of them, amc@NLO has only variations of the PDF set used to produce it.
       	
 	for (unsigned int i=9; i <= 109; i++) {
 	  thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
 	  pdfNNPDFWeights->push_back(thisWeight);
+	  thisWeight = (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); //fixme todo: removed theWeight, was multiplying by a factor +-200000 in amc@NLO
+	  //std::cout<<i<<"  "<<theWeight<<"  "<<EvtHandle->weights()[i].wgt<<"  "<<EvtHandle->originalXWGTUP()<<std::endl;
+	  //EvtHandle->weights()[0].wgt < 0 ? 
+	  pdfNNPDFWeightsAMCNLO->push_back(thisWeight);
+
 	}
 	
       	for (unsigned int i=315; i <= 365; i++) {
@@ -287,13 +296,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  pdfPDF4LHCWeights->push_back(thisWeight);
 	}
 	*/
-      	for (unsigned int i=9; i <= 109; i++) {//fixme todo: adding this for amc@nlo - needs to be updated manually if production PDF changes
-	  thisWeight = (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); //fixme todo: removed theWeight, was multiplying by a factor +-200000 in amc@NLO
-	  //std::cout<<i<<"  "<<theWeight<<"  "<<EvtHandle->weights()[i].wgt<<"  "<<EvtHandle->originalXWGTUP()<<std::endl;
-	  //EvtHandle->weights()[0].wgt < 0 ? 
-	  pdfAmcNLOWeights->push_back(thisWeight);
-	}
-	
+    
       	EvtHandle->weights()[0].wgt < 0 ? *amcNLOweight.get()=-1. : *amcNLOweight.get()=1.;
       
       	/*
@@ -321,8 +324,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pdfMMTHWeights, "PDFMMTHWeights" );
   iEvent.put( pdfNNPDFWeights, "PDFNNPDFWeights" );
   //iEvent.put( pdfPDF4LHCWeights, "PDFPDF4LHCWeights" );
-  iEvent.put( pdfAmcNLOWeights, "PDFAmcNLOWeights");
+  iEvent.put( pdfNNPDFWeightsAMCNLO, "PDFNNPDFWeightsAMCNLO");
   iEvent.put( scaleWeights, "ScaleWeights" );
+  iEvent.put( scaleWeightsAMCNLO, "ScaleWeightsAMCNLO" );
   iEvent.put( amcNLOweight, "amcNLOWeight" );
   iEvent.put( Number_interactions,   "PileUpInteractions"   );
   iEvent.put( trueNumberInteractions, "PileUpInteractionsTrue" );

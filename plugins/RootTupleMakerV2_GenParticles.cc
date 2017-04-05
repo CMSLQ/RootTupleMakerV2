@@ -205,7 +205,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // for W/Z Pt
       // we always have 2 hard process leptons in DY or W samples; in other samples we may not
       if(hardProcessLeptonLorentzVectors.size()==2)
-        *worzsystempt.get() = (hardProcessLeptonLorentzVectors[0].pt()+hardProcessLeptonLorentzVectors[1].pt());
+        *worzsystempt.get() = (hardProcessLeptonLorentzVectors[0]+hardProcessLeptonLorentzVectors[1]).pt();
 
     } else { // invalid genParticles handle
       edm::LogError("RootTupleMakerV2_GenParticlesError") << "Error! Can't get the genPartInputToken_";

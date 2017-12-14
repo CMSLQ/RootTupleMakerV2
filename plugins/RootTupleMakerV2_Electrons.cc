@@ -209,9 +209,9 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
 
   // Track information
 
-  produces <std::vector<float> > ( prefix + "TrackVx"                  + suffix );
-  produces <std::vector<float> > ( prefix + "TrackVy"                  + suffix );
-  produces <std::vector<float> > ( prefix + "TrackVz"                  + suffix );
+  produces <std::vector<float> > ( prefix + "TrackPx"                  + suffix );
+  produces <std::vector<float> > ( prefix + "TrackPy"                  + suffix );
+  produces <std::vector<float> > ( prefix + "TrackPz"                  + suffix );
   produces <std::vector<float> > ( prefix + "TrackPt"                  + suffix );
   produces <std::vector<float> > ( prefix + "TrackValidFractionOfHits" + suffix );
 
@@ -404,9 +404,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Track information 
 
-  std::auto_ptr<std::vector<float> >  trackVx                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackVy                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackVz                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackPx                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackPy                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackPz                   ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  trackPt                   ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  trackValidFractionOfHits  ( new std::vector<float>()  );  
 
@@ -992,9 +992,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
 			       
       // Track information     
-      trackVx                  -> push_back( it->gsfTrack()->vx() );
-      trackVy                  -> push_back( it->gsfTrack()->vy() );
-      trackVz                  -> push_back( it->gsfTrack()->vz() );
+      trackPx                  -> push_back( it->gsfTrack()->px() );
+      trackPy                  -> push_back( it->gsfTrack()->py() );
+      trackPz                  -> push_back( it->gsfTrack()->pz() );
       trackPt                  -> push_back( it->gsfTrack()->pt() );
       trackValidFractionOfHits -> push_back( it->gsfTrack()->validFraction() );
 
@@ -1144,9 +1144,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Track information
 
-  iEvent.put( trackVx                 , prefix + "TrackVx"                  + suffix );
-  iEvent.put( trackVy                 , prefix + "TrackVy"                  + suffix );
-  iEvent.put( trackVz                 , prefix + "TrackVz"                  + suffix );
+  iEvent.put( trackPx                 , prefix + "Trackpx"                  + suffix );
+  iEvent.put( trackPy                 , prefix + "Trackpy"                  + suffix );
+  iEvent.put( trackPz                 , prefix + "Trackpz"                  + suffix );
   iEvent.put( trackPt                 , prefix + "TrackPt"                  + suffix );
   iEvent.put( trackValidFractionOfHits, prefix + "TrackValidFractionOfHits" + suffix );
 

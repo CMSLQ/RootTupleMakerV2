@@ -72,7 +72,6 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   //------------------------------------------------------------------------
   
   // Kinematic variables
-
   produces <std::vector<float> > ( prefix + "Eta"                      + suffix );
   produces <std::vector<float> > ( prefix + "Phi"                      + suffix );
   produces <std::vector<float> > ( prefix + "Pt"                       + suffix );
@@ -80,11 +79,10 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<float> > ( prefix + "Energy"                   + suffix );
   produces <std::vector<float> > ( prefix + "CaloEnergy"               + suffix );
   produces <std::vector<float> > ( prefix + "EcalEnergy"               + suffix );
-  produces <std::vector<int> >    ( prefix + "Charge"                   + suffix );
+  produces <std::vector<int> >   ( prefix + "Charge"                   + suffix );
   produces <std::vector<float> > ( prefix + "HoE"                      + suffix );
 								        
   // Supercluster kinematic variables				        
-								        
   produces <std::vector<float> > ( prefix + "ESuperClusterOverP"       + suffix );
   produces <std::vector<float> > ( prefix + "SCEta"                    + suffix );
   produces <std::vector<float> > ( prefix + "SCSeedEta"                + suffix );
@@ -93,25 +91,24 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<float> > ( prefix + "SCRawEnergy"              + suffix );
   produces <std::vector<float> > ( prefix + "SCEnergy"                 + suffix );
   produces <std::vector<float> > ( prefix + "SCSeedCryEnergy"          + suffix );
-  produces <std::vector<bool> >   ( prefix + "SCSeedCryIsBarrel"        + suffix );
+  produces <std::vector<bool> >  ( prefix + "SCSeedCryIsBarrel"        + suffix );
 
   // ID information
-  
   produces <std::vector<int> >     ( prefix + "PassId"                     + suffix );
   produces <std::vector<bool> >    ( prefix + "PassEGammaIDVeto"           + suffix );
   produces <std::vector<bool> >    ( prefix + "PassEGammaIDLoose"          + suffix );
   produces <std::vector<bool> >    ( prefix + "PassEGammaIDMedium"         + suffix );
   produces <std::vector<bool> >    ( prefix + "PassEGammaIDTight"          + suffix );
   produces <std::vector<bool> >    ( prefix + "PassHEEPID"                 + suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDMedium" + suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDTight"  + suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDMedium" + suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDTight"  + suffix );
   produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDHEEP"   + suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDLoose" + suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
-  produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDTight" + suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDLoose" + suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
+  //produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDTight" + suffix );
   produces <std::vector<std::string> >    ( prefix + "CutFlowHashesEGammaIDHEEP"  + suffix );
   produces <std::vector<float> >   ( prefix + "RhoIsoHEEP"                 + suffix );
 
@@ -127,31 +124,27 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<bool> >   ( prefix + "HasTrackerDrivenSeed"     + suffix );
 
   // Charge consistency variables - Ferdinando Giordano
-
   produces <std::vector<bool> >   ( prefix + "GsfCtfScPixCharge"        + suffix );
   produces <std::vector<bool> >   ( prefix + "GsfScPixCharge"           + suffix );
   produces <std::vector<bool> >   ( prefix + "GsfCtfCharge"             + suffix );
 
   // EE or EB - Ferdinando Giordano
-
   produces <std::vector<bool> >   ( prefix + "IsEB"                     + suffix );
   produces <std::vector<bool> >   ( prefix + "IsEE"                     + suffix );
   
   // ECAL eta/phi vs tracker eta/phi				        
-								        
   produces <std::vector<float> > ( prefix + "DeltaPhiTrkSC"            + suffix );
   produces <std::vector<float> > ( prefix + "DeltaEtaTrkSC"            + suffix );
   produces <std::vector<float> > ( prefix + "DeltaEtaTrkSeedSC"        + suffix );
 								        
   // Shower shape						        
-								        
   produces <std::vector<float> > ( prefix + "SigmaEtaEta"              + suffix );
-  produces <std::vector<float> > ( prefix + "SigmaIEtaIEta"            + suffix );
+  //produces <std::vector<float> > ( prefix + "SigmaIEtaIEta"            + suffix );
   produces <std::vector<float> > ( prefix + "Full5x5SigmaIEtaIEta"     + suffix );
   produces <std::vector<int> >    ( prefix + "Classif"                  + suffix );
   produces <std::vector<float> > ( prefix + "R9"                       + suffix );
-  produces <std::vector<float> > ( prefix + "E1x5OverE5x5"             + suffix );
-  produces <std::vector<float> > ( prefix + "E2x5OverE5x5"             + suffix );
+  //produces <std::vector<float> > ( prefix + "E1x5OverE5x5"             + suffix );
+  //produces <std::vector<float> > ( prefix + "E2x5OverE5x5"             + suffix );
   produces <std::vector<float> > ( prefix + "Full5x5E1x5OverE5x5"      + suffix );
   produces <std::vector<float> > ( prefix + "Full5x5E2x5OverE5x5"      + suffix );
   								        
@@ -164,18 +157,16 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   //produces <std::vector<int> >    ( prefix + "PassIsoPAT"               + suffix );
 
   // Isolation variables: particle flow
-  
   produces <std::vector<float> > ( prefix + "PFChargedHadronIso03"     + suffix );
   produces <std::vector<float> > ( prefix + "PFNeutralHadronIso03"     + suffix );
   produces <std::vector<float> > ( prefix + "PFPhotonIso03"            + suffix );
   produces <std::vector<float> > ( prefix + "PFPUIso03"                + suffix );
 
-  produces <std::vector<float> > ( prefix + "PFChargedHadronIso04"     + suffix );
-  produces <std::vector<float> > ( prefix + "PFNeutralHadronIso04"     + suffix );
-  produces <std::vector<float> > ( prefix + "PFPhotonIso04"            + suffix );
+  //produces <std::vector<float> > ( prefix + "PFChargedHadronIso04"     + suffix );
+  //produces <std::vector<float> > ( prefix + "PFNeutralHadronIso04"     + suffix );
+  //produces <std::vector<float> > ( prefix + "PFPhotonIso04"            + suffix );
   
   // Isolation variables: DR 0.3				        
-								        
   produces <std::vector<float> > ( prefix + "EcalIsoDR03"              + suffix );
   produces <std::vector<float> > ( prefix + "HcalIsoDR03"              + suffix );
   produces <std::vector<float> > ( prefix + "HcalIsoDR03FullCone"      + suffix );
@@ -187,7 +178,6 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<float> > ( prefix + "Heep70TrkIso"             + suffix );
 				        
   // Conversion variables					        
-								        
   produces <std::vector<int> >    ( prefix + "MissingHits"              + suffix );
   produces <std::vector<int> >    ( prefix + "MissingHitsEG"            + suffix );
   produces <std::vector<float> > ( prefix + "Dist"                     + suffix );
@@ -196,8 +186,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<bool> >   ( prefix + "HasMatchedConvPhot"       + suffix );
 
   // Vertex and beamspot information
-
-  produces <std::vector<int> >    ( prefix + "VtxIndex"                 + suffix );
+  produces <std::vector<int> >   ( prefix + "VtxIndex"                 + suffix );
   produces <std::vector<float> > ( prefix + "VtxDistXY"                + suffix );
   produces <std::vector<float> > ( prefix + "VtxDistZ"                 + suffix );
   produces <std::vector<float> > ( prefix + "LeadVtxDistXY"            + suffix );
@@ -208,10 +197,9 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<float> > ( prefix + "BeamSpotDXYError"         + suffix );
 
   // Track information
-
-  produces <std::vector<float> > ( prefix + "TrackVx"                  + suffix );
-  produces <std::vector<float> > ( prefix + "TrackVy"                  + suffix );
-  produces <std::vector<float> > ( prefix + "TrackVz"                  + suffix );
+  produces <std::vector<float> > ( prefix + "TrackPx"                  + suffix );
+  produces <std::vector<float> > ( prefix + "TrackPy"                  + suffix );
+  produces <std::vector<float> > ( prefix + "TrackPz"                  + suffix );
   produces <std::vector<float> > ( prefix + "TrackPt"                  + suffix );
   produces <std::vector<float> > ( prefix + "TrackValidFractionOfHits" + suffix );
 
@@ -244,7 +232,6 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   //produces <std::vector<float> > ( prefix + "HLTEleJetJetMatchPhi" + suffix );
 
   // Gen matching: status 3 only 
-
   produces <std::vector<float> > ( prefix + "MatchedGenParticlePt"   + suffix );
   produces <std::vector<float> > ( prefix + "MatchedGenParticleEta"  + suffix );
   produces <std::vector<float> > ( prefix + "MatchedGenParticlePhi"  + suffix );
@@ -404,9 +391,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Track information 
 
-  std::auto_ptr<std::vector<float> >  trackVx                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackVy                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackVz                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackPx                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackPy                   ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  trackPz                   ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  trackPt                   ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  trackValidFractionOfHits  ( new std::vector<float>()  );  
 
@@ -992,9 +979,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       }
 			       
       // Track information     
-      trackVx                  -> push_back( it->gsfTrack()->vx() );
-      trackVy                  -> push_back( it->gsfTrack()->vy() );
-      trackVz                  -> push_back( it->gsfTrack()->vz() );
+      trackPx                  -> push_back( it->gsfTrack()->px() );
+      trackPy                  -> push_back( it->gsfTrack()->py() );
+      trackPz                  -> push_back( it->gsfTrack()->pz() );
       trackPt                  -> push_back( it->gsfTrack()->pt() );
       trackValidFractionOfHits -> push_back( it->gsfTrack()->validFraction() );
 
@@ -1040,15 +1027,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( passEGammaIDMedium      , prefix + "PassEGammaIDMedium"       + suffix );
   iEvent.put( passEGammaIDTight       , prefix + "PassEGammaIDTight"        + suffix );
   iEvent.put( passHEEPID              , prefix + "PassHEEPID"               + suffix );
-  iEvent.put( cutFlowNamesEGammaIDVeto   , prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
-  iEvent.put( cutFlowNamesEGammaIDLoose  , prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
-  iEvent.put( cutFlowNamesEGammaIDMedium , prefix + "CutFlowNamesEGammaIDMedium" + suffix );
-  iEvent.put( cutFlowNamesEGammaIDTight  , prefix + "CutFlowNamesEGammaIDTight"  + suffix );
+  //iEvent.put( cutFlowNamesEGammaIDVeto   , prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
+  //iEvent.put( cutFlowNamesEGammaIDLoose  , prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
+  //iEvent.put( cutFlowNamesEGammaIDMedium , prefix + "CutFlowNamesEGammaIDMedium" + suffix );
+  //iEvent.put( cutFlowNamesEGammaIDTight  , prefix + "CutFlowNamesEGammaIDTight"  + suffix );
   iEvent.put( cutFlowNamesEGammaIDHEEP   , prefix + "CutFlowNamesEGammaIDHEEP"   + suffix );
-  iEvent.put( cutFlowHashesEGammaIDVeto  , prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
-  iEvent.put( cutFlowHashesEGammaIDLoose , prefix + "CutFlowHashesEGammaIDLoose" + suffix );
-  iEvent.put( cutFlowHashesEGammaIDMedium, prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
-  iEvent.put( cutFlowHashesEGammaIDTight , prefix + "CutFlowHashesEGammaIDTight" + suffix );
+  //iEvent.put( cutFlowHashesEGammaIDVeto  , prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
+  //iEvent.put( cutFlowHashesEGammaIDLoose , prefix + "CutFlowHashesEGammaIDLoose" + suffix );
+  //iEvent.put( cutFlowHashesEGammaIDMedium, prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
+  //iEvent.put( cutFlowHashesEGammaIDTight , prefix + "CutFlowHashesEGammaIDTight" + suffix );
   iEvent.put( cutFlowHashesEGammaIDHEEP  , prefix + "CutFlowHashesEGammaIDHEEP"  + suffix );
   iEvent.put( rhoIsoHEEP              , prefix + "RhoIsoHEEP"               + suffix );
   
@@ -1082,11 +1069,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Shower shape						        
 
   iEvent.put( sigmaEtaEta             , prefix + "SigmaEtaEta"              + suffix );
-  iEvent.put( sigmaIEtaIEta           , prefix + "SigmaIEtaIEta"            + suffix );
+  //iEvent.put( sigmaIEtaIEta           , prefix + "SigmaIEtaIEta"            + suffix );
   iEvent.put( full5x5SigmaIEtaIEta    , prefix + "Full5x5SigmaIEtaIEta"     + suffix );
   iEvent.put( r9                      , prefix + "R9"                       + suffix );
-  iEvent.put( e1x5overe5x5            , prefix + "E1x5OverE5x5"             + suffix );
-  iEvent.put( e2x5overe5x5            , prefix + "E2x5OverE5x5"             + suffix );
+  //iEvent.put( e1x5overe5x5            , prefix + "E1x5OverE5x5"             + suffix );
+  //iEvent.put( e2x5overe5x5            , prefix + "E2x5OverE5x5"             + suffix );
   iEvent.put( full5x5e1x5overe5x5        , prefix + "Full5x5E1x5OverE5x5"         + suffix );
   iEvent.put( full5x5e2x5overe5x5        , prefix + "Full5x5E2x5OverE5x5"         + suffix );
   iEvent.put( classif                 , prefix + "Classif"                  + suffix );
@@ -1117,9 +1104,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( pfPhotonIso03           , prefix + "PFPhotonIso03"            + suffix );
   iEvent.put( pfPUIso03               , prefix + "PFPUIso03"                + suffix );
 
-  iEvent.put( pfChargedHadronIso04    , prefix + "PFChargedHadronIso04"     + suffix );
-  iEvent.put( pfNeutralHadronIso04    , prefix + "PFNeutralHadronIso04"     + suffix );
-  iEvent.put( pfPhotonIso04           , prefix + "PFPhotonIso04"            + suffix );
+  //iEvent.put( pfChargedHadronIso04    , prefix + "PFChargedHadronIso04"     + suffix );
+  //iEvent.put( pfNeutralHadronIso04    , prefix + "PFNeutralHadronIso04"     + suffix );
+  //iEvent.put( pfPhotonIso04           , prefix + "PFPhotonIso04"            + suffix );
 
   // Conversion variables					        
   
@@ -1144,9 +1131,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Track information
 
-  iEvent.put( trackVx                 , prefix + "TrackVx"                  + suffix );
-  iEvent.put( trackVy                 , prefix + "TrackVy"                  + suffix );
-  iEvent.put( trackVz                 , prefix + "TrackVz"                  + suffix );
+  iEvent.put( trackPx                 , prefix + "TrackPx"                  + suffix );
+  iEvent.put( trackPy                 , prefix + "TrackPy"                  + suffix );
+  iEvent.put( trackPz                 , prefix + "TrackPz"                  + suffix );
   iEvent.put( trackPt                 , prefix + "TrackPt"                  + suffix );
   iEvent.put( trackValidFractionOfHits, prefix + "TrackValidFractionOfHits" + suffix );
 

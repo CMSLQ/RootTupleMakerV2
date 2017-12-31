@@ -431,13 +431,22 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  //now just ask if we have a match to whichever HLT path in the object
 			
 	  // HLT Single Muon trigger matching
-	  const pat::TriggerObjectStandAloneCollection matchesSingleMu = it->triggerObjectMatchesByPath("HLT_Mu45_eta2p1_v*");
-	  if (matchesSingleMu.size() > 0)
+	  const pat::TriggerObjectStandAloneCollection matchesSingleMu   = it->triggerObjectMatchesByPath("HLT_Mu50_v*");
+	  const pat::TriggerObjectStandAloneCollection matchesSingleTkMu = it->triggerObjectMatchesByPath("HLT_TkMu50_v*");
+	  if (matchesSingleMu.size() > 0 || matchesSingleTkMu.size() > 0)
 	    {
-	      HLTSingleMuonMatched  -> push_back ( true ) ;
-	      HLTSingleMuonMatchPt  -> push_back ( matchesSingleMu[0].pt() );
-	      HLTSingleMuonMatchEta -> push_back ( matchesSingleMu[0].eta());
-	      HLTSingleMuonMatchPhi -> push_back ( matchesSingleMu[0].phi());
+	      if (matchesSingleMu.size() > 0){
+		HLTSingleMuonMatched  -> push_back ( true ) ;
+		HLTSingleMuonMatchPt  -> push_back ( matchesSingleMu[0].pt() );
+		HLTSingleMuonMatchEta -> push_back ( matchesSingleMu[0].eta());
+		HLTSingleMuonMatchPhi -> push_back ( matchesSingleMu[0].phi());
+	      }
+	      else if (matchesSingleTkMu.size() > 0){
+		HLTSingleMuonMatched  -> push_back ( true ) ;
+		HLTSingleMuonMatchPt  -> push_back ( matchesSingleTkMu[0].pt() );
+		HLTSingleMuonMatchEta -> push_back ( matchesSingleTkMu[0].eta());
+		HLTSingleMuonMatchPhi -> push_back ( matchesSingleTkMu[0].phi());
+	      }
 	    }
 	  else
 	    {

@@ -69,13 +69,13 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<int> >    ( prefix + "HFHadronMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "HFEMMultiplicity"  + suffix );
   produces <std::vector<int> >    ( prefix + "NConstituents"  + suffix );
-  produces <std::vector<float> >  ( prefix + "TrackCountingHighEffBTag" + suffix );
-  produces <std::vector<float> >  ( prefix + "TrackCountingHighPurBTag" + suffix );
-  produces <std::vector<float> >  ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
-  produces <std::vector<float> >  ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
-  produces <std::vector<float> >  ( prefix + "JetProbabilityBTag" + suffix );
-  produces <std::vector<float> >  ( prefix + "JetBProbabilityBTag" + suffix );
-  produces <std::vector<float> >  ( prefix + "CombinedSecondaryVertexBTag" + suffix );    
+  //produces <std::vector<float> >  ( prefix + "TrackCountingHighEffBTag" + suffix );
+  //produces <std::vector<float> >  ( prefix + "TrackCountingHighPurBTag" + suffix );
+  //produces <std::vector<float> >  ( prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  //produces <std::vector<float> >  ( prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  //produces <std::vector<float> >  ( prefix + "JetProbabilityBTag" + suffix );
+  //produces <std::vector<float> >  ( prefix + "JetBProbabilityBTag" + suffix );
+  //produces <std::vector<float> >  ( prefix + "CombinedSecondaryVertexBTag" + suffix );    
   //produces <std::vector<float> >  ( prefix + "CombinedSecondaryVertexMVABTag" + suffix ); 
   //produces <std::vector<float> >  ( prefix + "SoftElectronByPtBTag" + suffix );           
   //produces <std::vector<float> >  ( prefix + "SoftElectronByIP3dBTag" + suffix );         
@@ -84,8 +84,8 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   //produces <std::vector<float> >  ( prefix + "SoftMuonByIP3dBTag" + suffix );             
   produces <std::vector<float> >  ( prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
   produces <std::vector<float> >  ( prefix + "CombinedMVABTag" + suffix );
-  produces <std::vector<float> >  ( prefix + "CombinedCvsLJetTags" + suffix );
-  produces <std::vector<float> >  ( prefix + "CombinedCvsBJetTags" + suffix );
+  //produces <std::vector<float> >  ( prefix + "CombinedCvsLJetTags" + suffix );
+  //produces <std::vector<float> >  ( prefix + "CombinedCvsBJetTags" + suffix );
   produces <std::vector<int> >    ( prefix + "PassLooseID" + suffix);
   produces <std::vector<int> >    ( prefix + "PassTightID" + suffix);
   // for non-PUPPI jets, we get the MVA pileup ID discriminator
@@ -185,14 +185,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<int> >     hfHadronMultiplicity ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     hfEMMultiplicity ( new std::vector<int>()  ) ;
   std::auto_ptr<std::vector<int> >     nConstituents  ( new std::vector<int>()  ) ;
-  std::auto_ptr<std::vector<float> >   trackCountingHighEffBTag  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >   trackCountingHighPurBTag  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >   simpleSecondaryVertexHighEffBTag  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >   simpleSecondaryVertexHighPurBTag  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >   jetProbabilityBTag  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >   jetBProbabilityBTag  ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   trackCountingHighEffBTag  ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   trackCountingHighPurBTag  ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   simpleSecondaryVertexHighEffBTag  ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   simpleSecondaryVertexHighPurBTag  ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   jetProbabilityBTag  ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   jetBProbabilityBTag  ( new std::vector<float>()  );
 
-  std::auto_ptr<std::vector<float> >   combinedSecondaryVertexBTag          ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   combinedSecondaryVertexBTag          ( new std::vector<float>()  );
   //std::auto_ptr<std::vector<float> >   combinedSecondaryVertexMVABTag       ( new std::vector<float>()  );
   //std::auto_ptr<std::vector<float> >   softElectronByPtBTag                 ( new std::vector<float>()  );
   //std::auto_ptr<std::vector<float> >   softElectronByIP3dBTag               ( new std::vector<float>()  );
@@ -201,8 +201,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //std::auto_ptr<std::vector<float> >   softMuonByIP3dBTag                   ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >   combinedInclusiveSecondaryVertexBTag ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >   combinedMVABTag                      ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >   combinedCvsLJetTag                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >   combinedCvsBJetTag                   ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   combinedCvsLJetTag                   ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   combinedCvsBJetTag                   ( new std::vector<float>()  );
 	
   std::auto_ptr<std::vector<int> >   passLooseID  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<int> >   passTightID  ( new std::vector<int>()  );
@@ -641,17 +641,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  hfHadronMultiplicity->push_back( it->HFHadronMultiplicity() );
 	  hfEMMultiplicity->push_back( it->HFEMMultiplicity() );
 	  nConstituents->push_back( it->numberOfDaughters() ); // same as it->getPFConstituents().size()
-	  trackCountingHighEffBTag            ->push_back( it->bDiscriminator("pfTrackCountingHighEffBJetTags") );
-	  trackCountingHighPurBTag            ->push_back( it->bDiscriminator("pfTrackCountingHighPurBJetTags") );
-	  simpleSecondaryVertexHighEffBTag    ->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighEffBJetTags") );
-	  simpleSecondaryVertexHighPurBTag    ->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighPurBJetTags") );
-	  jetProbabilityBTag                  ->push_back( it->bDiscriminator("pfJetProbabilityBJetTags") );
-	  jetBProbabilityBTag                 ->push_back( it->bDiscriminator("pfJetBProbabilityBJetTags") );
-	  combinedSecondaryVertexBTag         ->push_back( it->bDiscriminator("pfCombinedSecondaryVertexV2BJetTags") );
+	  //trackCountingHighEffBTag            ->push_back( it->bDiscriminator("pfTrackCountingHighEffBJetTags") );
+	  //trackCountingHighPurBTag            ->push_back( it->bDiscriminator("pfTrackCountingHighPurBJetTags") );
+	  //simpleSecondaryVertexHighEffBTag    ->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighEffBJetTags") );
+	  //simpleSecondaryVertexHighPurBTag    ->push_back( it->bDiscriminator("pfSimpleSecondaryVertexHighPurBJetTags") );
+	  //jetProbabilityBTag                  ->push_back( it->bDiscriminator("pfJetProbabilityBJetTags") );
+	  //jetBProbabilityBTag                 ->push_back( it->bDiscriminator("pfJetBProbabilityBJetTags") );
+	  //combinedSecondaryVertexBTag         ->push_back( it->bDiscriminator("pfCombinedSecondaryVertexV2BJetTags") );
 	  combinedInclusiveSecondaryVertexBTag->push_back( it->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") );
 	  combinedMVABTag                     ->push_back( it->bDiscriminator("pfCombinedMVAV2BJetTags") );
-	  combinedCvsLJetTag                  ->push_back( it->bDiscriminator("pfCombinedCvsLJetTags") );
-	  combinedCvsBJetTag                  ->push_back( it->bDiscriminator("pfCombinedCvsBJetTags") );
+	  //combinedCvsLJetTag                  ->push_back( it->bDiscriminator("pfCombinedCvsLJetTags") );
+	  //combinedCvsBJetTag                  ->push_back( it->bDiscriminator("pfCombinedCvsBJetTags") );
 	  //combinedSecondaryVertexMVABTag      ->push_back( it->bDiscriminator("combinedSecondaryVertexMVABJetTags") );
 	  //softElectronByPtBTag                ->push_back( it->bDiscriminator("softElectronByPtBJetTags") );                
 	  //softElectronByIP3dBTag              ->push_back( it->bDiscriminator("softElectronByIP3dBJetTags") );
@@ -829,13 +829,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( hfHadronMultiplicity,  prefix + "HFHadronMultiplicity"  + suffix );
   iEvent.put( hfEMMultiplicity,  prefix + "HFEMMultiplicity"  + suffix );
   iEvent.put( nConstituents,  prefix + "NConstituents"  + suffix );
-  iEvent.put( trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix );
-  iEvent.put( trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix );
-  iEvent.put( simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
-  iEvent.put( simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
-  iEvent.put( jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix );
-  iEvent.put( jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix );
-  iEvent.put( combinedSecondaryVertexBTag         ,prefix + "CombinedSecondaryVertexBTag" + suffix );    
+  //iEvent.put( trackCountingHighEffBTag, prefix + "TrackCountingHighEffBTag" + suffix );
+  //iEvent.put( trackCountingHighPurBTag, prefix + "TrackCountingHighPurBTag" + suffix );
+  //iEvent.put( simpleSecondaryVertexHighEffBTag, prefix + "SimpleSecondaryVertexHighEffBTag" + suffix );
+  //iEvent.put( simpleSecondaryVertexHighPurBTag, prefix + "SimpleSecondaryVertexHighPurBTag" + suffix );
+  //iEvent.put( jetProbabilityBTag, prefix + "JetProbabilityBTag" + suffix );
+  //iEvent.put( jetBProbabilityBTag, prefix + "JetBProbabilityBTag" + suffix );
+  //iEvent.put( combinedSecondaryVertexBTag         ,prefix + "CombinedSecondaryVertexBTag" + suffix );    
   //iEvent.put( combinedSecondaryVertexMVABTag      ,prefix + "CombinedSecondaryVertexMVABTag" + suffix ); 
   //iEvent.put( softElectronByPtBTag                ,prefix + "SoftElectronByPtBTag" + suffix );           
   //iEvent.put( softElectronByIP3dBTag              ,prefix + "SoftElectronByIP3dBTag" + suffix );         
@@ -844,8 +844,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   //iEvent.put( softMuonByIP3dBTag                  ,prefix + "SoftMuonByIP3dBTag" + suffix );            
   iEvent.put( combinedInclusiveSecondaryVertexBTag,prefix + "CombinedInclusiveSecondaryVertexBTag" + suffix );
   iEvent.put( combinedMVABTag                     ,prefix + "CombinedMVABTag" + suffix ) ;
-  iEvent.put( combinedCvsLJetTag                  ,prefix + "CombinedCvsLJetTags" + suffix ) ;
-  iEvent.put( combinedCvsBJetTag                  ,prefix + "CombinedCvsBJetTags" + suffix ) ;
+  //iEvent.put( combinedCvsLJetTag                  ,prefix + "CombinedCvsLJetTags" + suffix ) ;
+  //iEvent.put( combinedCvsBJetTag                  ,prefix + "CombinedCvsBJetTags" + suffix ) ;
   iEvent.put( passLooseID, prefix + "PassLooseID" + suffix);
   iEvent.put( passTightID, prefix + "PassTightID" + suffix);
 	

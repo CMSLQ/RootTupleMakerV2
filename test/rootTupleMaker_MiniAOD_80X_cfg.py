@@ -99,7 +99,7 @@ process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 
 # Events to process
-process.maxEvents.input = 500
+process.maxEvents.input = 1000
 
 # Input files
 process.source.fileNames = [
@@ -118,8 +118,16 @@ process.source.fileNames = [
     #'/store/mc/RunIISummer16MiniAODv2/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/00688753-BCBD-E611-8B2F-001E67E71DDA.root'
     # powheg-pythia8
     #'/store/mc/RunIISummer16MiniAODv2/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/120000/08CB2C65-82BC-E611-8BCE-5065F3810301.root'
-    '/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
+    #'/store/data/Run2016B/SingleElectron/MINIAOD/03Feb2017_ver1-v1/100000/000E1D21-47ED-E611-85E0-0CC47A4D762A.root'
     #'/store/data/Run2016B/SingleMuon/MINIAOD/03Feb2017_ver2-v2/100000/FEF25E85-82EC-E611-A8F0-0CC47A4D7670.root'
+    #'/store/mc/RunIISummer16MiniAODv2/WJetsToLNu_Pt-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext4-v1/70000/8EC8BC3B-8DE0-E611-A0E6-141877410522.root'
+    ##'/store/data/Run2016C/DoubleMuon/MINIAOD/03Feb2017-v1/110000/1C2B6E95-57ED-E611-AA7F-0CC47A78A45A.root'
+    ##'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/0A1FD053-50ED-E611-9BF9-0CC47A7E6A4C.root'
+    ##'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/12B52FCA-04ED-E611-A9C9-002590DE6E64.root'
+    ##'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/40056129-61EB-E611-84F0-0CC47A7E69D8.root'
+    #'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/B076634F-50ED-E611-B04B-0CC47A7E6972.root'
+    '/store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver2-v1/80000/A4D34C71-A6EA-E611-BC37-001E674FCAE9.root'
+    #'/store/mc/RunIISummer16MiniAODv2/WJetsToLNu_Pt-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/70000/1ECEA183-5DD0-E611-B4BF-1866DAEB4284.root' 
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -561,7 +569,7 @@ process.LJFilter.elecPT       = 12.0
 process.LJFilter.tausMin = 0
 process.LJFilter.tauPT   = 12.0
 process.LJFilter.jetsMin = 0
-process.LJFilter.jetPT   = 12.0
+process.LJFilter.jetPT   = 17.0
 process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = False
 process.LJFilter.customfilterEMuTauJet2016 = True

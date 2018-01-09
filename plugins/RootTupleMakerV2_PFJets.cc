@@ -1,3 +1,4 @@
+
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_PFJets.h"
 
 
@@ -295,8 +296,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       for( std::vector<pat::Jet>::const_iterator it = jets->begin(); it != jets->end(); ++it )
 	{
 	  ijet++;
-	  // Only look at jets with pt>=20 GeV
-	  if( it->pt()<20 ) 
+	  // Only look at jets with pt>=17 GeV
+	  if( it->pt()<17 ) 
 	    continue;
 
 	  // exit from loop when you reach the required number of jets

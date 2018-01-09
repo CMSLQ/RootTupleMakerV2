@@ -105,7 +105,7 @@ process.maxEvents.input = 1000
 process.source.fileNames = [
     # specified by InputList.txt
     # amcatnlo DYJ inclusive
-    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
+    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
     # amcatnlo WJets inclusive
     #'/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/00BC765D-BD3D-E611-9343-0025905C2CD2.root'
     # signal
@@ -126,7 +126,7 @@ process.source.fileNames = [
     ##'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/12B52FCA-04ED-E611-A9C9-002590DE6E64.root'
     ##'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/40056129-61EB-E611-84F0-0CC47A7E69D8.root'
     #'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/B076634F-50ED-E611-B04B-0CC47A7E6972.root'
-    '/store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver2-v1/80000/A4D34C71-A6EA-E611-BC37-001E674FCAE9.root'
+    #'/store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver2-v1/80000/A4D34C71-A6EA-E611-BC37-001E674FCAE9.root'
     #'/store/mc/RunIISummer16MiniAODv2/WJetsToLNu_Pt-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/70000/1ECEA183-5DD0-E611-B4BF-1866DAEB4284.root' 
 ]
 
@@ -565,7 +565,7 @@ process.LJFilter.jetLabel  = cms.InputTag("slimmedJets")
 process.LJFilter
 process.LJFilter.muPT     = 8.0
 process.LJFilter.electronsMin = 0
-process.LJFilter.elecPT       = 12.0
+process.LJFilter.elecPT       = 11.0
 process.LJFilter.tausMin = 0
 process.LJFilter.tauPT   = 12.0
 process.LJFilter.jetsMin = 0

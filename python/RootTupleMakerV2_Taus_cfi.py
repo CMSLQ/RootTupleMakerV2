@@ -7,5 +7,5 @@ rootTupleHPSTaus = cms.EDProducer("RootTupleMakerV2_Taus",
                                   VertexInputTag = cms.InputTag('offlinePrimaryVertices'),
                                   isSCTau  = cms.bool(False),
                                   isHPSTau = cms.bool(True),
-                                  MaxSize  = cms.uint32(50)
+                                  MaxSize  = cms.uint32(10)
                                   )

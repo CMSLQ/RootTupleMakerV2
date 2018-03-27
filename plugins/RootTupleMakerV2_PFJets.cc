@@ -50,6 +50,7 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<float> >  ( prefix + "JERResSFUp" + suffix );
   produces <std::vector<float> >  ( prefix + "JERResSFDown" + suffix );
   produces <std::vector<int> >    ( prefix + "PartonFlavour" + suffix );
+  produces <std::vector<int> >    ( prefix + "HadronFlavour" + suffix );
   produces <std::vector<float> >  ( prefix + "ChargedEmEnergyFraction"  + suffix );
   produces <std::vector<float> >  ( prefix + "ChargedHadronEnergyFraction"  + suffix );
   produces <std::vector<float> >  ( prefix + "ChargedMuEnergyFraction"  + suffix );
@@ -166,6 +167,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<float> >   jerResSFup_vec ( new std::vector<float>() );
   std::auto_ptr<std::vector<float> >   jerResSFdown_vec ( new std::vector<float>() );
   std::auto_ptr<std::vector<int> >     partonFlavour  ( new std::vector<int>()  );
+  std::auto_ptr<std::vector<int> >     hadronFlavour  ( new std::vector<int>()  );
   std::auto_ptr<std::vector<float> >   chargedEmEnergyFraction  ( new std::vector<float>()  ) ;
   std::auto_ptr<std::vector<float> >   chargedHadronEnergyFraction  ( new std::vector<float>()  ) ;
   std::auto_ptr<std::vector<float> >   chargedMuEnergyFraction  ( new std::vector<float>()  ) ;
@@ -620,6 +622,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  }
 
 	  partonFlavour->push_back( it->partonFlavour() );
+	  hadronFlavour->push_back( it->hadronFlavour() );
 	  chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
 	  chargedHadronEnergyFraction->push_back( it->chargedHadronEnergyFraction() );
 	  // same as : it->chargedHadronEnergy() / it->correctedJet("Uncorrected").energy()
@@ -810,6 +813,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( jerResSFup_vec, prefix + "JERResSFUp" + suffix );
   iEvent.put( jerResSFdown_vec, prefix + "JERResSFDown" + suffix );
   iEvent.put( partonFlavour, prefix + "PartonFlavour" + suffix );
+  iEvent.put( hadronFlavour, prefix + "HadronFlavour" + suffix );
   iEvent.put( chargedEmEnergyFraction,  prefix + "ChargedEmEnergyFraction"  + suffix );
   iEvent.put( chargedHadronEnergyFraction,  prefix + "ChargedHadronEnergyFraction"  + suffix );
   iEvent.put( chargedMuEnergyFraction,  prefix + "ChargedMuEnergyFraction"  + suffix );

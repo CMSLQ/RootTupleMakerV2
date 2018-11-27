@@ -166,35 +166,32 @@ process.schedule = cms.Schedule()
 # See: https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaIDRecipesRun2
 #      https://twiki.cern.ch/twiki/bin/viewauth/CMS/HEEPElectronIdentificationRun2
 #
-#FIXME SIC 94X add back later
-## Load tools and function definitions
-#from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
-#switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
-## Define which IDs we want to produce
-## Each of these two example IDs contains all four standard cut-based ID working points
-#my_id_modules = []
-##my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff')
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff')
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff')
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff')
-#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff')
-##Add them to the VID producer
-#for idmod in my_id_modules:
-#  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
-## XXX NB, must be the same as input collection used for electron ntuplizer
-#process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
-#process.heepIDVarValueMaps.elesMiniAOD  = process.rootTupleElectrons.InputTag
-#process.electronRegressionValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag
-#process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag#FIXME do we need this?
-#
-#process.electronSupportPath = cms.Path()
+# Load tools and function definitions
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
+# Define which IDs we want to produce
+# Each of these two example IDs contains all four standard cut-based ID working points
+my_id_modules = []
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff')
+#Add them to the VID producer
+for idmod in my_id_modules:
+  setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
+# XXX NB, must be the same as input collection used for electron ntuplizer
+process.egmGsfElectronIDs.physicsObjectSrc = process.rootTupleElectrons.InputTag
+process.heepIDVarValueMaps.elesMiniAOD  = process.rootTupleElectrons.InputTag
+process.electronRegressionValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag
+process.electronMVAValueMapProducer.srcMiniAOD = process.rootTupleElectrons.InputTag#FIXME do we need this?
+
+process.electronSupportPath = cms.Path()
 #process.electronSupportPath += process.regressionApplication
 #process.electronSupportPath += process.selectedElectrons
 #process.electronSupportPath += process.calibratedPatElectrons
-#process.electronSupportPath += process.egmGsfElectronIDSequence
-#process.schedule.append(process.electronSupportPath)
+process.electronSupportPath += process.egmGsfElectronIDSequence
+process.schedule.append(process.electronSupportPath)
 
 #----------------------------------------------------------------------------------------------------
 # JER and JEC
@@ -669,20 +666,15 @@ process.p = cms.Path(
     process.rootTupleGenEventInfo*
     process.rootTupleGenParticles*
     process.rootTupleGenJetsSequence*
-    process.rootTupleGenMETTrue
+    process.rootTupleGenMETTrue*
+    process.rootTupleEventSelectionSequence*
+    process.rootTupleTree
 )
 
 process.schedule.append(process.p)
 
-#process.treePath = cms.Path(
-#)
-
-#process.schedule.append(process.treePath)
-
-process.endPath = cms.EndPath(
-        process.rootTupleEventSelectionSequence*
-        process.rootTupleTree
- )
+#process.endPath = cms.EndPath(
+# )
 ##----------------------------------------------------------------------------------------------------
 ## Dump if necessary
 ##----------------------------------------------------------------------------------------------------

@@ -122,12 +122,6 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
     produces <std::vector<int> >     ( prefix + "PileupMVApassesLoose"  + suffix);
     produces <std::vector<int> >     ( prefix + "PileupMVApassesMedium" + suffix);
     produces <std::vector<int> >     ( prefix + "PileupMVApassesTight"  + suffix);
-    produces <std::vector<float> >   (prefix + "VtxNtracks"  + suffix);
-    produces <std::vector<float> >   (prefix + "VtxMass"  + suffix);
-    produces <std::vector<float> >   (prefix + "VtxPx"  + suffix);
-    produces <std::vector<float> >   (prefix + "VtxPy"  + suffix);
-    produces <std::vector<float> >   (prefix + "Vtx3DVal"  + suffix);
-    produces <std::vector<float> >   (prefix + "Vtx3DSig"  + suffix);
     produces <std::vector<float> >   (prefix + "LeadTrackPt"  + suffix);
     produces <std::vector<float> >   (prefix + "SoftLepPt"  + suffix);
     produces <std::vector<float> >   (prefix + "SoftLepRatio"  + suffix);
@@ -268,12 +262,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::unique_ptr<std::vector<int> >   jetpileup_mva_passesLoose  ( new std::vector<int>()  );
   std::unique_ptr<std::vector<int> >   jetpileup_mva_passesMedium ( new std::vector<int>()  );
   std::unique_ptr<std::vector<int> >   jetpileup_mva_passesTight  ( new std::vector<int>()  );
-  std::unique_ptr<std::vector<float> > vtxNtracks  ( new std::vector<float>()  );
-  std::unique_ptr<std::vector<float> > vtxMass  ( new std::vector<float>()  );
-  std::unique_ptr<std::vector<float> > vtxPx  ( new std::vector<float>()  );
-  std::unique_ptr<std::vector<float> > vtxPy  ( new std::vector<float>()  );
-  std::unique_ptr<std::vector<float> > vtx3DVal  ( new std::vector<float>()  );
-  std::unique_ptr<std::vector<float> > vtx3DSig  ( new std::vector<float>()  );
   std::unique_ptr<std::vector<float> > leadTrackPt  ( new std::vector<float>()  );
   std::unique_ptr<std::vector<float> > softLepPt  ( new std::vector<float>()  );
   std::unique_ptr<std::vector<float> > softLepRatio  ( new std::vector<float>()  );
@@ -300,8 +288,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#JetCorUncertainties
   *hasJetWithBadUnc.get() = false;
   JetCorrectionUncertainty *jecUnc = 0;
+  const int nsrc = 26;
+  const char* srcnames[nsrc] =
+    {"AbsoluteStat", "AbsoluteScale", "AbsoluteMPFBias","Fragmentation","SinglePionECAL","SinglePionHCAL","FlavorQCD","TimePtEta","RelativeJEREC1","RelativeJEREC2","RelativeJERHF","RelativePtBB","RelativePtEC1","RelativePtEC2","RelativePtHF","RelativeBal","RelativeFSR","RelativeStatFSR","RelativeStatEC","RelativeStatHF","PileUpDataMC","PileUpPtRef","PileUpPtBB","PileUpPtEC1","PileUpPtEC2","PileUpPtHF"};//,"SubTotalPileUp","SubTotalRelative","SubTotalPt","SubTotalScale","SubTotalAbsolute","SubTotalMC","TotalNoFlavor","TotalNoTime","TotalNoFlavorNoTime","Total"};
+  std::vector<JetCorrectionUncertainty*> vsrc(nsrc);
   if(readJECuncertainty)
-    {
+  {
       // handle the jet corrector parameters collection
       edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
       // get the jet corrector parameters collection from the global tag
@@ -310,20 +302,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
       // instantiate the jec uncertainty object
       jecUnc = new JetCorrectionUncertainty(JetCorPar);
-    }
-
-  const int nsrc = 26;
-  const char* srcnames[nsrc] =
-    {"AbsoluteStat", "AbsoluteScale", "AbsoluteMPFBias","Fragmentation","SinglePionECAL","SinglePionHCAL","FlavorQCD","TimePtEta","RelativeJEREC1","RelativeJEREC2","RelativeJERHF","RelativePtBB","RelativePtEC1","RelativePtEC2","RelativePtHF","RelativeBal","RelativeFSR","RelativeStatFSR","RelativeStatEC","RelativeStatHF","PileUpDataMC","PileUpPtRef","PileUpPtBB","PileUpPtEC1","PileUpPtEC2","PileUpPtHF"};//,"SubTotalPileUp","SubTotalRelative","SubTotalPt","SubTotalScale","SubTotalAbsolute","SubTotalMC","TotalNoFlavor","TotalNoTime","TotalNoFlavorNoTime","Total"};
-  std::vector<JetCorrectionUncertainty*> vsrc(nsrc);
  
-  for (int isrc = 0; isrc < nsrc; isrc++) {    
-    const char *name = srcnames[isrc];
-    JetCorrectorParameters *p = new JetCorrectorParameters(jec_sources_file.fullPath(), name);
-    JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
-    vsrc[isrc] = unc;
-    delete p;
-  } // for isrc
+      for (int isrc = 0; isrc < nsrc; isrc++) {    
+        const char *name = srcnames[isrc];
+        JetCorrectorParameters *p = new JetCorrectorParameters(jec_sources_file.fullPath(), name);
+        JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+        vsrc[isrc] = unc;
+        delete p;
+      } // for isrc
+  }
   
   // Total uncertainty for reference
   //JetCorrectionUncertainty *total = new JetCorrectionUncertainty(*(new JetCorrectorParameters(jec_sources_file.fullPath(), "Total")));
@@ -828,14 +815,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    jetpileup_mva_passesMedium->push_back(bool(it->userInt(idName) & (1 << 1)));
 	    jetpileup_mva_passesTight ->push_back(bool(it->userInt(idName) & (1 << 0)));
 
-	    vtxNtracks->push_back(it->userFloat("vtxNtracks"));
-	    vtxMass->push_back(it->userFloat("vtxMass"));
-	    vtxPx->push_back(it->userFloat("vtxPx"));
-	    vtxPy->push_back(it->userFloat("vtxPy"));
-	    vtx3DVal->push_back(it->userFloat("vtx3DVal"));
-	    vtx3DSig->push_back(it->userFloat("vtx3DSig"));
-
-
 	    float leadTrackPt_ = 0, softLepPt_ = 0, softLepRatio_ = 0, softLepDr_ = 0;
 	    for ( unsigned k = 0; k < it->numberOfSourceCandidatePtrs(); ++k ) {
 	      reco::CandidatePtr pfJetConstituent = it->sourceCandidatePtr(k);
@@ -928,10 +907,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // 	edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTagL1Offset;
   // }
 	      
-  for (int isrc = 0; isrc < nsrc; isrc++) {    
-    delete vsrc[isrc];
+  if(readJECuncertainty)
+  {
+    for (int isrc = 0; isrc < nsrc; isrc++) {    
+      delete vsrc[isrc];
+    }
+    delete jecUnc;
   }
-  delete jecUnc;
   //delete total;
   //-----------------------------------------------------------------
   // put vectors in the event
@@ -1045,12 +1027,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     iEvent.put(std::move(jetpileup_mva_passesLoose),  prefix + "PileupMVApassesLoose"  + suffix);
     iEvent.put(std::move(jetpileup_mva_passesMedium), prefix + "PileupMVApassesMedium" + suffix);
     iEvent.put(std::move(jetpileup_mva_passesTight),  prefix + "PileupMVApassesTight"  + suffix);
-    iEvent.put(std::move(vtxNtracks),  prefix + "VtxNtracks"  + suffix);
-    iEvent.put(std::move(vtxMass),  prefix + "VtxMass"  + suffix);
-    iEvent.put(std::move(vtxPx),  prefix + "VtxPx"  + suffix);
-    iEvent.put(std::move(vtxPy),  prefix + "VtxPy"  + suffix);
-    iEvent.put(std::move(vtx3DVal),  prefix + "Vtx3DVal"  + suffix);
-    iEvent.put(std::move(vtx3DSig),  prefix + "Vtx3DSig"  + suffix);
     iEvent.put(std::move(leadTrackPt),  prefix + "LeadTrackPt"  + suffix);
     iEvent.put(std::move(softLepPt),  prefix + "SoftLepPt"  + suffix);
     iEvent.put(std::move(softLepRatio),  prefix + "SoftLepRatio"  + suffix);

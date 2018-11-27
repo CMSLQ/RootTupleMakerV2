@@ -66,7 +66,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //------------------------------------------------------------------------
   // Get the trigger names
   //------------------------------------------------------------------------
-  const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+  //const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
 
   int nTrigObjects = 0;
   //------------------------------------------------------------------------
@@ -76,7 +76,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     {
       v_type_ids   -> push_back ( std::vector<int>() );
       v_filter_names -> push_back (std::vector<std::string>() );
-      obj.unpackPathNames(names);
+      obj.unpackNamesAndLabels(iEvent,*triggerBits);
       //std::cout << "\tTrigger object:  pt " << obj.pt() << ", eta " << obj.eta() << ", phi " << obj.phi() << std::endl;
       v_pt->push_back(obj.pt());
       v_eta->push_back(obj.eta());

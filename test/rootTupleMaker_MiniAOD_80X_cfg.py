@@ -104,8 +104,9 @@ process.maxEvents.input = 1000
 # Input files
 process.source.fileNames = [
     # specified by InputList.txt
+    #'/store/mc/RunIISummer16MiniAODv2/GluGluToRadionToHHTo2B2ZTo2L2J_M-260_narrow_13TeV-madgraph-v2/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/60000/02D0F94D-16F1-E611-86B5-02163E01A377.root'
     # amcatnlo DYJ inclusive
-    '/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
+    #'/store/mc/RunIISpring16MiniAODv2/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/50000/000FF6AC-9F2A-E611-A063-0CC47A4C8EB0.root',
     # amcatnlo WJets inclusive
     #'/store/mc/RunIISpring16MiniAODv2/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v1/00000/00BC765D-BD3D-E611-9343-0025905C2CD2.root'
     # signal
@@ -128,6 +129,9 @@ process.source.fileNames = [
     #'/store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/B076634F-50ED-E611-B04B-0CC47A7E6972.root'
     #'/store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver2-v1/80000/A4D34C71-A6EA-E611-BC37-001E674FCAE9.root'
     #'/store/mc/RunIISummer16MiniAODv2/WJetsToLNu_Pt-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/70000/1ECEA183-5DD0-E611-B4BF-1866DAEB4284.root' 
+    #'/store/mc/RunIISummer16MiniAODv2/GluGluToBulkGravitonToHHTo2B2ZTo2L2J_M-260_narrow_13TeV-madgraph-v2/MINIAODSIM/80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/10000/BCBB6ECB-F973-E811-A47B-FA163E31C2D1.root'
+    #'/store/mc/RunIISummer16MiniAODv2/WJetsToLNu_Pt-600ToInf_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/80000/E8913023-2BC9-E611-904B-0CC47ABB517C.root'
+    'file:/afs/cern.ch/work/d/dmorse/work/leptoQuark/lheTesting/CMSSW_8_0_21/src/LQToBMu_M_1000_MINIAODSIM.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -192,10 +196,13 @@ switchOnVIDElectronIdProducer(process, DataFormat.MiniAOD)
 # Define which IDs we want to produce
 # Each of these two example IDs contains all four standard cut-based ID working points
 my_id_modules = []
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
+#my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff')
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV60_cff') # for 50 ns, 13 TeV data
 my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.heepElectronID_HEEPV70_cff')
-my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_GeneralPurpose_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff')
+my_id_modules.append('RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff')
 #Add them to the VID producer
 for idmod in my_id_modules:
   setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
@@ -648,7 +655,9 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 #process.esContent = cms.EDAnalyzer("PrintEventSetupContent")
 # to see Event content
 #process.load('FWCore.Modules.printContent_cfi')
-
+#process.SimpleMemoryCheck = cms.Service("SimpleMemoryCheck",
+#    ignoreTotal = cms.untracked.int32(1)
+#)
 process.p = cms.Path(
     ## L+J Filter
     process.LJFilter*  

@@ -44,6 +44,7 @@ class RootTupleMakerV2_PFJets : public edm::EDProducer {
   const bool jer_from_gt;
   const edm::FileInPath jer_resolutions_file;
   const edm::FileInPath jer_scale_factors_file;
+  const edm::FileInPath jec_sources_file;
   const edm::EDGetTokenT<double> rhoToken;
 };
 

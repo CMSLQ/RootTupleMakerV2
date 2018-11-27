@@ -1,6 +1,4 @@
-
 #include "Leptoquarks/RootTupleMakerV2/plugins/RootTupleMakerV2_PFJets.h"
-
 
 RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfig) :
   jetInputToken_ (consumes<std::vector<pat::Jet> >(iConfig.getParameter<edm::InputTag>("InputTag"))),
@@ -18,6 +16,7 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   jer_from_gt (iConfig.getParameter<bool>      ("ReadJERFromGT")),
   jer_resolutions_file (iConfig.getParameter<edm::FileInPath>  ("JERResolutionsFile")),
   jer_scale_factors_file (iConfig.getParameter<edm::FileInPath>("JERScaleFactorsFile")),
+  jec_sources_file (iConfig.getParameter<edm::FileInPath>("JECUncertaintySourcesFile")),
   rhoToken (consumes<double>(iConfig.getParameter<edm::InputTag>("RhoCollection")))
 {
   if(upperCase(inputTag.label()).find(upperCase("PUPPI")) != std::string::npos)
@@ -41,6 +40,33 @@ RootTupleMakerV2_PFJets::RootTupleMakerV2_PFJets(const edm::ParameterSet& iConfi
   produces <std::vector<float> >  ( prefix + "ScaledDownEnergy" + suffix );
   produces <std::vector<float> >  ( prefix + "EnergyRaw" + suffix );
   produces <std::vector<float> >  ( prefix + "JECUnc" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncAbsoluteStat" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncAbsoluteScale" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncAbsoluteMPFBias" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncFragmentation" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncSinglePionECAL" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncSinglePionHCAL" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncFlavorQCD" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncTimePtEta" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeJEREC1" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeJEREC2" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeJERHF" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativePtBB" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativePtEC1" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativePtEC2" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativePtHF" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeBal" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeFSR" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeStatFSR" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeStatEC" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncRelativeStatHF" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncPileUpDataMC" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncPileUpPtRef" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncPileUpPtBB" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncPileUpPtEC1" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncPileUpPtEC2" + suffix );
+  produces <std::vector<float> >  ( prefix + "JECUncPileUpPtHF" + suffix );
+  //produces <std::vector<float> >  ( prefix + "JECUncTotal" + suffix );
   produces <std::vector<float> >  ( prefix + "L2L3ResJEC" + suffix );
   produces <std::vector<float> >  ( prefix + "L3AbsJEC" + suffix );
   produces <std::vector<float> >  ( prefix + "L2RelJEC" + suffix );
@@ -157,6 +183,34 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::auto_ptr<std::vector<float> >   energy  ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >   energy_raw ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >   jecUnc_vec ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_AbsoluteStat ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_AbsoluteScale ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_AbsoluteMPFBias ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_Fragmentation ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_SinglePionECAL ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_SinglePionHCAL ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_FlavorQCD ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_TimePtEta ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeJEREC1 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeJEREC2 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeJERHF ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativePtBB ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativePtEC1 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativePtEC2 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativePtHF ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeBal ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeFSR ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeStatFSR ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeStatEC ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_RelativeStatHF ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_PileUpDataMC ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_PileUpPtRef ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_PileUpPtBB ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_PileUpPtEC1 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_PileUpPtEC2 ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >   jecUnc_vec_PileUpPtHF ( new std::vector<float>()  );
+  //std::auto_ptr<std::vector<float> >   jecUnc_vec_Total ( new std::vector<float>()  );
+  //,"SubTotalPileUp","SubTotalRelative","SubTotalPt","SubTotalScale","SubTotalAbsolute","SubTotalMC","TotalNoFlavor","TotalNoTime","TotalNoFlavorNoTime","Total"};
   std::auto_ptr<std::vector<float> >   l2l3resJEC_vec ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >   l3absJEC_vec ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >   l2relJEC_vec ( new std::vector<float>()  );
@@ -257,6 +311,28 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // instantiate the jec uncertainty object
       jecUnc = new JetCorrectionUncertainty(JetCorPar);
     }
+
+  const int nsrc = 26;
+  const char* srcnames[nsrc] =
+    {"AbsoluteStat", "AbsoluteScale", "AbsoluteMPFBias","Fragmentation","SinglePionECAL","SinglePionHCAL","FlavorQCD","TimePtEta","RelativeJEREC1","RelativeJEREC2","RelativeJERHF","RelativePtBB","RelativePtEC1","RelativePtEC2","RelativePtHF","RelativeBal","RelativeFSR","RelativeStatFSR","RelativeStatEC","RelativeStatHF","PileUpDataMC","PileUpPtRef","PileUpPtBB","PileUpPtEC1","PileUpPtEC2","PileUpPtHF"};//,"SubTotalPileUp","SubTotalRelative","SubTotalPt","SubTotalScale","SubTotalAbsolute","SubTotalMC","TotalNoFlavor","TotalNoTime","TotalNoFlavorNoTime","Total"};
+  std::vector<JetCorrectionUncertainty*> vsrc(nsrc);
+ 
+  for (int isrc = 0; isrc < nsrc; isrc++) {    
+    const char *name = srcnames[isrc];
+    JetCorrectorParameters *p = new JetCorrectorParameters(jec_sources_file.fullPath(), name);
+    JetCorrectionUncertainty *unc = new JetCorrectionUncertainty(*p);
+    vsrc[isrc] = unc;
+    delete p;
+  } // for isrc
+  
+  // Total uncertainty for reference
+  //JetCorrectionUncertainty *total = new JetCorrectionUncertainty(*(new JetCorrectorParameters(jec_sources_file.fullPath(), "Total")));
+  
+  // Calculate uncertainty per source and as a total
+  //double jetpt(50.);
+  //double jeteta(2.4);
+
+
   //JER Uncertainties
   // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyResolution
   // Access jet resolution and scale factor from the condition database
@@ -317,9 +393,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 	  if(readJECuncertainty)
 	    {
-	      jecUnc->setJetEta( it->eta() );
-	      // the uncertainty is a function of the corrected pt
-	      jecUnc->setJetPt( it->pt() );
 	    }
 
 	  // Status of JEC
@@ -607,6 +680,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    }
 	  if(readJECuncertainty){ 
 	    float uncertainty = -999.;
+	    double jetpt=it->pt();
+	    double jeteta=it->eta();
+	    jecUnc->setJetEta( jeteta );
+	    jecUnc->setJetPt( jetpt );
 	    try { 
 	      uncertainty = jecUnc->getUncertainty(true);
 	    } 
@@ -616,11 +693,90 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      *hasJetWithBadUnc.get() = true;
 	    }
 	    jecUnc_vec->push_back( uncertainty );
+
+	    //double sum2(0.);
+	    float cor_source(-999);
+	    for (int isrc = 0; isrc < nsrc; isrc++) {
+	      JetCorrectionUncertainty *unc2 = vsrc[isrc];
+	      unc2->setJetPt(jetpt);
+	      unc2->setJetEta(jeteta);
+	      cor_source = unc2->getUncertainty(true);
+	      //unfortunately these need to be done by hand for now
+	      if( isrc==0  ){  jecUnc_vec_AbsoluteStat->push_back(cor_source); }
+	      else if( isrc==1  ){  jecUnc_vec_AbsoluteScale->push_back(cor_source); }
+	      else if( isrc==2  ){  jecUnc_vec_AbsoluteMPFBias->push_back(cor_source); }
+	      else if( isrc==3  ){  jecUnc_vec_Fragmentation->push_back(cor_source); }
+	      else if( isrc==4  ){  jecUnc_vec_SinglePionECAL->push_back(cor_source); }
+	      else if( isrc==5  ){  jecUnc_vec_SinglePionHCAL->push_back(cor_source); }
+	      else if( isrc==6  ){  jecUnc_vec_FlavorQCD->push_back(cor_source); }
+	      else if( isrc==7  ){  jecUnc_vec_TimePtEta->push_back(cor_source); }
+	      else if( isrc==8  ){  jecUnc_vec_RelativeJEREC1->push_back(cor_source); }
+	      else if( isrc==9  ){  jecUnc_vec_RelativeJEREC2->push_back(cor_source); }
+	      else if( isrc==10 ){  jecUnc_vec_RelativeJERHF->push_back(cor_source); }
+	      else if( isrc==11 ){  jecUnc_vec_RelativePtBB->push_back(cor_source); }
+	      else if( isrc==12 ){  jecUnc_vec_RelativePtEC1->push_back(cor_source); }
+	      else if( isrc==13 ){  jecUnc_vec_RelativePtEC2->push_back(cor_source); }
+	      else if( isrc==14 ){  jecUnc_vec_RelativePtHF->push_back(cor_source); }
+	      else if( isrc==15 ){  jecUnc_vec_RelativeBal->push_back(cor_source); }
+	      else if( isrc==16 ){  jecUnc_vec_RelativeFSR->push_back(cor_source); }
+	      else if( isrc==17 ){  jecUnc_vec_RelativeStatFSR->push_back(cor_source); }
+	      else if( isrc==18 ){  jecUnc_vec_RelativeStatEC->push_back(cor_source); }
+	      else if( isrc==19 ){  jecUnc_vec_RelativeStatHF->push_back(cor_source); }
+	      else if( isrc==20 ){  jecUnc_vec_PileUpDataMC->push_back(cor_source); }
+	      else if( isrc==21 ){  jecUnc_vec_PileUpPtRef->push_back(cor_source); }
+	      else if( isrc==22 ){  jecUnc_vec_PileUpPtBB->push_back(cor_source); }
+	      else if( isrc==23 ){  jecUnc_vec_PileUpPtEC1->push_back(cor_source); }
+	      else if( isrc==24 ){  jecUnc_vec_PileUpPtEC2->push_back(cor_source); }
+	      else if( isrc==25 ){  jecUnc_vec_PileUpPtHF->push_back(cor_source); }
+	      //double sup = unc->getUncertainty(true); // up variation
+	      //unc->setJetPt(jetpt);
+	      //unc->setJetEta(jeteta);
+	      //double sdw = unc->getUncertainty(false); // down variation
+	      //std::cout<<sup<<"  "<<sdw<<std::endl;
+	      //std::cout<<isrc<<"  "<<cor_sources[isrc]<<std::endl;
+	      //sum2 += pow(cor_source,2);
+	    } // for isrc
+  
+	    //total->setJetPt(jetpt);
+	    //total->setJetEta(jeteta);
+	    //float uncert = total->getUncertainty(true);
+	    ////std::cout<<sqrt(sum2)<<"  "<<"  "<<uncert<<"  "<<uncert_jecUnc<<std::endl;
+	    //// Check that quadratic sum of sources equals total uncertainty
+	    ////assert(fabs(uncert - sqrt(sum2)) < 1e-3);
+	    ////std::cout<<"here  "<<cor_sources[0]<<std::endl<<std::endl;
+	    //jecUnc_vec_Total->push_back(uncert);
 	  }
 	  else {
 	    jecUnc_vec->push_back( -999 );
+	    jecUnc_vec_AbsoluteStat->push_back( -999 );
+	    jecUnc_vec_AbsoluteScale->push_back( -999 );
+	    jecUnc_vec_AbsoluteMPFBias->push_back( -999 );
+	    jecUnc_vec_Fragmentation->push_back( -999 );
+	    jecUnc_vec_SinglePionECAL->push_back( -999 );
+	    jecUnc_vec_SinglePionHCAL->push_back( -999 );
+	    jecUnc_vec_FlavorQCD->push_back( -999 );
+	    jecUnc_vec_TimePtEta->push_back( -999 );
+	    jecUnc_vec_RelativeJEREC1->push_back( -999 );
+	    jecUnc_vec_RelativeJEREC2->push_back( -999 );
+	    jecUnc_vec_RelativeJERHF->push_back( -999 );
+	    jecUnc_vec_RelativePtBB->push_back( -999 );
+	    jecUnc_vec_RelativePtEC1->push_back( -999 );
+	    jecUnc_vec_RelativePtEC2->push_back( -999 );
+	    jecUnc_vec_RelativePtHF->push_back( -999 );
+	    jecUnc_vec_RelativeBal->push_back( -999 );
+	    jecUnc_vec_RelativeFSR->push_back( -999 );
+	    jecUnc_vec_RelativeStatFSR->push_back( -999 );
+	    jecUnc_vec_RelativeStatEC->push_back( -999 );
+	    jecUnc_vec_RelativeStatHF->push_back( -999 );
+	    jecUnc_vec_PileUpDataMC->push_back( -999 );
+	    jecUnc_vec_PileUpPtRef->push_back( -999 );
+	    jecUnc_vec_PileUpPtBB->push_back( -999 );
+	    jecUnc_vec_PileUpPtEC1->push_back( -999 );
+	    jecUnc_vec_PileUpPtEC2->push_back( -999 );
+	    jecUnc_vec_PileUpPtHF->push_back( -999 );
+	    //jecUnc_vec_Total->push_back( -999 );
 	  }
-
+	  
 	  partonFlavour->push_back( it->partonFlavour() );
 	  hadronFlavour->push_back( it->hadronFlavour() );
 	  chargedEmEnergyFraction->push_back( it->chargedEmEnergyFraction() );
@@ -771,9 +927,12 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // {
   // 	edm::LogError("RootTupleMakerV2_PFJetsError") << "Error! Can't get the product " << inputTagL1Offset;
   // }
-
+	      
+  for (int isrc = 0; isrc < nsrc; isrc++) {    
+    delete vsrc[isrc];
+  }
   delete jecUnc;
-
+  //delete total;
   //-----------------------------------------------------------------
   // put vectors in the event
 	
@@ -804,6 +963,33 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put( energyScaledDown, prefix + "ScaledDownEnergy" + suffix );
   iEvent.put( energy_raw, prefix + "EnergyRaw" + suffix );
   iEvent.put( jecUnc_vec, prefix + "JECUnc" + suffix );
+  iEvent.put( jecUnc_vec_AbsoluteStat, prefix + "JECUncAbsoluteStat" + suffix );
+  iEvent.put( jecUnc_vec_AbsoluteScale, prefix + "JECUncAbsoluteScale" + suffix );
+  iEvent.put( jecUnc_vec_AbsoluteMPFBias, prefix + "JECUncAbsoluteMPFBias" + suffix );
+  iEvent.put( jecUnc_vec_Fragmentation, prefix + "JECUncFragmentation" + suffix );
+  iEvent.put( jecUnc_vec_SinglePionECAL, prefix + "JECUncSinglePionECAL" + suffix );
+  iEvent.put( jecUnc_vec_SinglePionHCAL, prefix + "JECUncSinglePionHCAL" + suffix );
+  iEvent.put( jecUnc_vec_FlavorQCD, prefix + "JECUncFlavorQCD" + suffix );
+  iEvent.put( jecUnc_vec_TimePtEta, prefix + "JECUncTimePtEta" + suffix );
+  iEvent.put( jecUnc_vec_RelativeJEREC1, prefix + "JECUncRelativeJEREC1" + suffix );
+  iEvent.put( jecUnc_vec_RelativeJEREC2, prefix + "JECUncRelativeJEREC2" + suffix );
+  iEvent.put( jecUnc_vec_RelativeJERHF, prefix + "JECUncRelativeJERHF" + suffix );
+  iEvent.put( jecUnc_vec_RelativePtBB, prefix + "JECUncRelativePtBB" + suffix );
+  iEvent.put( jecUnc_vec_RelativePtEC1, prefix + "JECUncRelativePtEC1" + suffix );
+  iEvent.put( jecUnc_vec_RelativePtEC2, prefix + "JECUncRelativePtEC2" + suffix );
+  iEvent.put( jecUnc_vec_RelativePtHF, prefix + "JECUncRelativePtHF" + suffix );
+  iEvent.put( jecUnc_vec_RelativeBal, prefix + "JECUncRelativeBal" + suffix );
+  iEvent.put( jecUnc_vec_RelativeFSR, prefix + "JECUncRelativeFSR" + suffix );
+  iEvent.put( jecUnc_vec_RelativeStatFSR, prefix + "JECUncRelativeStatFSR" + suffix );
+  iEvent.put( jecUnc_vec_RelativeStatEC, prefix + "JECUncRelativeStatEC" + suffix );
+  iEvent.put( jecUnc_vec_RelativeStatHF, prefix + "JECUncRelativeStatHF" + suffix );
+  iEvent.put( jecUnc_vec_PileUpDataMC, prefix + "JECUncPileUpDataMC" + suffix );
+  iEvent.put( jecUnc_vec_PileUpPtRef, prefix + "JECUncPileUpPtRef" + suffix );
+  iEvent.put( jecUnc_vec_PileUpPtBB, prefix + "JECUncPileUpPtBB" + suffix );
+  iEvent.put( jecUnc_vec_PileUpPtEC1, prefix + "JECUncPileUpPtEC1" + suffix );
+  iEvent.put( jecUnc_vec_PileUpPtEC2, prefix + "JECUncPileUpPtEC2" + suffix );
+  iEvent.put( jecUnc_vec_PileUpPtHF, prefix + "JECUncPileUpPtHF" + suffix );
+  //iEvent.put( jecUnc_vec_Total, prefix + "JECUncTotal" + suffix );
   iEvent.put( l2l3resJEC_vec, prefix + "L2L3ResJEC" + suffix );
   iEvent.put( l3absJEC_vec, prefix + "L3AbsJEC" + suffix );
   iEvent.put( l2relJEC_vec, prefix + "L2RelJEC" + suffix );

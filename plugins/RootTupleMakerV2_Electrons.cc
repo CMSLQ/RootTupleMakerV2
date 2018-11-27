@@ -35,6 +35,7 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 #include "TrackingTools/IPTools/interface/IPTools.h"
+#include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
 
 //------------------------------------------------------------------------
 // Constructor
@@ -48,12 +49,20 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   electronLooseIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronLooseIdMap"))),
   electronMediumIdMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMediumIdMap"))),
   electronTightIdMapToken_     (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronTightIdMap"))),
+  electronHLTPreselectionMapToken_ (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronHLTPreselectionMap"))),
   electronHEEPIdMapToken_      (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronHEEPIdMap"))),
+  electronMVAIdWP80MapToken_   (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMVAIdWP80Map"))),
+  electronMVAIdWP90MapToken_   (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMVAIdWP90Map"))),
+  electronMVAIdHZZMapToken_    (consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("ElectronMVAIdHZZMap"))),
   eleVetoIdCutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleVetoIdCutFlowResultMap"))),
   eleLooseIdCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleLooseIdCutFlowResultMap"))),
   eleMediumIdCutFlowResultMapToken_ (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleMediumIdCutFlowResultMap"))),
   eleTightIdCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleTightIdCutFlowResultMap"))),
+  eleHLTPreselectionCutFlowResultMapToken_  (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleHLTPreselectionCutFlowResultMap"))),
   eleHEEPIdCutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("eleHEEPIdCutFlowResultMap"))),
+  eleMVAIdWP80CutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("ElectronMVAIdWP80CutFlowResultMap"))),
+  eleMVAIdWP90CutFlowResultMapToken_   (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("ElectronMVAIdWP90CutFlowResultMap"))),
+  eleMVAIdHZZCutFlowResultMapToken_    (consumes<edm::ValueMap<vid::CutFlowResult> >(iConfig.getParameter<edm::InputTag>("ElectronMVAIdHZZCutFlowResultMap"))),
   heep70trkIsolMapToken_            (consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("heep70trkIsolMap"))),
   beamSpotInputToken_               (consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("BeamSpotInputTag"))), 
   ebReducedRecHitsInputToken_       (consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EBReducedRecHitsInputTag"))),
@@ -99,7 +108,11 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<bool> >    ( prefix + "PassEGammaIDLoose"          + suffix );
   produces <std::vector<bool> >    ( prefix + "PassEGammaIDMedium"         + suffix );
   produces <std::vector<bool> >    ( prefix + "PassEGammaIDTight"          + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassEGammaHLTPreselection"          + suffix );
   produces <std::vector<bool> >    ( prefix + "PassHEEPID"                 + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassMVAIDWP80"              + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassMVAIDWP90"              + suffix );
+  produces <std::vector<bool> >    ( prefix + "PassMVAIDHZZ"               + suffix );
   //produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
   //produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
   //produces <std::vector<std::string> >    ( prefix + "CutFlowNamesEGammaIDMedium" + suffix );
@@ -173,6 +186,8 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<float> > ( prefix + "HcalIsoD1DR03"            + suffix );
   produces <std::vector<float> > ( prefix + "HcalIsoD2DR03"            + suffix );
   produces <std::vector<float> > ( prefix + "TrkIsoDR03"               + suffix );
+  produces <std::vector<float> > ( prefix + "EcalPFClusterIso"               + suffix );
+  produces <std::vector<float> > ( prefix + "HcalPFClusterIso"               + suffix );
 
   // Isolation for HEEP v7.0
   produces <std::vector<float> > ( prefix + "Heep70TrkIso"             + suffix );
@@ -202,6 +217,7 @@ RootTupleMakerV2_Electrons::RootTupleMakerV2_Electrons(const edm::ParameterSet& 
   produces <std::vector<float> > ( prefix + "TrackPz"                  + suffix );
   produces <std::vector<float> > ( prefix + "TrackPt"                  + suffix );
   produces <std::vector<float> > ( prefix + "TrackValidFractionOfHits" + suffix );
+  produces <std::vector<float> > ( prefix + "NormalizedChi2" + suffix );
 
   //// Trigger matching: float electron
 
@@ -286,17 +302,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<bool> >    passEGammaIDLoose         ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDMedium        ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passEGammaIDTight         ( new std::vector<bool>   ()  );
+  std::auto_ptr<std::vector<bool> >    passEGammaHLTPreselection ( new std::vector<bool>   ()  );
   std::auto_ptr<std::vector<bool> >    passHEEPID                ( new std::vector<bool>   ()  ); 
+  std::auto_ptr<std::vector<bool> >    passMVAIDWP80             ( new std::vector<bool>   ()  ); 
+  std::auto_ptr<std::vector<bool> >    passMVAIDWP90             ( new std::vector<bool>   ()  ); 
+  std::auto_ptr<std::vector<bool> >    passMVAIDHZZ              ( new std::vector<bool>   ()  ); 
   std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDVeto   ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDLoose  ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMedium ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDTight  ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaHLTPreselection  ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDHEEP   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAWP80   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAWP90   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAHZZ    ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDVeto   ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDLoose  ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMedium ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDTight  ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaHLTPreselection  ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDHEEP   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAWP80   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAWP90   ( new std::vector<std::string> () );
+  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAHZZ    ( new std::vector<std::string> () );
   std::auto_ptr<std::vector<float> >   rhoIsoHEEP                ( new std::vector<float>   ()  ); 
   
   // Does this electron overlap with a muon?
@@ -364,6 +392,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<float> >  hcalIsoD1DR03             ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  hcalIsoD2DR03             ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  trkIsoDR03                ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  ecalPFClusterIso          ( new std::vector<float>()  );
+  std::auto_ptr<std::vector<float> >  hcalPFClusterIso          ( new std::vector<float>()  );
 
   // Isolation HEEP v7.0
   std::auto_ptr<std::vector<float> >  heep70TrkIso              ( new std::vector<float>()  );
@@ -396,6 +426,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::auto_ptr<std::vector<float> >  trackPz                   ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  trackPt                   ( new std::vector<float>()  );
   std::auto_ptr<std::vector<float> >  trackValidFractionOfHits  ( new std::vector<float>()  );  
+  std::auto_ptr<std::vector<float> >  normalizedChi2            ( new std::vector<float>()  );  
 
   // Trigger matching: float electron
 
@@ -487,23 +518,39 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
   edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
   edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > hlt_preselection_decisions;
   edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > mva_id_wp80_decisions;
+  edm::Handle<edm::ValueMap<bool> > mva_id_wp90_decisions;
+  edm::Handle<edm::ValueMap<bool> > mva_id_hzz_decisions;
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > veto_id_cutflow_data;
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > loose_id_cutflow_data;
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > medium_id_cutflow_data;
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > tight_id_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > hlt_preselection_cutflow_data;
   edm::Handle<edm::ValueMap<vid::CutFlowResult> > heep_id_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > mva_id_wp80_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > mva_id_wp90_cutflow_data;
+  edm::Handle<edm::ValueMap<vid::CutFlowResult> > mva_id_hzz_cutflow_data;
   edm::Handle<edm::ValueMap<float> > heep70trkIsolMapHandle;
   iEvent.getByToken(electronVetoIdMapToken_,veto_id_decisions);
   iEvent.getByToken(electronLooseIdMapToken_,loose_id_decisions);
   iEvent.getByToken(electronMediumIdMapToken_,medium_id_decisions);
   iEvent.getByToken(electronTightIdMapToken_,tight_id_decisions);
+  iEvent.getByToken(electronHLTPreselectionMapToken_,hlt_preselection_decisions);
   iEvent.getByToken(electronHEEPIdMapToken_,heep_id_decisions);
+  iEvent.getByToken(electronMVAIdWP80MapToken_,mva_id_wp80_decisions);
+  iEvent.getByToken(electronMVAIdWP90MapToken_,mva_id_wp90_decisions);
+  iEvent.getByToken(electronMVAIdHZZMapToken_,mva_id_hzz_decisions);
   iEvent.getByToken(eleVetoIdCutFlowResultMapToken_,veto_id_cutflow_data);
   iEvent.getByToken(eleLooseIdCutFlowResultMapToken_,loose_id_cutflow_data);
   iEvent.getByToken(eleMediumIdCutFlowResultMapToken_,medium_id_cutflow_data);
   iEvent.getByToken(eleTightIdCutFlowResultMapToken_,tight_id_cutflow_data);
+  iEvent.getByToken(eleHLTPreselectionCutFlowResultMapToken_,hlt_preselection_cutflow_data);
   iEvent.getByToken(eleHEEPIdCutFlowResultMapToken_,heep_id_cutflow_data);
+  iEvent.getByToken(eleMVAIdWP80CutFlowResultMapToken_,mva_id_wp80_cutflow_data);
+  iEvent.getByToken(eleMVAIdWP90CutFlowResultMapToken_,mva_id_wp90_cutflow_data);
+  iEvent.getByToken(eleMVAIdHZZCutFlowResultMapToken_,mva_id_hzz_cutflow_data);
   iEvent.getByToken(heep70trkIsolMapToken_,heep70trkIsolMapHandle);
 
   // for 03Feb2017 re-miniaod
@@ -845,17 +892,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       passEGammaIDLoose          -> push_back ((*loose_id_decisions)[ elPtr ]);
       passEGammaIDMedium         -> push_back ((*medium_id_decisions)[ elPtr ]);
       passEGammaIDTight          -> push_back ((*tight_id_decisions)[ elPtr ]);
+      passEGammaHLTPreselection  -> push_back ((*hlt_preselection_decisions)[ elPtr ]);
       passHEEPID                 -> push_back ((*heep_id_decisions)[ elPtr ]);
+      passMVAIDWP80              -> push_back ((*mva_id_wp80_decisions)[ elPtr ]);
+      passMVAIDWP90              -> push_back ((*mva_id_wp90_decisions)[ elPtr ]);
+      passMVAIDHZZ               -> push_back ((*mva_id_hzz_decisions)[ elPtr ]);
       cutFlowNamesEGammaIDVeto   -> push_back (((*veto_id_cutflow_data)[ elPtr ]).cutFlowName());
       cutFlowNamesEGammaIDLoose  -> push_back (((*loose_id_cutflow_data)[ elPtr ]).cutFlowName());
       cutFlowNamesEGammaIDMedium -> push_back (((*medium_id_cutflow_data)[ elPtr ]).cutFlowName());
       cutFlowNamesEGammaIDTight  -> push_back (((*tight_id_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaHLTPreselection  -> push_back (((*hlt_preselection_cutflow_data)[ elPtr ]).cutFlowName());
       cutFlowNamesEGammaIDHEEP   -> push_back (((*heep_id_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaIDMVAWP80-> push_back (((*mva_id_wp80_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaIDMVAWP90-> push_back (((*mva_id_wp90_cutflow_data)[ elPtr ]).cutFlowName());
+      cutFlowNamesEGammaIDMVAHZZ-> push_back (((*mva_id_hzz_cutflow_data)[ elPtr ]).cutFlowName());
       cutFlowHashesEGammaIDVeto  -> push_back (((*veto_id_cutflow_data)[ elPtr ]).cutFlowHash());
       cutFlowHashesEGammaIDLoose -> push_back (((*loose_id_cutflow_data)[ elPtr ]).cutFlowHash());
       cutFlowHashesEGammaIDMedium-> push_back (((*medium_id_cutflow_data)[ elPtr ]).cutFlowHash());
       cutFlowHashesEGammaIDTight -> push_back (((*tight_id_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaHLTPreselection -> push_back (((*hlt_preselection_cutflow_data)[ elPtr ]).cutFlowHash());
       cutFlowHashesEGammaIDHEEP  -> push_back (((*heep_id_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaIDMVAWP80  -> push_back (((*mva_id_wp80_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaIDMVAWP90  -> push_back (((*mva_id_wp90_cutflow_data)[ elPtr ]).cutFlowHash());
+      cutFlowHashesEGammaIDMVAHZZ   -> push_back (((*mva_id_hzz_cutflow_data)[ elPtr ]).cutFlowHash());
       //
       rhoIsoHEEP               -> push_back (rhoIso);
 
@@ -914,6 +973,10 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       hcalIsoD1DR03            -> push_back( it->dr03HcalDepth1TowerSumEt() );
       hcalIsoD2DR03            -> push_back( it->dr03HcalDepth2TowerSumEt() );
       trkIsoDR03               -> push_back( it->dr03TkSumPt() );
+
+      // pf clusters iso
+      ecalPFClusterIso         -> push_back( it->ecalPFClusterIso() );
+      hcalPFClusterIso         -> push_back( it->hcalPFClusterIso() );
 
       // Isolation HEEP v7.0
       if(!heep70trkIsolMapHandle.isValid())
@@ -984,7 +1047,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       trackPz                  -> push_back( it->gsfTrack()->pz() );
       trackPt                  -> push_back( it->gsfTrack()->pt() );
       trackValidFractionOfHits -> push_back( it->gsfTrack()->validFraction() );
-
+      // track chi2
+      normalizedChi2           ->push_back( it->gsfTrack()->normalizedChi2() );
 
       ++iElectron;
     }
@@ -1026,7 +1090,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( passEGammaIDLoose       , prefix + "PassEGammaIDLoose"        + suffix );
   iEvent.put( passEGammaIDMedium      , prefix + "PassEGammaIDMedium"       + suffix );
   iEvent.put( passEGammaIDTight       , prefix + "PassEGammaIDTight"        + suffix );
+  iEvent.put( passEGammaHLTPreselection       , prefix + "PassEGammaHLTPreselection"        + suffix );
   iEvent.put( passHEEPID              , prefix + "PassHEEPID"               + suffix );
+  iEvent.put( passMVAIDWP80           , prefix + "PassMVAIDWP80"               + suffix );
+  iEvent.put( passMVAIDWP90           , prefix + "PassMVAIDWP90"               + suffix );
+  iEvent.put( passMVAIDHZZ            , prefix + "PassMVAIDHZZ"               + suffix );
   //iEvent.put( cutFlowNamesEGammaIDVeto   , prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
   //iEvent.put( cutFlowNamesEGammaIDLoose  , prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
   //iEvent.put( cutFlowNamesEGammaIDMedium , prefix + "CutFlowNamesEGammaIDMedium" + suffix );
@@ -1094,7 +1162,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( hcalIsoD1DR03           , prefix + "HcalIsoD1DR03"            + suffix );
   iEvent.put( hcalIsoD2DR03           , prefix + "HcalIsoD2DR03"            + suffix );
   iEvent.put( trkIsoDR03              , prefix + "TrkIsoDR03"               + suffix );
-
+  iEvent.put( ecalPFClusterIso        , prefix + "EcalPFClusterIso"         + suffix );
+  iEvent.put( hcalPFClusterIso        , prefix + "HcalPFClusterIso"         + suffix );
   // Isolation HEEP 7.0
   iEvent.put ( heep70TrkIso           , prefix + "Heep70TrkIso"             + suffix );
   // Isolation variables: particle flow
@@ -1136,6 +1205,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   iEvent.put( trackPz                 , prefix + "TrackPz"                  + suffix );
   iEvent.put( trackPt                 , prefix + "TrackPt"                  + suffix );
   iEvent.put( trackValidFractionOfHits, prefix + "TrackValidFractionOfHits" + suffix );
+  iEvent.put( normalizedChi2          , prefix + "NormalizedChi2" + suffix );
 
   //// Trigger matching: Double electron
 

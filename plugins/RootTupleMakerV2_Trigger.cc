@@ -6,7 +6,7 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/L1TGlobal/interface/GlobalAlgBlk.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-
+#include "DataFormats/CTPPSReco/interface/CTPPSLocalTrackLite.h"
 
 unsigned int NmaxL1AlgoBit = 128;
 unsigned int NmaxL1TechBit = 64;

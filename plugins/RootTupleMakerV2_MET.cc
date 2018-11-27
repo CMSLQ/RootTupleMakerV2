@@ -32,17 +32,17 @@ RootTupleMakerV2_MET::RootTupleMakerV2_MET(const edm::ParameterSet& iConfig) :
 void RootTupleMakerV2_MET::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<float> >  met  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  metphi  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  sumet  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  metuncorr  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  metphiuncorr  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  sumetuncorr  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  metsig  ( new std::vector<float>()  );  
-  std::auto_ptr<std::vector<float> >  metsigmatrixdxx  ( new std::vector<float>()  );  
-  std::auto_ptr<std::vector<float> >  metsigmatrixdxy  ( new std::vector<float>()  );  
-  std::auto_ptr<std::vector<float> >  metsigmatrixdyx  ( new std::vector<float>()  );  
-  std::auto_ptr<std::vector<float> >  metsigmatrixdyy  ( new std::vector<float>()  );  
+  std::unique_ptr<std::vector<float> >  met  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  metphi  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  sumet  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  metuncorr  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  metphiuncorr  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  sumetuncorr  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  metsig  ( new std::vector<float>()  );  
+  std::unique_ptr<std::vector<float> >  metsigmatrixdxx  ( new std::vector<float>()  );  
+  std::unique_ptr<std::vector<float> >  metsigmatrixdxy  ( new std::vector<float>()  );  
+  std::unique_ptr<std::vector<float> >  metsigmatrixdyx  ( new std::vector<float>()  );  
+  std::unique_ptr<std::vector<float> >  metsigmatrixdyy  ( new std::vector<float>()  );  
 
   //-----------------------------------------------------------------
   edm::Handle<pat::METCollection> mets;
@@ -135,19 +135,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( met, prefix + "MET" + suffix );
-  iEvent.put( metphi, prefix + "METPhi" + suffix );
-  iEvent.put( sumet, prefix + "SumET" + suffix );
+  iEvent.put(std::move(met), prefix + "MET" + suffix );
+  iEvent.put(std::move(metphi), prefix + "METPhi" + suffix );
+  iEvent.put(std::move(sumet), prefix + "SumET" + suffix );
   if ( store_uncorrected_MET ) {
-    iEvent.put( metuncorr, prefix + "METUncorr" + suffix );
-    iEvent.put( metphiuncorr, prefix + "METPhiUncorr" + suffix );
-    iEvent.put( sumetuncorr, prefix + "SumETUncorr" + suffix );
+    iEvent.put(std::move(metuncorr), prefix + "METUncorr" + suffix );
+    iEvent.put(std::move(metphiuncorr), prefix + "METPhiUncorr" + suffix );
+    iEvent.put(std::move(sumetuncorr), prefix + "SumETUncorr" + suffix );
   }
   if ( store_MET_significance ) {
-    iEvent.put( metsig, prefix + "METSig" + suffix );
-    iEvent.put( metsigmatrixdxx, prefix + "METSigMatrixDXX" + suffix );
-    iEvent.put( metsigmatrixdxy, prefix + "METSigMatrixDXY" + suffix );
-    iEvent.put( metsigmatrixdyx, prefix + "METSigMatrixDYX" + suffix );
-    iEvent.put( metsigmatrixdyy, prefix + "METSigMatrixDYY" + suffix );
+    iEvent.put(std::move(metsig), prefix + "METSig" + suffix );
+    iEvent.put(std::move(metsigmatrixdxx), prefix + "METSigMatrixDXX" + suffix );
+    iEvent.put(std::move(metsigmatrixdxy), prefix + "METSigMatrixDXY" + suffix );
+    iEvent.put(std::move(metsigmatrixdyx), prefix + "METSigMatrixDYX" + suffix );
+    iEvent.put(std::move(metsigmatrixdyy), prefix + "METSigMatrixDYY" + suffix );
   }
 }

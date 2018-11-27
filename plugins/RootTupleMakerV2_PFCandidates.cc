@@ -26,11 +26,11 @@ RootTupleMakerV2_PFCandidates::RootTupleMakerV2_PFCandidates(const edm::Paramete
 void RootTupleMakerV2_PFCandidates::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pt  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<int> >    charge  ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pt  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >    charge  ( new std::vector<int>()  );
 
   //-----------------------------------------------------------------
 
@@ -197,9 +197,9 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( eta, prefix + "EtaLeptLink" + suffix );
-  iEvent.put( phi, prefix + "PhiLeptLink" + suffix );
-  iEvent.put( pt, prefix + "PtLeptLink" + suffix );
-  iEvent.put( energy, prefix + "EnergyLeptLink" + suffix );
-  iEvent.put( charge, prefix + "ChargeLeptLink" + suffix );
+  iEvent.put(std::move(eta), prefix + "EtaLeptLink" + suffix );
+  iEvent.put(std::move(phi), prefix + "PhiLeptLink" + suffix );
+  iEvent.put(std::move(pt), prefix + "PtLeptLink" + suffix );
+  iEvent.put(std::move(energy), prefix + "EnergyLeptLink" + suffix );
+  iEvent.put(std::move(charge), prefix + "ChargeLeptLink" + suffix );
 }

@@ -87,22 +87,22 @@ endRun(edm::Run const& iRun, edm::EventSetup const&) {
 void RootTupleMakerV2_GenEventInfo::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<unsigned int >        processID   ( new unsigned int() );
-  std::auto_ptr<float >               ptHat ( new float() );
-  //std::auto_ptr<std::vector<float> >  pdfCTEQWeights  ( new std::vector<float>()  );
-  //std::auto_ptr<std::vector<float> >  pdfMMTHWeights  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pdfNNPDFWeights  ( new std::vector<float>()  );
-  //std::auto_ptr<std::vector<float> >  pdfPDF4LHCWeights  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pdfNNPDFWeightsAMCNLO (new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scaleWeights  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scaleWeightsAMCNLO  ( new std::vector<float>()  );
-  std::auto_ptr<float>                amcNLOweight  ( new float()  );
-  std::auto_ptr<std::vector<int >  >  Number_interactions  ( new std::vector<int>() );
-  std::auto_ptr<std::vector<float> >  trueNumberInteractions ( new std::vector<float>() );
-  std::auto_ptr<std::vector<int >  >  OriginBX( new std::vector<int>() );
-  std::auto_ptr<float >               weight ( new float() );
-//   std::auto_ptr<float >               alphaQCD ( new float() );
-//   std::auto_ptr<float >               alphaQED ( new float() );
+  std::unique_ptr<unsigned int >        processID   ( new unsigned int() );
+  std::unique_ptr<float >               ptHat ( new float() );
+  //std::unique_ptr<std::vector<float> >  pdfCTEQWeights  ( new std::vector<float>()  );
+  //std::unique_ptr<std::vector<float> >  pdfMMTHWeights  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pdfNNPDFWeights  ( new std::vector<float>()  );
+  //std::unique_ptr<std::vector<float> >  pdfPDF4LHCWeights  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pdfNNPDFWeightsAMCNLO (new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scaleWeights  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scaleWeightsAMCNLO  ( new std::vector<float>()  );
+  std::unique_ptr<float>                amcNLOweight  ( new float()  );
+  std::unique_ptr<std::vector<int >  >  Number_interactions  ( new std::vector<int>() );
+  std::unique_ptr<std::vector<float> >  trueNumberInteractions ( new std::vector<float>() );
+  std::unique_ptr<std::vector<int >  >  OriginBX( new std::vector<int>() );
+  std::unique_ptr<float >               weight ( new float() );
+//   std::unique_ptr<float >               alphaQCD ( new float() );
+//   std::unique_ptr<float >               alphaQED ( new float() );
 
   *processID.get() = 0;
   *ptHat.get() = 0.;
@@ -319,20 +319,20 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   
   //-----------------------------------------------------------------
-  iEvent.put( processID, "ProcessID" );
-  iEvent.put( ptHat, "PtHat" );
-  //iEvent.put( pdfCTEQWeights, "PDFCTEQWeights" );
-  //iEvent.put( pdfMMTHWeights, "PDFMMTHWeights" );
-  iEvent.put( pdfNNPDFWeights, "PDFNNPDFWeights" );
-  //iEvent.put( pdfPDF4LHCWeights, "PDFPDF4LHCWeights" );
-  iEvent.put( pdfNNPDFWeightsAMCNLO, "PDFNNPDFWeightsAMCNLO");
-  iEvent.put( scaleWeights, "ScaleWeights" );
-  iEvent.put( scaleWeightsAMCNLO, "ScaleWeightsAMCNLO" );
-  iEvent.put( amcNLOweight, "amcNLOWeight" );
-  iEvent.put( Number_interactions,   "PileUpInteractions"   );
-  iEvent.put( trueNumberInteractions, "PileUpInteractionsTrue" );
-  iEvent.put( OriginBX,   "PileUpOriginBX" );
-  iEvent.put( weight, "Weight" );
-//   iEvent.put( alphaQCD, "alphaQCD" );
-//   iEvent.put( alphaQED, "alphaQED" );
+  iEvent.put(std::move(processID), "ProcessID" );
+  iEvent.put(std::move(ptHat), "PtHat" );
+  //iEvent.put(std::move(pdfCTEQWeights), "PDFCTEQWeights" );
+  //iEvent.put(std::move(pdfMMTHWeights), "PDFMMTHWeights" );
+  iEvent.put(std::move(pdfNNPDFWeights), "PDFNNPDFWeights" );
+  //iEvent.put(std::move(pdfPDF4LHCWeights), "PDFPDF4LHCWeights" );
+  iEvent.put(std::move(pdfNNPDFWeightsAMCNLO), "PDFNNPDFWeightsAMCNLO");
+  iEvent.put(std::move(scaleWeights), "ScaleWeights" );
+  iEvent.put(std::move(scaleWeightsAMCNLO), "ScaleWeightsAMCNLO" );
+  iEvent.put(std::move(amcNLOweight), "amcNLOWeight" );
+  iEvent.put(std::move(Number_interactions),   "PileUpInteractions"   );
+  iEvent.put(std::move(trueNumberInteractions), "PileUpInteractionsTrue" );
+  iEvent.put(std::move(OriginBX),   "PileUpOriginBX" );
+  iEvent.put(std::move(weight), "Weight" );
+//   iEvent.put(std::move(alphaQCD), "alphaQCD" );
+//   iEvent.put(std::move(alphaQED), "alphaQED" );
 }

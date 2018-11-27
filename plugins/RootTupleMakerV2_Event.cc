@@ -34,68 +34,68 @@ void RootTupleMakerV2_Event::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   std::string releaseVersion = (iEvent.processHistory().rbegin())->releaseVersion();
-  std::auto_ptr<std::string>  globaltag   ( new std::string(globalTagLabel_) );
-  std::auto_ptr<std::string>  cmsswrelease   ( new std::string(releaseVersion) );
-  std::auto_ptr<unsigned int >  run   ( new unsigned int(iEvent.id().run()        ) );
-  std::auto_ptr<unsigned int >  event ( new unsigned int(iEvent.id().event()      ) );
-  std::auto_ptr<unsigned int >  ls    ( new unsigned int(iEvent.luminosityBlock() ) );
+  std::unique_ptr<std::string>  globaltag   ( new std::string(globalTagLabel_) );
+  std::unique_ptr<std::string>  cmsswrelease   ( new std::string(releaseVersion) );
+  std::unique_ptr<unsigned int >  run   ( new unsigned int(iEvent.id().run()        ) );
+  std::unique_ptr<unsigned int >  event ( new unsigned int(iEvent.id().event()      ) );
+  std::unique_ptr<unsigned int >  ls    ( new unsigned int(iEvent.luminosityBlock() ) );
 
   double sec  = iEvent.time().value() >> 32 ;
   double usec = 0xFFFFFFFF & iEvent.time().value();
   double conv = 1e6;
 
-  std::auto_ptr<unsigned int >  bunch ( new unsigned int(iEvent.bunchCrossing()   ) );
-  std::auto_ptr<unsigned int >  orbit ( new unsigned int(iEvent.orbitNumber()     ) );
-  std::auto_ptr<double >        time  ( new double(sec+usec/conv));
+  std::unique_ptr<unsigned int >  bunch ( new unsigned int(iEvent.bunchCrossing()   ) );
+  std::unique_ptr<unsigned int >  orbit ( new unsigned int(iEvent.orbitNumber()     ) );
+  std::unique_ptr<double >        time  ( new double(sec+usec/conv));
 
-  std::auto_ptr<bool >          isdata  ( new bool(iEvent.isRealData()));
+  std::unique_ptr<bool >          isdata  ( new bool(iEvent.isRealData()));
 
   edm::Handle<double> fixedGridRhoAllH;
   iEvent.getByToken(fixedGridRhoAllToken_,fixedGridRhoAllH);
-  std::auto_ptr<double> fixedGridRhoAll (new double(*fixedGridRhoAllH.product() ) );
+  std::unique_ptr<double> fixedGridRhoAll (new double(*fixedGridRhoAllH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetAllH;
   iEvent.getByToken(fixedGridRhoFastjetAllToken_,fixedGridRhoFastjetAllH);
-  std::auto_ptr<double> fixedGridRhoFastjetAll (new double(*fixedGridRhoFastjetAllH.product() ) );
+  std::unique_ptr<double> fixedGridRhoFastjetAll (new double(*fixedGridRhoFastjetAllH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetAllCaloH;
   iEvent.getByToken(fixedGridRhoFastjetAllCaloToken_,fixedGridRhoFastjetAllCaloH);
-  std::auto_ptr<double> fixedGridRhoFastjetAllCalo (new double(*fixedGridRhoFastjetAllCaloH.product() ) );
+  std::unique_ptr<double> fixedGridRhoFastjetAllCalo (new double(*fixedGridRhoFastjetAllCaloH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralH;
   iEvent.getByToken(fixedGridRhoFastjetCentralToken_,fixedGridRhoFastjetCentralH);
-  std::auto_ptr<double> fixedGridRhoFastjetCentral (new double(*fixedGridRhoFastjetCentralH.product() ) );
+  std::unique_ptr<double> fixedGridRhoFastjetCentral (new double(*fixedGridRhoFastjetCentralH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralCaloH;
   iEvent.getByToken(fixedGridRhoFastjetCentralCaloToken_,fixedGridRhoFastjetCentralCaloH);
-  std::auto_ptr<double> fixedGridRhoFastjetCentralCalo (new double(*fixedGridRhoFastjetCentralCaloH.product() ) );
+  std::unique_ptr<double> fixedGridRhoFastjetCentralCalo (new double(*fixedGridRhoFastjetCentralCaloH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralNeutralH;
   iEvent.getByToken(fixedGridRhoFastjetCentralNeutralToken_,fixedGridRhoFastjetCentralNeutralH);
-  std::auto_ptr<double> fixedGridRhoFastjetCentralNeutral (new double(*fixedGridRhoFastjetCentralNeutralH.product() ) );
+  std::unique_ptr<double> fixedGridRhoFastjetCentralNeutral (new double(*fixedGridRhoFastjetCentralNeutralH.product() ) );
 
   edm::Handle<double> fixedGridRhoFastjetCentralChargedPileUpH;
   iEvent.getByToken(fixedGridRhoFastjetCentralChargedPileUpToken_,fixedGridRhoFastjetCentralChargedPileUpH);
-  std::auto_ptr<double> fixedGridRhoFastjetCentralChargedPileUp (new double(*fixedGridRhoFastjetCentralChargedPileUpH.product() ) );
+  std::unique_ptr<double> fixedGridRhoFastjetCentralChargedPileUp (new double(*fixedGridRhoFastjetCentralChargedPileUpH.product() ) );
 
 
 
 
   //-----------------------------------------------------------------
-  iEvent.put( globaltag, "globalTag");
-  iEvent.put( cmsswrelease, "cmsswRelease");
-  iEvent.put( run,   "run"   );
-  iEvent.put( event, "event" );
-  iEvent.put( ls   , "ls"    );
-  iEvent.put( bunch, "bunch" );
-  iEvent.put( orbit, "orbit" );
-  iEvent.put( time,  "time"  );
-  iEvent.put( isdata,"isData");
-  iEvent.put( fixedGridRhoAll,                         "fixedGridRhoAll"                         );
-  iEvent.put( fixedGridRhoFastjetAll,                  "fixedGridRhoFastjetAll"                  );
-  iEvent.put( fixedGridRhoFastjetAllCalo,              "fixedGridRhoFastjetAllCalo"              );
-  iEvent.put( fixedGridRhoFastjetCentral,              "fixedGridRhoFastjetCentral"              );
-  iEvent.put( fixedGridRhoFastjetCentralCalo,          "fixedGridRhoFastjetCentralCalo"          );
-  iEvent.put( fixedGridRhoFastjetCentralNeutral,       "fixedGridRhoFastjetCentralNeutral"       );
-  iEvent.put( fixedGridRhoFastjetCentralChargedPileUp, "fixedGridRhoFastjetCentralChargedPileUp" );
+  iEvent.put( std::move(globaltag), "globalTag");
+  iEvent.put( std::move(cmsswrelease), "cmsswRelease");
+  iEvent.put( std::move(run),   "run"   );
+  iEvent.put( std::move(event), "event" );
+  iEvent.put( std::move(ls)   , "ls"    );
+  iEvent.put( std::move(bunch), "bunch" );
+  iEvent.put( std::move(orbit), "orbit" );
+  iEvent.put( std::move(time),  "time"  );
+  iEvent.put( std::move(isdata),"isData");
+  iEvent.put( std::move(fixedGridRhoAll),                         "fixedGridRhoAll"                         );
+  iEvent.put( std::move(fixedGridRhoFastjetAll),                  "fixedGridRhoFastjetAll"                  );
+  iEvent.put( std::move(fixedGridRhoFastjetAllCalo),              "fixedGridRhoFastjetAllCalo"              );
+  iEvent.put( std::move(fixedGridRhoFastjetCentral),              "fixedGridRhoFastjetCentral"              );
+  iEvent.put( std::move(fixedGridRhoFastjetCentralCalo),          "fixedGridRhoFastjetCentralCalo"          );
+  iEvent.put( std::move(fixedGridRhoFastjetCentralNeutral),       "fixedGridRhoFastjetCentralNeutral"       );
+  iEvent.put( std::move(fixedGridRhoFastjetCentralChargedPileUp), "fixedGridRhoFastjetCentralChargedPileUp" );
 }

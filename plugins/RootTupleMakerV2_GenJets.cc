@@ -21,13 +21,13 @@ RootTupleMakerV2_GenJets::RootTupleMakerV2_GenJets(const edm::ParameterSet& iCon
 void RootTupleMakerV2_GenJets::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  p  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pt  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  emf  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  hadf  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  p  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pt  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  emf  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  hadf  ( new std::vector<float>()  );
 
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
@@ -58,11 +58,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( eta, prefix + "Eta" + suffix );
-  iEvent.put( phi, prefix + "Phi" + suffix );
-  iEvent.put( p, prefix + "P" + suffix );
-  iEvent.put( pt, prefix + "Pt" + suffix );
-  iEvent.put( energy, prefix + "Energy" + suffix );
-  iEvent.put( emf, prefix + "EMF" + suffix );
-  iEvent.put( hadf, prefix + "HADF" + suffix );
+  iEvent.put(std::move(eta), prefix + "Eta" + suffix );
+  iEvent.put(std::move(phi), prefix + "Phi" + suffix );
+  iEvent.put(std::move(p), prefix + "P" + suffix );
+  iEvent.put(std::move(pt), prefix + "Pt" + suffix );
+  iEvent.put(std::move(energy), prefix + "Energy" + suffix );
+  iEvent.put(std::move(emf), prefix + "EMF" + suffix );
+  iEvent.put(std::move(hadf), prefix + "HADF" + suffix );
 }

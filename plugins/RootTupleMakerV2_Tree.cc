@@ -86,8 +86,8 @@ RootTupleMakerV2_Tree(const edm::ParameterSet& cfg) {
   leafmap["String"]     = STRING;     leafmap["Strings"]    = STRING_V;
 
   edm::Service<edm::ConstProductRegistry> reg;
-  edm::SelectedProducts allBranches = reg->allBranchDescriptions();
-  edm::ProductSelectorRules productSelectorRules_(cfg, "outputCommands", "RootTupleMakerV2_Tree");
+  auto allBranches = reg->allBranchDescriptions();
+  const edm::ProductSelectorRules productSelectorRules_(cfg, "outputCommands", "RootTupleMakerV2_Tree");
   edm::ProductSelector productSelector_;
   productSelector_.initialize(productSelectorRules_, allBranches);
 

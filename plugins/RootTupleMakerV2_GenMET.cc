@@ -16,9 +16,9 @@ RootTupleMakerV2_GenMET::RootTupleMakerV2_GenMET(const edm::ParameterSet& iConfi
 void RootTupleMakerV2_GenMET::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<double> >  met  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  metphi  ( new std::vector<double>()  );
-  std::auto_ptr<std::vector<double> >  sumet  ( new std::vector<double>()  );
+  std::unique_ptr<std::vector<double> >  met  ( new std::vector<double>()  );
+  std::unique_ptr<std::vector<double> >  metphi  ( new std::vector<double>()  );
+  std::unique_ptr<std::vector<double> >  sumet  ( new std::vector<double>()  );
 
   //-----------------------------------------------------------------
   if( !iEvent.isRealData() ) {
@@ -42,7 +42,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( met, prefix + "MET" + suffix );
-  iEvent.put( metphi, prefix + "METPhi" + suffix );
-  iEvent.put( sumet, prefix + "SumET" + suffix );
+  iEvent.put(std::move(met), prefix + "MET" + suffix );
+  iEvent.put(std::move(metphi), prefix + "METPhi" + suffix );
+  iEvent.put(std::move(sumet), prefix + "SumET" + suffix );
 }

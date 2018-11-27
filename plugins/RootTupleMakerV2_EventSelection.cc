@@ -32,22 +32,22 @@ void RootTupleMakerV2_EventSelection::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
 
-  std::auto_ptr<bool> passhbhenoisefilter( new bool() );
-  std::auto_ptr<bool> passhbhenoiseisofilter( new bool() );
-  std::auto_ptr<bool> passbeamhalofiltertight( new bool() );
-  std::auto_ptr<bool> passtightHaloTrkMuUnvetoFilter( new bool() );
-  std::auto_ptr<bool> passbeamhalo2016globalfiltertight( new bool() );
-  std::auto_ptr<bool> passbeamhalo2016globalfiltersupertight( new bool() );
-  std::auto_ptr<bool> passbadpfmuonFilter( new bool() );
-  std::auto_ptr<bool> passbadchargedcandidateFilter( new bool() );
-  std::auto_ptr<bool> passecalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
-  std::auto_ptr<bool> isprimaryvertex( new bool() );
-  std::auto_ptr<bool> passbadEESupercrystalFilter ( new bool() ) ;
-  std::auto_ptr<bool> passchargedHadronTrackResolutionFilter( new bool() );
-  std::auto_ptr<bool> passmuonBadTrackFilter( new bool() );
-  std::auto_ptr<bool> flagBadMuons( new bool() );
-  std::auto_ptr<bool> flagDuplicateMuons( new bool() );
-  std::auto_ptr<bool> flagNoBadMuons( new bool() );
+  std::unique_ptr<bool> passhbhenoisefilter( new bool() );
+  std::unique_ptr<bool> passhbhenoiseisofilter( new bool() );
+  std::unique_ptr<bool> passbeamhalofiltertight( new bool() );
+  std::unique_ptr<bool> passtightHaloTrkMuUnvetoFilter( new bool() );
+  std::unique_ptr<bool> passbeamhalo2016globalfiltertight( new bool() );
+  std::unique_ptr<bool> passbeamhalo2016globalfiltersupertight( new bool() );
+  std::unique_ptr<bool> passbadpfmuonFilter( new bool() );
+  std::unique_ptr<bool> passbadchargedcandidateFilter( new bool() );
+  std::unique_ptr<bool> passecalDeadCellTriggerPrimitiveFilter ( new bool() ) ;
+  std::unique_ptr<bool> isprimaryvertex( new bool() );
+  std::unique_ptr<bool> passbadEESupercrystalFilter ( new bool() ) ;
+  std::unique_ptr<bool> passchargedHadronTrackResolutionFilter( new bool() );
+  std::unique_ptr<bool> passmuonBadTrackFilter( new bool() );
+  std::unique_ptr<bool> flagBadMuons( new bool() );
+  std::unique_ptr<bool> flagDuplicateMuons( new bool() );
+  std::unique_ptr<bool> flagNoBadMuons( new bool() );
   
   *passhbhenoisefilter.get() = true;
   *passhbhenoiseisofilter.get() = true;
@@ -225,23 +225,23 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   *passbadpfmuonFilter.get() = *ifilterbadPFMuon;
 
   //-----------------------------------------------------------------
-  iEvent.put(isprimaryvertex,"passGoodVertices");
-  iEvent.put(passhbhenoisefilter,"passHBHENoiseFilter");
-  iEvent.put(passhbhenoiseisofilter,"passHBHENoiseIsoFilter");
-  iEvent.put(passbeamhalofiltertight,"passCSCTightHaloFilter");
-  iEvent.put(passtightHaloTrkMuUnvetoFilter,"passCSCTightHaloTrkMuUnvetoFilter");
-  iEvent.put(passbeamhalo2016globalfiltertight,"passGlobalTightHalo2016Filter");
-  iEvent.put(passbeamhalo2016globalfiltersupertight,"passGlobalSuperTightHalo2016Filter");
-  iEvent.put(passecalDeadCellTriggerPrimitiveFilter,"passEcalDeadCellTriggerPrimitiveFilter");
+  iEvent.put(std::move(isprimaryvertex),"passGoodVertices");
+  iEvent.put(std::move(passhbhenoisefilter),"passHBHENoiseFilter");
+  iEvent.put(std::move(passhbhenoiseisofilter),"passHBHENoiseIsoFilter");
+  iEvent.put(std::move(passbeamhalofiltertight),"passCSCTightHaloFilter");
+  iEvent.put(std::move(passtightHaloTrkMuUnvetoFilter),"passCSCTightHaloTrkMuUnvetoFilter");
+  iEvent.put(std::move(passbeamhalo2016globalfiltertight),"passGlobalTightHalo2016Filter");
+  iEvent.put(std::move(passbeamhalo2016globalfiltersupertight),"passGlobalSuperTightHalo2016Filter");
+  iEvent.put(std::move(passecalDeadCellTriggerPrimitiveFilter),"passEcalDeadCellTriggerPrimitiveFilter");
   //
-  iEvent.put(passbadEESupercrystalFilter, "passEEBadScFilter");
+  iEvent.put(std::move(passbadEESupercrystalFilter), "passEEBadScFilter");
   //
-  iEvent.put(passbadpfmuonFilter, "passBadPFMuonFilter");
-  iEvent.put(passbadchargedcandidateFilter, "passBadChargedCandidateFilter");
+  iEvent.put(std::move(passbadpfmuonFilter), "passBadPFMuonFilter");
+  iEvent.put(std::move(passbadchargedcandidateFilter), "passBadChargedCandidateFilter");
   //
-  iEvent.put(passchargedHadronTrackResolutionFilter,"passChargedHadronTrackResolutionFilter");
-  iEvent.put(passmuonBadTrackFilter,"passMuonBadTrackFilter");
-  iEvent.put(flagBadMuons,"badMuonsFlag");
-  iEvent.put(flagDuplicateMuons,"duplicateMuonsFlag");
-  iEvent.put(flagNoBadMuons,"noBadMuonsFlag");
+  iEvent.put(std::move(passchargedHadronTrackResolutionFilter),"passChargedHadronTrackResolutionFilter");
+  iEvent.put(std::move(passmuonBadTrackFilter),"passMuonBadTrackFilter");
+  iEvent.put(std::move(flagBadMuons),"badMuonsFlag");
+  iEvent.put(std::move(flagDuplicateMuons),"duplicateMuonsFlag");
+  iEvent.put(std::move(flagNoBadMuons),"noBadMuonsFlag");
 }

@@ -110,29 +110,29 @@ beginRun(const edm::Run& iRun, edm::EventSetup const& iSetup) {
 void RootTupleMakerV2_Trigger::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<int> >  l1bits   ( new std::vector<int>() );
-  std::auto_ptr<int> l1prescaleColumn  (new int);
+  std::unique_ptr<std::vector<int> >  l1bits   ( new std::vector<int>() );
+  std::unique_ptr<int> l1prescaleColumn  (new int);
   *l1prescaleColumn.get() = -999;
-  //std::auto_ptr<std::vector<int> >  l1physbits   ( new std::vector<int>() );
-  //std::auto_ptr<std::vector<int> >  l1techbits   ( new std::vector<int>() );
-  // std::auto_ptr<std::vector<int> >  hltbits      ( new std::vector<int>() );
-  // std::auto_ptr<std::vector<int> >  hltresults   ( new std::vector<int>() );
-  // std::auto_ptr<std::vector<int> >  hltprescales ( new std::vector<int>() );
+  //std::unique_ptr<std::vector<int> >  l1physbits   ( new std::vector<int>() );
+  //std::unique_ptr<std::vector<int> >  l1techbits   ( new std::vector<int>() );
+  // std::unique_ptr<std::vector<int> >  hltbits      ( new std::vector<int>() );
+  // std::unique_ptr<std::vector<int> >  hltresults   ( new std::vector<int>() );
+  // std::unique_ptr<std::vector<int> >  hltprescales ( new std::vector<int>() );
 
-  std::auto_ptr<std::vector < std::string > > v_hlt_insideDataset_names             (new std::vector<std::string>  ());
-  std::auto_ptr<std::vector < std::string > > v_hlt_outsideDataset_names            (new std::vector<std::string>  ());
-  std::auto_ptr<std::vector < bool > >        v_hlt_insideDataset_decisions         (new std::vector<bool>         ());
-  std::auto_ptr<std::vector < bool > >        v_hlt_outsideDataset_decisions        (new std::vector<bool>         ());
-  std::auto_ptr<std::vector < int > >         v_hlt_insideDataset_prescales         (new std::vector<int>          ());
-  std::auto_ptr<std::vector < int > >         v_hlt_outsideDataset_prescales        (new std::vector<int>          ());
-  std::auto_ptr<std::vector < int > >         v_hlt_insideDataset_packedPrescales   (new std::vector<int>          ());
-  std::auto_ptr<std::vector < int > >         v_hlt_outsideDataset_packedPrescales  (new std::vector<int>          ());
+  std::unique_ptr<std::vector < std::string > > v_hlt_insideDataset_names             (new std::vector<std::string>  ());
+  std::unique_ptr<std::vector < std::string > > v_hlt_outsideDataset_names            (new std::vector<std::string>  ());
+  std::unique_ptr<std::vector < bool > >        v_hlt_insideDataset_decisions         (new std::vector<bool>         ());
+  std::unique_ptr<std::vector < bool > >        v_hlt_outsideDataset_decisions        (new std::vector<bool>         ());
+  std::unique_ptr<std::vector < int > >         v_hlt_insideDataset_prescales         (new std::vector<int>          ());
+  std::unique_ptr<std::vector < int > >         v_hlt_outsideDataset_prescales        (new std::vector<int>          ());
+  std::unique_ptr<std::vector < int > >         v_hlt_insideDataset_packedPrescales   (new std::vector<int>          ());
+  std::unique_ptr<std::vector < int > >         v_hlt_outsideDataset_packedPrescales  (new std::vector<int>          ());
 
   /*
-  std::auto_ptr<std::map<std::string,bool > > m_hlt_insideDataset_namesToDecisions  (new std::map<std::string,bool>());
-  std::auto_ptr<std::map<std::string,bool > > m_hlt_outsideDataset_namesToDecisions (new std::map<std::string,bool>());
-  std::auto_ptr<std::map<std::string,int  > > m_hlt_insideDataset_namesToPrescales  (new std::map<std::string,int >());
-  std::auto_ptr<std::map<std::string,int  > > m_hlt_outsideDataset_namesToPrescales (new std::map<std::string,int >());
+  std::unique_ptr<std::map<std::string,bool > > m_hlt_insideDataset_namesToDecisions  (new std::map<std::string,bool>());
+  std::unique_ptr<std::map<std::string,bool > > m_hlt_outsideDataset_namesToDecisions (new std::map<std::string,bool>());
+  std::unique_ptr<std::map<std::string,int  > > m_hlt_insideDataset_namesToPrescales  (new std::map<std::string,int >());
+  std::unique_ptr<std::map<std::string,int  > > m_hlt_outsideDataset_namesToPrescales (new std::map<std::string,int >());
   */
 
   //-----------------------------------------------------------------
@@ -221,31 +221,31 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( l1bits, "L1Bits" );
-  iEvent.put( l1prescaleColumn, "L1PrescaleColumn" );
-  //iEvent.put( l1physbits, "L1PhysBits" );
-  //iEvent.put( l1techbits, "L1TechBits" );
-  // iEvent.put( hltbits,    "HLTBits" );
-  // iEvent.put( hltresults, "HLTResults" );
-  // iEvent.put( hltprescales, "HLTPrescales" );
+  iEvent.put(std::move( l1bits), "L1Bits" );
+  iEvent.put(std::move( l1prescaleColumn), "L1PrescaleColumn" );
+  //iEvent.put(std::move( l1physbits), "L1PhysBits" );
+  //iEvent.put(std::move( l1techbits), "L1TechBits" );
+  // iEvent.put(std::move( hltbits),    "HLTBits" );
+  // iEvent.put(std::move( hltresults), "HLTResults" );
+  // iEvent.put(std::move( hltprescales), "HLTPrescales" );
 
-  iEvent.put( std::auto_ptr<std::string>(new std::string(hltConfig.tableName())), "HLTKey");
+  iEvent.put(std::move( std::unique_ptr<std::string>(new std::string(hltConfig.tableName()))), "HLTKey");
   
   /*
-  iEvent.put( m_hlt_insideDataset_namesToDecisions ,"HLTInsideDatasetDecisionMap" );
-  iEvent.put( m_hlt_outsideDataset_namesToDecisions,"HLTOutsideDatasetDecisionMap");
-  iEvent.put( m_hlt_insideDataset_namesToPrescales ,"HLTInsideDatasetPrescaleMap" );
-  iEvent.put( m_hlt_outsideDataset_namesToPrescales,"HLTOutsideDatasetPrescaleMap");
+  iEvent.put(std::move( m_hlt_insideDataset_namesToDecisions ),"HLTInsideDatasetDecisionMap" );
+  iEvent.put(std::move( m_hlt_outsideDataset_namesToDecisions),"HLTOutsideDatasetDecisionMap");
+  iEvent.put(std::move( m_hlt_insideDataset_namesToPrescales ),"HLTInsideDatasetPrescaleMap" );
+  iEvent.put(std::move( m_hlt_outsideDataset_namesToPrescales),"HLTOutsideDatasetPrescaleMap");
   */
 
-  iEvent.put ( v_hlt_insideDataset_names      , "HLTInsideDatasetTriggerNames"      ) ;
-  iEvent.put ( v_hlt_outsideDataset_names     , "HLTOutsideDatasetTriggerNames"     ) ;
-  iEvent.put ( v_hlt_insideDataset_decisions  , "HLTInsideDatasetTriggerDecisions"  ) ;
-  iEvent.put ( v_hlt_outsideDataset_decisions , "HLTOutsideDatasetTriggerDecisions" ) ;
-  iEvent.put ( v_hlt_insideDataset_prescales  , "HLTInsideDatasetTriggerPrescales"  ) ;
-  iEvent.put ( v_hlt_outsideDataset_prescales , "HLTOutsideDatasetTriggerPrescales" ) ;
-  iEvent.put ( v_hlt_insideDataset_packedPrescales  , "HLTInsideDatasetTriggerPackedPrescales"  ) ;
-  iEvent.put ( v_hlt_outsideDataset_packedPrescales , "HLTOutsideDatasetTriggerPackedPrescales" ) ;
+  iEvent.put(std::move( v_hlt_insideDataset_names      ), "HLTInsideDatasetTriggerNames"      ) ;
+  iEvent.put(std::move( v_hlt_outsideDataset_names     ), "HLTOutsideDatasetTriggerNames"     ) ;
+  iEvent.put(std::move( v_hlt_insideDataset_decisions  ), "HLTInsideDatasetTriggerDecisions"  ) ;
+  iEvent.put(std::move( v_hlt_outsideDataset_decisions ), "HLTOutsideDatasetTriggerDecisions" ) ;
+  iEvent.put(std::move( v_hlt_insideDataset_prescales  ), "HLTInsideDatasetTriggerPrescales"  ) ;
+  iEvent.put(std::move( v_hlt_outsideDataset_prescales ), "HLTOutsideDatasetTriggerPrescales" ) ;
+  iEvent.put(std::move( v_hlt_insideDataset_packedPrescales  ), "HLTInsideDatasetTriggerPackedPrescales"  ) ;
+  iEvent.put(std::move( v_hlt_outsideDataset_packedPrescales ), "HLTOutsideDatasetTriggerPackedPrescales" ) ;
 
   
 }

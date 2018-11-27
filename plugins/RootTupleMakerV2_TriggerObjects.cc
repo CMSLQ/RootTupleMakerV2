@@ -34,15 +34,15 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Declare items to push into the event
   //------------------------------------------------------------------------
 
-  std::auto_ptr<std::vector< std::vector< std::string > > > v_filter_names    ( new std::vector< std::vector< std::string > > ());
-  std::auto_ptr<std::vector< std::vector< std::string > > > v_path_names      ( new std::vector< std::vector< std::string > > ());
-  std::auto_ptr<std::vector< std::vector< bool        > > > v_passed_path_l3  ( new std::vector< std::vector< bool        > > ());
-  std::auto_ptr<std::vector< std::vector< bool        > > > v_passed_path_last( new std::vector< std::vector< bool        > > ());
-  std::auto_ptr<std::vector< std::vector< int         > > > v_type_ids        ( new std::vector< std::vector< int         > > ());
-  std::auto_ptr<std::vector< float                      > > v_pt              ( new std::vector< float                      > ());
-  std::auto_ptr<std::vector< float                      > > v_eta             ( new std::vector< float                      > ());
-  std::auto_ptr<std::vector< float                      > > v_phi             ( new std::vector< float                      > ());
-  std::auto_ptr<std::vector< std::string                > > v_collection      ( new std::vector< std::string                > ());
+  std::unique_ptr<std::vector< std::vector< std::string > > > v_filter_names    ( new std::vector< std::vector< std::string > > ());
+  std::unique_ptr<std::vector< std::vector< std::string > > > v_path_names      ( new std::vector< std::vector< std::string > > ());
+  std::unique_ptr<std::vector< std::vector< bool        > > > v_passed_path_l3  ( new std::vector< std::vector< bool        > > ());
+  std::unique_ptr<std::vector< std::vector< bool        > > > v_passed_path_last( new std::vector< std::vector< bool        > > ());
+  std::unique_ptr<std::vector< std::vector< int         > > > v_type_ids        ( new std::vector< std::vector< int         > > ());
+  std::unique_ptr<std::vector< float                      > > v_pt              ( new std::vector< float                      > ());
+  std::unique_ptr<std::vector< float                      > > v_eta             ( new std::vector< float                      > ());
+  std::unique_ptr<std::vector< float                      > > v_phi             ( new std::vector< float                      > ());
+  std::unique_ptr<std::vector< std::string                > > v_collection      ( new std::vector< std::string                > ());
 
   //------------------------------------------------------------------------
   // Get the trigger bits and make sure they are valid
@@ -239,14 +239,14 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Push the information into the event
   //------------------------------------------------------------------------
 
-  iEvent.put ( v_filter_names, prefix + "TriggerObjFilterNames"    + suffix ) ;
-  iEvent.put ( v_path_names, prefix + "TriggerObjPathNames" + suffix);
-  iEvent.put ( v_passed_path_l3, prefix + "TriggerObjPassedPathL3Filter" + suffix);
-  iEvent.put ( v_passed_path_last, prefix + "TriggerObjPassedPathLastFilter" + suffix);
-  iEvent.put ( v_type_ids , prefix + "TriggerObjTypeIds"   + suffix ) ;
-  iEvent.put ( v_pt , prefix + "TriggerObjPt"   + suffix ) ;
-  iEvent.put ( v_eta , prefix + "TriggerObjEta"  + suffix ) ;
-  iEvent.put ( v_phi , prefix + "TriggerObjPhi"  + suffix ) ;
-  iEvent.put ( v_collection, prefix + "TriggerObjCollectionName" + suffix) ;
+  iEvent.put(std::move( v_filter_names), prefix + "TriggerObjFilterNames"    + suffix ) ;
+  iEvent.put(std::move( v_path_names), prefix + "TriggerObjPathNames" + suffix);
+  iEvent.put(std::move( v_passed_path_l3), prefix + "TriggerObjPassedPathL3Filter" + suffix);
+  iEvent.put(std::move( v_passed_path_last), prefix + "TriggerObjPassedPathLastFilter" + suffix);
+  iEvent.put(std::move( v_type_ids ), prefix + "TriggerObjTypeIds"   + suffix ) ;
+  iEvent.put(std::move( v_pt ), prefix + "TriggerObjPt"   + suffix ) ;
+  iEvent.put(std::move( v_eta ), prefix + "TriggerObjEta"  + suffix ) ;
+  iEvent.put(std::move( v_phi ), prefix + "TriggerObjPhi"  + suffix ) ;
+  iEvent.put(std::move( v_collection), prefix + "TriggerObjCollectionName" + suffix) ;
 
 }

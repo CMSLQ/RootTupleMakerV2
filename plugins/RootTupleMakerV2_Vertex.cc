@@ -25,18 +25,18 @@ RootTupleMakerV2_Vertex::RootTupleMakerV2_Vertex(const edm::ParameterSet& iConfi
 void RootTupleMakerV2_Vertex::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<float> >  x  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  y  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  z  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  xErr  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  yErr  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  zErr  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  rho  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  chi2  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  ndf  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<int> >    ntracks  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >    ntracksw05  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<bool> >   isfake  ( new std::vector<bool>()  );
+  std::unique_ptr<std::vector<float> >  x  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  y  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  z  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  xErr  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  yErr  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  zErr  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  rho  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  chi2  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  ndf  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >    ntracks  ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<int> >    ntracksw05  ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<bool> >   isfake  ( new std::vector<bool>()  );
 
   //-----------------------------------------------------------------
   edm::Handle<reco::VertexCollection> primaryVertices;
@@ -65,16 +65,16 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   //-----------------------------------------------------------------
   // put vectors in the event
-  iEvent.put( x, prefix + "X" + suffix );
-  iEvent.put( y, prefix + "Y" + suffix );
-  iEvent.put( z, prefix + "Z" + suffix );
-  iEvent.put( xErr, prefix + "XErr" + suffix );
-  iEvent.put( yErr, prefix + "YErr" + suffix );
-  iEvent.put( zErr, prefix + "ZErr" + suffix );
-  iEvent.put( rho, prefix + "Rho" + suffix );
-  iEvent.put( chi2, prefix + "Chi2" + suffix );
-  iEvent.put( ndf, prefix + "NDF" + suffix );
-  iEvent.put( ntracks, prefix + "NTracks" + suffix );
-  iEvent.put( ntracksw05, prefix + "NTracksW05" + suffix );
-  iEvent.put( isfake, prefix + "IsFake" + suffix );
+  iEvent.put(std::move(x), prefix + "X" + suffix );
+  iEvent.put(std::move(y), prefix + "Y" + suffix );
+  iEvent.put(std::move(z), prefix + "Z" + suffix );
+  iEvent.put(std::move(xErr), prefix + "XErr" + suffix );
+  iEvent.put(std::move(yErr), prefix + "YErr" + suffix );
+  iEvent.put(std::move(zErr), prefix + "ZErr" + suffix );
+  iEvent.put(std::move(rho), prefix + "Rho" + suffix );
+  iEvent.put(std::move(chi2), prefix + "Chi2" + suffix );
+  iEvent.put(std::move(ndf), prefix + "NDF" + suffix );
+  iEvent.put(std::move(ntracks), prefix + "NTracks" + suffix );
+  iEvent.put(std::move(ntracksw05), prefix + "NTracksW05" + suffix );
+  iEvent.put(std::move(isfake), prefix + "IsFake" + suffix );
 }

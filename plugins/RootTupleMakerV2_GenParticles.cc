@@ -47,40 +47,40 @@ RootTupleMakerV2_GenParticles::RootTupleMakerV2_GenParticles(const edm::Paramete
 void RootTupleMakerV2_GenParticles::
 produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-  std::auto_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  p    ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  px   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  py   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pz   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pt   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  mass  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<int> >    pdgId   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<float> >  vx  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  vy  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  vz  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<int> >    numDaught  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >    status     ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >    motherIndex   ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<int> >    taudecaymode  ( new std::vector<int>()  );
-  std::auto_ptr<std::vector<float> >  tauvisiblept  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  tauvisibleeta ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  tauvisiblephi ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  eta  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  phi  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  p    ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  px   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  py   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pz   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pt   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  energy  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  mass  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >    pdgId   ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<float> >  vx  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  vy  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  vz  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >    numDaught  ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<int> >    status     ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<int> >    motherIndex   ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<int> >    taudecaymode  ( new std::vector<int>()  );
+  std::unique_ptr<std::vector<float> >  tauvisiblept  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  tauvisibleeta ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  tauvisiblephi ( new std::vector<float>()  );
   // some genstatusflags
-  std::auto_ptr<std::vector<bool> >   isPromptFinalState        ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >   isPromptDecayed           ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >   isHardProcess             ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >   fromHardProcessFinalState ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >   fromHardProcessDecayed    ( new std::vector<bool>());
-  std::auto_ptr<std::vector<bool> >   isLastCopy                ( new std::vector<bool>());
-  std::auto_ptr<float >               topptweight ( new float() );
+  std::unique_ptr<std::vector<bool> >   isPromptFinalState        ( new std::vector<bool>());
+  std::unique_ptr<std::vector<bool> >   isPromptDecayed           ( new std::vector<bool>());
+  std::unique_ptr<std::vector<bool> >   isHardProcess             ( new std::vector<bool>());
+  std::unique_ptr<std::vector<bool> >   fromHardProcessFinalState ( new std::vector<bool>());
+  std::unique_ptr<std::vector<bool> >   fromHardProcessDecayed    ( new std::vector<bool>());
+  std::unique_ptr<std::vector<bool> >   isLastCopy                ( new std::vector<bool>());
+  std::unique_ptr<float >               topptweight ( new float() );
   *topptweight.get() = 1.0;
   // w/z system Pt
-  std::auto_ptr<float >               worzsystempt ( new float() );
+  std::unique_ptr<float >               worzsystempt ( new float() );
   *worzsystempt.get() = -999;
   // not kept in ntuple
-  std::auto_ptr<std::vector<int> >     indexInGenPColl( new std::vector<int>()  );
+  std::unique_ptr<std::vector<int> >     indexInGenPColl( new std::vector<int>()  );
   
   if( !iEvent.isRealData() ) {
     edm::Handle<reco::GenParticleCollection> genParticles;
@@ -213,36 +213,36 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 
   // put vectors in the event
-  iEvent.put( eta,          prefix + "Eta"          + suffix );
-  iEvent.put( phi,          prefix + "Phi"          + suffix );
-  iEvent.put( p,            prefix + "P"            + suffix );
-  iEvent.put( px,           prefix + "Px"           + suffix );
-  iEvent.put( py,           prefix + "Py"           + suffix );
-  iEvent.put( pz,           prefix + "Pz"           + suffix );
-  iEvent.put( pt,           prefix + "Pt"           + suffix );
-  iEvent.put( energy,       prefix + "Energy"       + suffix );
-  iEvent.put( mass,         prefix + "Mass"       + suffix );
-  iEvent.put( pdgId,        prefix + "PdgId"        + suffix );
-  iEvent.put( vx,           prefix + "VX"           + suffix );
-  iEvent.put( vy,           prefix + "VY"           + suffix );
-  iEvent.put( vz,           prefix + "VZ"           + suffix );
-  iEvent.put( numDaught,    prefix + "NumDaught"    + suffix );
-  iEvent.put( status,       prefix + "Status"       + suffix );
-  iEvent.put( motherIndex,  prefix + "MotherIndex"  + suffix );
-  iEvent.put( taudecaymode, prefix + "TauDecayMode" + suffix );
-  iEvent.put( tauvisiblept, prefix + "TauVisiblePt" + suffix );
-  iEvent.put( tauvisibleeta,prefix + "TauVisibleEta"+ suffix );
-  iEvent.put( tauvisiblephi,prefix + "TauVisiblePhi"+ suffix );
+  iEvent.put(std::move(eta),          prefix + "Eta"          + suffix );
+  iEvent.put(std::move(phi),          prefix + "Phi"          + suffix );
+  iEvent.put(std::move(p),            prefix + "P"            + suffix );
+  iEvent.put(std::move(px),           prefix + "Px"           + suffix );
+  iEvent.put(std::move(py),           prefix + "Py"           + suffix );
+  iEvent.put(std::move(pz),           prefix + "Pz"           + suffix );
+  iEvent.put(std::move(pt),           prefix + "Pt"           + suffix );
+  iEvent.put(std::move(energy),       prefix + "Energy"       + suffix );
+  iEvent.put(std::move(mass),         prefix + "Mass"       + suffix );
+  iEvent.put(std::move(pdgId),        prefix + "PdgId"        + suffix );
+  iEvent.put(std::move(vx),           prefix + "VX"           + suffix );
+  iEvent.put(std::move(vy),           prefix + "VY"           + suffix );
+  iEvent.put(std::move(vz),           prefix + "VZ"           + suffix );
+  iEvent.put(std::move(numDaught),    prefix + "NumDaught"    + suffix );
+  iEvent.put(std::move(status),       prefix + "Status"       + suffix );
+  iEvent.put(std::move(motherIndex),  prefix + "MotherIndex"  + suffix );
+  iEvent.put(std::move(taudecaymode), prefix + "TauDecayMode" + suffix );
+  iEvent.put(std::move(tauvisiblept), prefix + "TauVisiblePt" + suffix );
+  iEvent.put(std::move(tauvisibleeta),prefix + "TauVisibleEta"+ suffix );
+  iEvent.put(std::move(tauvisiblephi),prefix + "TauVisiblePhi"+ suffix );
   // gen status flags
-  iEvent.put(isPromptFinalState       ,prefix + "IsPromptFinalState"+ suffix );
-  iEvent.put(isPromptDecayed          ,prefix + "IsPromptDecayed"+ suffix );
-  iEvent.put(isHardProcess            ,prefix + "IsHardProcess"+ suffix );
-  iEvent.put(fromHardProcessFinalState,prefix + "FromHardProcessFinalState"+ suffix );
-  iEvent.put(fromHardProcessDecayed   ,prefix + "FromHardProcessDecayed"+ suffix );
-  iEvent.put(isLastCopy               ,prefix + "IsLastCopy"+ suffix );
-  iEvent.put( topptweight  ,prefix + "TopPtWeight"  + suffix );
+  iEvent.put(std::move(isPromptFinalState       ),prefix + "IsPromptFinalState"+ suffix );
+  iEvent.put(std::move(isPromptDecayed          ),prefix + "IsPromptDecayed"+ suffix );
+  iEvent.put(std::move(isHardProcess            ),prefix + "IsHardProcess"+ suffix );
+  iEvent.put(std::move(fromHardProcessFinalState),prefix + "FromHardProcessFinalState"+ suffix );
+  iEvent.put(std::move(fromHardProcessDecayed   ),prefix + "FromHardProcessDecayed"+ suffix );
+  iEvent.put(std::move(isLastCopy               ),prefix + "IsLastCopy"+ suffix );
+  iEvent.put(std::move(topptweight  ),prefix + "TopPtWeight"  + suffix );
   // W/Z system Pt
-  iEvent.put( worzsystempt ,prefix + "WorZSystemPt"  + suffix );
+  iEvent.put(std::move(worzsystempt ),prefix + "WorZSystemPt"  + suffix );
 }
 
 

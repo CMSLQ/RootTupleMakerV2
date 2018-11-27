@@ -274,197 +274,197 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Kinematic variables
 
-  std::auto_ptr<std::vector<float> >  eta                       ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  phi                       ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pt                        ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  ptHeep                    ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  energy                    ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  caloEnergy                ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  ecalEnergy                ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<int> >     charge                    ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<float> >  hoe                       ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  eta                       ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  phi                       ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pt                        ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  ptHeep                    ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  energy                    ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  caloEnergy                ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  ecalEnergy                ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >     charge                    ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<float> >  hoe                       ( new std::vector<float>()  );
 
   // Supercluster kinematic variables
 
-  std::auto_ptr<std::vector<float> >  eSuperClusterOverP        ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scEta                     ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scSeedEta                 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scPhi                     ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scPt                      ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scRawEnergy               ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scEnergy                  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  scSeedCryEnergy           ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<bool> >    scSeedCryIsBarrel         ( new std::vector<bool>()  );
+  std::unique_ptr<std::vector<float> >  eSuperClusterOverP        ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scEta                     ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scSeedEta                 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scPhi                     ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scPt                      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scRawEnergy               ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scEnergy                  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  scSeedCryEnergy           ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<bool> >    scSeedCryIsBarrel         ( new std::vector<bool>()  );
 
   // ID information
-  std::auto_ptr<std::vector<int> >     passIds                   ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<bool> >    passEGammaIDVeto          ( new std::vector<bool>   ()  );
-  std::auto_ptr<std::vector<bool> >    passEGammaIDLoose         ( new std::vector<bool>   ()  );
-  std::auto_ptr<std::vector<bool> >    passEGammaIDMedium        ( new std::vector<bool>   ()  );
-  std::auto_ptr<std::vector<bool> >    passEGammaIDTight         ( new std::vector<bool>   ()  );
-  std::auto_ptr<std::vector<bool> >    passEGammaHLTPreselection ( new std::vector<bool>   ()  );
-  std::auto_ptr<std::vector<bool> >    passHEEPID                ( new std::vector<bool>   ()  ); 
-  std::auto_ptr<std::vector<bool> >    passMVAIDWP80             ( new std::vector<bool>   ()  ); 
-  std::auto_ptr<std::vector<bool> >    passMVAIDWP90             ( new std::vector<bool>   ()  ); 
-  std::auto_ptr<std::vector<bool> >    passMVAIDHZZ              ( new std::vector<bool>   ()  ); 
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDVeto   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDLoose  ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMedium ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDTight  ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaHLTPreselection  ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDHEEP   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAWP80   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAWP90   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAHZZ    ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDVeto   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDLoose  ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMedium ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDTight  ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaHLTPreselection  ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDHEEP   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAWP80   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAWP90   ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAHZZ    ( new std::vector<std::string> () );
-  std::auto_ptr<std::vector<float> >   rhoIsoHEEP                ( new std::vector<float>   ()  ); 
+  std::unique_ptr<std::vector<int> >     passIds                   ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<bool> >    passEGammaIDVeto          ( new std::vector<bool>   ()  );
+  std::unique_ptr<std::vector<bool> >    passEGammaIDLoose         ( new std::vector<bool>   ()  );
+  std::unique_ptr<std::vector<bool> >    passEGammaIDMedium        ( new std::vector<bool>   ()  );
+  std::unique_ptr<std::vector<bool> >    passEGammaIDTight         ( new std::vector<bool>   ()  );
+  std::unique_ptr<std::vector<bool> >    passEGammaHLTPreselection ( new std::vector<bool>   ()  );
+  std::unique_ptr<std::vector<bool> >    passHEEPID                ( new std::vector<bool>   ()  ); 
+  std::unique_ptr<std::vector<bool> >    passMVAIDWP80             ( new std::vector<bool>   ()  ); 
+  std::unique_ptr<std::vector<bool> >    passMVAIDWP90             ( new std::vector<bool>   ()  ); 
+  std::unique_ptr<std::vector<bool> >    passMVAIDHZZ              ( new std::vector<bool>   ()  ); 
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDVeto   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDLoose  ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMedium ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDTight  ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaHLTPreselection  ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDHEEP   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAWP80   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAWP90   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowNamesEGammaIDMVAHZZ    ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDVeto   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDLoose  ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMedium ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDTight  ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaHLTPreselection  ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDHEEP   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAWP80   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAWP90   ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<std::string> > cutFlowHashesEGammaIDMVAHZZ    ( new std::vector<std::string> () );
+  std::unique_ptr<std::vector<float> >   rhoIsoHEEP                ( new std::vector<float>   ()  ); 
   
   // Does this electron overlap with a muon?
-  std::auto_ptr<std::vector<int> >     overlaps                  ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<int> >     overlaps                  ( new std::vector<int>   ()  );
 
   // Number of Brems = number of basic clusters minus one
-  std::auto_ptr<std::vector<int> >     numberOfBrems             ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<int> >     numberOfBrems             ( new std::vector<int>   ()  );
 
   // Is this ECAL driven? Or PFlow?  
-  std::auto_ptr<std::vector<bool> >    hasEcalDrivenSeed         ( new std::vector<bool>  ()  );
-  std::auto_ptr<std::vector<bool> >    isEcalDriven              ( new std::vector<bool>  ()  );
-  std::auto_ptr<std::vector<bool> >    hasTrackerDrivenSeed      ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    hasEcalDrivenSeed         ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    isEcalDriven              ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    hasTrackerDrivenSeed      ( new std::vector<bool>  ()  );
   
   // Charge consistency variables: Ferdinando Giordano
-  std::auto_ptr<std::vector<bool> >    gsfCtfScPixCharge         ( new std::vector<bool>  ()  );
-  std::auto_ptr<std::vector<bool> >    gsfScPixCharge            ( new std::vector<bool>  ()  );
-  std::auto_ptr<std::vector<bool> >    gsfCtfCharge              ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    gsfCtfScPixCharge         ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    gsfScPixCharge            ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    gsfCtfCharge              ( new std::vector<bool>  ()  );
   
   // EB or EE: Ferdinando Giordano
-  std::auto_ptr<std::vector<bool> >    isEB                      ( new std::vector<bool>  ()  );
-  std::auto_ptr<std::vector<bool> >    isEE                      ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    isEB                      ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<bool> >    isEE                      ( new std::vector<bool>  ()  );
   
   // ECAL eta/phi vs tracker eta/phi
 
-  std::auto_ptr<std::vector<float> >  deltaPhiTrkSC             ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  deltaEtaTrkSC             ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  deltaEtaTrkSeedSC         ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  deltaPhiTrkSC             ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  deltaEtaTrkSC             ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  deltaEtaTrkSeedSC         ( new std::vector<float>()  );
 
   // Shower shape
 
-  std::auto_ptr<std::vector<float> >  sigmaEtaEta               ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  sigmaIEtaIEta             ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  full5x5SigmaIEtaIEta      ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  r9                        ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  e1x5overe5x5              ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  e2x5overe5x5              ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  full5x5e1x5overe5x5       ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  full5x5e2x5overe5x5       ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<int> >     classif                   ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<float> >  sigmaEtaEta               ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  sigmaIEtaIEta             ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  full5x5SigmaIEtaIEta      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  r9                        ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  e1x5overe5x5              ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  e2x5overe5x5              ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  full5x5e1x5overe5x5       ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  full5x5e2x5overe5x5       ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >     classif                   ( new std::vector<int>   ()  );
 
   // Isolation variables: PAT
   
-  std::auto_ptr<std::vector<float> >  trkIsoPAT                 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  ecalIsoPAT                ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  hcalIsoPAT                ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  relIsoPAT                 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<int> >     passIsoPAT                ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<float> >  trkIsoPAT                 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  ecalIsoPAT                ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  hcalIsoPAT                ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  relIsoPAT                 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >     passIsoPAT                ( new std::vector<int>   ()  );
 
   // Isolation variables: particle flow 
   
-  std::auto_ptr<std::vector<float> >  pfChargedHadronIso03      ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pfNeutralHadronIso03      ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pfPhotonIso03             ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pfPUIso03                 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pfChargedHadronIso03      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pfNeutralHadronIso03      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pfPhotonIso03             ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pfPUIso03                 ( new std::vector<float>()  );
 
-  std::auto_ptr<std::vector<float> >  pfChargedHadronIso04      ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pfNeutralHadronIso04      ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  pfPhotonIso04             ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pfChargedHadronIso04      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pfNeutralHadronIso04      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  pfPhotonIso04             ( new std::vector<float>()  );
   
   // Isolation variables: DR 0.3
 
-  std::auto_ptr<std::vector<float> >  ecalIsoDR03               ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  hcalIsoDR03               ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  hcalIsoDR03FullCone       ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  hcalIsoD1DR03             ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  hcalIsoD2DR03             ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trkIsoDR03                ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  ecalPFClusterIso          ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  hcalPFClusterIso          ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  ecalIsoDR03               ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  hcalIsoDR03               ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  hcalIsoDR03FullCone       ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  hcalIsoD1DR03             ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  hcalIsoD2DR03             ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  trkIsoDR03                ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  ecalPFClusterIso          ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  hcalPFClusterIso          ( new std::vector<float>()  );
 
   // Isolation HEEP v7.0
-  std::auto_ptr<std::vector<float> >  heep70TrkIso              ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  heep70TrkIso              ( new std::vector<float>()  );
 
   // Conversion variables
 
-  std::auto_ptr<std::vector<int> >     missingHits               ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<int> >     missingHitsEG             ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<float> >  dist_vec                  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  dCotTheta                 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  fbrem                     ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<bool> >    hasMatchedConvPhot        ( new std::vector<bool>  ()  );
+  std::unique_ptr<std::vector<int> >     missingHits               ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<int> >     missingHitsEG             ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<float> >  dist_vec                  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  dCotTheta                 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  fbrem                     ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<bool> >    hasMatchedConvPhot        ( new std::vector<bool>  ()  );
   
   // Vertex and beamspot information
   
-  std::auto_ptr<std::vector<int> >     vtxIndex                  ( new std::vector<int>   ()  );
-  std::auto_ptr<std::vector<float> >  vtxDistXY                 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  vtxDistZ                  ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  vtx0DistXY                ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  vtx0DistZ                 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  primaryVertexDXY          ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  primaryVertexDXYError     ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  beamspotDXY               ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  beamspotDXYError          ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<int> >     vtxIndex                  ( new std::vector<int>   ()  );
+  std::unique_ptr<std::vector<float> >  vtxDistXY                 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  vtxDistZ                  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  vtx0DistXY                ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  vtx0DistZ                 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  primaryVertexDXY          ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  primaryVertexDXYError     ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  beamspotDXY               ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  beamspotDXYError          ( new std::vector<float>()  );
 
   // Track information 
 
-  std::auto_ptr<std::vector<float> >  trackPx                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackPy                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackPz                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackPt                   ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  trackValidFractionOfHits  ( new std::vector<float>()  );  
-  std::auto_ptr<std::vector<float> >  normalizedChi2            ( new std::vector<float>()  );  
+  std::unique_ptr<std::vector<float> >  trackPx                   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  trackPy                   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  trackPz                   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  trackPt                   ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  trackValidFractionOfHits  ( new std::vector<float>()  );  
+  std::unique_ptr<std::vector<float> >  normalizedChi2            ( new std::vector<float>()  );  
 
   // Trigger matching: float electron
 
-  std::auto_ptr<std::vector<bool  > >  HLTfloatEleMatched       ( new std::vector<bool  >()  );
-  std::auto_ptr<std::vector<float> >  HLTfloatEleMatchPt 	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTfloatEleMatchEta	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTfloatEleMatchPhi      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<bool  > >  HLTfloatEleMatched       ( new std::vector<bool  >()  );
+  std::unique_ptr<std::vector<float> >  HLTfloatEleMatchPt 	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTfloatEleMatchEta	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTfloatEleMatchPhi      ( new std::vector<float>()  );
 
   // Trigger matching: Single electron
 
-  std::auto_ptr<std::vector<bool  > >  HLTSingleEleMatched       ( new std::vector<bool  >()  );
-  std::auto_ptr<std::vector<float> >  HLTSingleEleMatchPt 	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTSingleEleMatchEta	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTSingleEleMatchPhi      ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<bool  > >  HLTSingleEleMatched       ( new std::vector<bool  >()  );
+  std::unique_ptr<std::vector<float> >  HLTSingleEleMatchPt 	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTSingleEleMatchEta	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTSingleEleMatchPhi      ( new std::vector<float>()  );
 
   // Trigger matching: Single electron (WP85)
 
-  std::auto_ptr<std::vector<bool  > >  HLTSingleEleWP85Matched   ( new std::vector<bool  >()  );
-  std::auto_ptr<std::vector<float> >  HLTSingleEleWP85MatchPt 	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTSingleEleWP85MatchEta	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTSingleEleWP85MatchPhi  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<bool  > >  HLTSingleEleWP85Matched   ( new std::vector<bool  >()  );
+  std::unique_ptr<std::vector<float> >  HLTSingleEleWP85MatchPt 	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTSingleEleWP85MatchEta	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTSingleEleWP85MatchPhi  ( new std::vector<float>()  );
 
   // Trigger matching: Ele+Jet+Jet
 
-  std::auto_ptr<std::vector<bool  > >  HLTEleJetJetMatched   ( new std::vector<bool  >()  );
-  std::auto_ptr<std::vector<float> >  HLTEleJetJetMatchPt 	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTEleJetJetMatchEta	 ( new std::vector<float>()  );
-  std::auto_ptr<std::vector<float> >  HLTEleJetJetMatchPhi  ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<bool  > >  HLTEleJetJetMatched   ( new std::vector<bool  >()  );
+  std::unique_ptr<std::vector<float> >  HLTEleJetJetMatchPt 	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTEleJetJetMatchEta	 ( new std::vector<float>()  );
+  std::unique_ptr<std::vector<float> >  HLTEleJetJetMatchPhi  ( new std::vector<float>()  );
 
   // Gen matching: Status 3 only
   
-  std::auto_ptr<std::vector<float> >  matchedGenParticlePt  ( new std::vector<float>()   );
-  std::auto_ptr<std::vector<float> >  matchedGenParticleEta ( new std::vector<float>()   );
-  std::auto_ptr<std::vector<float> >  matchedGenParticlePhi ( new std::vector<float>()   );
+  std::unique_ptr<std::vector<float> >  matchedGenParticlePt  ( new std::vector<float>()   );
+  std::unique_ptr<std::vector<float> >  matchedGenParticleEta ( new std::vector<float>()   );
+  std::unique_ptr<std::vector<float> >  matchedGenParticlePhi ( new std::vector<float>()   );
   
   // for 03Feb2017 re-miniaod
-  std::auto_ptr<bool> eGammaGSFixedDupECALClusters ( new bool() );
-  std::auto_ptr<std::vector<uint32_t> > ecalMultiAndGSGlobalRecHitEBHitsNotReplaced ( new std::vector<uint32_t>() );
+  std::unique_ptr<bool> eGammaGSFixedDupECALClusters ( new bool() );
+  std::unique_ptr<std::vector<uint32_t> > ecalMultiAndGSGlobalRecHitEBHitsNotReplaced ( new std::vector<uint32_t>() );
 
   //------------------------------------------------------------------------
   // Get handles for the event
@@ -1006,7 +1006,8 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       //missingHits              -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits() );
       //missingHits              -> push_back ( it->gsfTrack()->numberOfLostHits() );
       //missingHitsEG            -> push_back ( it->gsfTrack()->trackerExpectedHitsInner().numberOfHits()     );
-      missingHits            -> push_back ( it->gsfTrack()->hitPattern().numberOfHits(missingHitType) );
+      // 94X: https://hypernews.cern.ch/HyperNews/CMS/get/egamma-elecid/129/1/1/1.html
+      missingHits            -> push_back ( it->gsfTrack()->hitPattern().numberOfLostHits(missingHitType) );
       
       dist_vec                 -> push_back ( it->convDist() ); // from reco::GsfElectron
       dCotTheta                -> push_back ( it->convDcot() ); // from reco::GsfElectron
@@ -1062,187 +1063,187 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
   // Kinematic variables
 
-  iEvent.put( eta                     , prefix + "Eta"                      + suffix );
-  iEvent.put( phi                     , prefix + "Phi"                      + suffix );
-  iEvent.put( pt                      , prefix + "Pt"                       + suffix );
-  iEvent.put( ptHeep                  , prefix + "PtHeep"                   + suffix );
-  iEvent.put( energy                  , prefix + "Energy"                   + suffix );
-  iEvent.put( caloEnergy              , prefix + "CaloEnergy"               + suffix );
-  iEvent.put( ecalEnergy              , prefix + "EcalEnergy"               + suffix );
-  iEvent.put( charge                  , prefix + "Charge"                   + suffix );
-  iEvent.put( hoe                     , prefix + "HoE"                      + suffix );
+  iEvent.put(std::move(eta                     ), prefix + "Eta"                      + suffix );
+  iEvent.put(std::move(phi                     ), prefix + "Phi"                      + suffix );
+  iEvent.put(std::move(pt                      ), prefix + "Pt"                       + suffix );
+  iEvent.put(std::move(ptHeep                  ), prefix + "PtHeep"                   + suffix );
+  iEvent.put(std::move(energy                  ), prefix + "Energy"                   + suffix );
+  iEvent.put(std::move(caloEnergy              ), prefix + "CaloEnergy"               + suffix );
+  iEvent.put(std::move(ecalEnergy              ), prefix + "EcalEnergy"               + suffix );
+  iEvent.put(std::move(charge                  ), prefix + "Charge"                   + suffix );
+  iEvent.put(std::move(hoe                     ), prefix + "HoE"                      + suffix );
 
   // Supercluster kinematic variables				        
 
-  iEvent.put( eSuperClusterOverP      , prefix + "ESuperClusterOverP"       + suffix );
-  iEvent.put( scEta                   , prefix + "SCEta"                    + suffix );
-  iEvent.put( scSeedEta               , prefix + "SCSeedEta"                + suffix );
-  iEvent.put( scPhi                   , prefix + "SCPhi"                    + suffix );
-  iEvent.put( scPt                    , prefix + "SCPt"                     + suffix );
-  iEvent.put( scRawEnergy             , prefix + "SCRawEnergy"              + suffix );
-  iEvent.put( scEnergy                , prefix + "SCEnergy"                 + suffix );
-  iEvent.put( scSeedCryEnergy         , prefix + "SCSeedCryEnergy"          + suffix );
-  iEvent.put( scSeedCryIsBarrel       , prefix + "SCSeedCryIsBarrel"        + suffix );
+  iEvent.put(std::move(eSuperClusterOverP      ), prefix + "ESuperClusterOverP"       + suffix );
+  iEvent.put(std::move(scEta                   ), prefix + "SCEta"                    + suffix );
+  iEvent.put(std::move(scSeedEta               ), prefix + "SCSeedEta"                + suffix );
+  iEvent.put(std::move(scPhi                   ), prefix + "SCPhi"                    + suffix );
+  iEvent.put(std::move(scPt                    ), prefix + "SCPt"                     + suffix );
+  iEvent.put(std::move(scRawEnergy             ), prefix + "SCRawEnergy"              + suffix );
+  iEvent.put(std::move(scEnergy                ), prefix + "SCEnergy"                 + suffix );
+  iEvent.put(std::move(scSeedCryEnergy         ), prefix + "SCSeedCryEnergy"          + suffix );
+  iEvent.put(std::move(scSeedCryIsBarrel       ), prefix + "SCSeedCryIsBarrel"        + suffix );
 
   // ID information 
-  iEvent.put( passIds                 , prefix + "PassId"                   + suffix );
-  iEvent.put( passEGammaIDVeto        , prefix + "PassEGammaIDVeto"         + suffix );
-  iEvent.put( passEGammaIDLoose       , prefix + "PassEGammaIDLoose"        + suffix );
-  iEvent.put( passEGammaIDMedium      , prefix + "PassEGammaIDMedium"       + suffix );
-  iEvent.put( passEGammaIDTight       , prefix + "PassEGammaIDTight"        + suffix );
-  iEvent.put( passEGammaHLTPreselection       , prefix + "PassEGammaHLTPreselection"        + suffix );
-  iEvent.put( passHEEPID              , prefix + "PassHEEPID"               + suffix );
-  iEvent.put( passMVAIDWP80           , prefix + "PassMVAIDWP80"               + suffix );
-  iEvent.put( passMVAIDWP90           , prefix + "PassMVAIDWP90"               + suffix );
-  iEvent.put( passMVAIDHZZ            , prefix + "PassMVAIDHZZ"               + suffix );
-  //iEvent.put( cutFlowNamesEGammaIDVeto   , prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
-  //iEvent.put( cutFlowNamesEGammaIDLoose  , prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
-  //iEvent.put( cutFlowNamesEGammaIDMedium , prefix + "CutFlowNamesEGammaIDMedium" + suffix );
-  //iEvent.put( cutFlowNamesEGammaIDTight  , prefix + "CutFlowNamesEGammaIDTight"  + suffix );
-  iEvent.put( cutFlowNamesEGammaIDHEEP   , prefix + "CutFlowNamesEGammaIDHEEP"   + suffix );
-  //iEvent.put( cutFlowHashesEGammaIDVeto  , prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
-  //iEvent.put( cutFlowHashesEGammaIDLoose , prefix + "CutFlowHashesEGammaIDLoose" + suffix );
-  //iEvent.put( cutFlowHashesEGammaIDMedium, prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
-  //iEvent.put( cutFlowHashesEGammaIDTight , prefix + "CutFlowHashesEGammaIDTight" + suffix );
-  iEvent.put( cutFlowHashesEGammaIDHEEP  , prefix + "CutFlowHashesEGammaIDHEEP"  + suffix );
-  iEvent.put( rhoIsoHEEP              , prefix + "RhoIsoHEEP"               + suffix );
+  iEvent.put(std::move(passIds                 ), prefix + "PassId"                   + suffix );
+  iEvent.put(std::move(passEGammaIDVeto        ), prefix + "PassEGammaIDVeto"         + suffix );
+  iEvent.put(std::move(passEGammaIDLoose       ), prefix + "PassEGammaIDLoose"        + suffix );
+  iEvent.put(std::move(passEGammaIDMedium      ), prefix + "PassEGammaIDMedium"       + suffix );
+  iEvent.put(std::move(passEGammaIDTight       ), prefix + "PassEGammaIDTight"        + suffix );
+  iEvent.put(std::move(passEGammaHLTPreselection       ), prefix + "PassEGammaHLTPreselection"        + suffix );
+  iEvent.put(std::move(passHEEPID              ), prefix + "PassHEEPID"               + suffix );
+  iEvent.put(std::move(passMVAIDWP80           ), prefix + "PassMVAIDWP80"               + suffix );
+  iEvent.put(std::move(passMVAIDWP90           ), prefix + "PassMVAIDWP90"               + suffix );
+  iEvent.put(std::move(passMVAIDHZZ            ), prefix + "PassMVAIDHZZ"               + suffix );
+  //iEvent.put(std::move(cutFlowNamesEGammaIDVeto   ), prefix + "CutFlowNamesEGammaIDVeto"   + suffix );
+  //iEvent.put(std::move(cutFlowNamesEGammaIDLoose  ), prefix + "CutFlowNamesEGammaIDLoose"  + suffix );
+  //iEvent.put(std::move(cutFlowNamesEGammaIDMedium ), prefix + "CutFlowNamesEGammaIDMedium" + suffix );
+  //iEvent.put(std::move(cutFlowNamesEGammaIDTight  ), prefix + "CutFlowNamesEGammaIDTight"  + suffix );
+  iEvent.put(std::move(cutFlowNamesEGammaIDHEEP   ), prefix + "CutFlowNamesEGammaIDHEEP"   + suffix );
+  //iEvent.put(std::move(cutFlowHashesEGammaIDVeto  ), prefix + "CutFlowHashesEGammaIDVeto"  + suffix );
+  //iEvent.put(std::move(cutFlowHashesEGammaIDLoose ), prefix + "CutFlowHashesEGammaIDLoose" + suffix );
+  //iEvent.put(std::move(cutFlowHashesEGammaIDMedium), prefix + "CutFlowHashesEGammaIDMedium"+ suffix );
+  //iEvent.put(std::move(cutFlowHashesEGammaIDTight ), prefix + "CutFlowHashesEGammaIDTight" + suffix );
+  iEvent.put(std::move(cutFlowHashesEGammaIDHEEP  ), prefix + "CutFlowHashesEGammaIDHEEP"  + suffix );
+  iEvent.put(std::move(rhoIsoHEEP              ), prefix + "RhoIsoHEEP"               + suffix );
   
   // Does this electron overlap with a muon?			        
-  iEvent.put( overlaps                , prefix + "Overlaps"                 + suffix );
+  iEvent.put(std::move(overlaps                ), prefix + "Overlaps"                 + suffix );
 
   // Number of Brems = number of basic clusters minus one	        
-  iEvent.put( numberOfBrems           , prefix + "NumberOfBrems"            + suffix );
+  iEvent.put(std::move(numberOfBrems           ), prefix + "NumberOfBrems"            + suffix );
   
   // Is this ECAL driven? Or PFlow?  				        
-  iEvent.put( hasEcalDrivenSeed       , prefix + "HasEcalDrivenSeed"        + suffix );
-  iEvent.put( isEcalDriven            , prefix + "IsEcalDriven"             + suffix );
-  iEvent.put( hasTrackerDrivenSeed    , prefix + "HasTrackerDrivenSeed"     + suffix );
+  iEvent.put(std::move(hasEcalDrivenSeed       ), prefix + "HasEcalDrivenSeed"        + suffix );
+  iEvent.put(std::move(isEcalDriven            ), prefix + "IsEcalDriven"             + suffix );
+  iEvent.put(std::move(hasTrackerDrivenSeed    ), prefix + "HasTrackerDrivenSeed"     + suffix );
 
   // Charge consistency variables - Ferdinando Giordano
-  iEvent.put( gsfCtfScPixCharge       , prefix + "GsfCtfScPixCharge"        + suffix );
-  iEvent.put( gsfScPixCharge          , prefix + "GsfScPixCharge"           + suffix );
-  iEvent.put( gsfCtfCharge            , prefix + "GsfCtfCharge"             + suffix );
+  iEvent.put(std::move(gsfCtfScPixCharge       ), prefix + "GsfCtfScPixCharge"        + suffix );
+  iEvent.put(std::move(gsfScPixCharge          ), prefix + "GsfScPixCharge"           + suffix );
+  iEvent.put(std::move(gsfCtfCharge            ), prefix + "GsfCtfCharge"             + suffix );
 
   // EB or EE - Ferdinando Giordano
 
-  iEvent.put( isEB                    , prefix + "IsEB"                     + suffix );
-  iEvent.put( isEE                    , prefix + "IsEE"                     + suffix );
+  iEvent.put(std::move(isEB                    ), prefix + "IsEB"                     + suffix );
+  iEvent.put(std::move(isEE                    ), prefix + "IsEE"                     + suffix );
   
   // ECAL eta/phi vs tracker eta/phi				        
 
-  iEvent.put( deltaPhiTrkSC           , prefix + "DeltaPhiTrkSC"            + suffix );
-  iEvent.put( deltaEtaTrkSC           , prefix + "DeltaEtaTrkSC"            + suffix );
-  iEvent.put( deltaEtaTrkSeedSC       , prefix + "DeltaEtaTrkSeedSC"        + suffix );
+  iEvent.put(std::move(deltaPhiTrkSC           ), prefix + "DeltaPhiTrkSC"            + suffix );
+  iEvent.put(std::move(deltaEtaTrkSC           ), prefix + "DeltaEtaTrkSC"            + suffix );
+  iEvent.put(std::move(deltaEtaTrkSeedSC       ), prefix + "DeltaEtaTrkSeedSC"        + suffix );
 
   // Shower shape						        
 
-  iEvent.put( sigmaEtaEta             , prefix + "SigmaEtaEta"              + suffix );
-  //iEvent.put( sigmaIEtaIEta           , prefix + "SigmaIEtaIEta"            + suffix );
-  iEvent.put( full5x5SigmaIEtaIEta    , prefix + "Full5x5SigmaIEtaIEta"     + suffix );
-  iEvent.put( r9                      , prefix + "R9"                       + suffix );
-  //iEvent.put( e1x5overe5x5            , prefix + "E1x5OverE5x5"             + suffix );
-  //iEvent.put( e2x5overe5x5            , prefix + "E2x5OverE5x5"             + suffix );
-  iEvent.put( full5x5e1x5overe5x5        , prefix + "Full5x5E1x5OverE5x5"         + suffix );
-  iEvent.put( full5x5e2x5overe5x5        , prefix + "Full5x5E2x5OverE5x5"         + suffix );
-  iEvent.put( classif                 , prefix + "Classif"                  + suffix );
+  iEvent.put(std::move(sigmaEtaEta             ), prefix + "SigmaEtaEta"              + suffix );
+  //iEvent.put(std::move(sigmaIEtaIEta           ), prefix + "SigmaIEtaIEta"            + suffix );
+  iEvent.put(std::move(full5x5SigmaIEtaIEta    ), prefix + "Full5x5SigmaIEtaIEta"     + suffix );
+  iEvent.put(std::move(r9                      ), prefix + "R9"                       + suffix );
+  //iEvent.put(std::move(e1x5overe5x5            ), prefix + "E1x5OverE5x5"             + suffix );
+  //iEvent.put(std::move(e2x5overe5x5            ), prefix + "E2x5OverE5x5"             + suffix );
+  iEvent.put(std::move(full5x5e1x5overe5x5        ), prefix + "Full5x5E1x5OverE5x5"         + suffix );
+  iEvent.put(std::move(full5x5e2x5overe5x5        ), prefix + "Full5x5E2x5OverE5x5"         + suffix );
+  iEvent.put(std::move(classif                 ), prefix + "Classif"                  + suffix );
   
   //// Isolation variables: PAT					        
 
-  //iEvent.put( trkIsoPAT               , prefix + "TrkIsoPAT"                + suffix );
-  //iEvent.put( ecalIsoPAT              , prefix + "EcalIsoPAT"               + suffix );
-  //iEvent.put( hcalIsoPAT              , prefix + "HcalIsoPAT"               + suffix );
-  //iEvent.put( relIsoPAT               , prefix + "RelIsoPAT"                + suffix );
-  //iEvent.put( passIsoPAT              , prefix + "PassIsoPAT"               + suffix );
+  //iEvent.put(std::move(trkIsoPAT               ), prefix + "TrkIsoPAT"                + suffix );
+  //iEvent.put(std::move(ecalIsoPAT              ), prefix + "EcalIsoPAT"               + suffix );
+  //iEvent.put(std::move(hcalIsoPAT              ), prefix + "HcalIsoPAT"               + suffix );
+  //iEvent.put(std::move(relIsoPAT               ), prefix + "RelIsoPAT"                + suffix );
+  //iEvent.put(std::move(passIsoPAT              ), prefix + "PassIsoPAT"               + suffix );
 
   // Isolation variables: DR 0.3				        
 
-  iEvent.put( ecalIsoDR03             , prefix + "EcalIsoDR03"              + suffix );
-  iEvent.put( hcalIsoDR03             , prefix + "HcalIsoDR03"              + suffix );
-  iEvent.put( hcalIsoDR03FullCone     , prefix + "HcalIsoDR03FullCone"      + suffix );
-  iEvent.put( hcalIsoD1DR03           , prefix + "HcalIsoD1DR03"            + suffix );
-  iEvent.put( hcalIsoD2DR03           , prefix + "HcalIsoD2DR03"            + suffix );
-  iEvent.put( trkIsoDR03              , prefix + "TrkIsoDR03"               + suffix );
-  iEvent.put( ecalPFClusterIso        , prefix + "EcalPFClusterIso"         + suffix );
-  iEvent.put( hcalPFClusterIso        , prefix + "HcalPFClusterIso"         + suffix );
+  iEvent.put(std::move(ecalIsoDR03             ), prefix + "EcalIsoDR03"              + suffix );
+  iEvent.put(std::move(hcalIsoDR03             ), prefix + "HcalIsoDR03"              + suffix );
+  iEvent.put(std::move(hcalIsoDR03FullCone     ), prefix + "HcalIsoDR03FullCone"      + suffix );
+  iEvent.put(std::move(hcalIsoD1DR03           ), prefix + "HcalIsoD1DR03"            + suffix );
+  iEvent.put(std::move(hcalIsoD2DR03           ), prefix + "HcalIsoD2DR03"            + suffix );
+  iEvent.put(std::move(trkIsoDR03              ), prefix + "TrkIsoDR03"               + suffix );
+  iEvent.put(std::move(ecalPFClusterIso        ), prefix + "EcalPFClusterIso"         + suffix );
+  iEvent.put(std::move(hcalPFClusterIso        ), prefix + "HcalPFClusterIso"         + suffix );
   // Isolation HEEP 7.0
-  iEvent.put ( heep70TrkIso           , prefix + "Heep70TrkIso"             + suffix );
+  iEvent.put (std::move( heep70TrkIso           ), prefix + "Heep70TrkIso"             + suffix );
   // Isolation variables: particle flow
 
-  iEvent.put( pfChargedHadronIso03    , prefix + "PFChargedHadronIso03"     + suffix );
-  iEvent.put( pfNeutralHadronIso03    , prefix + "PFNeutralHadronIso03"     + suffix );
-  iEvent.put( pfPhotonIso03           , prefix + "PFPhotonIso03"            + suffix );
-  iEvent.put( pfPUIso03               , prefix + "PFPUIso03"                + suffix );
+  iEvent.put(std::move(pfChargedHadronIso03    ), prefix + "PFChargedHadronIso03"     + suffix );
+  iEvent.put(std::move(pfNeutralHadronIso03    ), prefix + "PFNeutralHadronIso03"     + suffix );
+  iEvent.put(std::move(pfPhotonIso03           ), prefix + "PFPhotonIso03"            + suffix );
+  iEvent.put(std::move(pfPUIso03               ), prefix + "PFPUIso03"                + suffix );
 
-  //iEvent.put( pfChargedHadronIso04    , prefix + "PFChargedHadronIso04"     + suffix );
-  //iEvent.put( pfNeutralHadronIso04    , prefix + "PFNeutralHadronIso04"     + suffix );
-  //iEvent.put( pfPhotonIso04           , prefix + "PFPhotonIso04"            + suffix );
+  //iEvent.put(std::move( pfChargedHadronIso04    ), prefix + "PFChargedHadronIso04"     + suffix );
+  //iEvent.put(std::move( pfNeutralHadronIso04    ), prefix + "PFNeutralHadronIso04"     + suffix );
+  //iEvent.put(std::move( pfPhotonIso04           ), prefix + "PFPhotonIso04"            + suffix );
 
   // Conversion variables					        
   
-  iEvent.put( missingHits             , prefix + "MissingHits"              + suffix );
-  iEvent.put( missingHitsEG           , prefix + "MissingHitsEG"            + suffix );
-  iEvent.put( dist_vec                , prefix + "Dist"                     + suffix );
-  iEvent.put( dCotTheta               , prefix + "DCotTheta"                + suffix );
-  iEvent.put( fbrem                   , prefix + "Fbrem"                    + suffix );
-  iEvent.put( hasMatchedConvPhot      , prefix + "HasMatchedConvPhot"       + suffix );
+  iEvent.put(std::move(missingHits             ), prefix + "MissingHits"              + suffix );
+  iEvent.put(std::move(missingHitsEG           ), prefix + "MissingHitsEG"            + suffix );
+  iEvent.put(std::move(dist_vec                ), prefix + "Dist"                     + suffix );
+  iEvent.put(std::move(dCotTheta               ), prefix + "DCotTheta"                + suffix );
+  iEvent.put(std::move(fbrem                   ), prefix + "Fbrem"                    + suffix );
+  iEvent.put(std::move(hasMatchedConvPhot      ), prefix + "HasMatchedConvPhot"       + suffix );
 
   // Vertex and beamspot information
 
-  iEvent.put( vtxIndex                , prefix + "VtxIndex"                 + suffix );
-  iEvent.put( vtxDistXY               , prefix + "VtxDistXY"                + suffix );
-  iEvent.put( vtxDistZ                , prefix + "VtxDistZ"                 + suffix );
-  iEvent.put( vtx0DistXY              , prefix + "LeadVtxDistXY"            + suffix );
-  iEvent.put( vtx0DistZ               , prefix + "LeadVtxDistZ"             + suffix );
-  iEvent.put( primaryVertexDXY        , prefix + "PrimaryVertexDXY"         + suffix );
-  iEvent.put( primaryVertexDXYError   , prefix + "PrimaryVertexDXYError"    + suffix );
-  iEvent.put( beamspotDXY             , prefix + "BeamSpotDXY"              + suffix );
-  iEvent.put( beamspotDXYError        , prefix + "BeamSpotDXYError"         + suffix );
+  iEvent.put(std::move(vtxIndex                ), prefix + "VtxIndex"                 + suffix );
+  iEvent.put(std::move(vtxDistXY               ), prefix + "VtxDistXY"                + suffix );
+  iEvent.put(std::move(vtxDistZ                ), prefix + "VtxDistZ"                 + suffix );
+  iEvent.put(std::move(vtx0DistXY              ), prefix + "LeadVtxDistXY"            + suffix );
+  iEvent.put(std::move(vtx0DistZ               ), prefix + "LeadVtxDistZ"             + suffix );
+  iEvent.put(std::move(primaryVertexDXY        ), prefix + "PrimaryVertexDXY"         + suffix );
+  iEvent.put(std::move(primaryVertexDXYError   ), prefix + "PrimaryVertexDXYError"    + suffix );
+  iEvent.put(std::move(beamspotDXY             ), prefix + "BeamSpotDXY"              + suffix );
+  iEvent.put(std::move(beamspotDXYError        ), prefix + "BeamSpotDXYError"         + suffix );
 
   // Track information
 
-  iEvent.put( trackPx                 , prefix + "TrackPx"                  + suffix );
-  iEvent.put( trackPy                 , prefix + "TrackPy"                  + suffix );
-  iEvent.put( trackPz                 , prefix + "TrackPz"                  + suffix );
-  iEvent.put( trackPt                 , prefix + "TrackPt"                  + suffix );
-  iEvent.put( trackValidFractionOfHits, prefix + "TrackValidFractionOfHits" + suffix );
-  iEvent.put( normalizedChi2          , prefix + "NormalizedChi2" + suffix );
+  iEvent.put(std::move(trackPx                 ), prefix + "TrackPx"                  + suffix );
+  iEvent.put(std::move(trackPy                 ), prefix + "TrackPy"                  + suffix );
+  iEvent.put(std::move(trackPz                 ), prefix + "TrackPz"                  + suffix );
+  iEvent.put(std::move(trackPt                 ), prefix + "TrackPt"                  + suffix );
+  iEvent.put(std::move(trackValidFractionOfHits), prefix + "TrackValidFractionOfHits" + suffix );
+  iEvent.put(std::move(normalizedChi2          ), prefix + "NormalizedChi2" + suffix );
 
   //// Trigger matching: Double electron
 
-  //iEvent.put( HLTDoubleEleMatched     , prefix + "HLTDoubleEleMatched"      + suffix );
-  //iEvent.put( HLTDoubleEleMatchPt     , prefix + "HLTDoubleEleMatchPt"      + suffix );
-  //iEvent.put( HLTDoubleEleMatchEta    , prefix + "HLTDoubleEleMatchEta"     + suffix );
-  //iEvent.put( HLTDoubleEleMatchPhi    , prefix + "HLTDoubleEleMatchPhi"     + suffix );
+  //iEvent.put(std::move(HLTDoubleEleMatched     ), prefix + "HLTDoubleEleMatched"      + suffix );
+  //iEvent.put(std::move(HLTDoubleEleMatchPt     ), prefix + "HLTDoubleEleMatchPt"      + suffix );
+  //iEvent.put(std::move(HLTDoubleEleMatchEta    ), prefix + "HLTDoubleEleMatchEta"     + suffix );
+  //iEvent.put(std::move(HLTDoubleEleMatchPhi    ), prefix + "HLTDoubleEleMatchPhi"     + suffix );
 
   //// Trigger matching: Single electron
 
-  //iEvent.put( HLTSingleEleMatched     , prefix + "HLTSingleEleMatched"      + suffix );
-  //iEvent.put( HLTSingleEleMatchPt     , prefix + "HLTSingleEleMatchPt"      + suffix );
-  //iEvent.put( HLTSingleEleMatchEta    , prefix + "HLTSingleEleMatchEta"     + suffix );
-  //iEvent.put( HLTSingleEleMatchPhi    , prefix + "HLTSingleEleMatchPhi"     + suffix );
+  //iEvent.put(std::move(HLTSingleEleMatched     ), prefix + "HLTSingleEleMatched"      + suffix );
+  //iEvent.put(std::move(HLTSingleEleMatchPt     ), prefix + "HLTSingleEleMatchPt"      + suffix );
+  //iEvent.put(std::move(HLTSingleEleMatchEta    ), prefix + "HLTSingleEleMatchEta"     + suffix );
+  //iEvent.put(std::move(HLTSingleEleMatchPhi    ), prefix + "HLTSingleEleMatchPhi"     + suffix );
 
   //// Trigger matching: Single electron (WP85)
 
-  //iEvent.put( HLTSingleEleWP85Matched , prefix + "HLTSingleEleWP85Matched"  + suffix );
-  //iEvent.put( HLTSingleEleWP85MatchPt , prefix + "HLTSingleEleWP85MatchPt"  + suffix );
-  //iEvent.put( HLTSingleEleWP85MatchEta, prefix + "HLTSingleEleWP85MatchEta" + suffix );
-  //iEvent.put( HLTSingleEleWP85MatchPhi, prefix + "HLTSingleEleWP85MatchPhi" + suffix );
+  //iEvent.put(std::move(HLTSingleEleWP85Matched ), prefix + "HLTSingleEleWP85Matched"  + suffix );
+  //iEvent.put(std::move(HLTSingleEleWP85MatchPt ), prefix + "HLTSingleEleWP85MatchPt"  + suffix );
+  //iEvent.put(std::move(HLTSingleEleWP85MatchEta), prefix + "HLTSingleEleWP85MatchEta" + suffix );
+  //iEvent.put(std::move(HLTSingleEleWP85MatchPhi), prefix + "HLTSingleEleWP85MatchPhi" + suffix );
 
   //// Trigger matching: Ele+Jet+Jet
 
-  //iEvent.put( HLTEleJetJetMatched , prefix + "HLTEleJetJetMatched"  + suffix );
-  //iEvent.put( HLTEleJetJetMatchPt , prefix + "HLTEleJetJetMatchPt"  + suffix );
-  //iEvent.put( HLTEleJetJetMatchEta, prefix + "HLTEleJetJetMatchEta" + suffix );
-  //iEvent.put( HLTEleJetJetMatchPhi, prefix + "HLTEleJetJetMatchPhi" + suffix );
+  //iEvent.put(std::move(HLTEleJetJetMatched ), prefix + "HLTEleJetJetMatched"  + suffix );
+  //iEvent.put(std::move(HLTEleJetJetMatchPt ), prefix + "HLTEleJetJetMatchPt"  + suffix );
+  //iEvent.put(std::move(HLTEleJetJetMatchEta), prefix + "HLTEleJetJetMatchEta" + suffix );
+  //iEvent.put(std::move(HLTEleJetJetMatchPhi), prefix + "HLTEleJetJetMatchPhi" + suffix );
 
   // Gen matching: Status 3 only
 
-  iEvent.put( matchedGenParticlePt ,   prefix + "MatchedGenParticlePt"      + suffix );
-  iEvent.put( matchedGenParticleEta,   prefix + "MatchedGenParticleEta"     + suffix );
-  iEvent.put( matchedGenParticlePhi,   prefix + "MatchedGenParticlePhi"     + suffix );
+  iEvent.put(std::move(matchedGenParticlePt ),   prefix + "MatchedGenParticlePt"      + suffix );
+  iEvent.put(std::move(matchedGenParticleEta),   prefix + "MatchedGenParticleEta"     + suffix );
+  iEvent.put(std::move(matchedGenParticlePhi),   prefix + "MatchedGenParticlePhi"     + suffix );
 
   // for 03Feb2017 re-miniaod
-  iEvent.put ( eGammaGSFixedDupECALClusters, prefix + "EGammaGSFixedDupECALClusters"     + suffix );
-  iEvent.put ( ecalMultiAndGSGlobalRecHitEBHitsNotReplaced, prefix + "EcalMultiAndGSGlobalRecHitEBHitsNotReplaced"     + suffix );
+  iEvent.put(std::move(eGammaGSFixedDupECALClusters), prefix + "EGammaGSFixedDupECALClusters"     + suffix );
+  iEvent.put(std::move(ecalMultiAndGSGlobalRecHitEBHitsNotReplaced), prefix + "EcalMultiAndGSGlobalRecHitEBHitsNotReplaced"     + suffix );
 
 }

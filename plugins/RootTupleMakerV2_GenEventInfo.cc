@@ -27,14 +27,13 @@ RootTupleMakerV2_GenEventInfo::RootTupleMakerV2_GenEventInfo(const edm::Paramete
   //produces <std::vector<float> > ( "PDFMMTHWeights" );
   produces <std::vector<float> > ( "PDFNNPDFWeights" );
   //produces <std::vector<float> > ( "PDFPDF4LHCWeights" );
-  produces <std::vector<float> > ( "PDFNNPDFWeightsAMCNLO" );
   produces <std::vector<float> > ( "ScaleWeights" );
-  produces <std::vector<float> > ( "ScaleWeightsAMCNLO" );
   produces <float>               ( "amcNLOWeight" );
   produces <std::vector<int> >   ( "PileUpInteractions");
   produces <std::vector<int> >   ( "PileUpOriginBX" ) ;
   produces <std::vector<float> > ( "PileUpInteractionsTrue" );
   produces <float>               ( "Weight" );
+  produces <float>               ( "LHEWeight" );
 //   produces <float>       ( "AlphaQCD" );
 //   produces <float>       ( "AlphaQED" );
 }
@@ -101,6 +100,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   std::unique_ptr<std::vector<float> >  trueNumberInteractions ( new std::vector<float>() );
   std::unique_ptr<std::vector<int >  >  OriginBX( new std::vector<int>() );
   std::unique_ptr<float >               weight ( new float() );
+  std::unique_ptr<float >               lheweight ( new float() );
 //   std::unique_ptr<float >               alphaQCD ( new float() );
 //   std::unique_ptr<float >               alphaQED ( new float() );
 
@@ -258,6 +258,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if (EvtHandle->weights().size()>0){
 
       	float theWeight = genEvtInfo->weight();
+        *lheweight.get() = theWeight;
       	float thisWeight = -1.;
 	
       	//This follows the suggestion here: https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW#How_to_use_weights
@@ -267,8 +268,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  //std::cout<<i<<"  "<<theWeight<<"  "<<EvtHandle->weights()[i].wgt<<"  "<<EvtHandle->originalXWGTUP()<<std::endl;
       		thisWeight = theWeight * (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); 
 		scaleWeights->push_back(thisWeight);
-      		thisWeight = (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); //fixme todo: removed theWeight, was multiplying by a factor +-200000 in amc@NLO
-		scaleWeightsAMCNLO->push_back(thisWeight);
       	}
 	//This is for PDF weights which are stored internally by the generator. Pythia and Powheg do not have them. MG has all of them, amc@NLO has only variations of the PDF set used to produce it.
       	
@@ -278,7 +277,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  thisWeight = (EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP()); //fixme todo: removed theWeight, was multiplying by a factor +-200000 in amc@NLO
 	  //std::cout<<i<<"  "<<theWeight<<"  "<<EvtHandle->weights()[i].wgt<<"  "<<EvtHandle->originalXWGTUP()<<std::endl;
 	  //EvtHandle->weights()[0].wgt < 0 ? 
-	  pdfNNPDFWeightsAMCNLO->push_back(thisWeight);
 
 	}
 	/*
@@ -325,14 +323,13 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //iEvent.put(std::move(pdfMMTHWeights), "PDFMMTHWeights" );
   iEvent.put(std::move(pdfNNPDFWeights), "PDFNNPDFWeights" );
   //iEvent.put(std::move(pdfPDF4LHCWeights), "PDFPDF4LHCWeights" );
-  iEvent.put(std::move(pdfNNPDFWeightsAMCNLO), "PDFNNPDFWeightsAMCNLO");
   iEvent.put(std::move(scaleWeights), "ScaleWeights" );
-  iEvent.put(std::move(scaleWeightsAMCNLO), "ScaleWeightsAMCNLO" );
   iEvent.put(std::move(amcNLOweight), "amcNLOWeight" );
   iEvent.put(std::move(Number_interactions),   "PileUpInteractions"   );
   iEvent.put(std::move(trueNumberInteractions), "PileUpInteractionsTrue" );
   iEvent.put(std::move(OriginBX),   "PileUpOriginBX" );
   iEvent.put(std::move(weight), "Weight" );
+  iEvent.put(std::move(lheweight), "LHEWeight" );
 //   iEvent.put(std::move(alphaQCD), "alphaQCD" );
 //   iEvent.put(std::move(alphaQED), "alphaQED" );
 }

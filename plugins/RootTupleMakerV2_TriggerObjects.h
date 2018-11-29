@@ -18,6 +18,7 @@ class RootTupleMakerV2_TriggerObjects : public edm::EDProducer {
   const edm::EDGetTokenT<edm::TriggerResults>   triggerBitsToken_;
   const edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection>   triggerObjectsToken_;
   const std::string     prefix, suffix;
+  const std::vector<std::string> hltPathsOfInterest;
 
 };
 

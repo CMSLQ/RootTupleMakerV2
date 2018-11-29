@@ -18,20 +18,14 @@ class RootTupleMakerV2_Trigger : public edm::EDProducer {
   virtual void produce( edm::Event &, const edm::EventSetup & ) override;
   virtual void endJob() {};
 
-  void getDataSource() ;
   void printNames(const std::vector<std::string>& names);
 
-  enum DataSource { NOT_APPLICABLE, STREAM, DATASET };
   const edm::InputTag   hltInputTag_;
   const edm::EDGetTokenT<GlobalAlgBlkBxCollection> l1uGTInputToken_;
   const edm::EDGetTokenT<edm::TriggerResults>   hltInputToken_;
   const edm::EDGetTokenT<pat::PackedTriggerPrescales> packedTrigPrescalesToken_;
   const std::vector<std::string> hltPathsOfInterest;
   HLTPrescaleProvider hltPrescaleProvider_;
-
-  std::string                 sourceName;
-  DataSource                  sourceType;
-  std::vector<std::string>    dataSource;
 
 };
 

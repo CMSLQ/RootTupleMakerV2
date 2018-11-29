@@ -74,29 +74,29 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   // Loop over trigger objects
   //------------------------------------------------------------------------
   for (pat::TriggerObjectStandAlone obj : *triggerObjects) {
+    obj.unpackNamesAndLabels(iEvent,*triggerBits);
     std::vector<std::string> pathNamesAll  = obj.pathNames(false);
-    // try to match with paths of interest
-    bool matchedPath = false;
-    for (auto itr = hltPathsOfInterest.begin(); itr != hltPathsOfInterest.end() && matchedPath==false; ++itr) {
+    // match with paths of interest
+    std::vector<std::string> matchedPathNames;
+    for (auto itr = hltPathsOfInterest.begin(); itr != hltPathsOfInterest.end(); ++itr) {
       for (auto objPathItr = pathNamesAll.begin(); objPathItr != pathNamesAll.end(); ++objPathItr) {
-        if(objPathItr->find(*itr)!=std::string::npos) {
-          matchedPath = true;
-          break;
-        }
+        if(objPathItr->find(*itr)!=std::string::npos)
+          matchedPathNames.push_back(*objPathItr);
       }
     }
-    if(!matchedPath)
+    if(matchedPathNames.empty())
       continue;
-    v_path_names -> push_back(std::vector<std::string>(pathNamesAll));
-    v_passed_path_l3 -> push_back(std::vector<bool>(pathNamesAll.size(),true));
+
+    v_path_names -> push_back(matchedPathNames);
+    // Record if the object is associated to a 'l3' filter (always true for the definition used in the PAT trigger producer)
+    //   and if it's associated to the last filter of a successful path,
+    //   which means that this object did cause this trigger to succeed. But it doesn't work on some multi-object triggers.
+    v_passed_path_l3 -> push_back(std::vector<bool>(matchedPathNames.size(),true));
     v_passed_path_last -> push_back(std::vector<bool>());
-    for (unsigned h = 0, n = pathNamesAll.size(); h < n; ++h) {
-      bool isLF   = obj.hasPathName( pathNamesAll[h], true, false ); 
+    for (unsigned h = 0, n = matchedPathNames.size(); h < n; ++h) {
+      bool isLF   = obj.hasPathName( matchedPathNames[h], true, false ); 
       (*v_passed_path_last )[nTrigObjects].push_back ( isLF );
     }
-    v_type_ids   -> push_back ( std::vector<int>() );
-    v_filter_names -> push_back (std::vector<std::string>() );
-    obj.unpackNamesAndLabels(iEvent,*triggerBits);
     //std::cout << "\tTrigger object:  pt " << obj.pt() << ", eta " << obj.eta() << ", phi " << obj.phi() << std::endl;
     v_pt->push_back(obj.pt());
     v_eta->push_back(obj.eta());
@@ -106,14 +106,19 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     v_collection->push_back(obj.collection());
     //std::cout << "\t   Type IDs:   ";
     //for (unsigned h = 0; h < obj.filterIds().size(); ++h) std::cout << " " << obj.filterIds()[h] ;
+    v_type_ids   -> push_back ( std::vector<int>() );
     for (unsigned h = 0; h < obj.triggerObjectTypes().size(); ++h)
       (*v_type_ids )[nTrigObjects].push_back ( obj.triggerObjectTypes()[h] );
     //std::cout << std::endl;
     //// Print associated trigger filters
     //std::cout << "\t   Filters:    ";
     //for (unsigned h = 0; h < obj.filterLabels().size(); ++h) std::cout << " " << obj.filterLabels()[h];
+    v_filter_names -> push_back (std::vector<std::string>() );
     for (unsigned h = 0; h < obj.filterLabels().size(); ++h)
       (*v_filter_names )[nTrigObjects].push_back ( obj.filterLabels()[h] );
+
+    nTrigObjects++;
+
     //std::cout << std::endl;
     //std::vector<std::string> pathNamesAll  = obj.pathNames(false);
     //std::vector<std::string> pathNamesLast = obj.pathNames(true);
@@ -133,11 +138,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     //  if (isNone && !isBoth && !isL3 && !isLF) std::cout << "(*,*)";
     //}
     //std::cout << std::endl;
-    // Record if the object is associated to a 'l3' filter (always true for the definition used in the PAT trigger producer)
-    //   and if it's associated to the last filter of a successful path,
-    //   which means that this object did cause this trigger to succeed. But it doesn't work on some multi-object triggers.
-
-    nTrigObjects++;
   }
   //std::cout << std::endl;
 

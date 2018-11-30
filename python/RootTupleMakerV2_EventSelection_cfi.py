@@ -14,8 +14,10 @@ from RecoMET.METFilters.BadPFMuonFilter_cfi import *
 from RecoMET.METFilters.BadChargedCandidateFilter_cfi import *
 BadPFMuonFilter.muons = cms.InputTag("slimmedMuons")
 BadPFMuonFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+BadPFMuonFilter.taggingMode   = cms.bool(True)
 BadChargedCandidateFilter.muons = cms.InputTag("slimmedMuons")
 BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
+BadChargedCandidateFilter.taggingMode   = cms.bool(True)
 
 rootTupleEventSelectionSequence = cms.Sequence(
   BadPFMuonFilter*

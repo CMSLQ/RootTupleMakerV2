@@ -2,9 +2,7 @@
 
 RootTupleMakerV2_EventSelection::RootTupleMakerV2_EventSelection(const edm::ParameterSet& iConfig) :
   l1InputToken_(consumes<L1GlobalTriggerReadoutRecord>(iConfig.getParameter<edm::InputTag>("L1InputTag"))),
-  filterResultsInputToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag"))),
-  BadChCandFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadChargedCandidateFilter"))),
-  BadPFMuonFilterToken_(consumes<bool>(iConfig.getParameter<edm::InputTag>("BadPFMuonFilter")))
+  filterResultsInputToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("FilterResultsInputTag")))
 {
   produces <bool> ("passGoodVertices");
   produces <bool> ("passHBHENoiseFilter");
@@ -105,7 +103,7 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   {
     //edm::LogInfo("RootTupleMakerV2_EventSelection") << "Successfully obtained " << filterResultsInputTag;
     const edm::TriggerNames &filterNames = iEvent.triggerNames(*filterResults);
-    // print filter names
+    //// print filter names
     //std::cout << "\n === FILTER NAMES === " << std::endl;
     //for (unsigned int i = 0, n = filterResults->size(); i < n; ++i)
     //{
@@ -212,17 +210,17 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if(index < filterNames.size())
       *flagNoBadMuons.get() = filterResults->accept(index);
 
+    index = filterNames.triggerIndex("Flag_BadChargedCandidateFilter");
+    if(index < filterNames.size())
+      *passbadchargedcandidateFilter.get() = filterResults->accept(index);
+
+    index = filterNames.triggerIndex("Flag_BadPFMuonFilter");
+    if(index < filterNames.size())
+      *passbadpfmuonFilter.get() = filterResults->accept(index);
 
   } else {
     edm::LogError("RootTupleMakerV2_EventSelectionError") << "Error! Can't get the filterResultsInputTag";
   }
-
-  edm::Handle<bool> ifilterbadChCand;
-  iEvent.getByToken(BadChCandFilterToken_, ifilterbadChCand);
-  *passbadchargedcandidateFilter.get() = *ifilterbadChCand;
-  edm::Handle<bool> ifilterbadPFMuon;
-  iEvent.getByToken(BadPFMuonFilterToken_, ifilterbadPFMuon);
-  *passbadpfmuonFilter.get() = *ifilterbadPFMuon;
 
   //-----------------------------------------------------------------
   iEvent.put(std::move(isprimaryvertex),"passGoodVertices");

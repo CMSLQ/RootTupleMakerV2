@@ -20,9 +20,6 @@ class RootTupleMakerV2_EventSelection : public edm::EDProducer {
   void produce( edm::Event &, const edm::EventSetup & );
   edm::EDGetTokenT<L1GlobalTriggerReadoutRecord>  l1InputToken_;
   edm::EDGetTokenT<edm::TriggerResults>  filterResultsInputToken_;
-  edm::EDGetTokenT<bool> BadChCandFilterToken_;
-  edm::EDGetTokenT<bool> BadPFMuonFilterToken_;
-
 };
 
 #endif

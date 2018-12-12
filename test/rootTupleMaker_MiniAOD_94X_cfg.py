@@ -73,8 +73,8 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 #----------------------------------------------------------------------------------------------------
 
 process.TFileService = cms.Service("TFileService",
-    #fileName = cms.string( "file_m650.root" )
-    fileName = cms.string( "file_ntuple.root" )
+    fileName = cms.string( "file_m1550.root" )
+    #fileName = cms.string( "file_ntuple.root" )
 )
 
 #----------------------------------------------------------------------------------------------------
@@ -99,12 +99,14 @@ process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 
 
 # Events to process
-process.maxEvents.input = 1000
+process.maxEvents.input = -1
 
 # Input files
 process.source.fileNames = [
     # specified by InputList.txt
-    'root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/120000/80DBA5F3-16BE-E811-854E-A0369FC5E530.root'
+    #'root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/120000/80DBA5F3-16BE-E811-854E-A0369FC5E530.root'
+    #'root://cms-xrd-global//store/mc/RunIISummer16MiniAODv3/LQToUE_M-1550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/270000/5E8B6A54-47CB-E811-91C6-0025905C4264.root'
+    'file:/tmp/scooper/5E8B6A54-47CB-E811-91C6-0025905C4264.root'
 ]
 
 #----------------------------------------------------------------------------------------------------
@@ -667,7 +669,7 @@ process.p = cms.Path(
     process.rootTupleGenParticles*
     process.rootTupleGenJetsSequence*
     process.rootTupleGenMETTrue*
-    process.rootTupleEventSelectionSequence*
+    process.rootTupleEventSelection*
     process.rootTupleTree
 )
 

@@ -73,7 +73,7 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 #----------------------------------------------------------------------------------------------------
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string( "file_m1550.root" )
+    fileName = cms.string( "test_file_m1550.root" )
     #fileName = cms.string( "file_ntuple.root" )
 )
 
@@ -88,11 +88,9 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '')
 # just plain GlobalTag
 # MC
 if varOptions.isMC:
-  process.GlobalTag.globaltag = '94X_mcRun2_asymptotic_v3'
+  process.GlobalTag.globaltag = '94X_mc2017_realistic_v17'
 else:
-  #process.GlobalTag.globaltag = '80X_dataRun2_Prompt_v16' # for 03Feb2017 re-miniaod 2016 H Prompt
-  #process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'# for 03Feb2017 re-miniaod (2016B-G)
-  process.GlobalTag.globaltag = '94X_dataRun2_v10'
+  process.GlobalTag.globaltag = '94X_dataRun2_v11'
 # feed it into the ntuple
 process.rootTupleEvent.globalTag = process.GlobalTag.globaltag
 #process.source.duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
@@ -105,8 +103,8 @@ process.maxEvents.input = -1
 process.source.fileNames = [
     # specified by InputList.txt
     #'root://xrootd-cms.infn.it//store/mc/RunIISummer16MiniAODv3/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3_ext2-v1/120000/80DBA5F3-16BE-E811-854E-A0369FC5E530.root'
-    #'root://cms-xrd-global//store/mc/RunIISummer16MiniAODv3/LQToUE_M-1550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/270000/5E8B6A54-47CB-E811-91C6-0025905C4264.root'
-    'file:/tmp/scooper/5E8B6A54-47CB-E811-91C6-0025905C4264.root'
+    'root://cms-xrd-global//store/mc/RunIISummer16MiniAODv3/LQToUE_M-1550_BetaOne_TuneCUETP8M1_13TeV-pythia8/MINIAODSIM/PUMoriond17_94X_mcRun2_asymptotic_v3-v1/270000/5E8B6A54-47CB-E811-91C6-0025905C4264.root'
+    #'file:/tmp/scooper/5E8B6A54-47CB-E811-91C6-0025905C4264.root'
 ]
 
 #----------------------------------------------------------------------------------------------------

@@ -16,24 +16,14 @@ rootTupleElectrons = cms.EDProducer("RootTupleMakerV2_Electrons",
     LikelihoodInputTag = cms.InputTag('egammaIDLikelihood') ,
     # rho for HEEP. See e.g. https://github.com/cms-sw/cmssw/blob/CMSSW_7_5_X/RecoEgamma/ElectronIdentification/python/Identification/heepElectronID_HEEPV50_CSA14_startup_cff.py
     RhoInputTag = cms.InputTag('fixedGridRhoFastjetAll'),
-    ElectronVetoIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto"),
-    ElectronLooseIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"),
-    ElectronMediumIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
-    ElectronTightIdMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
-    ElectronHLTPreselectionMap = cms.InputTag("egmGsfElectronIDs:cutBasedElectronHLTPreselection-Summer16-V1"),
-    ElectronHEEPIdMap    = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
-    ElectronMVAIdWP80Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
-    ElectronMVAIdWP90Map = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
-    ElectronMVAIdHZZMap  = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-HZZ-V1-wpLoose"),
-    # The map name for the full info is the same as the map name of the
-    # corresponding simple pass/fail map above, they are distinguished by
-    # the type of the content.
-    eleHEEPIdCutFlowResultMap         = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
-    ElectronMVAIdWP80CutFlowResultMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
-    ElectronMVAIdWP90CutFlowResultMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
-    ElectronMVAIdHZZCutFlowResultMap  = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring16-HZZ-V1-wpLoose"),
-    # new HEEP 7.0 track isolation
-    heep70trkIsolMap = cms.InputTag("heepIDVarValueMaps","eleTrkPtIso"),
+    ElectronVetoId = cms.string("cutBasedElectronID-Summer16-80X-V1-veto"),
+    ElectronLooseId = cms.string("cutBasedElectronID-Summer16-80X-V1-loose"),
+    ElectronMediumId = cms.string("cutBasedElectronID-Summer16-80X-V1-medium"),
+    ElectronTightId = cms.string("cutBasedElectronID-Summer16-80X-V1-tight"),
+    ElectronHEEPId    = cms.string("heepElectronID-HEEPV70"),
+    ElectronMVAIdWP80 = cms.string("mvaEleID-Spring16-GeneralPurpose-V1-wp80"),
+    ElectronMVAIdWP90 = cms.string("mvaEleID-Spring16-GeneralPurpose-V1-wp90"),
+    ElectronMVAIdHZZ  = cms.string("mvaEleID-Spring16-HZZ-V1-wpLoose"),
     EBReducedRecHitsInputTag = cms.InputTag("reducedEgamma:reducedEBRecHits"),
     EEReducedRecHitsInputTag = cms.InputTag("reducedEgamma:reducedEERecHits"),
 )

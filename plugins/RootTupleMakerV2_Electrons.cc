@@ -795,20 +795,11 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       passEGammaIDLoose          -> push_back (it->userInt(electronLooseId));
       passEGammaIDMedium         -> push_back (it->userInt(electronMediumId));
       passEGammaIDTight          -> push_back (it->userInt(electronTightId));
-      edm::LogError("RootTupleMakerV2_Electrons") << " try passHEEPID";
       passHEEPID                 -> push_back (it->userInt(electronHEEPId));
+      heep70TrkIso               -> push_back (it->userFloat("heepTrkPtIso"));
       //passMVAIDWP80              -> push_back ((*mva_id_wp80_decisions)[ elPtr ]);
       //passMVAIDWP90              -> push_back ((*mva_id_wp90_decisions)[ elPtr ]);
       //passMVAIDHZZ               -> push_back ((*mva_id_hzz_decisions)[ elPtr ]);
-      //FIXME redo in userdata
-      //cutFlowNamesEGammaIDHEEP   -> push_back (((*heep_id_cutflow_data)[ elPtr ]).cutFlowName());
-      //cutFlowNamesEGammaIDMVAWP80-> push_back (((*mva_id_wp80_cutflow_data)[ elPtr ]).cutFlowName());
-      //cutFlowNamesEGammaIDMVAWP90-> push_back (((*mva_id_wp90_cutflow_data)[ elPtr ]).cutFlowName());
-      //cutFlowNamesEGammaIDMVAHZZ-> push_back (((*mva_id_hzz_cutflow_data)[ elPtr ]).cutFlowName());
-      //cutFlowHashesEGammaIDHEEP  -> push_back (((*heep_id_cutflow_data)[ elPtr ]).cutFlowHash());
-      //cutFlowHashesEGammaIDMVAWP80  -> push_back (((*mva_id_wp80_cutflow_data)[ elPtr ]).cutFlowHash());
-      //cutFlowHashesEGammaIDMVAWP90  -> push_back (((*mva_id_wp90_cutflow_data)[ elPtr ]).cutFlowHash());
-      //cutFlowHashesEGammaIDMVAHZZ   -> push_back (((*mva_id_hzz_cutflow_data)[ elPtr ]).cutFlowHash());
       //
       rhoIsoHEEP               -> push_back (rhoIso);
 
@@ -871,15 +862,6 @@ produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       // pf clusters iso
       ecalPFClusterIso         -> push_back( it->ecalPFClusterIso() );
       hcalPFClusterIso         -> push_back( it->hcalPFClusterIso() );
-
-      const vid::CutFlowResult* vidResult = it->userData<vid::CutFlowResult>(electronHEEPId);
-      if(!vidResult) {
-        edm::LogError("RootTupleMakerV2_Electrons") << "CutFlow result was NULL for some reason!";
-        heep70TrkIso        -> push_back(-1);
-      }
-      else
-        heep70TrkIso        -> push_back(vidResult->getValueCutUpon(7));
-
 
       // Isolation variables: particle flow
       // methods from reco::GsfElectron; should be filled with dR 0.3 values from isolation value maps, e.g., gedElPFIsoValueCharged03

@@ -167,6 +167,8 @@ setupEgammaPostRecoSeq(process,
                        era=era)
 process.egPath = cms.Path(process.egammaPostRecoSeq)
 process.schedule.append(process.egPath)
+process.load('Leptoquarks.RootTupleMakerV2.heepV70Modifier_cfi')
+process.slimmedElectrons.modifierConfig.modifications.extend(process.heep_modifications)
 # For 2016 MiniAOD v2, no additional corrections needed
 
 process.load('TrackingTools.TransientTrack.TransientTrackBuilder_cfi')
@@ -405,6 +407,7 @@ process.load('FWCore.Modules.printContent_cfi')
 #    ignoreTotal = cms.untracked.int32(1)
 #)
 process.p = cms.Path(
+    #process.printContent*
     # supporting producers
     process.unpackedPatTrigger*
     ## L+J Filter
@@ -433,11 +436,9 @@ process.p = cms.Path(
 
 process.schedule.append(process.p)
 
-#process.endPath = cms.EndPath(
-# )
-##----------------------------------------------------------------------------------------------------
-## Dump if necessary
-##----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+# Dump if necessary
+#----------------------------------------------------------------------------------------------------
 #
 #process.dump = cms.OutputModule("PoolOutputModule",
 #                                outputCommands = cms.untracked.vstring(
@@ -467,10 +468,10 @@ process.schedule.append(process.p)
 #        'keep *_rootTupleGenTaus*_*_*',
 #        'keep *_rootTupleGenMETTrue_*_*',
 #        ),
-#        fileName = cms.untracked.string('dump.root')
 #        )
 #process.DUMP    = cms.EndPath (process.dump)
-
+#process.schedule.append(process.DUMP)
+#
 #----------------------------------------------------------------------------------------------------
 # Run the path
 #----------------------------------------------------------------------------------------------------
